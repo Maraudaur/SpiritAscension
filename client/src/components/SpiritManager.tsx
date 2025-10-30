@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useGameState } from '@/lib/stores/useGameState';
 import { getBaseSpirit, getElement, getLineage, getRarityColor, getPotentialColor, calculateAllStats, getAvailableSkills } from '@/lib/spiritUtils';
 import { Button } from '@/components/ui/button';
-import { X, Plus, Trash2 } from 'lucide-react';
+import { X, Plus, Trash2, ArrowUp, Sparkles } from 'lucide-react';
 import type { PlayerSpirit } from '@shared/types';
 
 interface SpiritManagerProps {
@@ -10,8 +10,9 @@ interface SpiritManagerProps {
 }
 
 export function SpiritManager({ onClose }: SpiritManagerProps) {
-  const { spirits, activeParty, addToParty, removeFromParty } = useGameState();
+  const { spirits, activeParty, qi, addToParty, removeFromParty, levelUpSpirit, harmonizeSpirit, getEssenceCount, getLevelUpCost } = useGameState();
   const [selectedSpirit, setSelectedSpirit] = useState<PlayerSpirit | null>(null);
+  const [showHarmonizeConfirm, setShowHarmonizeConfirm] = useState(false);
 
   const handleAddToParty = (instanceId: string) => {
     addToParty(instanceId);
@@ -19,6 +20,16 @@ export function SpiritManager({ onClose }: SpiritManagerProps) {
 
   const handleRemoveFromParty = (instanceId: string) => {
     removeFromParty(instanceId);
+  };
+
+  const handleLevelUp = (instanceId: string) => {
+    levelUpSpirit(instanceId);
+  };
+
+  const handleHarmonize = (instanceId: string) => {
+    harmonizeSpirit(instanceId);
+    setShowHarmonizeConfirm(false);
+    setSelectedSpirit(null);
   };
 
   return (
@@ -192,6 +203,18 @@ export function SpiritManager({ onClose }: SpiritManagerProps) {
                       </div>
 
                       <div>
+                        <h4 className="font-bold parchment-text text-sm mb-1">Essence</h4>
+                        <div className="text-sm parchment-text space-y-1">
+                          <div className="flex justify-between items-center">
+                            <span>{baseSpirit.name} Essence:</span>
+                            <span className="font-semibold text-purple-700">
+                              {getEssenceCount(baseSpirit.id)}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div>
                         <h4 className="font-bold parchment-text text-sm mb-1">Combat Stats</h4>
                         <div className="text-sm parchment-text space-y-1">
                           <div className="flex justify-between">
@@ -251,6 +274,51 @@ export function SpiritManager({ onClose }: SpiritManagerProps) {
                           ))}
                         </div>
                       </div>
+
+                      <div className="space-y-2 pt-2 border-t-2 border-amber-300">
+                        {(() => {
+                          const levelUpCost = getLevelUpCost(selectedSpirit.level);
+                          const essenceCount = getEssenceCount(baseSpirit.id);
+                          const canLevelUp = qi >= levelUpCost.qi && essenceCount >= levelUpCost.essence;
+                          const harmonizeReward = 5 + (selectedSpirit.level * 2);
+
+                          return (
+                            <>
+                              <button
+                                onClick={() => handleLevelUp(selectedSpirit.instanceId)}
+                                disabled={!canLevelUp}
+                                className={`w-full p-2 rounded font-semibold text-sm flex items-center justify-center gap-2 ${
+                                  canLevelUp
+                                    ? 'bg-blue-600 text-white hover:bg-blue-700'
+                                    : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                                }`}
+                              >
+                                <ArrowUp className="w-4 h-4" />
+                                Level Up (Lv.{selectedSpirit.level} → {selectedSpirit.level + 1})
+                              </button>
+                              <div className="text-xs parchment-text text-center space-y-0.5">
+                                <div className={qi >= levelUpCost.qi ? 'text-green-700' : 'text-red-600'}>
+                                  Cost: {levelUpCost.qi} Qi {qi < levelUpCost.qi && '(Insufficient)'}
+                                </div>
+                                <div className={essenceCount >= levelUpCost.essence ? 'text-green-700' : 'text-red-600'}>
+                                  Cost: {levelUpCost.essence} {baseSpirit.name} Essence {essenceCount < levelUpCost.essence && '(Insufficient)'}
+                                </div>
+                              </div>
+
+                              <button
+                                onClick={() => setShowHarmonizeConfirm(true)}
+                                className="w-full p-2 rounded font-semibold text-sm flex items-center justify-center gap-2 bg-purple-600 text-white hover:bg-purple-700"
+                              >
+                                <Sparkles className="w-4 h-4" />
+                                Harmonize Spirit
+                              </button>
+                              <div className="text-xs parchment-text text-center text-purple-700">
+                                Gain +{harmonizeReward} {baseSpirit.name} Essence
+                              </div>
+                            </>
+                          );
+                        })()}
+                      </div>
                     </div>
                   </>
                 );
@@ -258,6 +326,40 @@ export function SpiritManager({ onClose }: SpiritManagerProps) {
             </div>
           )}
         </div>
+
+        {showHarmonizeConfirm && selectedSpirit && (
+          <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center rounded-lg">
+            <div className="parchment-bg chinese-border p-6 rounded-lg max-w-md">
+              <h3 className="text-xl font-bold parchment-text mb-4 text-center">Harmonize Spirit?</h3>
+              <p className="text-sm parchment-text mb-4 text-center">
+                This will permanently remove{' '}
+                <span className="font-bold">{getBaseSpirit(selectedSpirit.spiritId)?.name}</span> from your
+                collection and grant you{' '}
+                <span className="font-bold text-purple-700">
+                  {5 + (selectedSpirit.level * 2)} {getBaseSpirit(selectedSpirit.spiritId)?.name} Essence
+                </span>
+                .
+              </p>
+              <p className="text-sm parchment-text mb-6 text-center font-semibold text-red-700">
+                This action cannot be undone!
+              </p>
+              <div className="flex gap-3">
+                <button
+                  onClick={() => setShowHarmonizeConfirm(false)}
+                  className="flex-1 p-2 rounded font-semibold text-sm bg-gray-300 text-gray-700 hover:bg-gray-400"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={() => handleHarmonize(selectedSpirit.instanceId)}
+                  className="flex-1 p-2 rounded font-semibold text-sm bg-purple-600 text-white hover:bg-purple-700"
+                >
+                  Confirm
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
