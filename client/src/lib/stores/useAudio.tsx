@@ -15,6 +15,10 @@ interface AudioState {
   toggleMute: () => void;
   playHit: () => void;
   playSuccess: () => void;
+  playButtonClick: () => void;
+  playButtonHover: () => void;
+  playDamage: () => void;
+  playHeal: () => void;
 }
 
 export const useAudio = create<AudioState>((set, get) => ({
@@ -69,6 +73,47 @@ export const useAudio = create<AudioState>((set, get) => ({
       successSound.play().catch(error => {
         console.log("Success sound play prevented:", error);
       });
+    }
+  },
+  
+  playButtonClick: () => {
+    const { hitSound, isMuted } = get();
+    if (hitSound && !isMuted) {
+      const soundClone = hitSound.cloneNode() as HTMLAudioElement;
+      soundClone.volume = 0.15;
+      soundClone.playbackRate = 1.2;
+      soundClone.play().catch(() => {});
+    }
+  },
+  
+  playButtonHover: () => {
+    const { hitSound, isMuted } = get();
+    if (hitSound && !isMuted) {
+      const soundClone = hitSound.cloneNode() as HTMLAudioElement;
+      soundClone.volume = 0.08;
+      soundClone.playbackRate = 1.5;
+      soundClone.play().catch(() => {});
+    }
+  },
+  
+  playDamage: () => {
+    const { hitSound, isMuted } = get();
+    if (hitSound && !isMuted) {
+      const soundClone = hitSound.cloneNode() as HTMLAudioElement;
+      soundClone.volume = 0.4;
+      soundClone.playbackRate = 0.9;
+      soundClone.play().catch(() => {});
+    }
+  },
+  
+  playHeal: () => {
+    const { successSound, isMuted } = get();
+    if (successSound && !isMuted) {
+      const soundClone = successSound.cloneNode() as HTMLAudioElement;
+      soundClone.volume = 0.25;
+      soundClone.playbackRate = 1.3;
+      soundClone.currentTime = 0;
+      soundClone.play().catch(() => {});
     }
   }
 }));
