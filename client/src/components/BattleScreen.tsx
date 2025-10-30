@@ -38,6 +38,31 @@ export function BattleScreen({ onClose }: BattleScreenProps) {
   const [actionMenu, setActionMenu] = useState<ActionMenu>('none');
   const [isBlocking, setIsBlocking] = useState(false);
 
+  const generateNewEnemy = (spiritList: BattleSpirit[]) => {
+    if (spiritList.length === 0) return null;
+    
+    // Find highest level spirit in active party
+    const highestLevel = Math.max(...spiritList.map(s => s.playerSpirit.level));
+    // Enemy level is within 2 levels of highest spirit (can be -2 to +2, minimum 1)
+    const levelOffset = Math.floor(Math.random() * 5) - 2; // -2, -1, 0, 1, or 2
+    const enemyLevel = Math.max(1, highestLevel + levelOffset);
+    
+    const enemyNames = ['Shadow Beast', 'Dark Serpent', 'Rogue Phantom', 'Chaos Wolf', 'Storm Drake'];
+    const randomName = enemyNames[Math.floor(Math.random() * enemyNames.length)];
+    
+    const newEnemy: Enemy = {
+      id: 'enemy_' + Date.now(),
+      name: randomName,
+      level: enemyLevel,
+      attack: 80 + enemyLevel * 20,
+      defense: 60 + enemyLevel * 15,
+      maxHealth: 200 + enemyLevel * 50,
+      currentHealth: 200 + enemyLevel * 50,
+    };
+    
+    return newEnemy;
+  };
+
   useEffect(() => {
     if (activeParty.length === 0) {
       setBattleLog(['No spirits in active party! Please add spirits to your party first.']);
@@ -58,24 +83,11 @@ export function BattleScreen({ onClose }: BattleScreenProps) {
 
     setPlayerSpirits(spiritsInBattle);
 
-    // Find highest level spirit in active party
-    const highestLevel = Math.max(...spiritsInBattle.map(s => s.playerSpirit.level));
-    // Enemy level is within 2 levels of highest spirit (can be -2 to +2, minimum 1)
-    const levelOffset = Math.floor(Math.random() * 5) - 2; // -2, -1, 0, 1, or 2
-    const enemyLevel = Math.max(1, highestLevel + levelOffset);
-    
-    const newEnemy: Enemy = {
-      id: 'enemy_' + Date.now(),
-      name: 'Shadow Beast',
-      level: enemyLevel,
-      attack: 80 + enemyLevel * 20,
-      defense: 60 + enemyLevel * 15,
-      maxHealth: 200 + enemyLevel * 50,
-      currentHealth: 200 + enemyLevel * 50,
-    };
-    setEnemy(newEnemy);
-
-    setBattleLog([`A wild ${newEnemy.name} (Lv. ${enemyLevel}) appears!`]);
+    const newEnemy = generateNewEnemy(spiritsInBattle);
+    if (newEnemy) {
+      setEnemy(newEnemy);
+      setBattleLog([`A wild ${newEnemy.name} (Lv. ${newEnemy.level}) appears!`]);
+    }
   }, [activeParty, spirits]);
 
   const startBattle = () => {
@@ -184,15 +196,29 @@ export function BattleScreen({ onClose }: BattleScreenProps) {
     if (newHealth <= 0) {
       addLog(`${targetBase?.name} has been defeated!`);
       
-      const allDefeated = playerSpirits.every((s, i) => 
-        i === targetIndex ? newHealth <= 0 : s.currentHealth <= 0
+      // Check if there are any other living spirits (after this one is defeated)
+      const hasLivingSpirit = playerSpirits.some((s, i) => 
+        i !== targetIndex && s.currentHealth > 0
       );
-
-      if (allDefeated) {
+      
+      if (!hasLivingSpirit) {
+        // No living spirits left - defeat
         setTimeout(() => {
           setBattleState('defeat');
           addLog('All spirits have been defeated...');
-        }, 500);
+        }, 800);
+      } else {
+        // Auto-swap to next living spirit
+        setTimeout(() => {
+          const nextAliveIndex = playerSpirits.findIndex((s, i) => 
+            i !== targetIndex && s.currentHealth > 0
+          );
+          if (nextAliveIndex !== -1) {
+            const nextSpirit = getBaseSpirit(playerSpirits[nextAliveIndex].playerSpirit.spiritId);
+            setActivePartySlot(nextAliveIndex);
+            addLog(`${nextSpirit?.name} enters the battle!`);
+          }
+        }, 800);
       }
     }
   };
@@ -232,6 +258,21 @@ export function BattleScreen({ onClose }: BattleScreenProps) {
   const handleSkillSelect = (skillId: string) => {
     setActionMenu('none');
     handleAttack(skillId);
+  };
+
+  const handleContinueBattle = () => {
+    // Generate new enemy based on current player spirits
+    const newEnemy = generateNewEnemy(playerSpirits);
+    if (!newEnemy) return;
+    
+    setEnemy(newEnemy);
+    setBattleState('fighting');
+    setBattleRewards(null);
+    setActivePartySlot(0);
+    setActionMenu('none');
+    setIsBlocking(false);
+    addLog(`A wild ${newEnemy.name} (Lv. ${newEnemy.level}) appears!`);
+    addLog('The battle continues!');
   };
 
   const handleClose = () => {
@@ -490,34 +531,49 @@ export function BattleScreen({ onClose }: BattleScreenProps) {
 
         {battleState === 'victory' && battleRewards && (
           <div className="p-4 bg-green-100 rounded-lg border-2 border-green-600">
-            <h3 className="font-bold text-green-800 text-xl mb-2">Victory!</h3>
-            <div className="mb-3 space-y-2">
-              <p className="text-lg font-bold text-green-800">Rewards:</p>
-              <p className="text-md text-green-800">+ {battleRewards.qi} Qi</p>
-              <p className="text-md text-green-800">+ {battleRewards.qiGeneration.toFixed(1)} to Qi generation</p>
+            <h3 className="font-bold text-green-800 text-2xl mb-3 text-center">🎉 Victory! 🎉</h3>
+            <p className="text-md text-green-800 mb-3 text-center font-semibold">
+              You defeated the enemy! A new challenger approaches...
+            </p>
+            <div className="mb-4 space-y-2 p-3 bg-white rounded border border-green-400">
+              <p className="text-lg font-bold text-green-800">Battle Rewards:</p>
+              <p className="text-md text-green-800">✦ +{battleRewards.qi} Qi</p>
+              <p className="text-md text-green-800">✦ +{battleRewards.qiGeneration.toFixed(1)} to Qi generation per second</p>
               <p className="text-sm text-green-700 mt-2 italic">
-                All spirits have been healed to full health!
+                All spirits have been fully healed!
               </p>
             </div>
-            <Button
-              onClick={handleClose}
-              className="w-full"
-              style={{ background: 'var(--jade-green)', color: 'var(--parchment)' }}
-            >
-              Return to Cultivation
-            </Button>
+            <div className="grid grid-cols-2 gap-3">
+              <Button
+                onClick={handleContinueBattle}
+                className="w-full font-bold"
+                style={{ background: 'var(--vermillion)', color: 'var(--parchment)' }}
+              >
+                Continue Battling
+              </Button>
+              <Button
+                onClick={handleClose}
+                className="w-full font-bold"
+                style={{ background: 'var(--jade-green)', color: 'var(--parchment)' }}
+              >
+                Return to Cultivation
+              </Button>
+            </div>
           </div>
         )}
 
         {battleState === 'defeat' && (
           <div className="p-4 bg-red-100 rounded-lg border-2 border-red-600">
-            <h3 className="font-bold text-red-800 text-xl mb-2">Defeat</h3>
-            <p className="text-sm text-red-800 mb-3">
-              Your spirits need to recover. Return and try again when stronger.
+            <h3 className="font-bold text-red-800 text-2xl mb-3 text-center">Defeat...</h3>
+            <p className="text-md text-red-800 mb-2 text-center">
+              All your spirits have been defeated.
+            </p>
+            <p className="text-sm text-red-700 mb-4 text-center italic">
+              Return to cultivation and strengthen your spirits before trying again.
             </p>
             <Button
               onClick={handleClose}
-              className="w-full"
+              className="w-full font-bold"
               style={{ background: 'var(--vermillion)', color: 'var(--parchment)' }}
             >
               Return to Cultivation
