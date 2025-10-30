@@ -1,18 +1,42 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useGameState } from '@/lib/stores/useGameState';
 import { getBaseSpirit, getElement, getLineage, getRarityColor, getPotentialColor, calculateAllStats, getAvailableSkills } from '@/lib/spiritUtils';
 import { Button } from '@/components/ui/button';
-import { X, Plus, Trash2, ArrowUp, Sparkles } from 'lucide-react';
+import { X, Plus, Trash2, ArrowUp, Sparkles, TrendingUp } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import type { PlayerSpirit } from '@shared/types';
 
 interface SpiritManagerProps {
   onClose: () => void;
 }
 
+interface StatComparison {
+  attack: { old: number; new: number };
+  defense: { old: number; new: number };
+  health: { old: number; new: number };
+  elementalAffinity: { old: number; new: number };
+}
+
 export function SpiritManager({ onClose }: SpiritManagerProps) {
   const { spirits, activeParty, qi, addToParty, removeFromParty, levelUpSpirit, harmonizeSpirit, getEssenceCount, getLevelUpCost } = useGameState();
   const [selectedSpirit, setSelectedSpirit] = useState<PlayerSpirit | null>(null);
   const [showHarmonizeConfirm, setShowHarmonizeConfirm] = useState(false);
+  const [levelUpAnimation, setLevelUpAnimation] = useState<{
+    spirit: PlayerSpirit;
+    oldLevel: number;
+    newLevel: number;
+    stats: StatComparison;
+  } | null>(null);
+  const [audioElement, setAudioElement] = useState<HTMLAudioElement | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (audioElement) {
+        audioElement.pause();
+        audioElement.currentTime = 0;
+      }
+    };
+  }, [audioElement]);
 
   const handleAddToParty = (instanceId: string) => {
     addToParty(instanceId);
@@ -23,7 +47,50 @@ export function SpiritManager({ onClose }: SpiritManagerProps) {
   };
 
   const handleLevelUp = (instanceId: string) => {
+    const spirit = spirits.find(s => s.instanceId === instanceId);
+    if (!spirit) return;
+
+    // Calculate old stats
+    const oldStats = calculateAllStats(spirit);
+    const oldLevel = spirit.level;
+
+    // Level up the spirit
     levelUpSpirit(instanceId);
+
+    // Get updated spirit and calculate new stats
+    // We need to manually create the leveled up spirit for the animation
+    const newSpirit = { ...spirit, level: spirit.level + 1 };
+    const newStats = calculateAllStats(newSpirit);
+
+    // Create stat comparison
+    const statComparison: StatComparison = {
+      attack: { old: oldStats.attack, new: newStats.attack },
+      defense: { old: oldStats.defense, new: newStats.defense },
+      health: { old: oldStats.health, new: newStats.health },
+      elementalAffinity: { old: oldStats.elementalAffinity, new: newStats.elementalAffinity },
+    };
+
+    // Show animation
+    setLevelUpAnimation({
+      spirit: newSpirit,
+      oldLevel,
+      newLevel: newSpirit.level,
+      stats: statComparison,
+    });
+
+    // Play sound effect
+    const audio = new Audio('/sounds/success.mp3');
+    audio.volume = 0.6;
+    audio.play();
+    setAudioElement(audio);
+
+    // Update selected spirit to show new stats after animation completes
+    setTimeout(() => {
+      const updatedSpirit = spirits.find(s => s.instanceId === instanceId);
+      if (updatedSpirit) {
+        setSelectedSpirit(updatedSpirit);
+      }
+    }, 100);
   };
 
   const handleHarmonize = (instanceId: string) => {
@@ -360,6 +427,146 @@ export function SpiritManager({ onClose }: SpiritManagerProps) {
             </div>
           </div>
         )}
+
+        <AnimatePresence>
+          {levelUpAnimation && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="absolute inset-0 bg-black bg-opacity-70 flex items-center justify-center rounded-lg z-50"
+            >
+              <motion.div
+                initial={{ scale: 0.8, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.8, opacity: 0 }}
+                className="parchment-bg chinese-border p-8 rounded-lg max-w-lg relative overflow-hidden"
+              >
+                {/* Particle effects */}
+                <div className="absolute inset-0 pointer-events-none">
+                  {[...Array(12)].map((_, i) => (
+                    <motion.div
+                      key={i}
+                      initial={{ 
+                        x: '50%', 
+                        y: '50%', 
+                        scale: 0,
+                        opacity: 1 
+                      }}
+                      animate={{ 
+                        x: `${50 + Math.cos((i / 12) * Math.PI * 2) * 200}%`,
+                        y: `${50 + Math.sin((i / 12) * Math.PI * 2) * 200}%`,
+                        scale: [0, 1, 0],
+                        opacity: [1, 1, 0]
+                      }}
+                      transition={{ 
+                        duration: 1.5,
+                        delay: i * 0.05,
+                        ease: "easeOut"
+                      }}
+                      className="absolute w-3 h-3 bg-blue-500 rounded-full"
+                      style={{ 
+                        boxShadow: '0 0 10px 2px rgba(59, 130, 246, 0.5)',
+                        filter: 'blur(1px)'
+                      }}
+                    />
+                  ))}
+                </div>
+
+                {/* Glowing background */}
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.5 }}
+                  animate={{ opacity: 0.3, scale: 1 }}
+                  className="absolute inset-0 bg-gradient-radial from-blue-400 via-transparent to-transparent"
+                  style={{ filter: 'blur(40px)' }}
+                />
+
+                <div className="relative z-10">
+                  <motion.div
+                    initial={{ y: -20, opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    transition={{ delay: 0.2 }}
+                    className="text-center mb-6"
+                  >
+                    <TrendingUp className="w-16 h-16 mx-auto mb-3 text-blue-600" />
+                    <h3 className="text-3xl font-bold parchment-text mb-2">
+                      Level Up!
+                    </h3>
+                    <p className="text-xl font-semibold parchment-text">
+                      {getBaseSpirit(levelUpAnimation.spirit.spiritId)?.name}
+                    </p>
+                    <motion.p
+                      initial={{ scale: 1 }}
+                      animate={{ scale: [1, 1.2, 1] }}
+                      transition={{ delay: 0.3, duration: 0.5 }}
+                      className="text-lg font-bold text-blue-700 mt-2"
+                    >
+                      Lv.{levelUpAnimation.oldLevel} → Lv.{levelUpAnimation.newLevel}
+                    </motion.p>
+                  </motion.div>
+
+                  {/* Stats comparison */}
+                  <motion.div
+                    initial={{ y: 20, opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    transition={{ delay: 0.4 }}
+                    className="bg-amber-50 rounded-lg p-4 mb-6 border-2 border-amber-300"
+                  >
+                    <h4 className="font-bold parchment-text text-center mb-3">Stat Changes</h4>
+                    <div className="space-y-2">
+                      {Object.entries(levelUpAnimation.stats).map(([stat, values], index) => {
+                        const increase = values.new - values.old;
+                        return (
+                          <motion.div
+                            key={stat}
+                            initial={{ x: -20, opacity: 0 }}
+                            animate={{ x: 0, opacity: 1 }}
+                            transition={{ delay: 0.5 + index * 0.1 }}
+                            className="flex justify-between items-center"
+                          >
+                            <span className="font-semibold parchment-text capitalize">
+                              {stat === 'elementalAffinity' ? 'Affinity' : stat}:
+                            </span>
+                            <div className="flex items-center gap-2">
+                              <span className="text-gray-600">{values.old}</span>
+                              <span className="text-gray-400">→</span>
+                              <motion.span
+                                initial={{ scale: 1 }}
+                                animate={{ scale: [1, 1.3, 1] }}
+                                transition={{ delay: 0.6 + index * 0.1, duration: 0.4 }}
+                                className="font-bold text-green-700"
+                              >
+                                {values.new}
+                              </motion.span>
+                              <motion.span
+                                initial={{ opacity: 0, y: 10 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ delay: 0.6 + index * 0.1 }}
+                                className="text-green-600 font-semibold text-sm"
+                              >
+                                +{increase}
+                              </motion.span>
+                            </div>
+                          </motion.div>
+                        );
+                      })}
+                    </div>
+                  </motion.div>
+
+                  <motion.button
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 1.2 }}
+                    onClick={() => setLevelUpAnimation(null)}
+                    className="w-full p-3 bg-blue-600 text-white rounded-lg font-bold text-lg hover:bg-blue-700 transition-colors"
+                  >
+                    Continue
+                  </motion.button>
+                </div>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
     </div>
   );
