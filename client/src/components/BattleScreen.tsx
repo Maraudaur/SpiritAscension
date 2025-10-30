@@ -26,12 +26,13 @@ interface Enemy {
 }
 
 export function BattleScreen({ onClose }: BattleScreenProps) {
-  const { spirits, activeParty, winBattle, updateSpiritHealth } = useGameState();
+  const { spirits, activeParty, winBattle, updateSpiritHealth, battlesWon } = useGameState();
   const [battleState, setBattleState] = useState<'setup' | 'fighting' | 'victory' | 'defeat'>('setup');
   const [activePartySlot, setActivePartySlot] = useState(0);
   const [battleLog, setBattleLog] = useState<string[]>([]);
   const [playerSpirits, setPlayerSpirits] = useState<BattleSpirit[]>([]);
   const [enemy, setEnemy] = useState<Enemy | null>(null);
+  const [battleRewards, setBattleRewards] = useState<{ qi: number; qiGeneration: number } | null>(null);
 
   useEffect(() => {
     if (activeParty.length === 0) {
@@ -71,6 +72,7 @@ export function BattleScreen({ onClose }: BattleScreenProps) {
   const startBattle = () => {
     if (playerSpirits.length === 0) return;
     setBattleState('fighting');
+    setBattleRewards(null);
     addLog('Battle begins!');
   };
 
@@ -110,10 +112,24 @@ export function BattleScreen({ onClose }: BattleScreenProps) {
       setTimeout(() => {
         setBattleState('victory');
         addLog('Victory! The enemy has been defeated!');
-        winBattle();
+        
+        // Calculate rewards before updating state
+        const qiReward = 100 * (battlesWon + 1);
+        const qiGenerationIncrease = 0.1;
+        setBattleRewards({ qi: qiReward, qiGeneration: qiGenerationIncrease });
+        
+        // Heal all spirits to full health in both local state and game state
+        setPlayerSpirits(prev => prev.map(spirit => ({
+          ...spirit,
+          currentHealth: spirit.maxHealth
+        })));
+        
         playerSpirits.forEach(spirit => {
-          updateSpiritHealth(spirit.playerSpirit.instanceId, spirit.currentHealth);
+          updateSpiritHealth(spirit.playerSpirit.instanceId, spirit.maxHealth);
         });
+        
+        // Update game state with battle rewards
+        winBattle();
       }, 500);
       return;
     }
@@ -356,12 +372,23 @@ export function BattleScreen({ onClose }: BattleScreenProps) {
               </Button>
             )}
 
-            {battleState === 'victory' && (
+            {battleState === 'victory' && battleRewards && (
               <div className="p-4 bg-green-100 rounded border-2 border-green-600">
                 <h3 className="font-bold text-green-800 text-xl mb-2">Victory!</h3>
-                <p className="text-sm text-green-800 mb-3">
-                  You have gained Qi and improved your cultivation multiplier!
-                </p>
+                <div className="mb-3 space-y-2">
+                  <p className="text-lg font-bold text-green-800">
+                    Rewards:
+                  </p>
+                  <p className="text-md text-green-800">
+                    + {battleRewards.qi} Qi
+                  </p>
+                  <p className="text-md text-green-800">
+                    + {battleRewards.qiGeneration.toFixed(1)} to Qi generation
+                  </p>
+                  <p className="text-sm text-green-700 mt-2 italic">
+                    All spirits have been healed to full health!
+                  </p>
+                </div>
                 <Button
                   onClick={handleClose}
                   className="w-full"
