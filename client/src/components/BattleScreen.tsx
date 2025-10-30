@@ -31,7 +31,7 @@ interface Enemy {
 
 export function BattleScreen({ onClose }: BattleScreenProps) {
   const { spirits, activeParty, winBattle, updateSpiritHealth, battleRewardMultiplier } = useGameState();
-  const { playDamage, playHeal, playButtonClick, playButtonHover, isMuted, toggleMute } = useAudio();
+  const { playDamage, playHeal, playButtonClick, playButtonHover, isMuted, toggleMute, playBattleMusic, playExploreMusic } = useAudio();
   const [battleState, setBattleState] = useState<'setup' | 'fighting' | 'victory' | 'defeat'>('setup');
   const [activePartySlot, setActivePartySlot] = useState(0);
   const [battleLog, setBattleLog] = useState<string[]>([]);
@@ -101,6 +101,9 @@ export function BattleScreen({ onClose }: BattleScreenProps) {
     setBattleState('fighting');
     setBattleRewards(null);
     addLog('Battle begins!');
+    
+    // Switch to battle music
+    playBattleMusic();
   };
 
   const addLog = (message: string) => {
@@ -303,6 +306,10 @@ export function BattleScreen({ onClose }: BattleScreenProps) {
     playerSpirits.forEach(spirit => {
       updateSpiritHealth(spirit.playerSpirit.instanceId, spirit.currentHealth);
     });
+    
+    // Switch back to explore music when leaving battle
+    playExploreMusic();
+    
     onClose();
   };
 

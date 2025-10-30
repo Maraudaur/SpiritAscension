@@ -2,15 +2,20 @@ import { create } from "zustand";
 
 interface AudioState {
   backgroundMusic: HTMLAudioElement | null;
+  exploreMusic: HTMLAudioElement | null;
+  battleMusic: HTMLAudioElement | null;
   hitSound: HTMLAudioElement | null;
   successSound: HTMLAudioElement | null;
   healSound: HTMLAudioElement | null;
   clickSound: HTMLAudioElement | null;
   hoverSound: HTMLAudioElement | null;
   isMuted: boolean;
+  currentMusic: 'explore' | 'battle' | null;
   
   // Setter functions
   setBackgroundMusic: (music: HTMLAudioElement) => void;
+  setExploreMusic: (music: HTMLAudioElement) => void;
+  setBattleMusic: (music: HTMLAudioElement) => void;
   setHitSound: (sound: HTMLAudioElement) => void;
   setSuccessSound: (sound: HTMLAudioElement) => void;
   setHealSound: (sound: HTMLAudioElement) => void;
@@ -19,6 +24,9 @@ interface AudioState {
   
   // Control functions
   toggleMute: () => void;
+  playExploreMusic: () => void;
+  playBattleMusic: () => void;
+  stopAllMusic: () => void;
   playHit: () => void;
   playSuccess: () => void;
   playButtonClick: () => void;
@@ -29,14 +37,19 @@ interface AudioState {
 
 export const useAudio = create<AudioState>((set, get) => ({
   backgroundMusic: null,
+  exploreMusic: null,
+  battleMusic: null,
   hitSound: null,
   successSound: null,
   healSound: null,
   clickSound: null,
   hoverSound: null,
   isMuted: false, // Start unmuted so sounds play by default
+  currentMusic: null,
   
   setBackgroundMusic: (music) => set({ backgroundMusic: music }),
+  setExploreMusic: (music) => set({ exploreMusic: music }),
+  setBattleMusic: (music) => set({ battleMusic: music }),
   setHitSound: (sound) => set({ hitSound: sound }),
   setSuccessSound: (sound) => set({ successSound: sound }),
   setHealSound: (sound) => set({ healSound: sound }),
@@ -44,14 +57,79 @@ export const useAudio = create<AudioState>((set, get) => ({
   setHoverSound: (sound) => set({ hoverSound: sound }),
   
   toggleMute: () => {
-    const { isMuted } = get();
+    const { isMuted, exploreMusic, battleMusic } = get();
     const newMutedState = !isMuted;
     
-    // Just update the muted state
-    set({ isMuted: newMutedState });
+    // Adjust music volume based on mute state
+    if (exploreMusic) exploreMusic.volume = newMutedState ? 0 : 0.3;
+    if (battleMusic) battleMusic.volume = newMutedState ? 0 : 0.4;
     
-    // Log the change
+    set({ isMuted: newMutedState });
     console.log(`Sound ${newMutedState ? 'muted' : 'unmuted'}`);
+  },
+  
+  playExploreMusic: () => {
+    const { exploreMusic, battleMusic, isMuted, currentMusic } = get();
+    
+    // Don't restart if already playing
+    if (currentMusic === 'explore' && exploreMusic && !exploreMusic.paused) {
+      return;
+    }
+    
+    // Stop battle music if playing
+    if (battleMusic) {
+      battleMusic.pause();
+      battleMusic.currentTime = 0;
+    }
+    
+    // Play explore music
+    if (exploreMusic) {
+      exploreMusic.loop = true;
+      exploreMusic.volume = isMuted ? 0 : 0.3;
+      exploreMusic.play().catch(() => console.log('Explore music autoplay prevented'));
+      set({ currentMusic: 'explore' });
+      console.log('🎵 Playing explore music');
+    }
+  },
+  
+  playBattleMusic: () => {
+    const { exploreMusic, battleMusic, isMuted, currentMusic } = get();
+    
+    // Don't restart if already playing
+    if (currentMusic === 'battle' && battleMusic && !battleMusic.paused) {
+      return;
+    }
+    
+    // Stop explore music if playing
+    if (exploreMusic) {
+      exploreMusic.pause();
+      exploreMusic.currentTime = 0;
+    }
+    
+    // Play battle music
+    if (battleMusic) {
+      battleMusic.loop = true;
+      battleMusic.volume = isMuted ? 0 : 0.4;
+      battleMusic.play().catch(() => console.log('Battle music autoplay prevented'));
+      set({ currentMusic: 'battle' });
+      console.log('⚔️ Playing battle music');
+    }
+  },
+  
+  stopAllMusic: () => {
+    const { exploreMusic, battleMusic } = get();
+    
+    if (exploreMusic) {
+      exploreMusic.pause();
+      exploreMusic.currentTime = 0;
+    }
+    
+    if (battleMusic) {
+      battleMusic.pause();
+      battleMusic.currentTime = 0;
+    }
+    
+    set({ currentMusic: null });
   },
   
   playHit: () => {

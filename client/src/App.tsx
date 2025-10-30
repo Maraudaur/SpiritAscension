@@ -11,7 +11,7 @@ type Screen = 'main' | 'spirits' | 'battle' | 'summon';
 function App() {
   const [currentScreen, setCurrentScreen] = useState<Screen>('main');
   const [audioInitialized, setAudioInitialized] = useState(false);
-  const { setHitSound, setSuccessSound, setHealSound, setClickSound, setHoverSound } = useAudio();
+  const { setHitSound, setSuccessSound, setHealSound, setClickSound, setHoverSound, setExploreMusic, setBattleMusic, playExploreMusic } = useAudio();
   
   useEffect(() => {
     // Load all audio files when app initializes
@@ -20,6 +20,8 @@ function App() {
     const heal = new Audio('/sounds/Healsound.mp3');
     const click = new Audio('/sounds/MenuClick1.mp3');
     const hover = new Audio('/sounds/MenuHover1_1761804350112.mp3');
+    const exploreMusic = new Audio('/sounds/ExploreBase.mp3');
+    const battleMusic = new Audio('/sounds/Battle3.mp3');
     
     // Load all audio files
     hit.load();
@@ -27,13 +29,17 @@ function App() {
     heal.load();
     click.load();
     hover.load();
+    exploreMusic.load();
+    battleMusic.load();
     
     console.log('✨ All audio files loaded:', { 
       hit: hit.src, 
       success: success.src,
       heal: heal.src,
       click: click.src,
-      hover: hover.src
+      hover: hover.src,
+      exploreMusic: exploreMusic.src,
+      battleMusic: battleMusic.src
     });
     
     setHitSound(hit);
@@ -41,13 +47,15 @@ function App() {
     setHealSound(heal);
     setClickSound(click);
     setHoverSound(hover);
+    setExploreMusic(exploreMusic);
+    setBattleMusic(battleMusic);
     
     // Initialize audio on first user interaction
     const initializeAudio = async () => {
       if (!audioInitialized) {
         try {
           // Play and immediately pause to unlock audio for all sounds
-          const sounds = [hit, success, heal, click, hover];
+          const sounds = [hit, success, heal, click, hover, exploreMusic, battleMusic];
           for (const sound of sounds) {
             await sound.play();
             sound.pause();
@@ -56,6 +64,9 @@ function App() {
           
           console.log('🎵 Audio context unlocked for all sounds!');
           setAudioInitialized(true);
+          
+          // Start playing explore music
+          playExploreMusic();
         } catch (err) {
           console.log('Audio unlock failed, will retry on next interaction:', err);
         }
@@ -73,7 +84,7 @@ function App() {
         document.removeEventListener(event, initializeAudio);
       });
     };
-  }, [setHitSound, setSuccessSound, setHealSound, setClickSound, setHoverSound, audioInitialized]);
+  }, [setHitSound, setSuccessSound, setHealSound, setClickSound, setHoverSound, setExploreMusic, setBattleMusic, playExploreMusic, audioInitialized]);
 
   return (
     <div style={{ width: '100vw', height: '100vh', position: 'relative', overflow: 'hidden' }}>
