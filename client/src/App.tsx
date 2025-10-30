@@ -11,35 +11,50 @@ type Screen = 'main' | 'spirits' | 'battle' | 'summon';
 function App() {
   const [currentScreen, setCurrentScreen] = useState<Screen>('main');
   const [audioInitialized, setAudioInitialized] = useState(false);
-  const { setHitSound, setSuccessSound } = useAudio();
+  const { setHitSound, setSuccessSound, setHealSound, setClickSound, setHoverSound } = useAudio();
   
   useEffect(() => {
-    // Load audio files when app initializes
-    const hit = new Audio('/sounds/hit.mp3');
+    // Load all audio files when app initializes
+    const hit = new Audio('/sounds/Hitsound.mp3');
     const success = new Audio('/sounds/success.mp3');
+    const heal = new Audio('/sounds/Healsound.mp3');
+    const click = new Audio('/sounds/MenuClick1.mp3');
+    const hover = new Audio('/sounds/MenuHover1_1761804350112.mp3');
     
+    // Load all audio files
     hit.load();
     success.load();
+    heal.load();
+    click.load();
+    hover.load();
     
-    console.log('Audio files loaded:', { hit: hit.src, success: success.src });
+    console.log('✨ All audio files loaded:', { 
+      hit: hit.src, 
+      success: success.src,
+      heal: heal.src,
+      click: click.src,
+      hover: hover.src
+    });
     
     setHitSound(hit);
     setSuccessSound(success);
+    setHealSound(heal);
+    setClickSound(click);
+    setHoverSound(hover);
     
     // Initialize audio on first user interaction
     const initializeAudio = async () => {
       if (!audioInitialized) {
         try {
-          // Play and immediately pause to unlock audio
-          await hit.play();
-          hit.pause();
-          hit.currentTime = 0;
+          // Play and immediately pause to unlock audio for all sounds
+          const sounds = [hit, success, heal, click, hover];
+          for (const sound of sounds) {
+            await sound.play();
+            sound.pause();
+            sound.currentTime = 0;
+          }
           
-          await success.play();
-          success.pause();
-          success.currentTime = 0;
-          
-          console.log('Audio context unlocked');
+          console.log('🎵 Audio context unlocked for all sounds!');
           setAudioInitialized(true);
         } catch (err) {
           console.log('Audio unlock failed, will retry on next interaction:', err);
@@ -58,7 +73,7 @@ function App() {
         document.removeEventListener(event, initializeAudio);
       });
     };
-  }, [setHitSound, setSuccessSound, audioInitialized]);
+  }, [setHitSound, setSuccessSound, setHealSound, setClickSound, setHoverSound, audioInitialized]);
 
   return (
     <div style={{ width: '100vw', height: '100vh', position: 'relative', overflow: 'hidden' }}>

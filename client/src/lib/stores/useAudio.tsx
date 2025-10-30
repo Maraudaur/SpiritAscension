@@ -4,12 +4,18 @@ interface AudioState {
   backgroundMusic: HTMLAudioElement | null;
   hitSound: HTMLAudioElement | null;
   successSound: HTMLAudioElement | null;
+  healSound: HTMLAudioElement | null;
+  clickSound: HTMLAudioElement | null;
+  hoverSound: HTMLAudioElement | null;
   isMuted: boolean;
   
   // Setter functions
   setBackgroundMusic: (music: HTMLAudioElement) => void;
   setHitSound: (sound: HTMLAudioElement) => void;
   setSuccessSound: (sound: HTMLAudioElement) => void;
+  setHealSound: (sound: HTMLAudioElement) => void;
+  setClickSound: (sound: HTMLAudioElement) => void;
+  setHoverSound: (sound: HTMLAudioElement) => void;
   
   // Control functions
   toggleMute: () => void;
@@ -25,11 +31,17 @@ export const useAudio = create<AudioState>((set, get) => ({
   backgroundMusic: null,
   hitSound: null,
   successSound: null,
+  healSound: null,
+  clickSound: null,
+  hoverSound: null,
   isMuted: false, // Start unmuted so sounds play by default
   
   setBackgroundMusic: (music) => set({ backgroundMusic: music }),
   setHitSound: (sound) => set({ hitSound: sound }),
   setSuccessSound: (sound) => set({ successSound: sound }),
+  setHealSound: (sound) => set({ healSound: sound }),
+  setClickSound: (sound) => set({ clickSound: sound }),
+  setHoverSound: (sound) => set({ hoverSound: sound }),
   
   toggleMute: () => {
     const { isMuted } = get();
@@ -77,29 +89,21 @@ export const useAudio = create<AudioState>((set, get) => ({
   },
   
   playButtonClick: () => {
-    const { hitSound, isMuted } = get();
+    const { clickSound, isMuted } = get();
     console.log('🔊 playButtonClick called:', { 
-      hasSound: !!hitSound, 
+      hasSound: !!clickSound, 
       isMuted,
-      soundSrc: hitSound?.src,
-      readyState: hitSound?.readyState,
-      duration: hitSound?.duration,
-      volume: hitSound?.volume
+      soundSrc: clickSound?.src,
+      readyState: clickSound?.readyState,
+      duration: clickSound?.duration,
+      volume: clickSound?.volume
     });
-    if (hitSound && !isMuted) {
-      const soundClone = hitSound.cloneNode() as HTMLAudioElement;
-      soundClone.volume = 0.5; // Increase volume for testing
-      soundClone.playbackRate = 1.2;
-      console.log('🎵 Attempting to play click sound...', {
-        cloneVolume: soundClone.volume,
-        cloneSrc: soundClone.src,
-        cloneDuration: soundClone.duration
-      });
+    if (clickSound && !isMuted) {
+      const soundClone = clickSound.cloneNode() as HTMLAudioElement;
+      soundClone.volume = 0.4;
       soundClone.play()
         .then(() => {
-          console.log('✅ Click sound play() promise resolved!', {
-            paused: soundClone.paused,
-            currentTime: soundClone.currentTime,
+          console.log('✅ Click sound played!', {
             duration: soundClone.duration
           });
         })
@@ -110,23 +114,20 @@ export const useAudio = create<AudioState>((set, get) => ({
   },
   
   playButtonHover: () => {
-    const { hitSound, isMuted } = get();
+    const { hoverSound, isMuted } = get();
     console.log('🔊 playButtonHover called:', { 
-      hasSound: !!hitSound, 
+      hasSound: !!hoverSound, 
       isMuted,
-      soundSrc: hitSound?.src,
-      readyState: hitSound?.readyState,
-      duration: hitSound?.duration
+      soundSrc: hoverSound?.src,
+      readyState: hoverSound?.readyState,
+      duration: hoverSound?.duration
     });
-    if (hitSound && !isMuted) {
-      const soundClone = hitSound.cloneNode() as HTMLAudioElement;
-      soundClone.volume = 0.3; // Increase volume for testing
-      soundClone.playbackRate = 1.5;
+    if (hoverSound && !isMuted) {
+      const soundClone = hoverSound.cloneNode() as HTMLAudioElement;
+      soundClone.volume = 0.2;
       soundClone.play()
         .then(() => {
-          console.log('✅ Hover sound play() promise resolved!', {
-            paused: soundClone.paused,
-            currentTime: soundClone.currentTime,
+          console.log('✅ Hover sound played!', {
             duration: soundClone.duration
           });
         })
@@ -147,11 +148,10 @@ export const useAudio = create<AudioState>((set, get) => ({
   },
   
   playHeal: () => {
-    const { successSound, isMuted } = get();
-    if (successSound && !isMuted) {
-      const soundClone = successSound.cloneNode() as HTMLAudioElement;
-      soundClone.volume = 0.25;
-      soundClone.playbackRate = 1.3;
+    const { healSound, isMuted } = get();
+    if (healSound && !isMuted) {
+      const soundClone = healSound.cloneNode() as HTMLAudioElement;
+      soundClone.volume = 0.3;
       soundClone.currentTime = 0;
       soundClone.play().catch(() => {});
     }
