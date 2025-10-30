@@ -78,27 +78,31 @@ export const useAudio = create<AudioState>((set, get) => ({
   
   playButtonClick: () => {
     const { hitSound, isMuted } = get();
-    console.log('playButtonClick called:', { hasSound: !!hitSound, isMuted });
+    console.log('🔊 playButtonClick called:', { hasSound: !!hitSound, isMuted });
     if (hitSound && !isMuted) {
       const soundClone = hitSound.cloneNode() as HTMLAudioElement;
       soundClone.volume = 0.15;
       soundClone.playbackRate = 1.2;
-      soundClone.play().catch((err) => {
-        console.log('Button click sound play error:', err);
-      });
+      soundClone.play()
+        .then(() => console.log('✅ Click sound played successfully!'))
+        .catch((err) => console.log('❌ Button click sound play error:', err));
+    } else {
+      console.log('⏸️ Click sound NOT played (muted or no sound loaded)');
     }
   },
   
   playButtonHover: () => {
     const { hitSound, isMuted } = get();
-    console.log('playButtonHover called:', { hasSound: !!hitSound, isMuted });
+    console.log('🔊 playButtonHover called:', { hasSound: !!hitSound, isMuted });
     if (hitSound && !isMuted) {
       const soundClone = hitSound.cloneNode() as HTMLAudioElement;
       soundClone.volume = 0.08;
       soundClone.playbackRate = 1.5;
-      soundClone.play().catch((err) => {
-        console.log('Button hover sound play error:', err);
-      });
+      soundClone.play()
+        .then(() => console.log('✅ Hover sound played successfully!'))
+        .catch((err) => console.log('❌ Button hover sound play error:', err));
+    } else {
+      console.log('⏸️ Hover sound NOT played (muted or no sound loaded)');
     }
   },
   

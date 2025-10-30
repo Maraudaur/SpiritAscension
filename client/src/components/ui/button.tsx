@@ -47,11 +47,13 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     const buttonSounds = useButtonSounds()
     
     const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+      console.log('🖱️ BUTTON CLICKED!');
       buttonSounds.onClick();
       onClick?.(e);
     };
     
     const handleMouseEnter = (e: React.MouseEvent<HTMLButtonElement>) => {
+      console.log('👆 BUTTON HOVER detected!');
       buttonSounds.onMouseEnter();
       onMouseEnter?.(e);
     };
