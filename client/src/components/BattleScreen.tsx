@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react';
 import { useGameState } from '@/lib/stores/useGameState';
+import { useAudio } from '@/lib/stores/useAudio';
 import { getBaseSpirit, getElement, calculateAllStats, getAvailableSkills, getSkill } from '@/lib/spiritUtils';
 import { Button } from '@/components/ui/button';
 import { X, Swords, ArrowLeftRight, Heart, Shield } from 'lucide-react';
+import { motion } from 'framer-motion';
 import type { PlayerSpirit } from '@shared/types';
 
 type ActionMenu = 'none' | 'skills' | 'swap';
@@ -29,6 +31,7 @@ interface Enemy {
 
 export function BattleScreen({ onClose }: BattleScreenProps) {
   const { spirits, activeParty, winBattle, updateSpiritHealth, battleRewardMultiplier } = useGameState();
+  const { playDamage, playHeal, playButtonClick, playButtonHover } = useAudio();
   const [battleState, setBattleState] = useState<'setup' | 'fighting' | 'victory' | 'defeat'>('setup');
   const [activePartySlot, setActivePartySlot] = useState(0);
   const [battleLog, setBattleLog] = useState<string[]>([]);
@@ -37,6 +40,9 @@ export function BattleScreen({ onClose }: BattleScreenProps) {
   const [battleRewards, setBattleRewards] = useState<{ qi: number; qiGeneration: number } | null>(null);
   const [actionMenu, setActionMenu] = useState<ActionMenu>('none');
   const [isBlocking, setIsBlocking] = useState(false);
+  const [playerHealthBarShake, setPlayerHealthBarShake] = useState(false);
+  const [enemyHealthBarShake, setEnemyHealthBarShake] = useState(false);
+  const [playerHealthBarHeal, setPlayerHealthBarHeal] = useState(false);
 
   const generateNewEnemy = (spiritList: BattleSpirit[]) => {
     if (spiritList.length === 0) return null;
@@ -116,6 +122,11 @@ export function BattleScreen({ onClose }: BattleScreenProps) {
     const damage = Math.max(1, Math.floor((stats.attack * skill.damage) - (enemy.defense * 0.3)));
     const newEnemyHealth = Math.max(0, enemy.currentHealth - damage);
     
+    // Play damage sound and shake enemy health bar
+    playDamage();
+    setEnemyHealthBarShake(true);
+    setTimeout(() => setEnemyHealthBarShake(false), 500);
+    
     addLog(`${baseSpirit.name} used ${skill.name}! Dealt ${damage} damage.`);
 
     if (skill.healing > 0) {
@@ -124,6 +135,12 @@ export function BattleScreen({ onClose }: BattleScreenProps) {
       setPlayerSpirits(prev => prev.map((s, i) => 
         i === activePartySlot ? { ...s, currentHealth: newHealth } : s
       ));
+      
+      // Play heal sound and glow player health bar
+      playHeal();
+      setPlayerHealthBarHeal(true);
+      setTimeout(() => setPlayerHealthBarHeal(false), 600);
+      
       addLog(`${baseSpirit.name} healed ${healing} HP!`);
     }
 
@@ -185,6 +202,11 @@ export function BattleScreen({ onClose }: BattleScreenProps) {
     }
     
     const newHealth = Math.max(0, target.currentHealth - damage);
+
+    // Play damage sound and shake player health bar
+    playDamage();
+    setPlayerHealthBarShake(true);
+    setTimeout(() => setPlayerHealthBarShake(false), 500);
 
     setPlayerSpirits(prev => prev.map((s, i) => 
       i === targetIndex ? { ...s, currentHealth: newHealth } : s
@@ -346,12 +368,24 @@ export function BattleScreen({ onClose }: BattleScreenProps) {
                     </span>
                     <span>{activeSpirit.currentHealth} / {activeSpirit.maxHealth}</span>
                   </div>
-                  <div className="w-full bg-gray-300 rounded-full h-4">
-                    <div
+                  <motion.div 
+                    className="w-full bg-gray-300 rounded-full h-4 overflow-hidden"
+                    animate={{
+                      x: playerHealthBarShake ? [0, -4, 4, -4, 4, 0] : 0,
+                    }}
+                    transition={{ duration: 0.5 }}
+                  >
+                    <motion.div
                       className="bg-green-600 h-4 rounded-full transition-all"
                       style={{ width: `${(activeSpirit.currentHealth / activeSpirit.maxHealth) * 100}%` }}
+                      animate={{
+                        boxShadow: playerHealthBarHeal 
+                          ? ['0 0 0px rgba(34, 197, 94, 0)', '0 0 15px rgba(34, 197, 94, 0.8)', '0 0 0px rgba(34, 197, 94, 0)']
+                          : '0 0 0px rgba(34, 197, 94, 0)'
+                      }}
+                      transition={{ duration: 0.6 }}
                     />
-                  </div>
+                  </motion.div>
                 </div>
                 <div className="grid grid-cols-2 gap-2 text-sm parchment-text">
                   <div>ATK: {activeStats.attack}</div>
@@ -385,12 +419,18 @@ export function BattleScreen({ onClose }: BattleScreenProps) {
                     <span>HP</span>
                     <span>{enemy.currentHealth} / {enemy.maxHealth}</span>
                   </div>
-                  <div className="w-full bg-gray-300 rounded-full h-4">
+                  <motion.div 
+                    className="w-full bg-gray-300 rounded-full h-4 overflow-hidden"
+                    animate={{
+                      x: enemyHealthBarShake ? [0, -4, 4, -4, 4, 0] : 0,
+                    }}
+                    transition={{ duration: 0.5 }}
+                  >
                     <div
                       className="bg-red-600 h-4 rounded-full transition-all"
                       style={{ width: `${(enemy.currentHealth / enemy.maxHealth) * 100}%` }}
                     />
-                  </div>
+                  </motion.div>
                 </div>
                 <div className="grid grid-cols-2 gap-2 text-sm parchment-text">
                   <div>ATK: {enemy.attack}</div>
@@ -428,28 +468,44 @@ export function BattleScreen({ onClose }: BattleScreenProps) {
             {actionMenu === 'none' && (
               <div className="grid grid-cols-4 gap-3">
                 <button
-                  onClick={() => availableSkills.length > 0 && handleSkillSelect(availableSkills[0].id)}
+                  onClick={() => {
+                    playButtonClick();
+                    availableSkills.length > 0 && handleSkillSelect(availableSkills[0].id);
+                  }}
+                  onMouseEnter={playButtonHover}
                   className="p-4 bg-red-600 hover:bg-red-700 text-white rounded-lg font-bold flex flex-col items-center justify-center gap-2"
                 >
                   <Swords className="w-6 h-6" />
                   <span>Attack</span>
                 </button>
                 <button
-                  onClick={handleBlock}
+                  onClick={() => {
+                    playButtonClick();
+                    handleBlock();
+                  }}
+                  onMouseEnter={playButtonHover}
                   className="p-4 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-bold flex flex-col items-center justify-center gap-2"
                 >
                   <Shield className="w-6 h-6" />
                   <span>Block</span>
                 </button>
                 <button
-                  onClick={() => setActionMenu('skills')}
+                  onClick={() => {
+                    playButtonClick();
+                    setActionMenu('skills');
+                  }}
+                  onMouseEnter={playButtonHover}
                   className="p-4 bg-purple-600 hover:bg-purple-700 text-white rounded-lg font-bold flex flex-col items-center justify-center gap-2"
                 >
                   <Swords className="w-6 h-6" />
                   <span>Skills</span>
                 </button>
                 <button
-                  onClick={() => setActionMenu('swap')}
+                  onClick={() => {
+                    playButtonClick();
+                    setActionMenu('swap');
+                  }}
+                  onMouseEnter={playButtonHover}
                   className="p-4 bg-green-600 hover:bg-green-700 text-white rounded-lg font-bold flex flex-col items-center justify-center gap-2"
                 >
                   <ArrowLeftRight className="w-6 h-6" />
@@ -463,7 +519,11 @@ export function BattleScreen({ onClose }: BattleScreenProps) {
                 <div className="flex justify-between items-center mb-3">
                   <h3 className="font-bold parchment-text text-lg">Select Skill</h3>
                   <button
-                    onClick={() => setActionMenu('none')}
+                    onClick={() => {
+                      playButtonClick();
+                      setActionMenu('none');
+                    }}
+                    onMouseEnter={playButtonHover}
                     className="px-3 py-1 bg-gray-300 hover:bg-gray-400 rounded text-sm font-semibold"
                   >
                     Back
@@ -473,7 +533,11 @@ export function BattleScreen({ onClose }: BattleScreenProps) {
                   {availableSkills.map((skill) => (
                     <button
                       key={skill.id}
-                      onClick={() => handleSkillSelect(skill.id)}
+                      onClick={() => {
+                        playButtonClick();
+                        handleSkillSelect(skill.id);
+                      }}
+                      onMouseEnter={playButtonHover}
                       className="p-3 bg-purple-600 hover:bg-purple-700 text-white rounded-lg text-left"
                     >
                       <p className="font-bold">{skill.name}</p>
@@ -489,7 +553,11 @@ export function BattleScreen({ onClose }: BattleScreenProps) {
                 <div className="flex justify-between items-center mb-3">
                   <h3 className="font-bold parchment-text text-lg">Swap Spirit</h3>
                   <button
-                    onClick={() => setActionMenu('none')}
+                    onClick={() => {
+                      playButtonClick();
+                      setActionMenu('none');
+                    }}
+                    onMouseEnter={playButtonHover}
                     className="px-3 py-1 bg-gray-300 hover:bg-gray-400 rounded text-sm font-semibold"
                   >
                     Back
@@ -504,7 +572,13 @@ export function BattleScreen({ onClose }: BattleScreenProps) {
                     return (
                       <button
                         key={spirit.playerSpirit.instanceId}
-                        onClick={() => handleSwap(index)}
+                        onClick={() => {
+                          if (!isDead && !isActive) playButtonClick();
+                          handleSwap(index);
+                        }}
+                        onMouseEnter={() => {
+                          if (!isDead && !isActive) playButtonHover();
+                        }}
                         disabled={isDead || isActive}
                         className={`p-3 rounded-lg border-2 text-left ${
                           isActive ? 'border-blue-600 bg-blue-100 cursor-not-allowed' : 
