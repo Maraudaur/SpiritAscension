@@ -1,0 +1,32 @@
+{
+  "wood": {
+    "id": "wood",
+    "name": "Wood",
+    "color": "#4a7c59",
+    "description": "The element of growth and vitality"
+  },
+  "earth": {
+    "id": "earth",
+    "name": "Earth",
+    "color": "#8b6f47",
+    "description": "The element of stability and endurance"
+  },
+  "fire": {
+    "id": "fire",
+    "name": "Fire",
+    "color": "#c44536",
+    "description": "The element of passion and destruction"
+  },
+  "water": {
+    "id": "water",
+    "name": "Water",
+    "color": "#3a6ea5",
+    "description": "The element of flow and adaptability"
+  },
+  "metal": {
+    "id": "metal",
+    "name": "Metal",
+    "color": "#a8a8a8",
+    "description": "The element of precision and strength"
+  }
+}

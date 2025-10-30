@@ -1,0 +1,26 @@
+{
+  "basic_attack": {
+    "id": "basic_attack",
+    "name": "Basic Strike",
+    "description": "A simple attack dealing moderate damage",
+    "damage": 1.0,
+    "healing": 0,
+    "unlockLevel": 1
+  },
+  "heavy_hit": {
+    "id": "heavy_hit",
+    "name": "Heavy Hit",
+    "description": "A powerful strike dealing heavy damage",
+    "damage": 1.5,
+    "healing": 0,
+    "unlockLevel": 2
+  },
+  "hit_and_heal": {
+    "id": "hit_and_heal",
+    "name": "Draining Strike",
+    "description": "Attack that heals the user for a portion of damage dealt",
+    "damage": 1.0,
+    "healing": 0.3,
+    "unlockLevel": 3
+  }
+}

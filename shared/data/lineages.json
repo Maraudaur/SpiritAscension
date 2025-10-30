@@ -1,0 +1,32 @@
+{
+  "tiger": {
+    "id": "tiger",
+    "name": "Tiger",
+    "description": "Fierce and powerful hunters"
+  },
+  "dragon": {
+    "id": "dragon",
+    "name": "Dragon",
+    "description": "Ancient and wise beings of immense power"
+  },
+  "ox": {
+    "id": "ox",
+    "name": "Ox",
+    "description": "Steadfast and resilient warriors"
+  },
+  "serpent": {
+    "id": "serpent",
+    "name": "Serpent",
+    "description": "Cunning and swift strikers"
+  },
+  "horse": {
+    "id": "horse",
+    "name": "Horse",
+    "description": "Noble and swift spirits"
+  },
+  "monkey": {
+    "id": "monkey",
+    "name": "Monkey",
+    "description": "Clever and agile tricksters"
+  }
+}
