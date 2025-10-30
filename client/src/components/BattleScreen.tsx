@@ -173,9 +173,21 @@ export function BattleScreen({ onClose, isBossBattle = false }: BattleScreenProp
     setBattleLog(prev => [...prev, message]);
   };
 
-  const executeTriggerEffects = (_trigger: string, _attacker: BattleSpirit | Enemy, _target: BattleSpirit | Enemy | null) => {
-    // Phase 3: Implement trigger logic for Thorns, Shield, and passive abilities
-    // This will process active effects and triggered abilities based on combat events
+  const executeTriggerEffects = (trigger: string, attacker: BattleSpirit | Enemy, target: BattleSpirit | Enemy | null, damage?: number): number => {
+    let reflectedDamage = 0;
+    
+    // Handle Thorns effect on 'on_get_hit' trigger
+    if (trigger === 'on_get_hit' && target && 'activeEffects' in target) {
+      const battleSpirit = target as BattleSpirit;
+      battleSpirit.activeEffects.forEach(effect => {
+        if (effect.effectType === 'thorns' && effect.damageReturnRatio && damage) {
+          reflectedDamage = Math.floor(damage * effect.damageReturnRatio);
+          addLog(`${battleSpirit.playerSpirit.instanceId}'s Thorns reflects ${reflectedDamage} damage!`);
+        }
+      });
+    }
+    
+    return reflectedDamage;
   };
 
   const applyStatusEffect = (spirit: BattleSpirit, effect: ActiveEffect): BattleSpirit => {
@@ -188,17 +200,29 @@ export function BattleScreen({ onClose, isBossBattle = false }: BattleScreenProp
   };
 
   const tickEffects = (spirits: BattleSpirit[], enemyState: Enemy | null): { updatedSpirits: BattleSpirit[], updatedEnemy: Enemy | null } => {
-    // Phase 3: Implement effect tick logic
-    // 1. Apply DOT damage
-    // 2. Decrement turnsRemaining on all effects
-    // 3. Filter out expired effects (turnsRemaining <= 0)
-    
-    const updatedSpirits = spirits.map(spirit => ({
-      ...spirit,
-      activeEffects: spirit.activeEffects
+    const updatedSpirits = spirits.map(spirit => {
+      let currentHealth = spirit.currentHealth;
+      
+      // Apply DOT damage from active effects
+      spirit.activeEffects.forEach(effect => {
+        if (effect.effectType === 'dot' && effect.damagePerTurn) {
+          const dotDamage = effect.damagePerTurn;
+          currentHealth = Math.max(0, currentHealth - dotDamage);
+          addLog(`${spirit.playerSpirit.instanceId} takes ${dotDamage} damage from ${effect.effectType}!`);
+        }
+      });
+      
+      // Decrement turnsRemaining and filter expired effects
+      const activeEffects = spirit.activeEffects
         .map(effect => ({ ...effect, turnsRemaining: effect.turnsRemaining - 1 }))
-        .filter(effect => effect.turnsRemaining > 0),
-    }));
+        .filter(effect => effect.turnsRemaining > 0);
+      
+      return {
+        ...spirit,
+        currentHealth,
+        activeEffects,
+      };
+    });
 
     return { updatedSpirits, updatedEnemy: enemyState };
   };
@@ -337,7 +361,25 @@ export function BattleScreen({ onClose, isBossBattle = false }: BattleScreenProp
         setIsBlocking(false);
       }
       
+      // Check for Shield effects
+      let shieldBlocked = false;
+      const hasShield = target.activeEffects.some(effect => 
+        effect.effectType === 'shield' && effect.blocksFullHit
+      );
+      
+      if (hasShield) {
+        damage = 0;
+        shieldBlocked = true;
+        const targetBase = getBaseSpirit(target.playerSpirit.spiritId);
+        addLog(`${targetBase?.name}'s Shield blocks the attack!`);
+      }
+      
       const newHealth = Math.max(0, target.currentHealth - damage);
+      
+      // Calculate Thorns reflected damage
+      const reflectedDamage = executeTriggerEffects('on_get_hit', enemy, target, damage);
+      const newEnemyHealth = reflectedDamage > 0 ? Math.max(0, enemy.currentHealth - reflectedDamage) : enemy.currentHealth;
+      
       playDamage();
       setPlayerHealthBarShake(true);
       setTimeout(() => setPlayerHealthBarShake(false), 500);
@@ -345,15 +387,40 @@ export function BattleScreen({ onClose, isBossBattle = false }: BattleScreenProp
       setPlayerSpirits(prev => {
         // Apply damage first
         const withDamage = prev.map((s, i) => 
-          i === targetIndex ? { ...s, currentHealth: newHealth } : s
+          i === targetIndex ? { 
+            ...s, 
+            currentHealth: newHealth,
+            // Remove Shield effect if it blocked damage
+            activeEffects: shieldBlocked && i === targetIndex 
+              ? s.activeEffects.filter(e => !(e.effectType === 'shield' && e.blocksFullHit))
+              : s.activeEffects
+          } : s
         );
         // Then tick effects
         const { updatedSpirits } = tickEffects(withDamage, enemy);
+        
+        // Check for defeat after DOT effects
+        const updatedTarget = updatedSpirits[targetIndex];
+        if (updatedTarget && updatedTarget.currentHealth <= 0) {
+          setTimeout(() => checkDefeat(updatedTarget.currentHealth, targetIndex), 0);
+        }
+        
         return updatedSpirits;
       });
+      
+      // Update enemy health if Thorns reflected damage
+      if (reflectedDamage > 0) {
+        setEnemy({ ...enemy, currentHealth: newEnemyHealth });
+        // Check if enemy was defeated by Thorns
+        if (newEnemyHealth <= 0) {
+          setTimeout(() => handleVictory(), 0);
+        }
+      }
 
       const targetBase = getBaseSpirit(target.playerSpirit.spiritId);
-      addLog(`${enemy.name} uses Basic Strike on ${targetBase?.name}! Dealt ${damage} damage.`);
+      if (!shieldBlocked) {
+        addLog(`${enemy.name} uses Basic Strike on ${targetBase?.name}! Dealt ${damage} damage.`);
+      }
       
       setBossState(prev => ({ ...prev, patternStep: 1 }));
       
@@ -386,7 +453,25 @@ export function BattleScreen({ onClose, isBossBattle = false }: BattleScreenProp
           setIsBlocking(false);
         }
         
+        // Check for Shield effects
+        let shieldBlocked = false;
+        const hasShield = target.activeEffects.some(effect => 
+          effect.effectType === 'shield' && effect.blocksFullHit
+        );
+        
+        if (hasShield) {
+          damage = 0;
+          shieldBlocked = true;
+          const targetBase = getBaseSpirit(target.playerSpirit.spiritId);
+          addLog(`${targetBase?.name}'s Shield blocks the attack!`);
+        }
+        
         const newHealth = Math.max(0, target.currentHealth - damage);
+        
+        // Calculate Thorns reflected damage
+        const reflectedDamage = executeTriggerEffects('on_get_hit', enemy, target, damage);
+        const newEnemyHealth = reflectedDamage > 0 ? Math.max(0, enemy.currentHealth - reflectedDamage) : enemy.currentHealth;
+        
         playDamage();
         setPlayerHealthBarShake(true);
         setTimeout(() => setPlayerHealthBarShake(false), 500);
@@ -394,15 +479,40 @@ export function BattleScreen({ onClose, isBossBattle = false }: BattleScreenProp
         setPlayerSpirits(prev => {
           // Apply damage first
           const withDamage = prev.map((s, i) => 
-            i === targetIndex ? { ...s, currentHealth: newHealth } : s
+            i === targetIndex ? { 
+              ...s, 
+              currentHealth: newHealth,
+              // Remove Shield effect if it blocked damage
+              activeEffects: shieldBlocked && i === targetIndex 
+                ? s.activeEffects.filter(e => !(e.effectType === 'shield' && e.blocksFullHit))
+                : s.activeEffects
+            } : s
           );
           // Then tick effects
           const { updatedSpirits } = tickEffects(withDamage, enemy);
+          
+          // Check for defeat after DOT effects
+          const updatedTarget = updatedSpirits[targetIndex];
+          if (updatedTarget && updatedTarget.currentHealth <= 0) {
+            setTimeout(() => checkDefeat(updatedTarget.currentHealth, targetIndex), 0);
+          }
+          
           return updatedSpirits;
         });
+        
+        // Update enemy health if Thorns reflected damage
+        if (reflectedDamage > 0) {
+          setEnemy({ ...enemy, currentHealth: newEnemyHealth });
+          // Check if enemy was defeated by Thorns
+          if (newEnemyHealth <= 0) {
+            setTimeout(() => handleVictory(), 0);
+          }
+        }
 
         const targetBase = getBaseSpirit(target.playerSpirit.spiritId);
-        addLog(`${enemy.name} unleashes Charged Hit on ${targetBase?.name}! Dealt ${damage} devastating damage!`);
+        if (!shieldBlocked) {
+          addLog(`${enemy.name} unleashes Charged Hit on ${targetBase?.name}! Dealt ${damage} devastating damage!`);
+        }
         
         setBossState(prev => ({ ...prev, patternStep: 0, isCharging: false }));
         
@@ -422,7 +532,24 @@ export function BattleScreen({ onClose, isBossBattle = false }: BattleScreenProp
       setIsBlocking(false);
     }
     
+    // Check for Shield effects
+    let shieldBlocked = false;
+    const hasShield = target.activeEffects.some(effect => 
+      effect.effectType === 'shield' && effect.blocksFullHit
+    );
+    
+    if (hasShield) {
+      damage = 0;
+      shieldBlocked = true;
+      const targetBase = getBaseSpirit(target.playerSpirit.spiritId);
+      addLog(`${targetBase?.name}'s Shield blocks the attack!`);
+    }
+    
     const newHealth = Math.max(0, target.currentHealth - damage);
+    
+    // Calculate Thorns reflected damage
+    const reflectedDamage = executeTriggerEffects('on_get_hit', enemy, target, damage);
+    const newEnemyHealth = reflectedDamage > 0 ? Math.max(0, enemy.currentHealth - reflectedDamage) : enemy.currentHealth;
 
     playDamage();
     setPlayerHealthBarShake(true);
@@ -431,15 +558,40 @@ export function BattleScreen({ onClose, isBossBattle = false }: BattleScreenProp
     setPlayerSpirits(prev => {
       // Apply damage first
       const withDamage = prev.map((s, i) => 
-        i === targetIndex ? { ...s, currentHealth: newHealth } : s
+        i === targetIndex ? { 
+          ...s, 
+          currentHealth: newHealth,
+          // Remove Shield effect if it blocked damage
+          activeEffects: shieldBlocked && i === targetIndex 
+            ? s.activeEffects.filter(e => !(e.effectType === 'shield' && e.blocksFullHit))
+            : s.activeEffects
+        } : s
       );
       // Then tick effects
       const { updatedSpirits } = tickEffects(withDamage, enemy);
+      
+      // Check for defeat after DOT effects
+      const updatedTarget = updatedSpirits[targetIndex];
+      if (updatedTarget && updatedTarget.currentHealth <= 0) {
+        setTimeout(() => checkDefeat(updatedTarget.currentHealth, targetIndex), 0);
+      }
+      
       return updatedSpirits;
     });
+    
+    // Update enemy health if Thorns reflected damage
+    if (reflectedDamage > 0) {
+      setEnemy({ ...enemy, currentHealth: newEnemyHealth });
+      // Check if enemy was defeated by Thorns
+      if (newEnemyHealth <= 0) {
+        setTimeout(() => handleVictory(), 0);
+      }
+    }
 
     const targetBase = getBaseSpirit(target.playerSpirit.spiritId);
-    addLog(`${enemy.name} attacks ${targetBase?.name}! Dealt ${damage} damage.`);
+    if (!shieldBlocked) {
+      addLog(`${enemy.name} attacks ${targetBase?.name}! Dealt ${damage} damage.`);
+    }
 
     checkDefeat(newHealth, targetIndex);
   };
