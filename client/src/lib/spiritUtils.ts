@@ -1,4 +1,4 @@
-import type { PlayerSpirit, BaseSpirit, Element, Lineage, Skill, PassiveAbility, PotentialGrade, ElementId } from '@shared/types';
+import type { PlayerSpirit, BaseSpirit, Element, Lineage, Skill, PassiveAbility, PotentialGrade, ElementId, ActiveEffect } from '@shared/types';
 import spiritsData from '@shared/data/spirits.json';
 import elementsData from '@shared/data/elements.json';
 import lineagesData from '@shared/data/lineages.json';
@@ -53,29 +53,50 @@ export function calculateAllStats(playerSpirit: PlayerSpirit) {
     return { attack: 0, defense: 0, health: 0, elementalAffinity: 0 };
   }
 
-  const attack = calculateStat(
+  let attack = calculateStat(
     baseSpirit.baseStats.attack,
     playerSpirit.level,
     playerSpirit.potentialFactors.attack
   );
   
-  const defense = calculateStat(
+  let defense = calculateStat(
     baseSpirit.baseStats.defense,
     playerSpirit.level,
     playerSpirit.potentialFactors.defense
   );
   
-  const health = calculateStat(
+  let health = calculateStat(
     baseSpirit.baseStats.health,
     playerSpirit.level,
     playerSpirit.potentialFactors.health
   );
   
-  const elementalAffinity = calculateStat(
+  let elementalAffinity = calculateStat(
     baseSpirit.baseStats.elementalAffinity,
     playerSpirit.level,
     playerSpirit.potentialFactors.elementalAffinity
   );
+
+  // Apply active effects (stat buffs/debuffs)
+  const activeEffects = playerSpirit.activeEffects || [];
+  activeEffects.forEach(effect => {
+    if ((effect.effectType === 'stat_buff' || effect.effectType === 'stat_debuff') && effect.stat && effect.statMultiplier) {
+      switch (effect.stat) {
+        case 'attack':
+          attack = Math.floor(attack * effect.statMultiplier);
+          break;
+        case 'defense':
+          defense = Math.floor(defense * effect.statMultiplier);
+          break;
+        case 'health':
+          health = Math.floor(health * effect.statMultiplier);
+          break;
+        case 'elementalAffinity':
+          elementalAffinity = Math.floor(elementalAffinity * effect.statMultiplier);
+          break;
+      }
+    }
+  });
 
   const passiveBonus = getPassiveBonus(baseSpirit.passiveAbility);
   

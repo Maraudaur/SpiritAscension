@@ -47,6 +47,7 @@ export interface ActiveEffect {
   id: string;
   effectType: CustomEffect['type'];
   turnsRemaining: number;
+  stat?: StatType;
   statMultiplier?: number;
   damagePerTurn?: number;
   damageReturnRatio?: number;
