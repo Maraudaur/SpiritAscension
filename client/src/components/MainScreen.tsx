@@ -5,7 +5,7 @@ import { Sparkles, Swords, Users, Volume2, VolumeX } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 interface MainScreenProps {
-  onNavigate: (screen: 'main' | 'spirits' | 'battle' | 'summon') => void;
+  onNavigate: (screen: 'main' | 'spirits' | 'battle' | 'summon' | 'boss') => void;
 }
 
 export function MainScreen({ onNavigate }: MainScreenProps) {
@@ -120,7 +120,7 @@ export function MainScreen({ onNavigate }: MainScreenProps) {
           </Button>
         </div>
 
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid grid-cols-3 gap-4 mb-4">
           <Button
             onClick={() => onNavigate('summon')}
             className="p-6 flex flex-col items-center gap-2"
@@ -148,6 +148,15 @@ export function MainScreen({ onNavigate }: MainScreenProps) {
             <span className="text-sm font-semibold">Enter Battle</span>
           </Button>
         </div>
+
+        <Button
+          onClick={() => onNavigate('boss')}
+          className="w-full p-6 flex flex-col items-center gap-2"
+          style={{ background: 'linear-gradient(135deg, #8B0000 0%, #FF4500 100%)', color: 'var(--parchment)' }}
+        >
+          <Swords className="w-10 h-10" />
+          <span className="text-lg font-bold">⚔️ Challenge Boss ⚔️</span>
+        </Button>
       </div>
     </div>
   );

@@ -558,5 +558,17 @@
       "passiveAbility": "attack",
       "skills": ["basic_attack", "heavy_hit", "hit_and_heal"]
     }
+  ],
+  "boss": [
+    {
+      "id": "boss_01",
+      "name": "Heavenly Warlord",
+      "rarity": "legendary",
+      "element": "metal",
+      "lineage": "dragon",
+      "baseStats": { "attack": 300, "defense": 150, "health": 1000, "elementalAffinity": 50 },
+      "passiveAbility": "health",
+      "skills": ["basic_attack", "atk_buff", "charged_hit"]
+    }
   ]
 }

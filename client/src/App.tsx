@@ -6,7 +6,7 @@ import { BattleScreen } from "./components/BattleScreen";
 import { useAudio } from "./lib/stores/useAudio";
 import "@fontsource/inter";
 
-type Screen = 'main' | 'spirits' | 'battle' | 'summon';
+type Screen = 'main' | 'spirits' | 'battle' | 'summon' | 'boss';
 
 function App() {
   const [currentScreen, setCurrentScreen] = useState<Screen>('main');
@@ -100,6 +100,10 @@ function App() {
 
       {currentScreen === 'battle' && (
         <BattleScreen onClose={() => setCurrentScreen('main')} />
+      )}
+
+      {currentScreen === 'boss' && (
+        <BattleScreen onClose={() => setCurrentScreen('main')} isBossBattle={true} />
       )}
     </div>
   );

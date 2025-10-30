@@ -11,6 +11,7 @@ type ActionMenu = 'none' | 'skills' | 'swap';
 
 interface BattleScreenProps {
   onClose: () => void;
+  isBossBattle?: boolean;
 }
 
 interface BattleSpirit {
@@ -27,9 +28,16 @@ interface Enemy {
   maxHealth: number;
   attack: number;
   defense: number;
+  baseAttack?: number;
 }
 
-export function BattleScreen({ onClose }: BattleScreenProps) {
+interface BossBattleState {
+  patternStep: number;
+  atkBuffTurnsRemaining: number;
+  isCharging: boolean;
+}
+
+export function BattleScreen({ onClose, isBossBattle = false }: BattleScreenProps) {
   const { spirits, activeParty, winBattle, updateSpiritHealth, battleRewardMultiplier } = useGameState();
   const { playDamage, playHeal, playButtonClick, playButtonHover, isMuted, toggleMute, playBattleMusic, playExploreMusic } = useAudio();
   const [battleState, setBattleState] = useState<'setup' | 'fighting' | 'victory' | 'defeat'>('setup');
@@ -43,8 +51,54 @@ export function BattleScreen({ onClose }: BattleScreenProps) {
   const [playerHealthBarShake, setPlayerHealthBarShake] = useState(false);
   const [enemyHealthBarShake, setEnemyHealthBarShake] = useState(false);
   const [playerHealthBarHeal, setPlayerHealthBarHeal] = useState(false);
+  const [bossState, setBossState] = useState<BossBattleState>({
+    patternStep: 0,
+    atkBuffTurnsRemaining: 0,
+    isCharging: false,
+  });
+
+  const generateBossEnemy = (): Enemy => {
+    const bossSpirit = getBaseSpirit('boss_01');
+    if (!bossSpirit) {
+      return {
+        id: 'boss_' + Date.now(),
+        name: 'Heavenly Warlord',
+        level: 10,
+        attack: 300,
+        defense: 150,
+        maxHealth: 1500,
+        currentHealth: 1500,
+        baseAttack: 300,
+      };
+    }
+    
+    const level = 10;
+    const stats = calculateAllStats({
+      instanceId: 'boss_temp',
+      spiritId: 'boss_01',
+      level,
+      experience: 0,
+      isPrismatic: false,
+      potentialFactors: { attack: 'C', defense: 'C', health: 'C', elementalAffinity: 'C' },
+    });
+    
+    return {
+      id: 'boss_' + Date.now(),
+      name: bossSpirit.name,
+      level,
+      attack: stats.attack,
+      defense: stats.defense,
+      maxHealth: stats.health,
+      currentHealth: stats.health,
+      baseAttack: stats.attack,
+    };
+  };
 
   const generateNewEnemy = (spiritList: BattleSpirit[]) => {
+    if (isBossBattle) {
+      return generateBossEnemy();
+    }
+    
     if (spiritList.length === 0) return null;
     
     // Find highest level spirit in active party
@@ -182,6 +236,18 @@ export function BattleScreen({ onClose }: BattleScreenProps) {
   const enemyTurn = (specifiedTargetIndex?: number) => {
     if (!enemy || playerSpirits.length === 0) return;
 
+    // Decrease ATK buff turns if active and reset attack when it expires
+    if (isBossBattle && bossState.atkBuffTurnsRemaining > 0) {
+      const newBuffTurns = bossState.atkBuffTurnsRemaining - 1;
+      setBossState(prev => ({ ...prev, atkBuffTurnsRemaining: newBuffTurns }));
+      
+      // Reset attack to base when buff expires
+      if (newBuffTurns === 0 && enemy.baseAttack) {
+        setEnemy(prev => prev ? { ...prev, attack: enemy.baseAttack! } : null);
+        addLog(`${enemy.name}'s ATK Buff has worn off!`);
+      }
+    }
+
     // Use the specified target index if provided, otherwise use activePartySlot
     let targetIndex = specifiedTargetIndex !== undefined ? specifiedTargetIndex : activePartySlot;
     while (targetIndex < playerSpirits.length && playerSpirits[targetIndex].currentHealth <= 0) {
@@ -196,9 +262,97 @@ export function BattleScreen({ onClose }: BattleScreenProps) {
 
     const target = playerSpirits[targetIndex];
     const stats = calculateAllStats(target.playerSpirit);
+    
+    if (isBossBattle) {
+      executeBossTurn(targetIndex, target, stats);
+    } else {
+      executeNormalEnemyTurn(targetIndex, target, stats);
+    }
+  };
+
+  const executeBossTurn = (targetIndex: number, target: BattleSpirit, stats: any) => {
+    if (!enemy) return;
+
+    // Boss attack pattern: 0 = Basic Attack, 1 = ATK Buff, 2 = Charged Hit
+    const pattern = bossState.patternStep;
+
+    if (pattern === 0) {
+      // Basic Attack
+      let damage = Math.max(1, Math.floor(enemy.attack - (stats.defense * 0.3)));
+      
+      if (isBlocking) {
+        damage = Math.floor(damage * 0.5);
+        addLog(`${getBaseSpirit(target.playerSpirit.spiritId)?.name} blocked! Damage reduced.`);
+        setIsBlocking(false);
+      }
+      
+      const newHealth = Math.max(0, target.currentHealth - damage);
+      playDamage();
+      setPlayerHealthBarShake(true);
+      setTimeout(() => setPlayerHealthBarShake(false), 500);
+
+      setPlayerSpirits(prev => prev.map((s, i) => 
+        i === targetIndex ? { ...s, currentHealth: newHealth } : s
+      ));
+
+      const targetBase = getBaseSpirit(target.playerSpirit.spiritId);
+      addLog(`${enemy.name} uses Basic Strike on ${targetBase?.name}! Dealt ${damage} damage.`);
+      
+      setBossState(prev => ({ ...prev, patternStep: 1 }));
+      
+      checkDefeat(newHealth, targetIndex);
+    } else if (pattern === 1) {
+      // ATK Buff
+      const baseAttack = enemy.baseAttack || enemy.attack;
+      const buffedAttack = Math.floor(baseAttack * 1.5);
+      setEnemy({ ...enemy, attack: buffedAttack });
+      setBossState(prev => ({ 
+        ...prev, 
+        patternStep: 2, 
+        atkBuffTurnsRemaining: 3 
+      }));
+      
+      addLog(`${enemy.name} uses ATK Buff! Attack increased for 3 turns!`);
+    } else if (pattern === 2) {
+      // Charged Hit
+      if (!bossState.isCharging) {
+        // Start charging
+        setBossState(prev => ({ ...prev, isCharging: true }));
+        addLog(`${enemy.name} is charging a powerful attack...`);
+      } else {
+        // Execute charged attack (2x damage)
+        let damage = Math.max(1, Math.floor((enemy.attack * 2.0) - (stats.defense * 0.3)));
+        
+        if (isBlocking) {
+          damage = Math.floor(damage * 0.5);
+          addLog(`${getBaseSpirit(target.playerSpirit.spiritId)?.name} blocked! Damage reduced.`);
+          setIsBlocking(false);
+        }
+        
+        const newHealth = Math.max(0, target.currentHealth - damage);
+        playDamage();
+        setPlayerHealthBarShake(true);
+        setTimeout(() => setPlayerHealthBarShake(false), 500);
+
+        setPlayerSpirits(prev => prev.map((s, i) => 
+          i === targetIndex ? { ...s, currentHealth: newHealth } : s
+        ));
+
+        const targetBase = getBaseSpirit(target.playerSpirit.spiritId);
+        addLog(`${enemy.name} unleashes Charged Hit on ${targetBase?.name}! Dealt ${damage} devastating damage!`);
+        
+        setBossState(prev => ({ ...prev, patternStep: 0, isCharging: false }));
+        
+        checkDefeat(newHealth, targetIndex);
+      }
+    }
+  };
+
+  const executeNormalEnemyTurn = (targetIndex: number, target: BattleSpirit, stats: any) => {
+    if (!enemy) return;
+
     let damage = Math.max(1, Math.floor(enemy.attack - (stats.defense * 0.3)));
     
-    // Apply blocking damage reduction
     if (isBlocking) {
       damage = Math.floor(damage * 0.5);
       addLog(`${getBaseSpirit(target.playerSpirit.spiritId)?.name} blocked! Damage reduced.`);
@@ -207,7 +361,6 @@ export function BattleScreen({ onClose }: BattleScreenProps) {
     
     const newHealth = Math.max(0, target.currentHealth - damage);
 
-    // Play damage sound and shake player health bar
     playDamage();
     setPlayerHealthBarShake(true);
     setTimeout(() => setPlayerHealthBarShake(false), 500);
@@ -219,22 +372,24 @@ export function BattleScreen({ onClose }: BattleScreenProps) {
     const targetBase = getBaseSpirit(target.playerSpirit.spiritId);
     addLog(`${enemy.name} attacks ${targetBase?.name}! Dealt ${damage} damage.`);
 
+    checkDefeat(newHealth, targetIndex);
+  };
+
+  const checkDefeat = (newHealth: number, targetIndex: number) => {
     if (newHealth <= 0) {
+      const targetBase = getBaseSpirit(playerSpirits[targetIndex].playerSpirit.spiritId);
       addLog(`${targetBase?.name} has been defeated!`);
       
-      // Check if there are any other living spirits (after this one is defeated)
       const hasLivingSpirit = playerSpirits.some((s, i) => 
         i !== targetIndex && s.currentHealth > 0
       );
       
       if (!hasLivingSpirit) {
-        // No living spirits left - defeat
         setTimeout(() => {
           setBattleState('defeat');
           addLog('All spirits have been defeated...');
         }, 800);
       } else {
-        // Auto-swap to next living spirit
         setTimeout(() => {
           const nextAliveIndex = playerSpirits.findIndex((s, i) => 
             i !== targetIndex && s.currentHealth > 0
@@ -365,7 +520,7 @@ export function BattleScreen({ onClose }: BattleScreenProps) {
         </button>
 
         <h2 className="text-3xl font-bold text-center mb-4 parchment-text brush-stroke">
-          Cultivation Battle
+          {isBossBattle ? '⚔️ Boss Battle ⚔️' : 'Cultivation Battle'}
         </h2>
 
         {/* Battle Scene Placeholder */}
@@ -465,6 +620,24 @@ export function BattleScreen({ onClose }: BattleScreenProps) {
                   <div>ATK: {enemy.attack}</div>
                   <div>DEF: {enemy.defense}</div>
                 </div>
+                {isBossBattle && (
+                  <div className="mt-2 space-y-1">
+                    {bossState.atkBuffTurnsRemaining > 0 && (
+                      <div className="p-2 bg-red-100 rounded border border-red-400">
+                        <p className="text-xs font-bold text-red-800">
+                          ⚡ ATK Buffed! ({bossState.atkBuffTurnsRemaining} turns)
+                        </p>
+                      </div>
+                    )}
+                    {bossState.isCharging && (
+                      <div className="p-2 bg-yellow-100 rounded border border-yellow-400">
+                        <p className="text-xs font-bold text-yellow-800 animate-pulse">
+                          ⚡ Charging...
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
             ) : (
               <p className="text-sm parchment-text opacity-50">No enemy</p>
@@ -634,9 +807,13 @@ export function BattleScreen({ onClose }: BattleScreenProps) {
 
         {battleState === 'victory' && battleRewards && (
           <div className="p-4 bg-green-100 rounded-lg border-2 border-green-600">
-            <h3 className="font-bold text-green-800 text-2xl mb-3 text-center">🎉 Victory! 🎉</h3>
+            <h3 className="font-bold text-green-800 text-2xl mb-3 text-center">
+              🎉 {isBossBattle ? 'Boss Defeated!' : 'Victory!'} 🎉
+            </h3>
             <p className="text-md text-green-800 mb-3 text-center font-semibold">
-              You defeated the enemy! A new challenger approaches...
+              {isBossBattle 
+                ? 'You have defeated the mighty boss! Your cultivation deepens...'
+                : 'You defeated the enemy! A new challenger approaches...'}
             </p>
             <div className="mb-4 space-y-2 p-3 bg-white rounded border border-green-400">
               <p className="text-lg font-bold text-green-800">Battle Rewards:</p>
@@ -646,14 +823,7 @@ export function BattleScreen({ onClose }: BattleScreenProps) {
                 All spirits have been fully healed!
               </p>
             </div>
-            <div className="grid grid-cols-2 gap-3">
-              <Button
-                onClick={handleContinueBattle}
-                className="w-full font-bold"
-                style={{ background: 'var(--vermillion)', color: 'var(--parchment)' }}
-              >
-                Continue Battling
-              </Button>
+            {isBossBattle ? (
               <Button
                 onClick={handleClose}
                 className="w-full font-bold"
@@ -661,7 +831,24 @@ export function BattleScreen({ onClose }: BattleScreenProps) {
               >
                 Return to Cultivation
               </Button>
-            </div>
+            ) : (
+              <div className="grid grid-cols-2 gap-3">
+                <Button
+                  onClick={handleContinueBattle}
+                  className="w-full font-bold"
+                  style={{ background: 'var(--vermillion)', color: 'var(--parchment)' }}
+                >
+                  Continue Battling
+                </Button>
+                <Button
+                  onClick={handleClose}
+                  className="w-full font-bold"
+                  style={{ background: 'var(--jade-green)', color: 'var(--parchment)' }}
+                >
+                  Return to Cultivation
+                </Button>
+              </div>
+            )}
           </div>
         )}
 

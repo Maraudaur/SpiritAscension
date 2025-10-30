@@ -22,5 +22,21 @@
     "damage": 1.0,
     "healing": 0.3,
     "unlockLevel": 3
+  },
+  "atk_buff": {
+    "id": "atk_buff",
+    "name": "ATK Buff",
+    "description": "Increases attack power for 3 turns",
+    "damage": 0,
+    "healing": 0,
+    "unlockLevel": 1
+  },
+  "charged_hit": {
+    "id": "charged_hit",
+    "name": "Charged Hit",
+    "description": "Charges for one turn, then unleashes a devastating strike with 2x damage",
+    "damage": 2.0,
+    "healing": 0,
+    "unlockLevel": 1
   }
 }
