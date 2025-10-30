@@ -176,10 +176,11 @@ export function BattleScreen({ onClose }: BattleScreenProps) {
     setTimeout(() => enemyTurn(), 800);
   };
 
-  const enemyTurn = () => {
+  const enemyTurn = (specifiedTargetIndex?: number) => {
     if (!enemy || playerSpirits.length === 0) return;
 
-    let targetIndex = activePartySlot;
+    // Use the specified target index if provided, otherwise use activePartySlot
+    let targetIndex = specifiedTargetIndex !== undefined ? specifiedTargetIndex : activePartySlot;
     while (targetIndex < playerSpirits.length && playerSpirits[targetIndex].currentHealth <= 0) {
       targetIndex++;
     }
@@ -260,7 +261,8 @@ export function BattleScreen({ onClose }: BattleScreenProps) {
     setIsBlocking(false);
     addLog(`Swapped ${oldSpirit?.name} for ${newSpirit?.name}!`);
     
-    setTimeout(() => enemyTurn(), 800);
+    // Pass the new index directly to enemyTurn to ensure it targets the correct spirit
+    setTimeout(() => enemyTurn(index), 800);
   };
 
   const handleBlock = () => {
