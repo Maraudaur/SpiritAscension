@@ -76,4 +76,5 @@ export interface GameState {
   battlesWon: number;
   lastUpdate: number;
   essences: Record<string, number>;
+  summonCount?: number;
 }

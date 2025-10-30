@@ -38,7 +38,7 @@ interface BossBattleState {
 }
 
 export function BattleScreen({ onClose, isBossBattle = false }: BattleScreenProps) {
-  const { spirits, activeParty, winBattle, updateSpiritHealth, battleRewardMultiplier } = useGameState();
+  const { spirits, activeParty, winBattle, updateSpiritHealth, battleRewardMultiplier, healAllSpirits } = useGameState();
   const { playDamage, playHeal, playButtonClick, playButtonHover, isMuted, toggleMute, playBattleMusic, playExploreMusic } = useAudio();
   const [battleState, setBattleState] = useState<'setup' | 'fighting' | 'victory' | 'defeat'>('setup');
   const [activePartySlot, setActivePartySlot] = useState(0);
@@ -257,6 +257,14 @@ export function BattleScreen({ onClose, isBossBattle = false }: BattleScreenProp
     if (targetIndex >= playerSpirits.length) {
       setBattleState('defeat');
       addLog('All spirits have been defeated...');
+      
+      // Heal all spirits when losing (both global and local state)
+      healAllSpirits();
+      setPlayerSpirits(prev => prev.map(spirit => ({
+        ...spirit,
+        currentHealth: spirit.maxHealth
+      })));
+      
       return;
     }
 
@@ -388,6 +396,13 @@ export function BattleScreen({ onClose, isBossBattle = false }: BattleScreenProp
         setTimeout(() => {
           setBattleState('defeat');
           addLog('All spirits have been defeated...');
+          
+          // Heal all spirits when losing (both global and local state)
+          healAllSpirits();
+          setPlayerSpirits(prev => prev.map(spirit => ({
+            ...spirit,
+            currentHealth: spirit.maxHealth
+          })));
         }, 800);
       } else {
         setTimeout(() => {
@@ -458,9 +473,12 @@ export function BattleScreen({ onClose, isBossBattle = false }: BattleScreenProp
   };
 
   const handleClose = () => {
-    playerSpirits.forEach(spirit => {
-      updateSpiritHealth(spirit.playerSpirit.instanceId, spirit.currentHealth);
-    });
+    // Only save health if not defeated (defeat heals all spirits)
+    if (battleState !== 'defeat') {
+      playerSpirits.forEach(spirit => {
+        updateSpiritHealth(spirit.playerSpirit.instanceId, spirit.currentHealth);
+      });
+    }
     
     // Switch back to explore music when leaving battle
     playExploreMusic();

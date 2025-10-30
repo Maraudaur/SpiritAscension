@@ -79,6 +79,7 @@ interface GameStore extends GameState {
   getEssenceCount: (spiritId: string) => number;
   harmonizeSpirit: (instanceId: string) => void;
   getLevelUpCost: (level: number) => { qi: number; essence: number };
+  healAllSpirits: () => void;
 }
 
 const BASE_SPIRIT_COST = 100;
@@ -100,6 +101,7 @@ export const useGameState = create<GameStore>()(
       battlesWon: 0,
       lastUpdate: Date.now(),
       essences: {},
+      summonCount: 0,
 
       updateQi: () => {
         const now = Date.now();
@@ -127,7 +129,9 @@ export const useGameState = create<GameStore>()(
       },
 
       getSpiritCost: () => {
-        return BASE_SPIRIT_COST;
+        const state = get();
+        const cost = Math.floor(BASE_SPIRIT_COST * Math.pow(1.5, state.summonCount || 0));
+        return cost;
       },
 
       getBattleRewardUpgradeCost: () => {
@@ -162,6 +166,7 @@ export const useGameState = create<GameStore>()(
 
         set((state) => ({
           spirits: [...state.spirits, newSpirit],
+          summonCount: (state.summonCount || 0) + 1,
         }));
 
         return newSpirit;
@@ -305,6 +310,15 @@ export const useGameState = create<GameStore>()(
           qi: level * 50,
           essence: level * 2,
         };
+      },
+
+      healAllSpirits: () => {
+        set((state) => ({
+          spirits: state.spirits.map(spirit => ({
+            ...spirit,
+            currentHealth: undefined,
+          })),
+        }));
       },
     }),
     {

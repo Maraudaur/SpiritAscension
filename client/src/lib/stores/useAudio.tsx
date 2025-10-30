@@ -73,13 +73,18 @@ export const useAudio = create<AudioState>((set, get) => ({
     
     // Don't restart if already playing
     if (currentMusic === 'explore' && exploreMusic && !exploreMusic.paused) {
+      console.log('🎵 Explore music already playing, skipping');
       return;
     }
     
-    // Stop battle music if playing
+    // Stop ALL music first to prevent stacking
     if (battleMusic) {
       battleMusic.pause();
       battleMusic.currentTime = 0;
+    }
+    if (exploreMusic) {
+      exploreMusic.pause();
+      exploreMusic.currentTime = 0;
     }
     
     // Play explore music
@@ -97,13 +102,18 @@ export const useAudio = create<AudioState>((set, get) => ({
     
     // Don't restart if already playing
     if (currentMusic === 'battle' && battleMusic && !battleMusic.paused) {
+      console.log('⚔️ Battle music already playing, skipping');
       return;
     }
     
-    // Stop explore music if playing
+    // Stop ALL music first to prevent stacking
     if (exploreMusic) {
       exploreMusic.pause();
       exploreMusic.currentTime = 0;
+    }
+    if (battleMusic) {
+      battleMusic.pause();
+      battleMusic.currentTime = 0;
     }
     
     // Play battle music
