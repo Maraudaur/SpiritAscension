@@ -26,7 +26,7 @@ interface Enemy {
 }
 
 export function BattleScreen({ onClose }: BattleScreenProps) {
-  const { spirits, activeParty, winBattle, updateSpiritHealth, battlesWon } = useGameState();
+  const { spirits, activeParty, winBattle, updateSpiritHealth, battleRewardMultiplier } = useGameState();
   const [battleState, setBattleState] = useState<'setup' | 'fighting' | 'victory' | 'defeat'>('setup');
   const [activePartySlot, setActivePartySlot] = useState(0);
   const [battleLog, setBattleLog] = useState<string[]>([]);
@@ -54,7 +54,12 @@ export function BattleScreen({ onClose }: BattleScreenProps) {
 
     setPlayerSpirits(spiritsInBattle);
 
-    const enemyLevel = 1 + Math.floor(Math.random() * 3);
+    // Find highest level spirit in active party
+    const highestLevel = Math.max(...spiritsInBattle.map(s => s.playerSpirit.level));
+    // Enemy level is within 2 levels of highest spirit (can be -2 to +2, minimum 1)
+    const levelOffset = Math.floor(Math.random() * 5) - 2; // -2, -1, 0, 1, or 2
+    const enemyLevel = Math.max(1, highestLevel + levelOffset);
+    
     const newEnemy: Enemy = {
       id: 'enemy_' + Date.now(),
       name: 'Shadow Beast',
@@ -113,8 +118,9 @@ export function BattleScreen({ onClose }: BattleScreenProps) {
         setBattleState('victory');
         addLog('Victory! The enemy has been defeated!');
         
-        // Calculate rewards before updating state
-        const qiReward = 100 * (battlesWon + 1);
+        // Calculate rewards based on enemy level and multiplier
+        const baseQiReward = enemy.level * 10;
+        const qiReward = Math.floor(baseQiReward * battleRewardMultiplier);
         const qiGenerationIncrease = 0.1;
         setBattleRewards({ qi: qiReward, qiGeneration: qiGenerationIncrease });
         
@@ -129,7 +135,7 @@ export function BattleScreen({ onClose }: BattleScreenProps) {
         });
         
         // Update game state with battle rewards
-        winBattle();
+        winBattle(qiReward);
       }, 500);
       return;
     }

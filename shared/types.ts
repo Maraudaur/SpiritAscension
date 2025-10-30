@@ -70,6 +70,7 @@ export interface GameState {
     baseProduction: number;
     multiplier: number;
   };
+  battleRewardMultiplier: number;
   spirits: PlayerSpirit[];
   activeParty: string[];
   battlesWon: number;

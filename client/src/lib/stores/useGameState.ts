@@ -69,14 +69,17 @@ interface GameStore extends GameState {
   addQi: (amount: number) => void;
   spendQi: (amount: number) => boolean;
   upgradeQiProduction: () => void;
-  winBattle: () => void;
+  upgradeBattleReward: () => void;
+  winBattle: (qiReward: number) => void;
   getSpiritCost: () => number;
+  getBattleRewardUpgradeCost: () => number;
   updateSpiritHealth: (instanceId: string, health: number) => void;
   levelUpSpirit: (instanceId: string) => void;
 }
 
 const BASE_SPIRIT_COST = 100;
 const QI_UPGRADE_BASE_COST = 500;
+const BATTLE_REWARD_UPGRADE_BASE_COST = 300;
 
 export const useGameState = create<GameStore>()(
   persist(
@@ -87,6 +90,7 @@ export const useGameState = create<GameStore>()(
         baseProduction: 1,
         multiplier: 1,
       },
+      battleRewardMultiplier: 1.0,
       spirits: [],
       activeParty: [],
       battlesWon: 0,
@@ -119,6 +123,12 @@ export const useGameState = create<GameStore>()(
 
       getSpiritCost: () => {
         return BASE_SPIRIT_COST;
+      },
+
+      getBattleRewardUpgradeCost: () => {
+        const state = get();
+        const upgradeLevel = Math.floor((state.battleRewardMultiplier - 1.0) / 0.1);
+        return BATTLE_REWARD_UPGRADE_BASE_COST * (upgradeLevel + 1);
       },
 
       summonSpirit: () => {
@@ -191,12 +201,26 @@ export const useGameState = create<GameStore>()(
         });
       },
 
-      winBattle: () => {
+      upgradeBattleReward: () => {
         set((state) => {
-          const reward = 100 * (state.battlesWon + 1);
+          const upgradeLevel = Math.floor((state.battleRewardMultiplier - 1.0) / 0.1);
+          const cost = BATTLE_REWARD_UPGRADE_BASE_COST * (upgradeLevel + 1);
+          if (state.qi >= cost) {
+            return {
+              ...state,
+              qi: state.qi - cost,
+              battleRewardMultiplier: state.battleRewardMultiplier + 0.1,
+            };
+          }
+          return state;
+        });
+      },
+
+      winBattle: (qiReward: number) => {
+        set((state) => {
           return {
             battlesWon: state.battlesWon + 1,
-            qi: state.qi + reward,
+            qi: state.qi + qiReward,
             qiUpgrades: {
               ...state.qiUpgrades,
               multiplier: state.qiUpgrades.multiplier + 0.1,

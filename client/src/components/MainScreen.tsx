@@ -8,7 +8,7 @@ interface MainScreenProps {
 }
 
 export function MainScreen({ onNavigate }: MainScreenProps) {
-  const { qi, qiPerSecond, updateQi, qiUpgrades, upgradeQiProduction, battlesWon } = useGameState();
+  const { qi, qiPerSecond, updateQi, qiUpgrades, upgradeQiProduction, battlesWon, battleRewardMultiplier, upgradeBattleReward, getBattleRewardUpgradeCost } = useGameState();
   const [displayQi, setDisplayQi] = useState(qi);
 
   useEffect(() => {
@@ -25,6 +25,9 @@ export function MainScreen({ onNavigate }: MainScreenProps) {
 
   const upgradeCost = 500 * (qiUpgrades.baseProduction + 1);
   const canUpgrade = qi >= upgradeCost;
+
+  const battleRewardUpgradeCost = getBattleRewardUpgradeCost();
+  const canUpgradeBattleReward = qi >= battleRewardUpgradeCost;
 
   return (
     <div className="w-full h-full flex items-center justify-center p-4">
@@ -75,6 +78,30 @@ export function MainScreen({ onNavigate }: MainScreenProps) {
             }}
           >
             Enhance Cultivation ({upgradeCost} Qi)
+          </Button>
+        </div>
+
+        <div className="mb-6 p-4 parchment-bg rounded border-2 border-amber-700">
+          <h3 className="text-lg font-bold parchment-text mb-3">Battle Mastery</h3>
+          <div className="space-y-2">
+            <div className="flex justify-between parchment-text text-sm">
+              <span>Battle Reward Multiplier:</span>
+              <span className="font-semibold">{(battleRewardMultiplier * 100).toFixed(0)}%</span>
+            </div>
+            <p className="text-xs parchment-text opacity-75 italic">
+              Each upgrade increases battle Qi rewards by 10%
+            </p>
+          </div>
+          <Button
+            onClick={upgradeBattleReward}
+            disabled={!canUpgradeBattleReward}
+            className="w-full mt-4"
+            style={{
+              background: canUpgradeBattleReward ? 'var(--vermillion)' : '#999',
+              color: 'var(--parchment)',
+            }}
+          >
+            Enhance Battle Mastery ({battleRewardUpgradeCost} Qi)
           </Button>
         </div>
 
