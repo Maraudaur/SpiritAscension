@@ -75,6 +75,10 @@ interface GameStore extends GameState {
   getBattleRewardUpgradeCost: () => number;
   updateSpiritHealth: (instanceId: string, health: number) => void;
   levelUpSpirit: (instanceId: string) => void;
+  addEssence: (spiritId: string, amount: number) => void;
+  getEssenceCount: (spiritId: string) => number;
+  harmonizeSpirit: (instanceId: string) => void;
+  getLevelUpCost: (level: number) => { qi: number; essence: number };
 }
 
 const BASE_SPIRIT_COST = 100;
@@ -95,6 +99,7 @@ export const useGameState = create<GameStore>()(
       activeParty: [],
       battlesWon: 0,
       lastUpdate: Date.now(),
+      essences: {},
 
       updateQi: () => {
         const now = Date.now();
@@ -241,13 +246,65 @@ export const useGameState = create<GameStore>()(
       },
 
       levelUpSpirit: (instanceId: string) => {
+        const state = get();
+        const spirit = state.spirits.find(s => s.instanceId === instanceId);
+        if (!spirit) return;
+
+        const cost = get().getLevelUpCost(spirit.level);
+        const essenceCount = state.essences[spirit.spiritId] || 0;
+
+        if (state.qi >= cost.qi && essenceCount >= cost.essence) {
+          set((state) => ({
+            qi: state.qi - cost.qi,
+            essences: {
+              ...state.essences,
+              [spirit.spiritId]: (state.essences[spirit.spiritId] || 0) - cost.essence,
+            },
+            spirits: state.spirits.map(s =>
+              s.instanceId === instanceId
+                ? { ...s, level: s.level + 1, experience: 0 }
+                : s
+            ),
+          }));
+        }
+      },
+
+      addEssence: (spiritId: string, amount: number) => {
         set((state) => ({
-          spirits: state.spirits.map(spirit =>
-            spirit.instanceId === instanceId
-              ? { ...spirit, level: spirit.level + 1, experience: 0 }
-              : spirit
-          ),
+          essences: {
+            ...state.essences,
+            [spiritId]: (state.essences[spiritId] || 0) + amount,
+          },
         }));
+      },
+
+      getEssenceCount: (spiritId: string) => {
+        const state = get();
+        return state.essences[spiritId] || 0;
+      },
+
+      harmonizeSpirit: (instanceId: string) => {
+        const state = get();
+        const spirit = state.spirits.find(s => s.instanceId === instanceId);
+        if (!spirit) return;
+
+        const essenceGained = 5 + (spirit.level * 2);
+
+        set((state) => ({
+          spirits: state.spirits.filter(s => s.instanceId !== instanceId),
+          activeParty: state.activeParty.filter(id => id !== instanceId),
+          essences: {
+            ...state.essences,
+            [spirit.spiritId]: (state.essences[spirit.spiritId] || 0) + essenceGained,
+          },
+        }));
+      },
+
+      getLevelUpCost: (level: number) => {
+        return {
+          qi: level * 50,
+          essence: level * 2,
+        };
       },
     }),
     {

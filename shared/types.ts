@@ -75,4 +75,5 @@ export interface GameState {
   activeParty: string[];
   battlesWon: number;
   lastUpdate: number;
+  essences: Record<string, number>;
 }
