@@ -83,14 +83,17 @@ export function SpiritManager({ onClose }: SpiritManagerProps) {
     audio.volume = 0.6;
     audio.play();
     setAudioElement(audio);
+  };
 
-    // Update selected spirit to show new stats after animation completes
-    setTimeout(() => {
-      const updatedSpirit = spirits.find(s => s.instanceId === instanceId);
+  const closeLevelUpAnimation = () => {
+    // Update selected spirit to reflect the new stats
+    if (levelUpAnimation) {
+      const updatedSpirit = spirits.find(s => s.instanceId === levelUpAnimation.spirit.instanceId);
       if (updatedSpirit) {
         setSelectedSpirit(updatedSpirit);
       }
-    }, 100);
+    }
+    setLevelUpAnimation(null);
   };
 
   const handleHarmonize = (instanceId: string) => {
@@ -557,7 +560,7 @@ export function SpiritManager({ onClose }: SpiritManagerProps) {
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ delay: 1.2 }}
-                    onClick={() => setLevelUpAnimation(null)}
+                    onClick={closeLevelUpAnimation}
                     className="w-full p-3 bg-blue-600 text-white rounded-lg font-bold text-lg hover:bg-blue-700 transition-colors"
                   >
                     Continue
