@@ -1,9 +1,21 @@
-import type { PlayerSpirit, BaseSpirit, Element, Lineage, Skill, PassiveAbility, PotentialGrade } from '@shared/types';
+import type { PlayerSpirit, BaseSpirit, Element, Lineage, Skill, PassiveAbility, PotentialGrade, ElementId } from '@shared/types';
 import spiritsData from '@shared/data/spirits.json';
 import elementsData from '@shared/data/elements.json';
 import lineagesData from '@shared/data/lineages.json';
 import skillsData from '@shared/data/skills.json';
 import { POTENTIAL_BONUSES } from './stores/useGameState';
+
+const ELEMENTAL_MATRIX: Record<ElementId, Record<ElementId, number>> = {
+  wood: { water: 1.5, fire: 0.75, earth: 1.0, metal: 1.0, wood: 1.0 },
+  water: { metal: 1.5, wood: 0.75, earth: 1.0, fire: 1.0, water: 1.0 },
+  metal: { earth: 1.5, water: 0.75, wood: 1.0, fire: 1.0, metal: 1.0 },
+  earth: { fire: 1.5, metal: 0.75, wood: 1.0, water: 1.0, earth: 1.0 },
+  fire: { wood: 1.5, earth: 0.75, metal: 1.0, water: 1.0, fire: 1.0 },
+} as const;
+
+export function getElementalDamageMultiplier(attackerElement: ElementId, defenderElement: ElementId): number {
+  return ELEMENTAL_MATRIX[attackerElement]?.[defenderElement] || 1.0;
+}
 
 export function getBaseSpirit(spiritId: string): BaseSpirit | undefined {
   for (const rarity of Object.values(spiritsData)) {

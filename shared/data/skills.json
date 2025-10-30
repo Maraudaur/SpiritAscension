@@ -5,7 +5,8 @@
     "description": "A simple attack dealing moderate damage",
     "damage": 1.0,
     "healing": 0,
-    "unlockLevel": 1
+    "unlockLevel": 1,
+    "element": "none"
   },
   "heavy_hit": {
     "id": "heavy_hit",
@@ -13,7 +14,8 @@
     "description": "A powerful strike dealing heavy damage",
     "damage": 1.5,
     "healing": 0,
-    "unlockLevel": 2
+    "unlockLevel": 2,
+    "element": "none"
   },
   "hit_and_heal": {
     "id": "hit_and_heal",
@@ -21,7 +23,8 @@
     "description": "Attack that heals the user for a portion of damage dealt",
     "damage": 1.0,
     "healing": 0.3,
-    "unlockLevel": 3
+    "unlockLevel": 3,
+    "element": "none"
   },
   "atk_buff": {
     "id": "atk_buff",
@@ -29,7 +32,8 @@
     "description": "Increases attack power for 3 turns",
     "damage": 0,
     "healing": 0,
-    "unlockLevel": 1
+    "unlockLevel": 1,
+    "element": "none"
   },
   "charged_hit": {
     "id": "charged_hit",
@@ -37,6 +41,7 @@
     "description": "Charges for one turn, then unleashes a devastating strike with 2x damage",
     "damage": 2.0,
     "healing": 0,
-    "unlockLevel": 1
+    "unlockLevel": 1,
+    "element": "none"
   }
 }

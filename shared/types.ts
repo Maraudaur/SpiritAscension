@@ -8,6 +8,57 @@ export type PassiveAbility = 'attack' | 'defense' | 'health';
 
 export type PotentialGrade = 'C' | 'B' | 'A' | 'S' | 'SS';
 
+export type SkillElementId = ElementId | 'none';
+
+export type EffectTarget = 'self' | 'enemy' | 'party_member';
+export type StatType = 'attack' | 'defense' | 'health' | 'elementalAffinity';
+
+export interface StatBuffEffect {
+  type: 'stat_buff' | 'stat_debuff';
+  stat: StatType;
+  value: number;
+  duration: number;
+}
+
+export interface DOTEffect {
+  type: 'damage_over_time';
+  damagePerTurn: number;
+  duration: number;
+}
+
+export interface ThornsEffect {
+  type: 'thorns';
+  damageReturnRatio: number;
+  duration: number;
+}
+
+export interface OneTimeShieldEffect {
+  type: 'one_time_shield';
+}
+
+export type CustomEffect = StatBuffEffect | DOTEffect | ThornsEffect | OneTimeShieldEffect;
+
+export type CombatTrigger =
+  | 'on_hit' | 'on_get_hit' | 'on_start_turn' | 'on_end_turn'
+  | 'on_enter_battle' | 'on_switch_out' | 'on_knocked_out'
+  | 'check_party_element' | 'check_party_lineage';
+
+export interface ActiveEffect {
+  id: string;
+  effectType: CustomEffect['type'];
+  turnsRemaining: number;
+  statMultiplier?: number;
+  damagePerTurn?: number;
+  damageReturnRatio?: number;
+  blocksFullHit?: boolean;
+}
+
+export interface TriggeredAbility {
+  trigger: CombatTrigger;
+  condition?: { type: 'hp_threshold' | 'party_count'; value: any; };
+  effects: CustomEffect[];
+}
+
 export interface Element {
   id: ElementId;
   name: string;
@@ -28,6 +79,8 @@ export interface Skill {
   damage: number;
   healing: number;
   unlockLevel: number;
+  element: SkillElementId;
+  effects?: CustomEffect[];
 }
 
 export interface BaseSpirit {
@@ -44,6 +97,7 @@ export interface BaseSpirit {
   };
   passiveAbility: PassiveAbility;
   skills: string[];
+  triggeredAbilities?: TriggeredAbility[];
 }
 
 export interface PotentialFactors {
@@ -61,6 +115,7 @@ export interface PlayerSpirit {
   isPrismatic: boolean;
   potentialFactors: PotentialFactors;
   currentHealth?: number;
+  activeEffects?: ActiveEffect[];
 }
 
 export interface GameState {
