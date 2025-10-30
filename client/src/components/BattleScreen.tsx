@@ -1,11 +1,11 @@
 import { useState, useEffect } from 'react';
 import { useGameState } from '@/lib/stores/useGameState';
 import { useAudio } from '@/lib/stores/useAudio';
-import { getBaseSpirit, getElement, calculateAllStats, getAvailableSkills, getSkill } from '@/lib/spiritUtils';
+import { getBaseSpirit, getElement, calculateAllStats, getAvailableSkills, getSkill, getElementalDamageMultiplier } from '@/lib/spiritUtils';
 import { Button } from '@/components/ui/button';
 import { X, Swords, ArrowLeftRight, Heart, Shield, Volume2, VolumeX } from 'lucide-react';
 import { motion } from 'framer-motion';
-import type { PlayerSpirit } from '@shared/types';
+import type { PlayerSpirit, ActiveEffect, ElementId } from '@shared/types';
 
 type ActionMenu = 'none' | 'skills' | 'swap';
 
@@ -18,6 +18,7 @@ interface BattleSpirit {
   playerSpirit: PlayerSpirit;
   currentHealth: number;
   maxHealth: number;
+  activeEffects: ActiveEffect[];
 }
 
 interface Enemy {
@@ -29,6 +30,7 @@ interface Enemy {
   attack: number;
   defense: number;
   baseAttack?: number;
+  element: ElementId;
 }
 
 interface BossBattleState {
@@ -69,6 +71,7 @@ export function BattleScreen({ onClose, isBossBattle = false }: BattleScreenProp
         maxHealth: 1500,
         currentHealth: 1500,
         baseAttack: 300,
+        element: 'fire',
       };
     }
     
@@ -91,6 +94,7 @@ export function BattleScreen({ onClose, isBossBattle = false }: BattleScreenProp
       maxHealth: stats.health,
       currentHealth: stats.health,
       baseAttack: stats.attack,
+      element: bossSpirit.element,
     };
   };
 
@@ -110,6 +114,9 @@ export function BattleScreen({ onClose, isBossBattle = false }: BattleScreenProp
     const enemyNames = ['Shadow Beast', 'Dark Serpent', 'Rogue Phantom', 'Chaos Wolf', 'Storm Drake'];
     const randomName = enemyNames[Math.floor(Math.random() * enemyNames.length)];
     
+    const elements: ElementId[] = ['wood', 'earth', 'fire', 'water', 'metal'];
+    const randomElement = elements[Math.floor(Math.random() * elements.length)];
+    
     const newEnemy: Enemy = {
       id: 'enemy_' + Date.now(),
       name: randomName,
@@ -118,6 +125,7 @@ export function BattleScreen({ onClose, isBossBattle = false }: BattleScreenProp
       defense: 60 + enemyLevel * 15,
       maxHealth: 200 + enemyLevel * 50,
       currentHealth: 200 + enemyLevel * 50,
+      element: randomElement,
     };
     
     return newEnemy;
@@ -138,6 +146,7 @@ export function BattleScreen({ onClose, isBossBattle = false }: BattleScreenProp
           playerSpirit: spirit,
           currentHealth: spirit.currentHealth ?? stats.health,
           maxHealth: stats.health,
+          activeEffects: spirit.activeEffects || [],
         };
       });
 
@@ -164,6 +173,36 @@ export function BattleScreen({ onClose, isBossBattle = false }: BattleScreenProp
     setBattleLog(prev => [...prev, message]);
   };
 
+  const executeTriggerEffects = (_trigger: string, _attacker: BattleSpirit | Enemy, _target: BattleSpirit | Enemy | null) => {
+    // Phase 3: Implement trigger logic for Thorns, Shield, and passive abilities
+    // This will process active effects and triggered abilities based on combat events
+  };
+
+  const applyStatusEffect = (spirit: BattleSpirit, effect: ActiveEffect): BattleSpirit => {
+    // Phase 3: Implement status effect application logic
+    // Check if effect stacks, refresh duration, or apply new
+    return {
+      ...spirit,
+      activeEffects: [...spirit.activeEffects, effect],
+    };
+  };
+
+  const tickEffects = (spirits: BattleSpirit[], enemyState: Enemy | null): { updatedSpirits: BattleSpirit[], updatedEnemy: Enemy | null } => {
+    // Phase 3: Implement effect tick logic
+    // 1. Apply DOT damage
+    // 2. Decrement turnsRemaining on all effects
+    // 3. Filter out expired effects (turnsRemaining <= 0)
+    
+    const updatedSpirits = spirits.map(spirit => ({
+      ...spirit,
+      activeEffects: spirit.activeEffects
+        .map(effect => ({ ...effect, turnsRemaining: effect.turnsRemaining - 1 }))
+        .filter(effect => effect.turnsRemaining > 0),
+    }));
+
+    return { updatedSpirits, updatedEnemy: enemyState };
+  };
+
   const handleAttack = (skillId: string) => {
     if (!enemy || battleState !== 'fighting' || playerSpirits.length === 0) return;
 
@@ -176,7 +215,11 @@ export function BattleScreen({ onClose, isBossBattle = false }: BattleScreenProp
     
     if (!skill || !baseSpirit) return;
 
-    const damage = Math.max(1, Math.floor((stats.attack * skill.damage) - (enemy.defense * 0.3)));
+    // Calculate elemental damage multiplier
+    const attackElement = skill.element !== 'none' ? skill.element : baseSpirit.element;
+    const elementalMultiplier = getElementalDamageMultiplier(attackElement, enemy.element);
+    
+    const damage = Math.max(1, Math.floor((stats.attack * skill.damage * elementalMultiplier) - (enemy.defense * 0.3)));
     const newEnemyHealth = Math.max(0, enemy.currentHealth - damage);
     
     // Play damage sound and shake enemy health bar
@@ -299,9 +342,15 @@ export function BattleScreen({ onClose, isBossBattle = false }: BattleScreenProp
       setPlayerHealthBarShake(true);
       setTimeout(() => setPlayerHealthBarShake(false), 500);
 
-      setPlayerSpirits(prev => prev.map((s, i) => 
-        i === targetIndex ? { ...s, currentHealth: newHealth } : s
-      ));
+      setPlayerSpirits(prev => {
+        // Apply damage first
+        const withDamage = prev.map((s, i) => 
+          i === targetIndex ? { ...s, currentHealth: newHealth } : s
+        );
+        // Then tick effects
+        const { updatedSpirits } = tickEffects(withDamage, enemy);
+        return updatedSpirits;
+      });
 
       const targetBase = getBaseSpirit(target.playerSpirit.spiritId);
       addLog(`${enemy.name} uses Basic Strike on ${targetBase?.name}! Dealt ${damage} damage.`);
@@ -342,9 +391,15 @@ export function BattleScreen({ onClose, isBossBattle = false }: BattleScreenProp
         setPlayerHealthBarShake(true);
         setTimeout(() => setPlayerHealthBarShake(false), 500);
 
-        setPlayerSpirits(prev => prev.map((s, i) => 
-          i === targetIndex ? { ...s, currentHealth: newHealth } : s
-        ));
+        setPlayerSpirits(prev => {
+          // Apply damage first
+          const withDamage = prev.map((s, i) => 
+            i === targetIndex ? { ...s, currentHealth: newHealth } : s
+          );
+          // Then tick effects
+          const { updatedSpirits } = tickEffects(withDamage, enemy);
+          return updatedSpirits;
+        });
 
         const targetBase = getBaseSpirit(target.playerSpirit.spiritId);
         addLog(`${enemy.name} unleashes Charged Hit on ${targetBase?.name}! Dealt ${damage} devastating damage!`);
@@ -373,9 +428,15 @@ export function BattleScreen({ onClose, isBossBattle = false }: BattleScreenProp
     setPlayerHealthBarShake(true);
     setTimeout(() => setPlayerHealthBarShake(false), 500);
 
-    setPlayerSpirits(prev => prev.map((s, i) => 
-      i === targetIndex ? { ...s, currentHealth: newHealth } : s
-    ));
+    setPlayerSpirits(prev => {
+      // Apply damage first
+      const withDamage = prev.map((s, i) => 
+        i === targetIndex ? { ...s, currentHealth: newHealth } : s
+      );
+      // Then tick effects
+      const { updatedSpirits } = tickEffects(withDamage, enemy);
+      return updatedSpirits;
+    });
 
     const targetBase = getBaseSpirit(target.playerSpirit.spiritId);
     addLog(`${enemy.name} attacks ${targetBase?.name}! Dealt ${damage} damage.`);
