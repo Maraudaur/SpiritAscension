@@ -78,13 +78,31 @@ export const useAudio = create<AudioState>((set, get) => ({
   
   playButtonClick: () => {
     const { hitSound, isMuted } = get();
-    console.log('🔊 playButtonClick called:', { hasSound: !!hitSound, isMuted });
+    console.log('🔊 playButtonClick called:', { 
+      hasSound: !!hitSound, 
+      isMuted,
+      soundSrc: hitSound?.src,
+      readyState: hitSound?.readyState,
+      duration: hitSound?.duration,
+      volume: hitSound?.volume
+    });
     if (hitSound && !isMuted) {
       const soundClone = hitSound.cloneNode() as HTMLAudioElement;
-      soundClone.volume = 0.15;
+      soundClone.volume = 0.5; // Increase volume for testing
       soundClone.playbackRate = 1.2;
+      console.log('🎵 Attempting to play click sound...', {
+        cloneVolume: soundClone.volume,
+        cloneSrc: soundClone.src,
+        cloneDuration: soundClone.duration
+      });
       soundClone.play()
-        .then(() => console.log('✅ Click sound played successfully!'))
+        .then(() => {
+          console.log('✅ Click sound play() promise resolved!', {
+            paused: soundClone.paused,
+            currentTime: soundClone.currentTime,
+            duration: soundClone.duration
+          });
+        })
         .catch((err) => console.log('❌ Button click sound play error:', err));
     } else {
       console.log('⏸️ Click sound NOT played (muted or no sound loaded)');
@@ -93,13 +111,25 @@ export const useAudio = create<AudioState>((set, get) => ({
   
   playButtonHover: () => {
     const { hitSound, isMuted } = get();
-    console.log('🔊 playButtonHover called:', { hasSound: !!hitSound, isMuted });
+    console.log('🔊 playButtonHover called:', { 
+      hasSound: !!hitSound, 
+      isMuted,
+      soundSrc: hitSound?.src,
+      readyState: hitSound?.readyState,
+      duration: hitSound?.duration
+    });
     if (hitSound && !isMuted) {
       const soundClone = hitSound.cloneNode() as HTMLAudioElement;
-      soundClone.volume = 0.08;
+      soundClone.volume = 0.3; // Increase volume for testing
       soundClone.playbackRate = 1.5;
       soundClone.play()
-        .then(() => console.log('✅ Hover sound played successfully!'))
+        .then(() => {
+          console.log('✅ Hover sound play() promise resolved!', {
+            paused: soundClone.paused,
+            currentTime: soundClone.currentTime,
+            duration: soundClone.duration
+          });
+        })
         .catch((err) => console.log('❌ Button hover sound play error:', err));
     } else {
       console.log('⏸️ Hover sound NOT played (muted or no sound loaded)');
