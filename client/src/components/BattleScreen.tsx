@@ -3,7 +3,7 @@ import { useGameState } from '@/lib/stores/useGameState';
 import { useAudio } from '@/lib/stores/useAudio';
 import { getBaseSpirit, getElement, calculateAllStats, getAvailableSkills, getSkill } from '@/lib/spiritUtils';
 import { Button } from '@/components/ui/button';
-import { X, Swords, ArrowLeftRight, Heart, Shield } from 'lucide-react';
+import { X, Swords, ArrowLeftRight, Heart, Shield, Volume2, VolumeX } from 'lucide-react';
 import { motion } from 'framer-motion';
 import type { PlayerSpirit } from '@shared/types';
 
@@ -31,7 +31,7 @@ interface Enemy {
 
 export function BattleScreen({ onClose }: BattleScreenProps) {
   const { spirits, activeParty, winBattle, updateSpiritHealth, battleRewardMultiplier } = useGameState();
-  const { playDamage, playHeal, playButtonClick, playButtonHover } = useAudio();
+  const { playDamage, playHeal, playButtonClick, playButtonHover, isMuted, toggleMute } = useAudio();
   const [battleState, setBattleState] = useState<'setup' | 'fighting' | 'victory' | 'defeat'>('setup');
   const [activePartySlot, setActivePartySlot] = useState(0);
   const [battleLog, setBattleLog] = useState<string[]>([]);
@@ -308,6 +308,16 @@ export function BattleScreen({ onClose }: BattleScreenProps) {
     return (
       <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center p-4 z-50">
         <div className="parchment-bg chinese-border max-w-md w-full p-8 rounded-lg relative">
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={toggleMute}
+            title={isMuted ? "Unmute Sound" : "Mute Sound"}
+            className="absolute top-4 left-4 bg-white/90 backdrop-blur-sm"
+          >
+            {isMuted ? <VolumeX size={18} /> : <Volume2 size={18} />}
+          </Button>
+          
           <button onClick={onClose} className="absolute top-4 right-4 parchment-text hover:opacity-70">
             <X className="w-6 h-6" />
           </button>
@@ -331,6 +341,16 @@ export function BattleScreen({ onClose }: BattleScreenProps) {
   return (
     <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center p-4 z-50">
       <div className="parchment-bg chinese-border max-w-6xl w-full h-[90vh] p-6 rounded-lg relative flex flex-col">
+        <Button
+          variant="outline"
+          size="icon"
+          onClick={toggleMute}
+          title={isMuted ? "Unmute Sound" : "Mute Sound"}
+          className="absolute top-4 left-4 bg-white/90 backdrop-blur-sm z-10"
+        >
+          {isMuted ? <VolumeX size={18} /> : <Volume2 size={18} />}
+        </Button>
+        
         <button onClick={handleClose} className="absolute top-4 right-4 parchment-text hover:opacity-70 z-10">
           <X className="w-6 h-6" />
         </button>

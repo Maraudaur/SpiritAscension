@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useGameState } from '@/lib/stores/useGameState';
-import { Sparkles, Swords, Users } from 'lucide-react';
+import { useAudio } from '@/lib/stores/useAudio';
+import { Sparkles, Swords, Users, Volume2, VolumeX } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 interface MainScreenProps {
@@ -9,6 +10,7 @@ interface MainScreenProps {
 
 export function MainScreen({ onNavigate }: MainScreenProps) {
   const { qi, qiPerSecond, updateQi, qiUpgrades, upgradeQiProduction, battlesWon, battleRewardMultiplier, upgradeBattleReward, getBattleRewardUpgradeCost } = useGameState();
+  const { isMuted, toggleMute } = useAudio();
   const [displayQi, setDisplayQi] = useState(qi);
 
   useEffect(() => {
@@ -30,7 +32,20 @@ export function MainScreen({ onNavigate }: MainScreenProps) {
   const canUpgradeBattleReward = qi >= battleRewardUpgradeCost;
 
   return (
-    <div className="w-full h-full flex items-center justify-center p-4">
+    <div className="w-full h-full flex items-center justify-center p-4 relative">
+      {/* Sound toggle button in top-right corner */}
+      <div className="fixed top-4 right-4 z-50">
+        <Button
+          variant="outline"
+          size="icon"
+          onClick={toggleMute}
+          title={isMuted ? "Unmute Sound" : "Mute Sound"}
+          className="bg-white/90 backdrop-blur-sm"
+        >
+          {isMuted ? <VolumeX size={20} /> : <Volume2 size={20} />}
+        </Button>
+      </div>
+
       <div className="parchment-bg chinese-border max-w-2xl w-full p-8 rounded-lg">
         <h1 className="text-5xl font-bold text-center mb-2 parchment-text brush-stroke">
           天道修真

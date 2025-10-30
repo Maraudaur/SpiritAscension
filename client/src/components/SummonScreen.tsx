@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useGameState } from '@/lib/stores/useGameState';
+import { useAudio } from '@/lib/stores/useAudio';
 import { getBaseSpirit, getElement, getLineage, getRarityColor, getPotentialColor, calculateAllStats } from '@/lib/spiritUtils';
 import { Button } from '@/components/ui/button';
-import { X, Sparkles } from 'lucide-react';
+import { X, Sparkles, Volume2, VolumeX } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import type { PlayerSpirit, Rarity } from '@shared/types';
 
@@ -22,6 +23,7 @@ const RARITY_GLOW_COLORS: Record<Rarity, string> = {
 
 export function SummonScreen({ onClose }: SummonScreenProps) {
   const { summonSpirit, spendQi, getSpiritCost } = useGameState();
+  const { isMuted, toggleMute } = useAudio();
   const [summonedSpirit, setSummonedSpirit] = useState<PlayerSpirit | null>(null);
   const [stage, setStage] = useState<SummonStage>('idle');
   const [audioElement, setAudioElement] = useState<HTMLAudioElement | null>(null);
@@ -82,6 +84,16 @@ export function SummonScreen({ onClose }: SummonScreenProps) {
   return (
     <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center p-4 z-50">
       <div className="parchment-bg chinese-border max-w-2xl w-full p-8 rounded-lg relative">
+        <Button
+          variant="outline"
+          size="icon"
+          onClick={toggleMute}
+          title={isMuted ? "Unmute Sound" : "Mute Sound"}
+          className="absolute top-4 left-4 bg-white/90 backdrop-blur-sm"
+        >
+          {isMuted ? <VolumeX size={18} /> : <Volume2 size={18} />}
+        </Button>
+        
         <button
           onClick={onClose}
           className="absolute top-4 right-4 parchment-text hover:opacity-70"

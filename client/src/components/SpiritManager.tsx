@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useGameState } from '@/lib/stores/useGameState';
+import { useAudio } from '@/lib/stores/useAudio';
 import { getBaseSpirit, getElement, getLineage, getRarityColor, getPotentialColor, calculateAllStats, getAvailableSkills } from '@/lib/spiritUtils';
 import { Button } from '@/components/ui/button';
-import { X, Plus, Trash2, ArrowUp, Sparkles, TrendingUp } from 'lucide-react';
+import { X, Plus, Trash2, ArrowUp, Sparkles, TrendingUp, Volume2, VolumeX } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import type { PlayerSpirit } from '@shared/types';
 
@@ -19,6 +20,7 @@ interface StatComparison {
 
 export function SpiritManager({ onClose }: SpiritManagerProps) {
   const { spirits, activeParty, qi, addToParty, removeFromParty, levelUpSpirit, harmonizeSpirit, getEssenceCount, getLevelUpCost } = useGameState();
+  const { isMuted, toggleMute } = useAudio();
   const [selectedSpirit, setSelectedSpirit] = useState<PlayerSpirit | null>(null);
   const [showHarmonizeConfirm, setShowHarmonizeConfirm] = useState(false);
   const [levelUpAnimation, setLevelUpAnimation] = useState<{
@@ -105,6 +107,16 @@ export function SpiritManager({ onClose }: SpiritManagerProps) {
   return (
     <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center p-4 z-50">
       <div className="parchment-bg chinese-border max-w-6xl w-full h-[90vh] p-6 rounded-lg relative flex flex-col">
+        <Button
+          variant="outline"
+          size="icon"
+          onClick={toggleMute}
+          title={isMuted ? "Unmute Sound" : "Mute Sound"}
+          className="absolute top-4 left-4 bg-white/90 backdrop-blur-sm z-10"
+        >
+          {isMuted ? <VolumeX size={18} /> : <Volume2 size={18} />}
+        </Button>
+        
         <button
           onClick={onClose}
           className="absolute top-4 right-4 parchment-text hover:opacity-70 z-10"
