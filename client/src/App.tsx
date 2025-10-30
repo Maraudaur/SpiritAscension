@@ -17,6 +17,11 @@ function App() {
     const hit = new Audio('/sounds/hit.mp3');
     const success = new Audio('/sounds/success.mp3');
     
+    hit.load();
+    success.load();
+    
+    console.log('Audio files loaded:', { hit: hit.src, success: success.src });
+    
     setHitSound(hit);
     setSuccessSound(success);
   }, [setHitSound, setSuccessSound]);

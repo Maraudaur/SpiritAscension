@@ -78,21 +78,27 @@ export const useAudio = create<AudioState>((set, get) => ({
   
   playButtonClick: () => {
     const { hitSound, isMuted } = get();
+    console.log('playButtonClick called:', { hasSound: !!hitSound, isMuted });
     if (hitSound && !isMuted) {
       const soundClone = hitSound.cloneNode() as HTMLAudioElement;
       soundClone.volume = 0.15;
       soundClone.playbackRate = 1.2;
-      soundClone.play().catch(() => {});
+      soundClone.play().catch((err) => {
+        console.log('Button click sound play error:', err);
+      });
     }
   },
   
   playButtonHover: () => {
     const { hitSound, isMuted } = get();
+    console.log('playButtonHover called:', { hasSound: !!hitSound, isMuted });
     if (hitSound && !isMuted) {
       const soundClone = hitSound.cloneNode() as HTMLAudioElement;
       soundClone.volume = 0.08;
       soundClone.playbackRate = 1.5;
-      soundClone.play().catch(() => {});
+      soundClone.play().catch((err) => {
+        console.log('Button hover sound play error:', err);
+      });
     }
   },
   
