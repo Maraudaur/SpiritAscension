@@ -52,18 +52,21 @@ export function MainScreen({ onNavigate }: MainScreenProps) {
         </h1>
         <p className="text-2xl text-center mb-8 parchment-text">Ascension</p>
 
-        <div className="mb-8 p-6 bg-gradient-to-br from-yellow-50 to-yellow-100 rounded-lg chinese-border">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-xl parchment-text font-bold">Qi Energy</span>
-            <span className="text-3xl font-bold qi-glow" style={{ color: 'var(--imperial-gold)' }}>
-              {Math.floor(displayQi)}
-            </span>
-          </div>
-          <div className="flex items-center justify-between">
-            <span className="text-sm parchment-text opacity-75">Generation Rate</span>
-            <span className="text-lg parchment-text font-semibold">
-              {qiPerSecond.toFixed(1)} / sec
-            </span>
+        <div className="mb-8 p-6 bg-gradient-to-br from-yellow-50 to-yellow-100 rounded-lg chinese-border flex gap-4">
+          <div className="qi-sprite flex-shrink-0" style={{ width: '64px', height: '100%', minHeight: '80px' }} />
+          <div className="flex-1">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-xl parchment-text font-bold">Qi Energy</span>
+              <span className="text-3xl font-bold qi-glow" style={{ color: 'var(--imperial-gold)' }}>
+                {Math.floor(displayQi)}
+              </span>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-sm parchment-text opacity-75">Generation Rate</span>
+              <span className="text-lg parchment-text font-semibold">
+                {qiPerSecond.toFixed(1)} / sec
+              </span>
+            </div>
           </div>
         </div>
 

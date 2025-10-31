@@ -90,6 +90,19 @@
   100% { filter: hue-rotate(360deg); }
 }
 
+@keyframes qi-sprite-animation {
+  0% { background-position: 0 0; }
+  50% { background-position: -100% 0; }
+  100% { background-position: 0 0; }
+}
+
+.qi-sprite {
+  background-image: url('/powerupsheet.png');
+  background-size: 200% 100%;
+  background-repeat: no-repeat;
+  animation: qi-sprite-animation 1s steps(2) infinite;
+}
+
 .element-wood { color: var(--jade-green); }
 .element-fire { color: var(--vermillion); }
 .element-water { color: var(--azure); }
