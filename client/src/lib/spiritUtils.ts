@@ -133,7 +133,7 @@ export function calculateStat(
 ): number {
   const potentialBonus = POTENTIAL_BONUSES[potential];
   const baseWithPotential = baseStat * (1 + potentialBonus);
-  return Math.floor(baseWithPotential * (level * 0.2));
+  return Math.floor(baseWithPotential * (level * 0.02));
 }
 
 export function getPassiveBonus(ability: PassiveAbility): number {
@@ -158,11 +158,12 @@ export function calculateAllStats(playerSpirit: PlayerSpirit) {
     playerSpirit.potentialFactors.defense,
   );
 
-  let health = calculateStat(
-    baseSpirit.baseStats.health,
-    playerSpirit.level,
-    playerSpirit.potentialFactors.health,
-  );
+  let health =
+    calculateStat(
+      baseSpirit.baseStats.health,
+      playerSpirit.level,
+      playerSpirit.potentialFactors.health,
+    ) + 10;
 
   let elementalAffinity = calculateStat(
     baseSpirit.baseStats.elementalAffinity,

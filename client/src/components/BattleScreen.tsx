@@ -232,7 +232,7 @@ export function BattleScreen({
     );
 
     const enemyPotentialBonus = 0.02; // The 2% bonus instead of a real potential factor
-    const levelMultiplier = enemyLevel * 0.2;
+    const levelMultiplier = enemyLevel * 0.02;
 
     // 6. Apply the new player-like formula to the enemy stats
     // This block should now be safe
@@ -246,11 +246,12 @@ export function BattleScreen({
         (1 + enemyPotentialBonus) *
         levelMultiplier,
     );
-    const enemyHealth = Math.floor(
-      randomSpirit.baseStats.health *
-        (1 + enemyPotentialBonus) *
-        levelMultiplier,
-    );
+    const enemyHealth =
+      Math.floor(
+        randomSpirit.baseStats.health *
+          (1 + enemyPotentialBonus) *
+          levelMultiplier,
+      ) + 10;
     const enemyElementalAffinity = Math.floor(
       randomSpirit.baseStats.elementalAffinity *
         (1 + enemyPotentialBonus) *
