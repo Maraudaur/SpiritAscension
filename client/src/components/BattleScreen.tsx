@@ -169,7 +169,7 @@ export function BattleScreen({
     const highestLevel = Math.max(
       ...spiritList.map((s) => s.playerSpirit.level),
     );
-    const levelOffset = Math.floor(Math.random() * 5) - 2; // -2, -1, 0, 1, or 2
+    const levelOffset = Math.floor(Math.random() * 3) - 1; // -2, -1, 0, 1, or 2
     const enemyLevel = Math.max(1, highestLevel + levelOffset);
     console.log(
       `--- 2. Target enemy level: ${enemyLevel} (base level ${highestLevel}) ---`,
@@ -453,35 +453,93 @@ export function BattleScreen({
     const attackElement =
       skillElement !== "none" ? skillElement : spiritElement;
 
-    // --- 2. Calculate Physical Damage Component ---
-    // Physical Damage = max(1, floor(Spirit Attack * Skill Damage - Enemy Defense * 0.4))
-    const basePhysicalDamage = stats.attack * skill.damage;
+    // --- 2. Calculate BASE Physical Damage Component (NEW FORMULA) ---
+
+    // A. Get the core stats
+    const level = activeSpirit.playerSpirit.level;
+    const attack = stats.attack;
+    // Ensure defense is at least 1 to prevent division by zero
+    const defense = Math.max(1, enemy.defense);
+
+    // B. Define your game's balance constants
+    // This is the "Base Power" for a standard (1.0x) move.
+    // **TUNE THIS NUMBER** to balance physical vs. elemental damage.
+    const STATIC_BASE_POWER = 60;
+    // This scales all physical damage. Higher = less damage.
+    const GAME_SCALING_FACTOR = 50;
+
+    // C. The Pokémon-style level and stat calculation
+    const levelComponent = Math.floor((2 * level) / 5) + 2;
+    const attackDefenseRatio = attack / defense;
+
+    // D. Calculate the "base" damage before skill multipliers
+    const baseCalculation =
+      Math.floor(
+        (levelComponent * STATIC_BASE_POWER * attackDefenseRatio) /
+          GAME_SCALING_FACTOR,
+      ) + 2;
+
+    // E. Apply the skill's multiplier
     const physicalDamage = Math.max(
-      1,
-      Math.floor(basePhysicalDamage - enemy.defense * 0.4),
+      1, // Ensures at least 1 damage
+      Math.floor(baseCalculation * skill.damage), // skill.damage is your 1.0x, 1.5x, etc.
     );
 
-    // --- 3. Calculate Elemental Damage Component ---
+    // --- 3. Calculate BASE Elemental Damage Component (OLD FORMULA) ---
+    // This is un-changed, using your original simple formula.
     const baseElementalDamage = Math.floor(affinityStat * affinityRatio);
+
+    // --- 4. Calculate Final Damage Based on Skill Type ---
     const elementalMultiplier = getElementalDamageMultiplier(
       attackElement,
       enemy.element,
     );
-    const finalElementalDamage = Math.floor(
-      baseElementalDamage * elementalMultiplier,
-    );
+
+    let totalDamage = 0;
     let elementalMessage = "";
-    if (finalElementalDamage > 0) {
-      // Only show if elemental damage was dealt
+
+    if (skillElement === "none") {
+      // 4a. BASIC ATTACK ("none") - SPLIT DAMAGE
+      const finalElementalDamage = Math.floor(
+        baseElementalDamage * elementalMultiplier,
+      );
+      totalDamage = physicalDamage + finalElementalDamage;
+
+      // Create log message
+      if (finalElementalDamage > 0) {
+        if (elementalMultiplier > 1.0) {
+          elementalMessage = " It's super effective!";
+        } else if (elementalMultiplier < 1.0) {
+          elementalMessage = " It was resisted...";
+        }
+      }
+      addLog(
+        `${baseSpirit.name} used ${skill.name}! Dealt ${totalDamage} damage ` +
+          `(${physicalDamage} Physical + ${finalElementalDamage} ${attackElement.toUpperCase()}).` +
+          elementalMessage,
+      );
+    } else {
+      // 4b. ELEMENTAL SKILL - CONVERTED DAMAGE
+      const totalBaseDamage = physicalDamage + baseElementalDamage;
+      totalDamage = Math.max(
+        1,
+        Math.floor(totalBaseDamage * elementalMultiplier),
+      );
+
+      // Create log message
       if (elementalMultiplier > 1.0) {
         elementalMessage = " It's super effective!";
       } else if (elementalMultiplier < 1.0) {
         elementalMessage = " It was resisted...";
       }
+      addLog(
+        `${baseSpirit.name} used ${skill.name}! It's an ${attackElement.toUpperCase()} attack! ` +
+          `Dealt ${totalDamage} total damage.` +
+          elementalMessage,
+      );
     }
 
-    // --- 4. Calculate Total Damage ---
-    const totalDamage = physicalDamage + finalElementalDamage;
+    // --- 5. Apply Damage and Handle Healing/Victory ---
     const newEnemyHealth = Math.max(0, enemy.currentHealth - totalDamage);
 
     // Play damage sound and shake enemy health bar
@@ -489,13 +547,7 @@ export function BattleScreen({
     setEnemyHealthBarShake(true);
     setTimeout(() => setEnemyHealthBarShake(false), 500);
 
-    // --- 5. Update Battle Log with Breakdown ---
-    addLog(
-      `${baseSpirit.name} used ${skill.name}! Dealt ${totalDamage} damage ` +
-        `(${physicalDamage} Physical + ${finalElementalDamage} ${attackElement.toUpperCase()}).` +
-        elementalMessage,
-    );
-
+    // Handle healing (if any)
     if (skill.healing > 0) {
       const healing = Math.floor(totalDamage * skill.healing); // Use totalDamage for healing
       const newHealth = Math.min(
@@ -516,6 +568,7 @@ export function BattleScreen({
       addLog(`${baseSpirit.name} healed ${healing} HP!`);
     }
 
+    // Set new enemy health and check for victory
     setEnemy({ ...enemy, currentHealth: newEnemyHealth });
 
     if (newEnemyHealth <= 0) {
@@ -525,6 +578,7 @@ export function BattleScreen({
       return;
     }
 
+    // Proceed to enemy turn
     setTimeout(() => enemyTurn(), 800);
   };
 
@@ -593,12 +647,36 @@ export function BattleScreen({
   ) => {
     if (!enemy) return;
 
+    // --- NEW FORMULA SETUP ---
+    // A. Get the core stats
+    const level = enemy.level;
+    const attack = enemy.attack; // Uses the boss's (potentially buffed) attack
+    const defense = Math.max(1, stats.defense); // Target's (player's) defense
+
+    // B. Define your game's balance constants
+    // MUST match the constants in handleAttack for balance
+    const STATIC_BASE_POWER = 60;
+    const GAME_SCALING_FACTOR = 50;
+
+    // C. The Pokémon-style level and stat calculation
+    const levelComponent = Math.floor((2 * level) / 5) + 2;
+    const attackDefenseRatio = attack / defense;
+
+    // D. This is the base damage for a 1.0x attack
+    const baseCalculation =
+      Math.floor(
+        (levelComponent * STATIC_BASE_POWER * attackDefenseRatio) /
+          GAME_SCALING_FACTOR,
+      ) + 2;
+    // --- END OF NEW FORMULA SETUP ---
+
     // Boss attack pattern: 0 = Basic Attack, 1 = ATK Buff, 2 = Charged Hit
     const pattern = bossState.patternStep;
 
     if (pattern === 0) {
       // Basic Attack
-      let damage = Math.max(1, Math.floor(enemy.attack - stats.defense * 0.3));
+      // NEW: (skill.damage is 1.0 for basic)
+      let damage = Math.max(1, Math.floor(baseCalculation * 1.0));
 
       if (isBlocking) {
         damage = Math.floor(damage * 0.5);
@@ -641,13 +719,11 @@ export function BattleScreen({
       setTimeout(() => setPlayerHealthBarShake(false), 500);
 
       setPlayerSpirits((prev) => {
-        // Apply damage first
         const withDamage = prev.map((s, i) =>
           i === targetIndex
             ? {
                 ...s,
                 currentHealth: newHealth,
-                // Remove Shield effect if it blocked damage
                 activeEffects:
                   shieldBlocked && i === targetIndex
                     ? s.activeEffects.filter(
@@ -661,10 +737,7 @@ export function BattleScreen({
               }
             : s,
         );
-        // Then tick effects
         const { updatedSpirits } = tickEffects(withDamage, enemy);
-
-        // Check for defeat after DOT effects
         const updatedTarget = updatedSpirits[targetIndex];
         if (updatedTarget && updatedTarget.currentHealth <= 0) {
           setTimeout(
@@ -672,16 +745,13 @@ export function BattleScreen({
             0,
           );
         }
-
         return updatedSpirits;
       });
 
       // Update enemy health if Thorns reflected damage
       if (reflectedDamage > 0) {
         setEnemy({ ...enemy, currentHealth: newEnemyHealth });
-        // Check if enemy was defeated by Thorns
         if (newEnemyHealth <= 0) {
-          // This is the correct call to fix the error and trigger victory logic
           setTimeout(() => handleVictory(enemy), 0);
         }
       }
@@ -697,7 +767,7 @@ export function BattleScreen({
 
       checkDefeat(newHealth, targetIndex);
     } else if (pattern === 1) {
-      // ATK Buff
+      // ATK Buff (This logic remains the same)
       const baseAttack = enemy.baseAttack || enemy.attack;
       const buffedAttack = Math.floor(baseAttack * 1.5);
       setEnemy({ ...enemy, attack: buffedAttack });
@@ -711,15 +781,13 @@ export function BattleScreen({
     } else if (pattern === 2) {
       // Charged Hit
       if (!bossState.isCharging) {
-        // Start charging
+        // Start charging (This logic remains the same)
         setBossState((prev) => ({ ...prev, isCharging: true }));
         addLog(`${enemy.name} is charging a powerful attack...`);
       } else {
         // Execute charged attack (2x damage)
-        let damage = Math.max(
-          1,
-          Math.floor(enemy.attack * 2.0 - stats.defense * 0.3),
-        );
+        // NEW: (skill.damage is 2.0 for charged)
+        let damage = Math.max(1, Math.floor(baseCalculation * 2.0));
 
         if (isBlocking) {
           damage = Math.floor(damage * 0.5);
@@ -762,13 +830,11 @@ export function BattleScreen({
         setTimeout(() => setPlayerHealthBarShake(false), 500);
 
         setPlayerSpirits((prev) => {
-          // Apply damage first
           const withDamage = prev.map((s, i) =>
             i === targetIndex
               ? {
                   ...s,
                   currentHealth: newHealth,
-                  // Remove Shield effect if it blocked damage
                   activeEffects:
                     shieldBlocked && i === targetIndex
                       ? s.activeEffects.filter(
@@ -782,10 +848,7 @@ export function BattleScreen({
                 }
               : s,
           );
-          // Then tick effects
           const { updatedSpirits } = tickEffects(withDamage, enemy);
-
-          // Check for defeat after DOT effects
           const updatedTarget = updatedSpirits[targetIndex];
           if (updatedTarget && updatedTarget.currentHealth <= 0) {
             setTimeout(
@@ -800,9 +863,7 @@ export function BattleScreen({
         // Update enemy health if Thorns reflected damage
         if (reflectedDamage > 0) {
           setEnemy({ ...enemy, currentHealth: newEnemyHealth });
-          // Check if enemy was defeated by Thorns
           if (newEnemyHealth <= 0) {
-            // This is the correct call to fix the error and trigger victory logic
             setTimeout(() => handleVictory(enemy), 0);
           }
         }
@@ -831,6 +892,7 @@ export function BattleScreen({
     stats: any,
   ) => {
     if (!enemy) return;
+    const targetBase = getBaseSpirit(target.playerSpirit.spiritId);
 
     // --- 1. SIMULATE A "BASIC ATTACK" SKILL ---
     const skillDamageMultiplier = 1.0; // Basic attack has 1.0 damage
@@ -850,18 +912,35 @@ export function BattleScreen({
       skillElement !== "none" ? skillElement : spiritElement;
 
     // --- 3. CALCULATE PHYSICAL DAMAGE (Using enemy's defense formula) ---
-    const basePhysicalDamage = enemy.attack * skillDamageMultiplier;
+    const level = enemy.level;
+    const attack = enemy.attack;
+    const defense = Math.max(1, stats.defense); // Target's (player's) defense
+
+    // MUST match the constants in handleAttack for balance
+    const STATIC_BASE_POWER = 60;
+    const GAME_SCALING_FACTOR = 50;
+
+    const levelComponent = Math.floor((2 * level) / 5) + 2;
+    const attackDefenseRatio = attack / defense;
+
+    // D. Calculate the "base" damage before skill multipliers
+    const baseCalculation =
+      Math.floor(
+        (levelComponent * STATIC_BASE_POWER * attackDefenseRatio) /
+          GAME_SCALING_FACTOR,
+      ) + 2;
+
+    // E. Apply the skill's multiplier (1.0 for a basic attack)
     const physicalDamage = Math.max(
-      1,
-      // Using the enemy's original defense reduction of 0.3
-      Math.floor(basePhysicalDamage - stats.defense * 0.3),
+      1, // Ensures at least 1 damage
+      Math.floor(baseCalculation * skillDamageMultiplier),
     );
 
-    // --- 4. CALCULATE ELEMENTAL DAMAGE (Copied from player logic) ---
+    // --- 4. CALCULATE ELEMENTAL DAMAGE (THIS WAS MISSING) ---
     const baseElementalDamage = Math.floor(affinityStat * affinityRatio);
     const elementalMultiplier = getElementalDamageMultiplier(
       attackElement,
-      activeBaseSpirit?.element || "none", // Get target's element
+      targetBase?.element || "none", // Get target's element
     );
     const finalElementalDamage = Math.floor(
       baseElementalDamage * elementalMultiplier,
@@ -962,7 +1041,6 @@ export function BattleScreen({
       }
     }
 
-    const targetBase = getBaseSpirit(target.playerSpirit.spiritId);
     if (!shieldBlocked) {
       // --- 8. UPDATE BATTLE LOG ---
       addLog(

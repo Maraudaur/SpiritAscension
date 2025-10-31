@@ -43,5 +43,14 @@
     "healing": 0,
     "unlockLevel": 1,
     "element": "none"
+  },
+  "metal_strike": {
+    "id": "metal_strike",
+    "name": "Metal Strike",
+    "description": "A powerful metal strike dealing heavy damage",
+    "damage": 1.5,
+    "healing": 0,
+    "unlockLevel": 2,
+    "element": "metal"
   }
 }
