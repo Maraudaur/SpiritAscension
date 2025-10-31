@@ -7,6 +7,7 @@ import {
   calculateAllStats,
   getAvailableSkills,
   getSkill,
+  getRandomEnemy,
   getElementalDamageMultiplier,
 } from "@/lib/spiritUtils";
 import { Button } from "@/components/ui/button";
@@ -20,7 +21,13 @@ import {
   VolumeX,
 } from "lucide-react";
 import { motion } from "framer-motion";
-import type { PlayerSpirit, ActiveEffect, ElementId } from "@shared/types";
+import type {
+  PlayerSpirit,
+  ActiveEffect,
+  BaseSpirit,
+  ElementId,
+} from "@shared/types";
+import spiritsData from "@shared/data/spirits.json";
 
 type ActionMenu = "none" | "skills" | "swap";
 
@@ -46,6 +53,7 @@ interface Enemy {
   defense: number;
   baseAttack?: number;
   element: ElementId;
+  elementalAffinity: number;
 }
 
 interface BossBattleState {
@@ -111,6 +119,7 @@ export function BattleScreen({
         currentHealth: 1500,
         baseAttack: 300,
         element: "fire",
+        elementalAffinity: 50,
       };
     }
 
@@ -139,48 +148,128 @@ export function BattleScreen({
       currentHealth: stats.health,
       baseAttack: stats.attack,
       element: bossSpirit.element,
+      elementalAffinity: stats.elementalAffinity,
     };
   };
 
   const generateNewEnemy = (spiritList: BattleSpirit[]) => {
+    console.log("--- 1. Generating New Enemy ---");
+
     if (isBossBattle) {
+      console.log("This is a boss battle, generating boss.");
       return generateBossEnemy();
     }
 
-    if (spiritList.length === 0) return null;
+    if (spiritList.length === 0) {
+      console.error("Generate enemy failed: Player spirit list is empty.");
+      return null;
+    }
 
-    // Find highest level spirit in active party
+    // --- This part is the same ---
     const highestLevel = Math.max(
       ...spiritList.map((s) => s.playerSpirit.level),
     );
-    // Enemy level is within 2 levels of highest spirit (can be -2 to +2, minimum 1)
     const levelOffset = Math.floor(Math.random() * 5) - 2; // -2, -1, 0, 1, or 2
     const enemyLevel = Math.max(1, highestLevel + levelOffset);
+    console.log(
+      `--- 2. Target enemy level: ${enemyLevel} (base level ${highestLevel}) ---`,
+    );
 
-    const enemyNames = [
-      "Shadow Beast",
-      "Dark Serpent",
-      "Rogue Phantom",
-      "Chaos Wolf",
-      "Storm Drake",
-    ];
-    const randomName =
-      enemyNames[Math.floor(Math.random() * enemyNames.length)];
+    // --- THIS SECTION IS UPDATED ---
 
-    const elements: ElementId[] = ["wood", "earth", "fire", "water", "metal"];
-    const randomElement = elements[Math.floor(Math.random() * elements.length)];
+    // 1. Get spirit data from JSON
+    const spiritMap = (spiritsData as any).default || spiritsData;
+
+    // CHANGED: Get all the arrays (common, uncommon, etc.)
+    const allSpiritArrays: BaseSpirit[][] = Object.values(spiritMap);
+    // CHANGED: Flatten the array of arrays into a single array of spirits
+    const allSpirits: BaseSpirit[] = allSpiritArrays.flat();
+
+    console.log(
+      `--- 3. Loaded ${allSpirits.length} total spirits from JSON ---`,
+    ); // This should now log 46
+
+    // 2. Filter for valid spirits that ACTUALLY HAVE baseStats
+    const validSpirits = allSpirits.filter((spirit) => spirit.baseStats);
+    console.log(
+      `--- 4. Found ${validSpirits.length} spirits with a 'baseStats' property ---`,
+    ); // This should also log 46
+
+    // 3. If no spirits have baseStats at all, log an error and exit
+    if (validSpirits.length === 0) {
+      console.error(
+        "CRITICAL ERROR: No spirits in spirits.json have a 'baseStats' property. Cannot generate enemy.",
+        spiritMap,
+      );
+      return null; // No valid spirits to generate
+    }
+
+    // 4. Filter valid spirits by rarity
+    const allowedRarities = ["common", "uncommon", "rare"];
+    let eligibleSpirits = validSpirits.filter((spirit) =>
+      allowedRarities.includes(spirit.rarity),
+    );
+    console.log(
+      `--- 5. Found ${eligibleSpirits.length} spirits matching allowed rarities (common, uncommon, rare) ---`,
+    ); // This should log "40"
+
+    // 5. Fallback: If no spirits match rarity, use ANY valid spirit
+    if (eligibleSpirits.length === 0) {
+      console.log(
+        "--- 6. No spirits matched rarity, falling back to all valid spirits. ---",
+      );
+      eligibleSpirits = validSpirits;
+    }
+    // --- END OF UPDATED SECTION ---
+
+    const randomSpirit =
+      eligibleSpirits[Math.floor(Math.random() * eligibleSpirits.length)];
+
+    console.log(
+      "--- 7. Selected random spirit:",
+      randomSpirit.name,
+      randomSpirit,
+    );
+
+    const enemyPotentialBonus = 0.02; // The 2% bonus instead of a real potential factor
+    const levelMultiplier = enemyLevel * 0.2;
+
+    // 6. Apply the new player-like formula to the enemy stats
+    // This block should now be safe
+    const enemyAttack = Math.floor(
+      randomSpirit.baseStats.attack *
+        (1 + enemyPotentialBonus) *
+        levelMultiplier,
+    );
+    const enemyDefense = Math.floor(
+      randomSpirit.baseStats.defense *
+        (1 + enemyPotentialBonus) *
+        levelMultiplier,
+    );
+    const enemyHealth = Math.floor(
+      randomSpirit.baseStats.health *
+        (1 + enemyPotentialBonus) *
+        levelMultiplier,
+    );
+    const enemyElementalAffinity = Math.floor(
+      randomSpirit.baseStats.elementalAffinity *
+        (1 + enemyPotentialBonus) *
+        levelMultiplier,
+    );
 
     const newEnemy: Enemy = {
       id: "enemy_" + Date.now(),
-      name: randomName,
+      name: randomSpirit.name, // Use spirit's name
       level: enemyLevel,
-      attack: 80 + enemyLevel * 20,
-      defense: 60 + enemyLevel * 15,
-      maxHealth: 200 + enemyLevel * 50,
-      currentHealth: 200 + enemyLevel * 50,
-      element: randomElement,
+      attack: enemyAttack,
+      defense: enemyDefense,
+      maxHealth: enemyHealth,
+      currentHealth: enemyHealth,
+      element: randomSpirit.element, // Use spirit's element
+      elementalAffinity: enemyElementalAffinity,
     };
 
+    console.log("--- 8. Successfully generated new enemy:", newEnemy);
     return newEnemy;
   };
 
@@ -199,8 +288,11 @@ export function BattleScreen({
         const stats = calculateAllStats(spirit);
         return {
           playerSpirit: spirit,
-          currentHealth: spirit.currentHealth ?? stats.health,
           maxHealth: stats.health,
+          currentHealth: Math.min(
+            spirit.currentHealth ?? stats.health, // Use saved HP or full HP
+            stats.health, // But never let it be more than the max
+          ),
           activeEffects: spirit.activeEffects || [],
         };
       });
@@ -377,6 +469,15 @@ export function BattleScreen({
     const finalElementalDamage = Math.floor(
       baseElementalDamage * elementalMultiplier,
     );
+    let elementalMessage = "";
+    if (finalElementalDamage > 0) {
+      // Only show if elemental damage was dealt
+      if (elementalMultiplier > 1.0) {
+        elementalMessage = " It's super effective!";
+      } else if (elementalMultiplier < 1.0) {
+        elementalMessage = " It was resisted...";
+      }
+    }
 
     // --- 4. Calculate Total Damage ---
     const totalDamage = physicalDamage + finalElementalDamage;
@@ -390,7 +491,8 @@ export function BattleScreen({
     // --- 5. Update Battle Log with Breakdown ---
     addLog(
       `${baseSpirit.name} used ${skill.name}! Dealt ${totalDamage} damage ` +
-        `(${physicalDamage} Physical + ${finalElementalDamage} ${attackElement.toUpperCase()}).`,
+        `(${physicalDamage} Physical + ${finalElementalDamage} ${attackElement.toUpperCase()}).` +
+        elementalMessage,
     );
 
     if (skill.healing > 0) {
@@ -729,8 +831,54 @@ export function BattleScreen({
   ) => {
     if (!enemy) return;
 
-    let damage = Math.max(1, Math.floor(enemy.attack - stats.defense * 0.3));
+    // --- 1. SIMULATE A "BASIC ATTACK" SKILL ---
+    const skillDamageMultiplier = 1.0; // Basic attack has 1.0 damage
+    const skillElement = "none"; // "none" means it will use the spirit's main element
 
+    // --- 2. DETERMINE ELEMENTAL PROPERTIES (Copied from player logic) ---
+    const spiritElement: ElementId = enemy.element;
+    const affinityStat = enemy.elementalAffinity; // Use the new stat
+
+    let affinityRatio = 0;
+    if (skillElement === "none" || skillElement === spiritElement) {
+      affinityRatio = 0.25; // Normal attack or matching element
+    } else {
+      affinityRatio = 0.15; // Mismatched element (won't happen with "none")
+    }
+    const attackElement =
+      skillElement !== "none" ? skillElement : spiritElement;
+
+    // --- 3. CALCULATE PHYSICAL DAMAGE (Using enemy's defense formula) ---
+    const basePhysicalDamage = enemy.attack * skillDamageMultiplier;
+    const physicalDamage = Math.max(
+      1,
+      // Using the enemy's original defense reduction of 0.3
+      Math.floor(basePhysicalDamage - stats.defense * 0.3),
+    );
+
+    // --- 4. CALCULATE ELEMENTAL DAMAGE (Copied from player logic) ---
+    const baseElementalDamage = Math.floor(affinityStat * affinityRatio);
+    const elementalMultiplier = getElementalDamageMultiplier(
+      attackElement,
+      activeBaseSpirit?.element || "none", // Get target's element
+    );
+    const finalElementalDamage = Math.floor(
+      baseElementalDamage * elementalMultiplier,
+    );
+    let elementalMessage = "";
+    if (finalElementalDamage > 0) {
+      // Only show if elemental damage was dealt
+      if (elementalMultiplier > 1.0) {
+        elementalMessage = " It's super effective!";
+      } else if (elementalMultiplier < 1.0) {
+        elementalMessage = " It was resisted...";
+      }
+    }
+
+    // --- 5. CALCULATE TOTAL DAMAGE ---
+    let damage = physicalDamage + finalElementalDamage;
+
+    // --- 6. (OLD LOGIC) APPLY BLOCK / SHIELD ---
     if (isBlocking) {
       damage = Math.floor(damage * 0.5);
       addLog(
@@ -739,7 +887,6 @@ export function BattleScreen({
       setIsBlocking(false);
     }
 
-    // Check for Shield effects
     let shieldBlocked = false;
     const hasShield = target.activeEffects.some(
       (effect) =>
@@ -755,7 +902,7 @@ export function BattleScreen({
 
     const newHealth = Math.max(0, target.currentHealth - damage);
 
-    // Calculate Thorns reflected damage
+    // --- 7. (OLD LOGIC) REFLECT, APPLY, AND LOG DAMAGE ---
     const reflectedDamage = executeTriggerEffects(
       "on_get_hit",
       enemy,
@@ -771,6 +918,7 @@ export function BattleScreen({
     setPlayerHealthBarShake(true);
     setTimeout(() => setPlayerHealthBarShake(false), 500);
 
+    // (This part remains the same: setPlayerSpirits, tickEffects, etc.)
     setPlayerSpirits((prev) => {
       // Apply damage first
       const withDamage = prev.map((s, i) =>
@@ -806,20 +954,20 @@ export function BattleScreen({
       return updatedSpirits;
     });
 
-    // Update enemy health if Thorns reflected damage
     if (reflectedDamage > 0) {
       setEnemy({ ...enemy, currentHealth: newEnemyHealth });
-      // Check if enemy was defeated by Thorns
       if (newEnemyHealth <= 0) {
-        // This is the correct call to fix the error and trigger victory logic
         setTimeout(() => handleVictory(enemy), 0);
       }
     }
 
     const targetBase = getBaseSpirit(target.playerSpirit.spiritId);
     if (!shieldBlocked) {
+      // --- 8. UPDATE BATTLE LOG ---
       addLog(
-        `${enemy.name} attacks ${targetBase?.name}! Dealt ${damage} damage.`,
+        `${enemy.name} attacks ${targetBase?.name}! Dealt ${damage} damage ` +
+          `(${physicalDamage} Physical + ${finalElementalDamage} ${attackElement.toUpperCase()}).` +
+          elementalMessage,
       );
     }
 
@@ -991,7 +1139,6 @@ export function BattleScreen({
   const availableSkills = activeSpirit
     ? getAvailableSkills(activeSpirit.playerSpirit)
     : [];
-
   return (
     <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center p-4 z-50">
       <div className="parchment-bg chinese-border max-w-6xl w-full h-[90vh] p-6 rounded-lg relative flex flex-col">
@@ -1036,10 +1183,17 @@ export function BattleScreen({
             </h3>
             {activeSpirit && activeBaseSpirit && activeStats ? (
               <div>
-                <div className="flex justify-between items-center mb-2">
-                  <span className="font-bold parchment-text text-lg">
-                    {activeBaseSpirit.name}
-                  </span>
+                <div className="flex justify-between items-start mb-2">
+                  <div>
+                    <span className="font-bold parchment-text text-lg">
+                      {activeBaseSpirit.name}
+                    </span>
+                    <div className="text-xs parchment-text opacity-80">
+                      <span className="capitalize">
+                        Element: {activeBaseSpirit.element}
+                      </span>
+                    </div>
+                  </div>
                   <span className="text-sm parchment-text">
                     Lv. {activeSpirit.playerSpirit.level}
                   </span>
@@ -1105,10 +1259,18 @@ export function BattleScreen({
             </h3>
             {enemy ? (
               <div>
-                <div className="flex justify-between items-center mb-2">
-                  <span className="font-bold parchment-text text-lg">
-                    {enemy.name}
-                  </span>
+                <div className="flex justify-between items-start mb-2">
+                  <div>
+                    <span className="font-bold parchment-text text-lg">
+                      {enemy.name}
+                    </span>
+                    {/* --- ADDED THIS LINE --- */}
+                    <div className="text-xs parchment-text opacity-80">
+                      <span className="capitalize">
+                        Element: {enemy.element}
+                      </span>
+                    </div>
+                  </div>
                   <span className="text-sm parchment-text">
                     Lv. {enemy.level}
                   </span>
