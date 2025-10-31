@@ -190,16 +190,25 @@ export function SpiritManager({ onClose }: SpiritManagerProps) {
                     }`}
                     style={{ background: 'var(--parchment)' }}
                   >
-                    <div className="flex justify-between items-start mb-2">
-                      <h4 className="font-bold parchment-text text-sm truncate flex-1">
-                        {baseSpirit.name}
-                      </h4>
-                      <span
-                        className="text-xs font-bold px-1.5 py-0.5 rounded ml-1 flex-shrink-0"
-                        style={{ background: getRarityColor(baseSpirit.rarity), color: 'white' }}
-                      >
-                        {baseSpirit.rarity[0].toUpperCase()}
-                      </span>
+                    <div className="flex items-center gap-2 mb-2">
+                      <img
+                        src="/icons/placeholdericon.png"
+                        alt={baseSpirit.name}
+                        className="w-12 h-12 object-contain flex-shrink-0"
+                      />
+                      <div className="flex-1 min-w-0">
+                        <div className="flex justify-between items-start">
+                          <h4 className="font-bold parchment-text text-sm truncate flex-1">
+                            {baseSpirit.name}
+                          </h4>
+                          <span
+                            className="text-xs font-bold px-1.5 py-0.5 rounded ml-1 flex-shrink-0"
+                            style={{ background: getRarityColor(baseSpirit.rarity), color: 'white' }}
+                          >
+                            {baseSpirit.rarity[0].toUpperCase()}
+                          </span>
+                        </div>
+                      </div>
                     </div>
                     <div className="text-xs parchment-text space-y-1">
                       <div className="flex justify-between">
@@ -250,19 +259,28 @@ export function SpiritManager({ onClose }: SpiritManagerProps) {
 
                 return (
                   <>
-                    <h3 className="text-xl font-bold parchment-text mb-1">{baseSpirit.name}</h3>
-                    <div className="flex gap-2 mb-3">
-                      <span
-                        className="text-xs font-bold px-2 py-1 rounded"
-                        style={{ background: getRarityColor(baseSpirit.rarity), color: 'white' }}
-                      >
-                        {baseSpirit.rarity.toUpperCase()}
-                      </span>
-                      {selectedSpirit.isPrismatic && (
-                        <span className="text-xs font-bold px-2 py-1 rounded prismatic-border">
-                          PRISMATIC
-                        </span>
-                      )}
+                    <div className="flex items-center gap-3 mb-3">
+                      <img
+                        src="/icons/placeholdericon.png"
+                        alt={baseSpirit.name}
+                        className="w-20 h-20 object-contain flex-shrink-0"
+                      />
+                      <div className="flex-1">
+                        <h3 className="text-xl font-bold parchment-text mb-1">{baseSpirit.name}</h3>
+                        <div className="flex gap-2">
+                          <span
+                            className="text-xs font-bold px-2 py-1 rounded"
+                            style={{ background: getRarityColor(baseSpirit.rarity), color: 'white' }}
+                          >
+                            {baseSpirit.rarity.toUpperCase()}
+                          </span>
+                          {selectedSpirit.isPrismatic && (
+                            <span className="text-xs font-bold px-2 py-1 rounded prismatic-border">
+                              PRISMATIC
+                            </span>
+                          )}
+                        </div>
+                      </div>
                     </div>
 
                     <div className="space-y-3">
