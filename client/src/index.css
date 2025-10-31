@@ -37,12 +37,12 @@
 
 .parchment-bg {
   background: linear-gradient(to bottom, var(--parchment) 0%, var(--parchment-dark) 100%);
-  background-image: 
+  background-image:
     linear-gradient(to bottom, var(--parchment) 0%, var(--parchment-dark) 100%),
     url("data:image/svg+xml,%3Csvg width='100' height='100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' /%3E%3C/filter%3E%3Crect width='100' height='100' filter='url(%23noise)' opacity='0.05'/%3E%3C/svg%3E");
-  box-shadow: 
-    inset 0 0 20px rgba(0,0,0,0.1),
-    0 4px 20px rgba(0,0,0,0.3);
+  box-shadow:
+    inset 0 0 20px rgba(0, 0, 0, 0.1),
+    0 4px 20px rgba(0, 0, 0, 0.3);
 }
 
 .parchment-text {
@@ -65,7 +65,7 @@
 
 .qi-glow {
   text-shadow: 0 0 10px rgba(212, 175, 55, 0.5),
-               0 0 20px rgba(212, 175, 55, 0.3);
+    0 0 20px rgba(212, 175, 55, 0.3);
 }
 
 .spirit-card {
@@ -74,40 +74,77 @@
 
 .spirit-card:hover {
   transform: translateY(-4px);
-  box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
 }
 
 .prismatic-border {
   border: 2px solid transparent;
-  background: 
+  background:
     linear-gradient(var(--parchment), var(--parchment)) padding-box,
     linear-gradient(45deg, #ff0080, #ff8c00, #40e0d0, #ff0080) border-box;
   animation: prismatic-rotate 3s linear infinite;
 }
 
-@keyframes prismatic-rotate {
-  0% { filter: hue-rotate(0deg); }
-  100% { filter: hue-rotate(360deg); }
-}
-
-@keyframes qi-sprite-animation {
-  0% { background-position: 0 0; }
-  50% { background-position: -100% 0; }
-  100% { background-position: 0 0; }
-}
-
 .qi-sprite {
-  background-image: url('/powerupsheet.png');
-  background-size: 200% 100%;
-  background-repeat: no-repeat;
-  animation: qi-sprite-animation 1s steps(2) infinite;
+/* The size of ONE frame */
+width: 128px;
+height: 128px;
+
+background-image: url('/powerupsheet.png');
+background-size: 200% 100%;
+background-repeat: no-repeat;
+
+  /* * NOTE: We removed 'steps(2, start)' from this line.
+   * We will define the steps in the keyframes instead.
+   */
+animation: qi-sprite-animation 1s infinite;
 }
 
-.element-wood { color: var(--jade-green); }
-.element-fire { color: var(--vermillion); }
-.element-water { color: var(--azure); }
-.element-earth { color: #8b6f47; }
-.element-metal { color: #a8a8a8; }
+/*
+ * This is the "manual" version of steps(2, start)
+ */
+@keyframes qi-sprite-animation {
+  /* * Frame 1 (no dots)
+   * Show from the beginning (0%) until just before 50%
+   */
+0% {
+background-position: 0% 0;
+}
+49.9% {
+background-position: 0% 0;
+}
+
+  /* * Frame 2 (with dots)
+   * Show from 50% until the end (100%)
+   */
+50% {
+    /* 100% position shows the 2nd frame */
+background-position: 100% 0; 
+}
+100% {
+background-position: 100% 0;
+}
+}
+
+.element-wood {
+  color: var(--jade-green);
+}
+
+.element-fire {
+  color: var(--vermillion);
+}
+
+.element-water {
+  color: var(--azure);
+}
+
+.element-earth {
+  color: #8b6f47;
+}
+
+.element-metal {
+  color: #a8a8a8;
+}
 
 .scroll-container {
   overflow-y: auto;

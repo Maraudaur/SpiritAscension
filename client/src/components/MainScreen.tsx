@@ -1,15 +1,27 @@
-import { useState, useEffect } from 'react';
-import { useGameState } from '@/lib/stores/useGameState';
-import { useAudio } from '@/lib/stores/useAudio';
-import { Sparkles, Swords, Users, Volume2, VolumeX } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { useState, useEffect } from "react";
+import { useGameState } from "@/lib/stores/useGameState";
+import { useAudio } from "@/lib/stores/useAudio";
+import { Sparkles, Swords, Users, Volume2, VolumeX } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 interface MainScreenProps {
-  onNavigate: (screen: 'main' | 'spirits' | 'battle' | 'summon' | 'boss') => void;
+  onNavigate: (
+    screen: "main" | "spirits" | "battle" | "summon" | "boss",
+  ) => void;
 }
 
 export function MainScreen({ onNavigate }: MainScreenProps) {
-  const { qi, qiPerSecond, updateQi, qiUpgrades, upgradeQiProduction, battlesWon, battleRewardMultiplier, upgradeBattleReward, getBattleRewardUpgradeCost } = useGameState();
+  const {
+    qi,
+    qiPerSecond,
+    updateQi,
+    qiUpgrades,
+    upgradeQiProduction,
+    battlesWon,
+    battleRewardMultiplier,
+    upgradeBattleReward,
+    getBattleRewardUpgradeCost,
+  } = useGameState();
   const { isMuted, toggleMute } = useAudio();
   const [displayQi, setDisplayQi] = useState(qi);
 
@@ -53,16 +65,23 @@ export function MainScreen({ onNavigate }: MainScreenProps) {
         <p className="text-2xl text-center mb-8 parchment-text">Ascension</p>
 
         <div className="mb-8 p-6 bg-gradient-to-br from-yellow-50 to-yellow-100 rounded-lg chinese-border flex gap-4">
-          <div className="qi-sprite flex-shrink-0" style={{ width: '64px', height: '100%', minHeight: '80px' }} />
+          <div className="qi-sprite flex-shrink-0" />
           <div className="flex-1">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-xl parchment-text font-bold">Qi Energy</span>
-              <span className="text-3xl font-bold qi-glow" style={{ color: 'var(--imperial-gold)' }}>
+              <span className="text-xl parchment-text font-bold">
+                Qi Energy
+              </span>
+              <span
+                className="text-3xl font-bold qi-glow"
+                style={{ color: "var(--imperial-gold)" }}
+              >
                 {Math.floor(displayQi)}
               </span>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-sm parchment-text opacity-75">Generation Rate</span>
+              <span className="text-sm parchment-text opacity-75">
+                Generation Rate
+              </span>
               <span className="text-lg parchment-text font-semibold">
                 {qiPerSecond.toFixed(1)} / sec
               </span>
@@ -71,7 +90,9 @@ export function MainScreen({ onNavigate }: MainScreenProps) {
         </div>
 
         <div className="mb-6 p-4 parchment-bg rounded border-2 border-amber-700">
-          <h3 className="text-lg font-bold parchment-text mb-3">Cultivation Progress</h3>
+          <h3 className="text-lg font-bold parchment-text mb-3">
+            Cultivation Progress
+          </h3>
           <div className="space-y-2">
             <div className="flex justify-between parchment-text text-sm">
               <span>Base Production:</span>
@@ -79,7 +100,9 @@ export function MainScreen({ onNavigate }: MainScreenProps) {
             </div>
             <div className="flex justify-between parchment-text text-sm">
               <span>Multiplier:</span>
-              <span className="font-semibold">{qiUpgrades.multiplier.toFixed(1)}x</span>
+              <span className="font-semibold">
+                {qiUpgrades.multiplier.toFixed(1)}x
+              </span>
             </div>
             <div className="flex justify-between parchment-text text-sm">
               <span>Battles Won:</span>
@@ -91,8 +114,8 @@ export function MainScreen({ onNavigate }: MainScreenProps) {
             disabled={!canUpgrade}
             className="w-full mt-4"
             style={{
-              background: canUpgrade ? 'var(--vermillion)' : '#999',
-              color: 'var(--parchment)',
+              background: canUpgrade ? "var(--vermillion)" : "#999",
+              color: "var(--parchment)",
             }}
           >
             Enhance Cultivation ({upgradeCost} Qi)
@@ -100,11 +123,15 @@ export function MainScreen({ onNavigate }: MainScreenProps) {
         </div>
 
         <div className="mb-6 p-4 parchment-bg rounded border-2 border-amber-700">
-          <h3 className="text-lg font-bold parchment-text mb-3">Battle Mastery</h3>
+          <h3 className="text-lg font-bold parchment-text mb-3">
+            Battle Mastery
+          </h3>
           <div className="space-y-2">
             <div className="flex justify-between parchment-text text-sm">
               <span>Battle Reward Multiplier:</span>
-              <span className="font-semibold">{(battleRewardMultiplier * 100).toFixed(0)}%</span>
+              <span className="font-semibold">
+                {(battleRewardMultiplier * 100).toFixed(0)}%
+              </span>
             </div>
             <p className="text-xs parchment-text opacity-75 italic">
               Each upgrade increases battle Qi rewards by 10%
@@ -115,8 +142,8 @@ export function MainScreen({ onNavigate }: MainScreenProps) {
             disabled={!canUpgradeBattleReward}
             className="w-full mt-4"
             style={{
-              background: canUpgradeBattleReward ? 'var(--vermillion)' : '#999',
-              color: 'var(--parchment)',
+              background: canUpgradeBattleReward ? "var(--vermillion)" : "#999",
+              color: "var(--parchment)",
             }}
           >
             Enhance Battle Mastery ({battleRewardUpgradeCost} Qi)
@@ -125,27 +152,33 @@ export function MainScreen({ onNavigate }: MainScreenProps) {
 
         <div className="grid grid-cols-3 gap-4 mb-4">
           <Button
-            onClick={() => onNavigate('summon')}
+            onClick={() => onNavigate("summon")}
             className="p-6 flex flex-col items-center gap-2"
-            style={{ background: 'var(--jade-green)', color: 'var(--parchment)' }}
+            style={{
+              background: "var(--jade-green)",
+              color: "var(--parchment)",
+            }}
           >
             <Sparkles className="w-8 h-8" />
             <span className="text-sm font-semibold">Summon Spirit</span>
           </Button>
 
           <Button
-            onClick={() => onNavigate('spirits')}
+            onClick={() => onNavigate("spirits")}
             className="p-6 flex flex-col items-center gap-2"
-            style={{ background: 'var(--azure)', color: 'var(--parchment)' }}
+            style={{ background: "var(--azure)", color: "var(--parchment)" }}
           >
             <Users className="w-8 h-8" />
             <span className="text-sm font-semibold">Manage Spirits</span>
           </Button>
 
           <Button
-            onClick={() => onNavigate('battle')}
+            onClick={() => onNavigate("battle")}
             className="p-6 flex flex-col items-center gap-2"
-            style={{ background: 'var(--vermillion)', color: 'var(--parchment)' }}
+            style={{
+              background: "var(--vermillion)",
+              color: "var(--parchment)",
+            }}
           >
             <Swords className="w-8 h-8" />
             <span className="text-sm font-semibold">Enter Battle</span>
@@ -153,9 +186,12 @@ export function MainScreen({ onNavigate }: MainScreenProps) {
         </div>
 
         <Button
-          onClick={() => onNavigate('boss')}
+          onClick={() => onNavigate("boss")}
           className="w-full p-6 flex flex-col items-center gap-2"
-          style={{ background: 'linear-gradient(135deg, #8B0000 0%, #FF4500 100%)', color: 'var(--parchment)' }}
+          style={{
+            background: "linear-gradient(135deg, #8B0000 0%, #FF4500 100%)",
+            color: "var(--parchment)",
+          }}
         >
           <Swords className="w-10 h-10" />
           <span className="text-lg font-bold">⚔️ Challenge Boss ⚔️</span>
