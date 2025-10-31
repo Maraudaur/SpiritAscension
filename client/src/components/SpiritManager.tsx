@@ -130,34 +130,64 @@ export function SpiritManager({ onClose }: SpiritManagerProps) {
 
         <div className="mb-4 p-4 bg-amber-50 rounded border-2 border-amber-700">
           <h3 className="font-bold parchment-text mb-2">Active Battle Party ({activeParty.length}/4)</h3>
-          <div className="grid grid-cols-4 gap-2">
+          <div className="grid grid-cols-2 gap-3">
             {[0, 1, 2, 3].map((index) => {
               const spiritInstanceId = activeParty[index];
               const spirit = spirits.find(s => s.instanceId === spiritInstanceId);
               const baseSpirit = spirit ? getBaseSpirit(spirit.spiritId) : null;
+              const element = spirit && baseSpirit ? getElement(baseSpirit.element) : null;
+              const lineage = spirit && baseSpirit ? getLineage(baseSpirit.lineage) : null;
+              const stats = spirit ? calculateAllStats(spirit) : null;
 
               return (
                 <div
                   key={index}
                   className={`p-3 rounded border-2 ${
                     spirit ? 'border-vermillion bg-white' : 'border-dashed border-gray-400 bg-gray-100'
-                  } min-h-[80px] flex flex-col justify-center items-center`}
+                  } min-h-[120px] flex gap-3`}
                 >
-                  {spirit && baseSpirit ? (
+                  {spirit && baseSpirit && element && lineage && stats ? (
                     <>
-                      <p className="text-sm font-bold parchment-text text-center truncate w-full">
-                        {baseSpirit.name}
-                      </p>
-                      <p className="text-xs parchment-text opacity-75">Lv. {spirit.level}</p>
-                      <button
-                        onClick={() => handleRemoveFromParty(spirit.instanceId)}
-                        className="mt-1 p-1 hover:bg-red-100 rounded"
-                      >
-                        <Trash2 className="w-3 h-3 text-red-600" />
-                      </button>
+                      <img
+                        src="/icons/placeholdericon.png"
+                        alt={baseSpirit.name}
+                        className="w-24 h-24 object-contain flex-shrink-0"
+                      />
+                      <div className="flex-1 flex flex-col min-w-0">
+                        <div className="flex justify-between items-start mb-1">
+                          <h4 className="font-bold parchment-text text-sm truncate flex-1">
+                            {baseSpirit.name}
+                          </h4>
+                          <span className="text-xs parchment-text ml-2">Lv. {spirit.level}</span>
+                        </div>
+                        <div className="flex justify-between items-center mb-2">
+                          <span className={`text-xs element-${element.id}`}>
+                            {element.name} | {lineage.name}
+                          </span>
+                          <span
+                            className="text-xs font-bold px-1.5 py-0.5 rounded ml-1 flex-shrink-0"
+                            style={{ background: getRarityColor(baseSpirit.rarity), color: 'white' }}
+                          >
+                            {baseSpirit.rarity[0].toUpperCase()}
+                          </span>
+                        </div>
+                        <div className="w-full bg-gray-300 rounded-full h-3 mb-2">
+                          <div
+                            className="bg-green-600 h-3 rounded-full"
+                            style={{ width: '100%' }}
+                          />
+                        </div>
+                        <button
+                          onClick={() => handleRemoveFromParty(spirit.instanceId)}
+                          className="w-full p-1 bg-blue-600 text-white rounded text-xs font-semibold hover:bg-blue-700 flex items-center justify-center gap-1"
+                        >
+                          <Trash2 className="w-3 h-3" />
+                          Remove from Party
+                        </button>
+                      </div>
                     </>
                   ) : (
-                    <p className="text-xs parchment-text opacity-50">Empty Slot</p>
+                    <p className="text-xs parchment-text opacity-50 m-auto">Empty Slot</p>
                   )}
                 </div>
               );
@@ -170,7 +200,7 @@ export function SpiritManager({ onClose }: SpiritManagerProps) {
             <h3 className="font-bold parchment-text mb-2 sticky top-0 bg-parchment py-2">
               All Spirits ({spirits.length})
             </h3>
-            <div className="grid grid-cols-3 gap-3">
+            <div className="grid grid-cols-2 gap-3">
               {spirits.map((spirit) => {
                 const baseSpirit = getBaseSpirit(spirit.spiritId);
                 if (!baseSpirit) return null;
@@ -178,6 +208,7 @@ export function SpiritManager({ onClose }: SpiritManagerProps) {
                 const element = getElement(baseSpirit.element);
                 const lineage = getLineage(baseSpirit.lineage);
                 const isInParty = activeParty.includes(spirit.instanceId);
+                const stats = calculateAllStats(spirit);
 
                 return (
                   <div
@@ -187,49 +218,52 @@ export function SpiritManager({ onClose }: SpiritManagerProps) {
                       spirit.isPrismatic ? 'prismatic-border' : 'border-2 border-amber-700'
                     } ${
                       selectedSpirit?.instanceId === spirit.instanceId ? 'ring-2 ring-blue-500' : ''
-                    }`}
+                    } flex gap-3`}
                     style={{ background: 'var(--parchment)' }}
                   >
-                    <div className="flex items-center gap-2 mb-2">
-                      <img
-                        src="/icons/placeholdericon.png"
-                        alt={baseSpirit.name}
-                        className="w-12 h-12 object-contain flex-shrink-0"
-                      />
-                      <div className="flex-1 min-w-0">
-                        <div className="flex justify-between items-start">
-                          <h4 className="font-bold parchment-text text-sm truncate flex-1">
-                            {baseSpirit.name}
-                          </h4>
-                          <span
-                            className="text-xs font-bold px-1.5 py-0.5 rounded ml-1 flex-shrink-0"
-                            style={{ background: getRarityColor(baseSpirit.rarity), color: 'white' }}
-                          >
-                            {baseSpirit.rarity[0].toUpperCase()}
-                          </span>
-                        </div>
+                    <img
+                      src="/icons/placeholdericon.png"
+                      alt={baseSpirit.name}
+                      className="w-24 h-24 object-contain flex-shrink-0"
+                    />
+                    <div className="flex-1 flex flex-col min-w-0">
+                      <div className="flex justify-between items-start mb-1">
+                        <h4 className="font-bold parchment-text text-sm truncate flex-1">
+                          {baseSpirit.name}
+                        </h4>
+                        <span className="text-xs parchment-text ml-2">Lv. {spirit.level}</span>
                       </div>
-                    </div>
-                    <div className="text-xs parchment-text space-y-1">
-                      <div className="flex justify-between">
-                        <span className={`element-${element.id}`}>{element.name}</span>
-                        <span>Lv. {spirit.level}</span>
+                      <div className="flex justify-between items-center mb-2">
+                        <span className={`text-xs element-${element.id}`}>
+                          {element.name} | {lineage.name}
+                        </span>
+                        <span
+                          className="text-xs font-bold px-1.5 py-0.5 rounded ml-1 flex-shrink-0"
+                          style={{ background: getRarityColor(baseSpirit.rarity), color: 'white' }}
+                        >
+                          {baseSpirit.rarity[0].toUpperCase()}
+                        </span>
                       </div>
-                      <div className="text-xs opacity-75">{lineage.name}</div>
+                      <div className="w-full bg-gray-300 rounded-full h-3 mb-2">
+                        <div
+                          className="bg-green-600 h-3 rounded-full"
+                          style={{ width: '100%' }}
+                        />
+                      </div>
                       {!isInParty && activeParty.length < 4 && (
                         <button
                           onClick={(e) => {
                             e.stopPropagation();
                             handleAddToParty(spirit.instanceId);
                           }}
-                          className="w-full mt-2 p-1 bg-green-600 text-white rounded text-xs font-semibold hover:bg-green-700 flex items-center justify-center gap-1"
+                          className="w-full p-1 bg-green-600 text-white rounded text-xs font-semibold hover:bg-green-700 flex items-center justify-center gap-1"
                         >
                           <Plus className="w-3 h-3" />
                           Add to Party
                         </button>
                       )}
                       {isInParty && (
-                        <div className="w-full mt-2 p-1 bg-blue-600 text-white rounded text-xs font-semibold text-center">
+                        <div className="w-full p-1 bg-blue-600 text-white rounded text-xs font-semibold text-center">
                           In Party
                         </div>
                       )}

@@ -4,6 +4,8 @@ import { useAudio } from "@/lib/stores/useAudio";
 import {
   getBaseSpirit,
   getElement,
+  getLineage,
+  getRarityColor,
   calculateAllStats,
   getAvailableSkills,
   getSkill,
@@ -1540,11 +1542,13 @@ export function BattleScreen({
                       Back
                     </button>
                   </div>
-                  <div className="grid grid-cols-4 gap-3">
+                  <div className="grid grid-cols-2 gap-3">
                     {playerSpirits.map((spirit, index) => {
                       const baseSpirit = getBaseSpirit(
                         spirit.playerSpirit.spiritId,
                       );
+                      const element = baseSpirit ? getElement(baseSpirit.element) : null;
+                      const lineage = baseSpirit ? getLineage(baseSpirit.lineage) : null;
                       const isActive = index === activePartySlot;
                       const isDead = spirit.currentHealth <= 0;
 
@@ -1559,7 +1563,7 @@ export function BattleScreen({
                             if (!isDead && !isActive) playButtonHover();
                           }}
                           disabled={isDead || isActive}
-                          className={`p-3 rounded-lg border-2 text-left ${
+                          className={`p-3 rounded-lg border-2 text-left flex gap-3 ${
                             isActive
                               ? "border-blue-600 bg-blue-100 cursor-not-allowed"
                               : isDead
@@ -1567,28 +1571,43 @@ export function BattleScreen({
                                 : "border-green-600 bg-white hover:bg-green-50"
                           }`}
                         >
-                          <div className="flex items-center gap-2 mb-2">
-                            <img
-                              src="/icons/placeholdericon.png"
-                              alt={baseSpirit?.name}
-                              className="w-10 h-10 object-contain flex-shrink-0"
-                            />
-                            <div className="flex-1 min-w-0">
-                              <p className="text-sm font-bold parchment-text truncate">
+                          <img
+                            src="/icons/placeholdericon.png"
+                            alt={baseSpirit?.name}
+                            className="w-24 h-24 object-contain flex-shrink-0"
+                          />
+                          <div className="flex-1 flex flex-col min-w-0">
+                            <div className="flex justify-between items-start mb-1">
+                              <p className="text-sm font-bold parchment-text truncate flex-1">
                                 {baseSpirit?.name}
                               </p>
-                              <p className="text-xs parchment-text">
+                              <span className="text-xs parchment-text ml-2">
                                 Lv. {spirit.playerSpirit.level}
-                              </p>
+                              </span>
                             </div>
-                          </div>
-                          <div className="w-full bg-gray-300 rounded-full h-2">
-                            <div
-                              className={`h-2 rounded-full ${isDead ? "bg-gray-500" : "bg-green-600"}`}
-                              style={{
-                                width: `${(spirit.currentHealth / spirit.maxHealth) * 100}%`,
-                              }}
-                            />
+                            {element && lineage && (
+                              <div className="flex justify-between items-center mb-2">
+                                <span className={`text-xs element-${element.id}`}>
+                                  {element.name} | {lineage.name}
+                                </span>
+                                {baseSpirit && (
+                                  <span
+                                    className="text-xs font-bold px-1.5 py-0.5 rounded ml-1 flex-shrink-0"
+                                    style={{ background: getRarityColor(baseSpirit.rarity), color: 'white' }}
+                                  >
+                                    {baseSpirit.rarity[0].toUpperCase()}
+                                  </span>
+                                )}
+                              </div>
+                            )}
+                            <div className="w-full bg-gray-300 rounded-full h-3">
+                              <div
+                                className={`h-3 rounded-full ${isDead ? "bg-gray-500" : "bg-green-600"}`}
+                                style={{
+                                  width: `${(spirit.currentHealth / spirit.maxHealth) * 100}%`,
+                                }}
+                              />
+                            </div>
                           </div>
                         </button>
                       );
