@@ -1,0 +1,17 @@
+{
+  "attack": {
+    "id": "attack",
+    "name": "Attack Focus",
+    "description": "Increases base Attack stat by 10%."
+  },
+  "defense": {
+    "id": "defense",
+    "name": "Defense Focus",
+    "description": "Increases base Defense stat by 10%."
+  },
+  "health": {
+    "id": "health",
+    "name": "Health Focus",
+    "description": "Increases base Health stat by 10%."
+  }
+}

@@ -13,6 +13,7 @@ import spiritsData from "@shared/data/spirits.json";
 import elementsData from "@shared/data/elements.json";
 import lineagesData from "@shared/data/lineages.json";
 import skillsData from "@shared/data/skills.json";
+import passivesData from "@shared/data/passives.json";
 import { POTENTIAL_BONUSES } from "./stores/useGameState";
 
 const ELEMENTAL_MATRIX: Record<ElementId, Record<ElementId, number>> = {
@@ -124,6 +125,17 @@ export function getLineage(lineageId: string): Lineage {
 
 export function getSkill(skillId: string): Skill {
   return (skillsData as Record<string, Skill>)[skillId];
+}
+
+interface PassiveAbilityDetails {
+  id: string;
+  name: string;
+  description: string;
+}
+
+export function getPassiveAbility(abilityId: string): PassiveAbilityDetails {
+  // Cast passivesData to the correct object type
+  return (passivesData as Record<string, PassiveAbilityDetails>)[abilityId];
 }
 
 export function calculateStat(

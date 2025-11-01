@@ -141,6 +141,8 @@ export interface GameState {
   qiUpgrades: {
     baseProduction: number;
     multiplier: number;
+    baseProductionLevel: number;
+    multiplierLevel: number;
   };
   battleRewardMultiplier: number;
   spirits: PlayerSpirit[];

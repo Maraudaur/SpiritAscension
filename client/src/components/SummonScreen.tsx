@@ -1,34 +1,138 @@
-import { useState, useEffect } from 'react';
-import { useGameState } from '@/lib/stores/useGameState';
-import { useAudio } from '@/lib/stores/useAudio';
-import { getBaseSpirit, getElement, getLineage, getRarityColor, getPotentialColor, calculateAllStats } from '@/lib/spiritUtils';
-import { Button } from '@/components/ui/button';
-import { X, Sparkles, Volume2, VolumeX } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
-import type { PlayerSpirit, Rarity } from '@shared/types';
+import { useState, useEffect } from "react";
+import { useGameState } from "@/lib/stores/useGameState";
+import { useAudio } from "@/lib/stores/useAudio";
+import {
+  getBaseSpirit,
+  getElement,
+  getLineage,
+  getRarityColor,
+  getPotentialColor,
+  calculateAllStats,
+  getPassiveAbility,
+} from "@/lib/spiritUtils";
+import { Button } from "@/components/ui/button";
+import { X, Sparkles, Volume2, VolumeX } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import type { PlayerSpirit, Rarity } from "@shared/types";
 
 interface SummonScreenProps {
   onClose: () => void;
+  summonCount?: number; // NEW: Number of summons to perform
 }
 
-type SummonStage = 'idle' | 'channeling' | 'revealing' | 'revealed';
+type SummonStage = "idle" | "channeling" | "revealing" | "revealed";
 
 const RARITY_GLOW_COLORS: Record<Rarity, string> = {
-  common: '#9CA3AF',
-  uncommon: '#10B981',
-  rare: '#3B82F6',
-  epic: '#A855F7',
-  legendary: '#F59E0B',
+  common: "#9CA3AF",
+  uncommon: "#10B981",
+  rare: "#3B82F6",
+  epic: "#A855F7",
+  legendary: "#F59E0B",
 };
 
-export function SummonScreen({ onClose }: SummonScreenProps) {
-  const { summonSpirit, spendQi, getSpiritCost } = useGameState();
+export function SummonScreen({ onClose, summonCount = 0 }: SummonScreenProps) {
+  const {
+    summonSpirit, // Used for single summons
+    spendQi,
+    getSpiritCost,
+    qi,
+    addEssence,
+    getMultiSummonCost, // NEW
+    summonMultipleSpirits, // NEW
+  } = useGameState();
   const { isMuted, toggleMute } = useAudio();
-  const [summonedSpirit, setSummonedSpirit] = useState<PlayerSpirit | null>(null);
-  const [stage, setStage] = useState<SummonStage>('idle');
-  const [audioElement, setAudioElement] = useState<HTMLAudioElement | null>(null);
+  const [summonedSpirit, setSummonedSpirit] = useState<PlayerSpirit | null>(
+    null,
+  );
+  const [stage, setStage] = useState<SummonStage>(
+    summonCount > 0 ? "channeling" : "idle",
+  );
+  const [audioElement, setAudioElement] = useState<HTMLAudioElement | null>(
+    null,
+  );
+
+  // NEW: State for multi-summon queue
+  const [summonQueue, setSummonQueue] = useState<PlayerSpirit[]>([]);
+  const [currentIndex, setCurrentIndex] = useState(0);
 
   const spiritCost = getSpiritCost();
+
+  // This function starts the reveal animation for a given spirit
+  const startReveal = (spirit: PlayerSpirit) => {
+    setSummonedSpirit(spirit);
+    setStage("channeling");
+
+    // Channeling phase (1.5 seconds)
+    setTimeout(() => {
+      setStage("revealing");
+
+      const baseSpirit = getBaseSpirit(spirit.spiritId);
+      if (baseSpirit) {
+        const audio = new Audio("/sounds/success.mp3");
+        audio.volume = 0.5;
+        audio.play();
+        setAudioElement(audio);
+      }
+
+      // Reveal phase (2 seconds)
+      setTimeout(() => {
+        setStage("revealed");
+      }, 2000);
+    }, 1500);
+  };
+
+  // This handles a single summon (called from 'idle' screen or useEffect)
+  const handleSingleSummon = () => {
+    const cost = getSpiritCost();
+    if (spendQi(cost)) {
+      const spirit = summonSpirit(); // This adds spirit to state
+
+      // Grant essence
+      const baseSpirit = getBaseSpirit(spirit.spiritId);
+      if (baseSpirit) {
+        const reward = 5 + spirit.level * 2; // 7
+        addEssence(baseSpirit.id, reward);
+      }
+
+      startReveal(spirit);
+    } else {
+      // Not enough Qi, just close
+      onClose();
+    }
+  };
+
+  // This handles a multi-summon (called from useEffect)
+  const handleMultiSummon = (count: number) => {
+    const cost = getMultiSummonCost(count);
+    if (spendQi(cost)) {
+      const newSpirits = summonMultipleSpirits(count); // Adds spirits to state
+
+      // Grant essence for all new spirits
+      newSpirits.forEach((spirit) => {
+        const baseSpirit = getBaseSpirit(spirit.spiritId);
+        if (baseSpirit) {
+          const reward = 5 + spirit.level * 2; // 7
+          addEssence(baseSpirit.id, reward);
+        }
+      });
+
+      setSummonQueue(newSpirits);
+      setCurrentIndex(0);
+      startReveal(newSpirits[0]); // Start reveal for the first spirit
+    } else {
+      onClose();
+    }
+  };
+
+  // NEW: useEffect to trigger summon on load
+  useEffect(() => {
+    if (summonCount === 1) {
+      handleSingleSummon();
+    } else if (summonCount > 1) {
+      handleMultiSummon(summonCount);
+    }
+    // If summonCount is 0, it stays on 'idle' stage (set in useState)
+  }, [summonCount]);
 
   useEffect(() => {
     return () => {
@@ -39,47 +143,44 @@ export function SummonScreen({ onClose }: SummonScreenProps) {
     };
   }, [audioElement]);
 
-  const handleSummon = () => {
-    if (spendQi(spiritCost)) {
-      setStage('channeling');
-      
-      // Channeling phase (1.5 seconds)
-      setTimeout(() => {
-        const spirit = summonSpirit();
-        setSummonedSpirit(spirit);
-        setStage('revealing');
-        
-        // Play sound based on rarity
-        const baseSpirit = getBaseSpirit(spirit.spiritId);
-        if (baseSpirit) {
-          const audio = new Audio('/sounds/success.mp3');
-          audio.volume = 0.5;
-          audio.play();
-          setAudioElement(audio);
-        }
-        
-        // Reveal phase (2 seconds to show rarity glow)
-        setTimeout(() => {
-          setStage('revealed');
-        }, 2000);
-      }, 1500);
-    }
-  };
-
+  // This is what the 'Continue' button does
   const handleContinue = () => {
-    setSummonedSpirit(null);
-    setStage('idle');
     if (audioElement) {
       audioElement.pause();
       audioElement.currentTime = 0;
     }
+
+    // Check if we are in a multi-summon queue
+    if (summonQueue.length > 0) {
+      const nextIndex = currentIndex + 1;
+      if (nextIndex < summonQueue.length) {
+        // More spirits to show
+        setCurrentIndex(nextIndex);
+        startReveal(summonQueue[nextIndex]);
+      } else {
+        // End of queue
+        setSummonQueue([]); // Clear queue
+        onClose();
+      }
+    } else {
+      // Was a single summon
+      onClose();
+    }
   };
 
-  const baseSpirit = summonedSpirit ? getBaseSpirit(summonedSpirit.spiritId) : null;
+  const baseSpirit = summonedSpirit
+    ? getBaseSpirit(summonedSpirit.spiritId)
+    : null;
   const element = baseSpirit ? getElement(baseSpirit.element) : null;
   const lineage = baseSpirit ? getLineage(baseSpirit.lineage) : null;
   const stats = summonedSpirit ? calculateAllStats(summonedSpirit) : null;
-  const rarityColor = baseSpirit ? RARITY_GLOW_COLORS[baseSpirit.rarity] : '#FFF';
+  const passive =
+    baseSpirit && baseSpirit.passiveAbility
+      ? getPassiveAbility(baseSpirit.passiveAbility)
+      : null;
+  const rarityColor = baseSpirit
+    ? RARITY_GLOW_COLORS[baseSpirit.rarity]
+    : "#FFF";
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center p-4 z-50">
@@ -93,7 +194,7 @@ export function SummonScreen({ onClose }: SummonScreenProps) {
         >
           {isMuted ? <VolumeX size={18} /> : <Volume2 size={18} />}
         </Button>
-        
+
         <button
           onClick={onClose}
           className="absolute top-4 right-4 parchment-text hover:opacity-70"
@@ -102,11 +203,14 @@ export function SummonScreen({ onClose }: SummonScreenProps) {
         </button>
 
         <h2 className="text-3xl font-bold text-center mb-6 parchment-text brush-stroke">
-          Spirit Summoning Circle
+          {/* NEW: Show summon count if multi-summoning */}
+          {summonQueue.length > 0
+            ? `Summoning (${currentIndex + 1}/${summonQueue.length})`
+            : "Spirit Summoning Circle"}
         </h2>
 
         <AnimatePresence mode="wait">
-          {stage === 'idle' && (
+          {stage === "idle" && (
             <motion.div
               key="idle"
               initial={{ opacity: 0 }}
@@ -114,262 +218,327 @@ export function SummonScreen({ onClose }: SummonScreenProps) {
               exit={{ opacity: 0 }}
               className="text-center"
             >
+              {/* ... (This is the original idle screen content) ... */}
               <div className="mb-6">
                 <div className="w-48 h-48 mx-auto rounded-full border-4 border-vermillion bg-gradient-to-br from-amber-100 to-amber-200 flex items-center justify-center">
-                  <Sparkles className="w-24 h-24" style={{ color: 'var(--imperial-gold)' }} />
+                  <Sparkles
+                    className="w-24 h-24"
+                    style={{ color: "var(--imperial-gold)" }}
+                  />
                 </div>
               </div>
-
               <div className="mb-6 parchment-text space-y-2">
-                <p className="text-lg font-semibold">Summon a new spirit to aid your cultivation</p>
-                <p className="text-sm opacity-75">Cost: {spiritCost} Qi</p>
+                <p className="text-lg font-semibold">
+                  Summon a new spirit to aid your cultivation
+                </p>
+                <p className="text-sm opacity-75">
+                  Cost: {spiritCost} Qi (Current: {Math.floor(qi)})
+                </p>
               </div>
-
+              {/* ... (Summoning Rates box) ... */}
               <div className="mb-6 p-4 bg-amber-50 rounded border-2 border-amber-300">
-                <h3 className="font-bold parchment-text mb-2">Summoning Rates</h3>
+                <h3 className="font-bold parchment-text mb-2">
+                  Summoning Rates
+                </h3>
                 <div className="grid grid-cols-2 gap-2 text-sm parchment-text">
-                  <div className="flex justify-between">
-                    <span style={{ color: getRarityColor('common') }}>Common:</span>
-                    <span>60%</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span style={{ color: getRarityColor('uncommon') }}>Uncommon:</span>
-                    <span>25%</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span style={{ color: getRarityColor('rare') }}>Rare:</span>
-                    <span>10%</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span style={{ color: getRarityColor('epic') }}>Epic:</span>
-                    <span>4%</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span style={{ color: getRarityColor('legendary') }}>Legendary:</span>
-                    <span>1%</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="prismatic-border px-1 rounded">Prismatic:</span>
-                    <span>0.1%</span>
-                  </div>
+                  {/* ... (rates) ... */}
                 </div>
               </div>
 
               <Button
-                onClick={handleSummon}
+                onClick={handleSingleSummon} // Changed from handleSummon
                 className="w-full p-6 text-lg font-bold"
-                style={{ background: 'var(--jade-green)', color: 'var(--parchment)' }}
+                style={{
+                  background: "var(--jade-green)",
+                  color: "var(--parchment)",
+                }}
+                disabled={qi < spiritCost}
               >
                 Summon Spirit
               </Button>
             </motion.div>
           )}
 
-          {stage === 'channeling' && (
+          {/*Channeling Phase*/}
+          {stage === "channeling" && (
             <motion.div
               key="channeling"
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 1.2 }}
-              className="text-center py-12"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="text-center h-96 flex flex-col items-center justify-center parchment-text"
             >
               <motion.div
                 animate={{
-                  scale: [1, 1.1, 1],
-                  rotate: [0, 180, 360],
+                  rotate: [0, 360],
+                  scale: [1, 1.2, 1],
+                  opacity: [0.8, 1, 0.8],
                 }}
                 transition={{
                   duration: 1.5,
                   repeat: Infinity,
-                  ease: "easeInOut"
+                  ease: "easeInOut",
                 }}
-                className="w-48 h-48 mx-auto rounded-full border-4 border-vermillion bg-gradient-to-br from-amber-100 to-amber-200 flex items-center justify-center"
+                className="w-48 h-48 rounded-full border-8 border-t-imperial-gold border-vermillion bg-gradient-to-br from-amber-100 to-amber-200 flex items-center justify-center"
               >
-                <Sparkles className="w-24 h-24" style={{ color: 'var(--imperial-gold)' }} />
+                <Sparkles
+                  className="w-24 h-24"
+                  style={{ color: "var(--imperial-gold)" }}
+                />
               </motion.div>
-              <motion.p
-                animate={{ opacity: [0.5, 1, 0.5] }}
-                transition={{ duration: 1, repeat: Infinity }}
-                className="text-xl parchment-text mt-6 font-bold"
-              >
-                Channeling Qi...
-              </motion.p>
+              <p className="text-lg font-semibold mt-6">
+                Channeling spiritual energy...
+              </p>
             </motion.div>
           )}
 
-          {stage === 'revealing' && baseSpirit && (
+          {/*Revealing Phase*/}
+          {stage === "revealing" && baseSpirit && (
             <motion.div
               key="revealing"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="text-center py-12"
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.8 }}
+              transition={{ duration: 0.5, ease: "backOut" }}
+              className="text-center h-96 flex flex-col items-center justify-center"
             >
-              <div className="relative">
-                <motion.div
-                  initial={{ scale: 0 }}
-                  animate={{ scale: [0, 1.5, 1] }}
-                  transition={{ duration: 0.8 }}
-                  className="w-64 h-64 mx-auto rounded-full flex items-center justify-center relative"
-                  style={{
-                    background: `radial-gradient(circle, ${rarityColor}40, ${rarityColor}10, transparent)`,
-                  }}
-                >
-                  {/* Animated particles */}
-                  {[...Array(summonedSpirit?.isPrismatic ? 12 : 8)].map((_, i) => (
-                    <motion.div
-                      key={i}
-                      initial={{ scale: 0, x: 0, y: 0 }}
-                      animate={{
-                        scale: [0, 1, 0],
-                        x: Math.cos((i / (summonedSpirit?.isPrismatic ? 12 : 8)) * Math.PI * 2) * 120,
-                        y: Math.sin((i / (summonedSpirit?.isPrismatic ? 12 : 8)) * Math.PI * 2) * 120,
-                      }}
-                      transition={{
-                        duration: 1.5,
-                        repeat: Infinity,
-                        delay: i * 0.1,
-                      }}
-                      className="absolute w-3 h-3 rounded-full"
-                      style={{
-                        background: summonedSpirit?.isPrismatic
-                          ? `linear-gradient(45deg, #ff0080, #7928ca, #0070f3, #00dfd8)`
-                          : rarityColor,
-                        boxShadow: `0 0 10px ${rarityColor}`,
-                      }}
-                    />
-                  ))}
-                  
-                  <motion.div
-                    animate={{
-                      boxShadow: [
-                        `0 0 20px ${rarityColor}`,
-                        `0 0 60px ${rarityColor}`,
-                        `0 0 20px ${rarityColor}`,
-                      ],
-                    }}
-                    transition={{ duration: 1, repeat: Infinity }}
-                    className={`w-32 h-32 rounded-full flex items-center justify-center ${summonedSpirit?.isPrismatic ? 'prismatic-border' : 'border-4'}`}
-                    style={{
-                      borderColor: summonedSpirit?.isPrismatic ? undefined : rarityColor,
-                      background: summonedSpirit?.isPrismatic
-                        ? 'linear-gradient(45deg, #ff008030, #7928ca30, #0070f330, #00dfd830)'
-                        : `${rarityColor}20`,
-                    }}
-                  >
-                    <Sparkles
-                      className="w-16 h-16"
-                      style={{ color: summonedSpirit?.isPrismatic ? '#FFD700' : rarityColor }}
-                    />
-                  </motion.div>
-                </motion.div>
-              </div>
-              
               <motion.div
+                key={summonedSpirit?.instanceId} // Force remount for animation
+                initial={{ scale: 0, rotate: -180, opacity: 0 }}
+                animate={{ scale: 1, rotate: 0, opacity: 1 }}
+                transition={{
+                  type: "spring",
+                  stiffness: 260,
+                  damping: 20,
+                  delay: 0.2,
+                }}
+                style={{
+                  boxShadow: `0 0 40px 15px ${rarityColor}, 0 0 10px 5px ${rarityColor} inset`,
+                }}
+                className="w-48 h-48 rounded-full flex items-center justify-center"
+              >
+                <img
+                  src={`/images/spirits/${baseSpirit.id}.png`}
+                  alt={baseSpirit.name}
+                  className="w-36 h-36"
+                />
+              </motion.div>
+              <motion.h3
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.5 }}
-                className="mt-8"
+                className="text-3xl font-bold parchment-text mt-6"
+                style={{ color: rarityColor }}
               >
-                <motion.h3
-                  animate={{
-                    textShadow: [
-                      `0 0 10px ${rarityColor}`,
-                      `0 0 20px ${rarityColor}`,
-                      `0 0 10px ${rarityColor}`,
-                    ],
-                  }}
-                  transition={{ duration: 1, repeat: Infinity }}
-                  className="text-3xl font-bold mb-2"
-                  style={{ color: rarityColor }}
-                >
-                  {baseSpirit.rarity.toUpperCase()}
-                  {summonedSpirit?.isPrismatic && ' - PRISMATIC!'}
-                </motion.h3>
-              </motion.div>
+                {baseSpirit.name}
+              </motion.h3>
+              <motion.p
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.7 }}
+                className="text-xl parchment-text"
+                style={{ color: getRarityColor(baseSpirit.rarity) }}
+              >
+                {baseSpirit.rarity.charAt(0).toUpperCase() +
+                  baseSpirit.rarity.slice(1)}
+              </motion.p>
             </motion.div>
           )}
+          {stage === "revealed" &&
+            summonedSpirit &&
+            baseSpirit &&
+            element &&
+            lineage &&
+            stats && (
+              <motion.div
+                key="revealed"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0 }} // <-- The exit prop is key!
+                className="space-y-4"
+              >
+                {/* --- START: Spirit Details Box Content --- */}
+                <div className="grid grid-cols-3 gap-4">
+                  {/* Left Column: Image */}
+                  <div className="flex flex-col items-center justify-center">
+                    <div
+                      className="w-32 h-32 rounded-full flex items-center justify-center"
+                      style={{
+                        boxShadow: `0 0 20px 8px ${rarityColor}, 0 0 5px 2px ${rarityColor} inset`,
+                      }}
+                    >
+                      <img
+                        src={`/images/spirits/${baseSpirit.id}.png`}
+                        alt={baseSpirit.name}
+                        className="w-24 h-24"
+                      />
+                    </div>
+                    {summonedSpirit.isPrismatic && (
+                      <span className="prismatic-text font-bold text-sm mt-2">
+                        PRISMATIC
+                      </span>
+                    )}
+                  </div>
+
+                  {/* Middle Column: Info */}
+                  <div className="col-span-2 space-y-2">
+                    <h3
+                      className="text-3xl font-bold parchment-text"
+                      style={{ color: rarityColor }}
+                    >
+                      {baseSpirit.name}
+                    </h3>
+
+                    {/* ADDED: Level */}
+                    <p className="text-lg font-semibold parchment-text -mt-1">
+                      Level {summonedSpirit.level}
+                    </p>
+
+                    <div className="flex gap-4 text-sm parchment-text">
+                      <span
+                        className="font-semibold px-2 py-0.5 rounded"
+                        style={{
+                          backgroundColor: getRarityColor(baseSpirit.rarity),
+                          color:
+                            baseSpirit.rarity === "common" ? "#111" : "#FFF",
+                        }}
+                      >
+                        {baseSpirit.rarity.toUpperCase()}
+                      </span>
+                      <span
+                        className="font-semibold px-2 py-0.5 rounded"
+                        style={{
+                          backgroundColor: element.color,
+                          color: "#FFF",
+                        }}
+                      >
+                        {element.name.toUpperCase()}
+                      </span>
+                    </div>
+                    <p className="text-sm parchment-text opacity-80 italic">
+                      {lineage.description}
+                    </p>
+
+                    {/* ADDED: Passive Info */}
+                    <div className="pt-1">
+                      <p className="text-sm parchment-text font-bold">
+                        Passive: {passive ? passive.name : "None"}
+                      </p>
+                      <p className="text-xs parchment-text opacity-80">
+                        {passive ? passive.description : ""}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* MODIFIED: Stats Section */}
+                <div className="mt-4 pt-4 border-t-2 border-amber-700/50">
+                  {/* Changed "Base Stats" to "Stats" and centered */}
+                  <h4 className="font-semibold mb-2 text-center text-lg parchment-text">
+                    Stats
+                  </h4>
+                  <div className="parchment-text space-y-1 max-w-xs mx-auto">
+                    {/* HP with Potential */}
+                    <div className="flex justify-between text-base">
+                      <span>HP:</span>
+                      <span className="font-medium">
+                        {stats.health}{" "}
+                        <span
+                          className="font-bold"
+                          style={{
+                            color: getPotentialColor(
+                              summonedSpirit.potentialFactors.health,
+                            ),
+                          }}
+                        >
+                          ({summonedSpirit.potentialFactors.health})
+                        </span>
+                      </span>
+                    </div>
+
+                    {/* ATK with Potential */}
+                    <div className="flex justify-between text-base">
+                      <span>ATK:</span>
+                      <span className="font-medium">
+                        {stats.attack}{" "}
+                        <span
+                          className="font-bold"
+                          style={{
+                            color: getPotentialColor(
+                              summonedSpirit.potentialFactors.attack,
+                            ),
+                          }}
+                        >
+                          ({summonedSpirit.potentialFactors.attack})
+                        </span>
+                      </span>
+                    </div>
+
+                    {/* DEF with Potential */}
+                    <div className="flex justify-between text-base">
+                      <span>DEF:</span>
+                      <span className="font-medium">
+                        {stats.defense}{" "}
+                        <span
+                          className="font-bold"
+                          style={{
+                            color: getPotentialColor(
+                              summonedSpirit.potentialFactors.defense,
+                            ),
+                          }}
+                        >
+                          ({summonedSpirit.potentialFactors.defense})
+                        </span>
+                      </span>
+                    </div>
+
+                    {/* ADDED: AFFINITY with Potential */}
+                    <div className="flex justify-between text-base">
+                      <span>AFFINITY:</span>
+                      <span className="font-medium">
+                        {stats.elementalAffinity}{" "}
+                        <span
+                          className="font-bold"
+                          style={{
+                            color: getPotentialColor(
+                              summonedSpirit.potentialFactors.elementalAffinity,
+                            ),
+                          }}
+                        >
+                          ({summonedSpirit.potentialFactors.elementalAffinity})
+                        </span>
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* ADDED: Harmonize Reward Text */}
+                <div className="mt-4 pt-4 border-t-2 border-amber-700/50 text-center parchment-text text-sm italic">
+                  You received{" "}
+                  <span className="font-bold">
+                    {/* This calculation is from your handleSummon functions */}
+                    {5 + summonedSpirit.level * 2} {baseSpirit.name} Essence
+                  </span>{" "}
+                  for this summon.
+                </div>
+                {/* --- END: Spirit Details Box Content --- */}
+                <Button
+                  onClick={handleContinue} // This button now correctly handles queues
+                  className="w-full p-4 text-lg font-bold"
+                  style={{
+                    background: "var(--vermillion)",
+                    color: "var(--parchment)",
+                  }}
+                >
+                  {/* NEW: Change button text if in queue */}
+                  {summonQueue.length > 0 &&
+                  currentIndex < summonQueue.length - 1
+                    ? `Next (${currentIndex + 2}/${summonQueue.length})`
+                    : "Continue"}
+                </Button>
+              </motion.div>
+            )}
         </AnimatePresence>
-
-        {stage === 'revealed' && summonedSpirit && baseSpirit && element && lineage && stats && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="space-y-4"
-          >
-            <div className={`p-6 rounded-lg ${summonedSpirit.isPrismatic ? 'prismatic-border' : 'border-2 border-amber-700'}`}>
-              <div className="text-center mb-4">
-                <h3 className="text-2xl font-bold parchment-text mb-1">{baseSpirit.name}</h3>
-                <div className="flex items-center justify-center gap-3">
-                  <span
-                    className="text-sm font-bold px-3 py-1 rounded"
-                    style={{ background: getRarityColor(baseSpirit.rarity), color: 'white' }}
-                  >
-                    {baseSpirit.rarity.toUpperCase()}
-                  </span>
-                  {summonedSpirit.isPrismatic && (
-                    <span className="text-sm font-bold px-3 py-1 rounded prismatic-border">
-                      PRISMATIC
-                    </span>
-                  )}
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4 mb-4">
-                <div className="parchment-text">
-                  <span className="font-semibold">Element: </span>
-                  <span className={`element-${element.id}`}>{element.name}</span>
-                </div>
-                <div className="parchment-text">
-                  <span className="font-semibold">Lineage: </span>
-                  <span>{lineage.name}</span>
-                </div>
-              </div>
-
-              <div className="mb-4">
-                <h4 className="font-bold parchment-text mb-2">Base Stats (Level 1)</h4>
-                <div className="grid grid-cols-2 gap-2 text-sm">
-                  <div className="flex justify-between parchment-text">
-                    <span>Attack:</span>
-                    <span className="font-semibold" style={{ color: getPotentialColor(summonedSpirit.potentialFactors.attack) }}>
-                      {stats.attack} [{summonedSpirit.potentialFactors.attack}]
-                    </span>
-                  </div>
-                  <div className="flex justify-between parchment-text">
-                    <span>Defense:</span>
-                    <span className="font-semibold" style={{ color: getPotentialColor(summonedSpirit.potentialFactors.defense) }}>
-                      {stats.defense} [{summonedSpirit.potentialFactors.defense}]
-                    </span>
-                  </div>
-                  <div className="flex justify-between parchment-text">
-                    <span>Health:</span>
-                    <span className="font-semibold" style={{ color: getPotentialColor(summonedSpirit.potentialFactors.health) }}>
-                      {stats.health} [{summonedSpirit.potentialFactors.health}]
-                    </span>
-                  </div>
-                  <div className="flex justify-between parchment-text">
-                    <span>Affinity:</span>
-                    <span className="font-semibold" style={{ color: getPotentialColor(summonedSpirit.potentialFactors.elementalAffinity) }}>
-                      {stats.elementalAffinity} [{summonedSpirit.potentialFactors.elementalAffinity}]
-                    </span>
-                  </div>
-                </div>
-              </div>
-
-              <div className="parchment-text text-sm">
-                <span className="font-semibold">Passive: </span>
-                <span>+10% {baseSpirit.passiveAbility.toUpperCase()}</span>
-              </div>
-            </div>
-
-            <Button
-              onClick={handleContinue}
-              className="w-full p-4 text-lg font-bold"
-              style={{ background: 'var(--vermillion)', color: 'var(--parchment)' }}
-            >
-              Continue
-            </Button>
-          </motion.div>
-        )}
       </div>
     </div>
   );
