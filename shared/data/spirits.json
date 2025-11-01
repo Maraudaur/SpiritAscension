@@ -6,7 +6,12 @@
       "rarity": "common",
       "element": "wood",
       "lineage": "tiger",
-      "baseStats": { "attack": 120, "defense": 140, "health": 180, "elementalAffinity": 60 },
+      "baseStats": {
+        "attack": 120,
+        "defense": 140,
+        "health": 180,
+        "elementalAffinity": 60
+      },
       "passiveAbility": "health",
       "skills": ["basic_attack", "heavy_hit", "hit_and_heal"]
     },
@@ -16,7 +21,12 @@
       "rarity": "common",
       "element": "earth",
       "lineage": "ox",
-      "baseStats": { "attack": 100, "defense": 180, "health": 160, "elementalAffinity": 60 },
+      "baseStats": {
+        "attack": 100,
+        "defense": 180,
+        "health": 160,
+        "elementalAffinity": 60
+      },
       "passiveAbility": "defense",
       "skills": ["basic_attack", "heavy_hit", "hit_and_heal"]
     },
@@ -26,7 +36,12 @@
       "rarity": "common",
       "element": "fire",
       "lineage": "serpent",
-      "baseStats": { "attack": 160, "defense": 100, "health": 140, "elementalAffinity": 100 },
+      "baseStats": {
+        "attack": 160,
+        "defense": 100,
+        "health": 140,
+        "elementalAffinity": 100
+      },
       "passiveAbility": "attack",
       "skills": ["basic_attack", "heavy_hit", "hit_and_heal"]
     },
@@ -36,7 +51,12 @@
       "rarity": "common",
       "element": "water",
       "lineage": "horse",
-      "baseStats": { "attack": 130, "defense": 120, "health": 150, "elementalAffinity": 100 },
+      "baseStats": {
+        "attack": 130,
+        "defense": 120,
+        "health": 150,
+        "elementalAffinity": 100
+      },
       "passiveAbility": "health",
       "skills": ["basic_attack", "heavy_hit", "hit_and_heal"]
     },
@@ -46,7 +66,12 @@
       "rarity": "common",
       "element": "metal",
       "lineage": "ox",
-      "baseStats": { "attack": 110, "defense": 170, "health": 140, "elementalAffinity": 80 },
+      "baseStats": {
+        "attack": 110,
+        "defense": 170,
+        "health": 140,
+        "elementalAffinity": 80
+      },
       "passiveAbility": "defense",
       "skills": ["basic_attack", "heavy_hit", "hit_and_heal"]
     },
@@ -56,7 +81,12 @@
       "rarity": "common",
       "element": "wood",
       "lineage": "monkey",
-      "baseStats": { "attack": 140, "defense": 120, "health": 150, "elementalAffinity": 90 },
+      "baseStats": {
+        "attack": 140,
+        "defense": 120,
+        "health": 150,
+        "elementalAffinity": 90
+      },
       "passiveAbility": "attack",
       "skills": ["basic_attack", "heavy_hit", "hit_and_heal"]
     },
@@ -66,7 +96,12 @@
       "rarity": "common",
       "element": "earth",
       "lineage": "tiger",
-      "baseStats": { "attack": 110, "defense": 160, "health": 170, "elementalAffinity": 60 },
+      "baseStats": {
+        "attack": 110,
+        "defense": 160,
+        "health": 170,
+        "elementalAffinity": 60
+      },
       "passiveAbility": "defense",
       "skills": ["basic_attack", "heavy_hit", "hit_and_heal"]
     },
@@ -76,7 +111,12 @@
       "rarity": "common",
       "element": "fire",
       "lineage": "monkey",
-      "baseStats": { "attack": 150, "defense": 110, "health": 130, "elementalAffinity": 110 },
+      "baseStats": {
+        "attack": 150,
+        "defense": 110,
+        "health": 130,
+        "elementalAffinity": 110
+      },
       "passiveAbility": "attack",
       "skills": ["basic_attack", "heavy_hit", "hit_and_heal"]
     },
@@ -86,7 +126,12 @@
       "rarity": "common",
       "element": "water",
       "lineage": "ox",
-      "baseStats": { "attack": 90, "defense": 190, "health": 150, "elementalAffinity": 70 },
+      "baseStats": {
+        "attack": 90,
+        "defense": 190,
+        "health": 150,
+        "elementalAffinity": 70
+      },
       "passiveAbility": "defense",
       "skills": ["basic_attack", "heavy_hit", "hit_and_heal"]
     },
@@ -96,7 +141,12 @@
       "rarity": "common",
       "element": "metal",
       "lineage": "serpent",
-      "baseStats": { "attack": 170, "defense": 90, "health": 130, "elementalAffinity": 110 },
+      "baseStats": {
+        "attack": 170,
+        "defense": 90,
+        "health": 130,
+        "elementalAffinity": 110
+      },
       "passiveAbility": "attack",
       "skills": ["basic_attack", "heavy_hit", "hit_and_heal"]
     },
@@ -106,7 +156,12 @@
       "rarity": "common",
       "element": "wood",
       "lineage": "serpent",
-      "baseStats": { "attack": 130, "defense": 130, "health": 140, "elementalAffinity": 100 },
+      "baseStats": {
+        "attack": 130,
+        "defense": 130,
+        "health": 140,
+        "elementalAffinity": 100
+      },
       "passiveAbility": "health",
       "skills": ["basic_attack", "heavy_hit", "hit_and_heal"]
     },
@@ -116,7 +171,12 @@
       "rarity": "common",
       "element": "earth",
       "lineage": "serpent",
-      "baseStats": { "attack": 140, "defense": 130, "health": 130, "elementalAffinity": 100 },
+      "baseStats": {
+        "attack": 140,
+        "defense": 130,
+        "health": 130,
+        "elementalAffinity": 100
+      },
       "passiveAbility": "attack",
       "skills": ["basic_attack", "heavy_hit", "hit_and_heal"]
     },
@@ -126,7 +186,12 @@
       "rarity": "common",
       "element": "fire",
       "lineage": "tiger",
-      "baseStats": { "attack": 150, "defense": 120, "health": 140, "elementalAffinity": 90 },
+      "baseStats": {
+        "attack": 150,
+        "defense": 120,
+        "health": 140,
+        "elementalAffinity": 90
+      },
       "passiveAbility": "attack",
       "skills": ["basic_attack", "heavy_hit", "hit_and_heal"]
     },
@@ -136,7 +201,12 @@
       "rarity": "common",
       "element": "water",
       "lineage": "serpent",
-      "baseStats": { "attack": 140, "defense": 110, "health": 140, "elementalAffinity": 110 },
+      "baseStats": {
+        "attack": 140,
+        "defense": 110,
+        "health": 140,
+        "elementalAffinity": 110
+      },
       "passiveAbility": "health",
       "skills": ["basic_attack", "heavy_hit", "hit_and_heal"]
     },
@@ -146,7 +216,12 @@
       "rarity": "common",
       "element": "metal",
       "lineage": "horse",
-      "baseStats": { "attack": 140, "defense": 130, "health": 120, "elementalAffinity": 110 },
+      "baseStats": {
+        "attack": 140,
+        "defense": 130,
+        "health": 120,
+        "elementalAffinity": 110
+      },
       "passiveAbility": "attack",
       "skills": ["basic_attack", "heavy_hit", "hit_and_heal"]
     },
@@ -156,7 +231,12 @@
       "rarity": "common",
       "element": "wood",
       "lineage": "ox",
-      "baseStats": { "attack": 110, "defense": 150, "health": 170, "elementalAffinity": 70 },
+      "baseStats": {
+        "attack": 110,
+        "defense": 150,
+        "health": 170,
+        "elementalAffinity": 70
+      },
       "passiveAbility": "health",
       "skills": ["basic_attack", "heavy_hit", "hit_and_heal"]
     },
@@ -166,7 +246,12 @@
       "rarity": "common",
       "element": "earth",
       "lineage": "horse",
-      "baseStats": { "attack": 130, "defense": 120, "health": 140, "elementalAffinity": 110 },
+      "baseStats": {
+        "attack": 130,
+        "defense": 120,
+        "health": 140,
+        "elementalAffinity": 110
+      },
       "passiveAbility": "attack",
       "skills": ["basic_attack", "heavy_hit", "hit_and_heal"]
     },
@@ -176,7 +261,12 @@
       "rarity": "common",
       "element": "fire",
       "lineage": "tiger",
-      "baseStats": { "attack": 160, "defense": 100, "health": 130, "elementalAffinity": 110 },
+      "baseStats": {
+        "attack": 160,
+        "defense": 100,
+        "health": 130,
+        "elementalAffinity": 110
+      },
       "passiveAbility": "attack",
       "skills": ["basic_attack", "heavy_hit", "hit_and_heal"]
     },
@@ -186,7 +276,12 @@
       "rarity": "common",
       "element": "water",
       "lineage": "monkey",
-      "baseStats": { "attack": 120, "defense": 140, "health": 140, "elementalAffinity": 100 },
+      "baseStats": {
+        "attack": 120,
+        "defense": 140,
+        "health": 140,
+        "elementalAffinity": 100
+      },
       "passiveAbility": "health",
       "skills": ["basic_attack", "heavy_hit", "hit_and_heal"]
     },
@@ -196,7 +291,12 @@
       "rarity": "common",
       "element": "metal",
       "lineage": "monkey",
-      "baseStats": { "attack": 140, "defense": 120, "health": 120, "elementalAffinity": 120 },
+      "baseStats": {
+        "attack": 140,
+        "defense": 120,
+        "health": 120,
+        "elementalAffinity": 120
+      },
       "passiveAbility": "attack",
       "skills": ["basic_attack", "heavy_hit", "hit_and_heal"]
     }
@@ -208,7 +308,12 @@
       "rarity": "uncommon",
       "element": "wood",
       "lineage": "tiger",
-      "baseStats": { "attack": 160, "defense": 150, "health": 200, "elementalAffinity": 90 },
+      "baseStats": {
+        "attack": 160,
+        "defense": 150,
+        "health": 200,
+        "elementalAffinity": 90
+      },
       "passiveAbility": "attack",
       "skills": ["basic_attack", "heavy_hit", "hit_and_heal"]
     },
@@ -218,7 +323,12 @@
       "rarity": "uncommon",
       "element": "earth",
       "lineage": "ox",
-      "baseStats": { "attack": 140, "defense": 200, "health": 190, "elementalAffinity": 70 },
+      "baseStats": {
+        "attack": 140,
+        "defense": 200,
+        "health": 190,
+        "elementalAffinity": 70
+      },
       "passiveAbility": "defense",
       "skills": ["basic_attack", "heavy_hit", "hit_and_heal"]
     },
@@ -228,7 +338,12 @@
       "rarity": "uncommon",
       "element": "fire",
       "lineage": "tiger",
-      "baseStats": { "attack": 200, "defense": 120, "health": 170, "elementalAffinity": 110 },
+      "baseStats": {
+        "attack": 200,
+        "defense": 120,
+        "health": 170,
+        "elementalAffinity": 110
+      },
       "passiveAbility": "attack",
       "skills": ["basic_attack", "heavy_hit", "hit_and_heal"]
     },
@@ -238,7 +353,12 @@
       "rarity": "uncommon",
       "element": "water",
       "lineage": "horse",
-      "baseStats": { "attack": 170, "defense": 140, "health": 180, "elementalAffinity": 110 },
+      "baseStats": {
+        "attack": 170,
+        "defense": 140,
+        "health": 180,
+        "elementalAffinity": 110
+      },
       "passiveAbility": "health",
       "skills": ["basic_attack", "heavy_hit", "hit_and_heal"]
     },
@@ -248,7 +368,12 @@
       "rarity": "uncommon",
       "element": "metal",
       "lineage": "horse",
-      "baseStats": { "attack": 180, "defense": 150, "health": 160, "elementalAffinity": 110 },
+      "baseStats": {
+        "attack": 180,
+        "defense": 150,
+        "health": 160,
+        "elementalAffinity": 110
+      },
       "passiveAbility": "attack",
       "skills": ["basic_attack", "heavy_hit", "hit_and_heal"]
     },
@@ -258,7 +383,12 @@
       "rarity": "uncommon",
       "element": "wood",
       "lineage": "tiger",
-      "baseStats": { "attack": 180, "defense": 140, "health": 180, "elementalAffinity": 100 },
+      "baseStats": {
+        "attack": 180,
+        "defense": 140,
+        "health": 180,
+        "elementalAffinity": 100
+      },
       "passiveAbility": "attack",
       "skills": ["basic_attack", "heavy_hit", "hit_and_heal"]
     },
@@ -268,7 +398,12 @@
       "rarity": "uncommon",
       "element": "earth",
       "lineage": "ox",
-      "baseStats": { "attack": 150, "defense": 210, "health": 180, "elementalAffinity": 60 },
+      "baseStats": {
+        "attack": 150,
+        "defense": 210,
+        "health": 180,
+        "elementalAffinity": 60
+      },
       "passiveAbility": "defense",
       "skills": ["basic_attack", "heavy_hit", "hit_and_heal"]
     },
@@ -278,7 +413,12 @@
       "rarity": "uncommon",
       "element": "fire",
       "lineage": "serpent",
-      "baseStats": { "attack": 190, "defense": 130, "health": 160, "elementalAffinity": 120 },
+      "baseStats": {
+        "attack": 190,
+        "defense": 130,
+        "health": 160,
+        "elementalAffinity": 120
+      },
       "passiveAbility": "attack",
       "skills": ["basic_attack", "heavy_hit", "hit_and_heal"]
     },
@@ -288,7 +428,12 @@
       "rarity": "uncommon",
       "element": "water",
       "lineage": "horse",
-      "baseStats": { "attack": 160, "defense": 150, "health": 190, "elementalAffinity": 100 },
+      "baseStats": {
+        "attack": 160,
+        "defense": 150,
+        "health": 190,
+        "elementalAffinity": 100
+      },
       "passiveAbility": "health",
       "skills": ["basic_attack", "heavy_hit", "hit_and_heal"]
     },
@@ -298,7 +443,12 @@
       "rarity": "uncommon",
       "element": "metal",
       "lineage": "ox",
-      "baseStats": { "attack": 150, "defense": 190, "health": 170, "elementalAffinity": 90 },
+      "baseStats": {
+        "attack": 150,
+        "defense": 190,
+        "health": 170,
+        "elementalAffinity": 90
+      },
       "passiveAbility": "defense",
       "skills": ["basic_attack", "heavy_hit", "hit_and_heal"]
     }
@@ -310,7 +460,12 @@
       "rarity": "rare",
       "element": "wood",
       "lineage": "dragon",
-      "baseStats": { "attack": 190, "defense": 180, "health": 230, "elementalAffinity": 100 },
+      "baseStats": {
+        "attack": 190,
+        "defense": 180,
+        "health": 230,
+        "elementalAffinity": 100
+      },
       "passiveAbility": "health",
       "skills": ["basic_attack", "heavy_hit", "hit_and_heal"]
     },
@@ -320,7 +475,12 @@
       "rarity": "rare",
       "element": "earth",
       "lineage": "ox",
-      "baseStats": { "attack": 170, "defense": 240, "health": 210, "elementalAffinity": 80 },
+      "baseStats": {
+        "attack": 170,
+        "defense": 240,
+        "health": 210,
+        "elementalAffinity": 80
+      },
       "passiveAbility": "defense",
       "skills": ["basic_attack", "heavy_hit", "hit_and_heal"]
     },
@@ -330,7 +490,12 @@
       "rarity": "rare",
       "element": "fire",
       "lineage": "dragon",
-      "baseStats": { "attack": 240, "defense": 150, "health": 200, "elementalAffinity": 110 },
+      "baseStats": {
+        "attack": 240,
+        "defense": 150,
+        "health": 200,
+        "elementalAffinity": 110
+      },
       "passiveAbility": "attack",
       "skills": ["basic_attack", "heavy_hit", "hit_and_heal"]
     },
@@ -340,7 +505,12 @@
       "rarity": "rare",
       "element": "water",
       "lineage": "dragon",
-      "baseStats": { "attack": 200, "defense": 170, "health": 220, "elementalAffinity": 110 },
+      "baseStats": {
+        "attack": 200,
+        "defense": 170,
+        "health": 220,
+        "elementalAffinity": 110
+      },
       "passiveAbility": "health",
       "skills": ["basic_attack", "heavy_hit", "hit_and_heal"]
     },
@@ -350,7 +520,12 @@
       "rarity": "rare",
       "element": "metal",
       "lineage": "dragon",
-      "baseStats": { "attack": 210, "defense": 190, "health": 190, "elementalAffinity": 110 },
+      "baseStats": {
+        "attack": 210,
+        "defense": 190,
+        "health": 190,
+        "elementalAffinity": 110
+      },
       "passiveAbility": "attack",
       "skills": ["basic_attack", "heavy_hit", "hit_and_heal"]
     },
@@ -360,7 +535,12 @@
       "rarity": "rare",
       "element": "wood",
       "lineage": "ox",
-      "baseStats": { "attack": 180, "defense": 200, "health": 230, "elementalAffinity": 90 },
+      "baseStats": {
+        "attack": 180,
+        "defense": 200,
+        "health": 230,
+        "elementalAffinity": 90
+      },
       "passiveAbility": "health",
       "skills": ["basic_attack", "heavy_hit", "hit_and_heal"]
     },
@@ -370,7 +550,12 @@
       "rarity": "rare",
       "element": "earth",
       "lineage": "ox",
-      "baseStats": { "attack": 160, "defense": 250, "health": 220, "elementalAffinity": 70 },
+      "baseStats": {
+        "attack": 160,
+        "defense": 250,
+        "health": 220,
+        "elementalAffinity": 70
+      },
       "passiveAbility": "defense",
       "skills": ["basic_attack", "heavy_hit", "hit_and_heal"]
     },
@@ -380,19 +565,29 @@
       "rarity": "rare",
       "element": "fire",
       "lineage": "tiger",
-      "baseStats": { "attack": 230, "defense": 160, "health": 200, "elementalAffinity": 110 },
+      "baseStats": {
+        "attack": 230,
+        "defense": 160,
+        "health": 200,
+        "elementalAffinity": 110
+      },
       "passiveAbility": "attack",
       "skills": ["basic_attack", "heavy_hit", "hit_and_heal"]
     },
     {
       "id": "spirit_r09",
-      "name": "Tidal Leviathan",
+      "name": "Riptide",
       "rarity": "rare",
       "element": "water",
       "lineage": "serpent",
-      "baseStats": { "attack": 210, "defense": 160, "health": 210, "elementalAffinity": 120 },
-      "passiveAbility": "health",
-      "skills": ["basic_attack", "heavy_hit", "hit_and_heal"]
+      "baseStats": {
+        "attack": 210,
+        "defense": 160,
+        "health": 210,
+        "elementalAffinity": 120
+      },
+      "passiveAbilities": ["health_focus", "healing_waters"]
+      "skills": ["bubble_barrier", "tidal_surge", "water_charge"]
     },
     {
       "id": "spirit_r10",
@@ -400,7 +595,12 @@
       "rarity": "rare",
       "element": "metal",
       "lineage": "horse",
-      "baseStats": { "attack": 220, "defense": 170, "health": 200, "elementalAffinity": 110 },
+      "baseStats": {
+        "attack": 220,
+        "defense": 170,
+        "health": 200,
+        "elementalAffinity": 110
+      },
       "passiveAbility": "attack",
       "skills": ["basic_attack", "heavy_hit", "hit_and_heal"]
     }
@@ -412,7 +612,12 @@
       "rarity": "epic",
       "element": "wood",
       "lineage": "dragon",
-      "baseStats": { "attack": 220, "defense": 220, "health": 260, "elementalAffinity": 100 },
+      "baseStats": {
+        "attack": 220,
+        "defense": 220,
+        "health": 260,
+        "elementalAffinity": 100
+      },
       "passiveAbility": "health",
       "skills": ["basic_attack", "heavy_hit", "hit_and_heal"]
     },
@@ -422,7 +627,12 @@
       "rarity": "epic",
       "element": "earth",
       "lineage": "ox",
-      "baseStats": { "attack": 200, "defense": 280, "health": 240, "elementalAffinity": 80 },
+      "baseStats": {
+        "attack": 200,
+        "defense": 280,
+        "health": 240,
+        "elementalAffinity": 80
+      },
       "passiveAbility": "defense",
       "skills": ["basic_attack", "heavy_hit", "hit_and_heal"]
     },
@@ -432,7 +642,12 @@
       "rarity": "epic",
       "element": "fire",
       "lineage": "dragon",
-      "baseStats": { "attack": 280, "defense": 180, "health": 240, "elementalAffinity": 100 },
+      "baseStats": {
+        "attack": 280,
+        "defense": 180,
+        "health": 240,
+        "elementalAffinity": 100
+      },
       "passiveAbility": "attack",
       "skills": ["basic_attack", "heavy_hit", "hit_and_heal"]
     },
@@ -442,7 +657,12 @@
       "rarity": "epic",
       "element": "water",
       "lineage": "dragon",
-      "baseStats": { "attack": 240, "defense": 200, "health": 260, "elementalAffinity": 100 },
+      "baseStats": {
+        "attack": 240,
+        "defense": 200,
+        "health": 260,
+        "elementalAffinity": 100
+      },
       "passiveAbility": "health",
       "skills": ["basic_attack", "heavy_hit", "hit_and_heal"]
     },
@@ -452,7 +672,12 @@
       "rarity": "epic",
       "element": "metal",
       "lineage": "dragon",
-      "baseStats": { "attack": 260, "defense": 220, "health": 220, "elementalAffinity": 100 },
+      "baseStats": {
+        "attack": 260,
+        "defense": 220,
+        "health": 220,
+        "elementalAffinity": 100
+      },
       "passiveAbility": "attack",
       "skills": ["basic_attack", "heavy_hit", "hit_and_heal"]
     },
@@ -462,7 +687,12 @@
       "rarity": "epic",
       "element": "wood",
       "lineage": "dragon",
-      "baseStats": { "attack": 230, "defense": 210, "health": 260, "elementalAffinity": 100 },
+      "baseStats": {
+        "attack": 230,
+        "defense": 210,
+        "health": 260,
+        "elementalAffinity": 100
+      },
       "passiveAbility": "health",
       "skills": ["basic_attack", "heavy_hit", "hit_and_heal"]
     },
@@ -472,7 +702,12 @@
       "rarity": "epic",
       "element": "earth",
       "lineage": "ox",
-      "baseStats": { "attack": 190, "defense": 290, "health": 250, "elementalAffinity": 70 },
+      "baseStats": {
+        "attack": 190,
+        "defense": 290,
+        "health": 250,
+        "elementalAffinity": 70
+      },
       "passiveAbility": "defense",
       "skills": ["basic_attack", "heavy_hit", "hit_and_heal"]
     },
@@ -482,7 +717,12 @@
       "rarity": "epic",
       "element": "fire",
       "lineage": "dragon",
-      "baseStats": { "attack": 270, "defense": 190, "health": 240, "elementalAffinity": 100 },
+      "baseStats": {
+        "attack": 270,
+        "defense": 190,
+        "health": 240,
+        "elementalAffinity": 100
+      },
       "passiveAbility": "attack",
       "skills": ["basic_attack", "heavy_hit", "hit_and_heal"]
     },
@@ -492,7 +732,12 @@
       "rarity": "epic",
       "element": "water",
       "lineage": "dragon",
-      "baseStats": { "attack": 250, "defense": 190, "health": 260, "elementalAffinity": 100 },
+      "baseStats": {
+        "attack": 250,
+        "defense": 190,
+        "health": 260,
+        "elementalAffinity": 100
+      },
       "passiveAbility": "health",
       "skills": ["basic_attack", "heavy_hit", "hit_and_heal"]
     },
@@ -502,7 +747,12 @@
       "rarity": "epic",
       "element": "metal",
       "lineage": "tiger",
-      "baseStats": { "attack": 270, "defense": 200, "health": 230, "elementalAffinity": 100 },
+      "baseStats": {
+        "attack": 270,
+        "defense": 200,
+        "health": 230,
+        "elementalAffinity": 100
+      },
       "passiveAbility": "attack",
       "skills": ["basic_attack", "heavy_hit", "hit_and_heal"]
     }
@@ -514,7 +764,12 @@
       "rarity": "legendary",
       "element": "wood",
       "lineage": "dragon",
-      "baseStats": { "attack": 250, "defense": 250, "health": 300, "elementalAffinity": 100 },
+      "baseStats": {
+        "attack": 250,
+        "defense": 250,
+        "health": 300,
+        "elementalAffinity": 100
+      },
       "passiveAbility": "health",
       "skills": ["basic_attack", "heavy_hit", "hit_and_heal"]
     },
@@ -524,7 +779,12 @@
       "rarity": "legendary",
       "element": "earth",
       "lineage": "dragon",
-      "baseStats": { "attack": 220, "defense": 320, "health": 280, "elementalAffinity": 80 },
+      "baseStats": {
+        "attack": 220,
+        "defense": 320,
+        "health": 280,
+        "elementalAffinity": 80
+      },
       "passiveAbility": "defense",
       "skills": ["basic_attack", "heavy_hit", "hit_and_heal"]
     },
@@ -534,7 +794,12 @@
       "rarity": "legendary",
       "element": "fire",
       "lineage": "dragon",
-      "baseStats": { "attack": 320, "defense": 200, "health": 280, "elementalAffinity": 100 },
+      "baseStats": {
+        "attack": 320,
+        "defense": 200,
+        "health": 280,
+        "elementalAffinity": 100
+      },
       "passiveAbility": "attack",
       "skills": ["basic_attack", "heavy_hit", "hit_and_heal"]
     },
@@ -544,7 +809,12 @@
       "rarity": "legendary",
       "element": "water",
       "lineage": "dragon",
-      "baseStats": { "attack": 270, "defense": 230, "health": 300, "elementalAffinity": 100 },
+      "baseStats": {
+        "attack": 270,
+        "defense": 230,
+        "health": 300,
+        "elementalAffinity": 100
+      },
       "passiveAbility": "health",
       "skills": ["basic_attack", "heavy_hit", "hit_and_heal"]
     },
@@ -554,7 +824,12 @@
       "rarity": "legendary",
       "element": "metal",
       "lineage": "tiger",
-      "baseStats": { "attack": 300, "defense": 240, "health": 260, "elementalAffinity": 100 },
+      "baseStats": {
+        "attack": 300,
+        "defense": 240,
+        "health": 260,
+        "elementalAffinity": 100
+      },
       "passiveAbility": "attack",
       "skills": ["basic_attack", "heavy_hit", "hit_and_heal"]
     }
@@ -566,7 +841,12 @@
       "rarity": "legendary",
       "element": "metal",
       "lineage": "dragon",
-      "baseStats": { "attack": 300, "defense": 150, "health": 1000, "elementalAffinity": 50 },
+      "baseStats": {
+        "attack": 300,
+        "defense": 150,
+        "health": 1000,
+        "elementalAffinity": 50
+      },
       "passiveAbility": "health",
       "skills": ["basic_attack", "atk_buff", "charged_hit"]
     }

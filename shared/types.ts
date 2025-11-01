@@ -10,7 +10,12 @@ export type LineageId =
   | "horse"
   | "monkey";
 
-export type PassiveAbility = "attack" | "defense" | "health";
+export interface PassiveAbility {
+  id: string;
+  name: string;
+  description: string;
+  effects: PassiveEffect[];
+}
 
 export type PotentialGrade = "C" | "B" | "A" | "S" | "SS";
 
@@ -18,6 +23,8 @@ export type SkillElementId = ElementId | "none";
 
 export type EffectTarget = "self" | "enemy" | "party_member";
 export type StatType = "attack" | "defense" | "health" | "elementalAffinity";
+/*** Defines the AI behavior for an enemy, e.g., a list of skill IDs to cycle through.*/
+export type EnemyAI = string[];
 
 export interface StatBuffEffect {
   type: "stat_buff" | "stat_debuff";
@@ -42,11 +49,32 @@ export interface OneTimeShieldEffect {
   type: "one_time_shield";
 }
 
+export interface BasicAttackConversionEffect {
+  type: "basic_attack_conversion";
+  element: ElementId;
+  duration: number;
+}
+
 export type CustomEffect =
   | StatBuffEffect
   | DOTEffect
   | ThornsEffect
-  | OneTimeShieldEffect;
+  | OneTimeShieldEffect
+  | BasicAttackConversionEffect;
+
+export interface PassiveStatBoost {
+  type: "stat_boost";
+  stat: StatType;
+  value: number; // 0.1 for 10%
+}
+
+export interface PassiveElementalLifesteal {
+  type: "elemental_lifesteal";
+  element: ElementId;
+  ratio: number; // 0.3 for 30%
+}
+
+export type PassiveEffect = PassiveStatBoost | PassiveElementalLifesteal;
 
 export type CombatTrigger =
   | "on_hit"
@@ -112,7 +140,7 @@ export interface BaseSpirit {
     health: number;
     elementalAffinity: number;
   };
-  passiveAbility: PassiveAbility;
+  passiveAbilities: string[];
   skills: string[];
   triggeredAbilities?: TriggeredAbility[];
 }
@@ -151,4 +179,31 @@ export interface GameState {
   lastUpdate: number;
   essences: Record<string, number>;
   summonCount?: number;
+}
+/**
+ * Encounter Types Data
+ */
+export interface EncounterEnemy {
+  spiritId: string; // ID from spirits.json
+  level: number;
+  ai: EnemyAI;
+}
+
+export interface EncounterReward {
+  qi: number;
+  essences?: Record<string, number>; // { [spiritId]: amount }
+  // You could add items here later: items?: Record<string, number>;
+}
+
+export interface EncounterPenalty {
+  qiLoss: number;
+}
+
+export interface Encounter {
+  id: string;
+  name: string;
+  averageLevel: number; // The target player level for this encounter
+  enemies: EncounterEnemy[];
+  rewards: EncounterReward;
+  penalties: EncounterPenalty;
 }

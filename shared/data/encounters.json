@@ -1,0 +1,87 @@
+[
+  {
+    "id": "e001",
+    "name": "JadeStone",
+    "averageLevel": 1,
+    "enemies": [
+      {
+        "spiritId": "spirit_c01",
+        "level": 1,
+        "ai": ["r000"]
+      },
+      {
+        "spiritId": "spirit_c02",
+        "level": 1,
+        "ai": ["r000"]
+      }
+    ],
+    "rewards": {
+      "qi": 300,
+      "essences": {
+        "spirit_c01": 3,
+        "spirit_c02": 3
+      }
+    },
+    "penalties": {
+      "qiLoss": 100
+    }
+  },
+  {
+    "id": "e002",
+    "name": "Ember Foxes",
+    "averageLevel": 2,
+    "enemies": [
+      {
+        "spiritId": "spirit_c03",
+        "level": 1,
+        "ai": ["r000"]
+      },
+      {
+        "spiritId": "spirit_c03",
+        "level": 1,
+        "ai": ["r000"]
+      },
+      {
+        "spiritId": "spirit_c03",
+        "level": 2,
+        "ai": ["r000"]
+      }
+    ],
+    "rewards": {
+      "qi": 500,
+      "essences": {
+        "spirit_c03": 9
+      }
+    },
+    "penalties": {
+      "qiLoss": 400
+    }
+  },
+  {
+    "id": "e003",
+    "name": "Mountain Duo",
+    "averageLevel": 3,
+    "enemies": [
+      {
+        "spiritId": "spirit_c07",
+        "level": 3,
+        "ai": ["basic_attack"]
+      },
+      {
+        "spiritId": "spirit_c06",
+        "level": 3,
+        "ai": ["basic_attack"]
+      }
+    ],
+    "rewards": {
+      "qi": 800,
+      "essences": {
+        "spirit_c07": 3,
+        "spirit_c06": 3
+      }
+    },
+    "penalties": {
+      "qiLoss": 500
+    }
+  }
+]

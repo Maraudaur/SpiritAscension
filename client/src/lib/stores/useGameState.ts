@@ -7,6 +7,8 @@ import type {
   PotentialGrade,
 } from "@shared/types";
 import spiritsData from "@shared/data/spirits.json";
+import { createJSONStorage } from "zustand/middleware";
+import { encrypt, decrypt } from "../encryption";
 
 const RARITY_CHANCES: Record<Rarity, number> = {
   common: 0.6,
@@ -590,8 +592,44 @@ export const useGameState = create<GameStore>()(
         set(getInitialState());
       },
     }),
+    // --- THIS IS THE NEW, ENCRYPTED CONFIG ---
     {
-      name: "ascension-game-state",
+      name: "ascension-game-state", // The name of the item in localStorage
+      storage: createJSONStorage(() => ({
+        /**
+         * This function runs when SAVING the state.
+         * We encrypt the 'value' (your game state) before saving.
+         */
+        setItem: (name, value) => {
+          const encryptedState = encrypt(value);
+          localStorage.setItem(name, encryptedState);
+        },
+        /**
+         * This function runs when LOADING the state.
+         * We load the encrypted data and try to decrypt it.
+         */
+        getItem: (name) => {
+          const encryptedState = localStorage.getItem(name);
+          // If no save exists, return null
+          if (!encryptedState) return null;
+
+          try {
+            // Decrypt the state after loading
+            const decryptedState = decrypt(encryptedState);
+            return decryptedState;
+          } catch (error) {
+            console.warn("Failed to decrypt state, resetting save.", error);
+            // If decryption fails (e.g., bad key, corrupt data),
+            // remove the bad save file to start fresh.
+            localStorage.removeItem(name);
+            return null;
+          }
+        },
+        /**
+         * This function runs when DELETING the state.
+         */
+        removeItem: (name) => localStorage.removeItem(name),
+      })),
     },
   ),
 );

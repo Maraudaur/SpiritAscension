@@ -1,17 +1,36 @@
 {
-  "attack": {
-    "id": "attack",
+  "attack_focus": {
+    "id": "attack_focus",
     "name": "Attack Focus",
-    "description": "Increases base Attack stat by 10%."
+    "description": "Increases base Attack stat by 10%.",
+    "effects": [{ "type": "stat_boost", "stat": "attack", "value": 0.1 }]
   },
-  "defense": {
-    "id": "defense",
+  "defense_focus": {
+    "id": "defense_focus",
     "name": "Defense Focus",
-    "description": "Increases base Defense stat by 10%."
+    "description": "Increases base Defense stat by 10%.",
+    "effects": [{ "type": "stat_boost", "stat": "defense", "value": 0.1 }]
   },
-  "health": {
-    "id": "health",
+  "health_focus": {
+    "id": "health_focus",
     "name": "Health Focus",
-    "description": "Increases base Health stat by 10%."
+    "description": "Increases base Health stat by 10%.",
+    "effects": [{ "type": "stat_boost", "stat": "health", "value": 0.1 }]
+  },
+  "healing_waters": {
+    "id": "healing_waters",
+    "name": "Healing Waters",
+    "description": "30% of water damage done will also heal the spirit.",
+    "effects": [
+      { "type": "elemental_lifesteal", "element": "water", "ratio": 0.3 }
+    ]
+  },
+  "healing_flames": {
+    "id": "healing_flames",
+    "name": "Healing Flames",
+    "description": "30% of fire damage done will also heal the spirit.",
+    "effects": [
+      { "type": "elemental_lifesteal", "element": "fire", "ratio": 0.3 }
+    ]
   }
 }

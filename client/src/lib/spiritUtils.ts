@@ -4,10 +4,13 @@ import type {
   Element,
   Lineage,
   Skill,
-  PassiveAbility,
   PotentialGrade,
   ElementId,
   ActiveEffect,
+  PassiveAbility, // This is now the interface
+  PassiveEffect,
+  PassiveStatBoost,
+  StatType,
 } from "@shared/types";
 import spiritsData from "@shared/data/spirits.json";
 import elementsData from "@shared/data/elements.json";
@@ -127,15 +130,9 @@ export function getSkill(skillId: string): Skill {
   return (skillsData as Record<string, Skill>)[skillId];
 }
 
-interface PassiveAbilityDetails {
-  id: string;
-  name: string;
-  description: string;
-}
-
-export function getPassiveAbility(abilityId: string): PassiveAbilityDetails {
+export function getPassiveAbility(abilityId: string): PassiveAbility {
   // Cast passivesData to the correct object type
-  return (passivesData as Record<string, PassiveAbilityDetails>)[abilityId];
+  return (passivesData as Record<string, PassiveAbility>)[abilityId];
 }
 
 export function calculateStat(
@@ -145,11 +142,7 @@ export function calculateStat(
 ): number {
   const potentialBonus = POTENTIAL_BONUSES[potential];
   const baseWithPotential = baseStat * (1 + potentialBonus);
-  return Math.floor(baseWithPotential * (level * 0.02));
-}
-
-export function getPassiveBonus(ability: PassiveAbility): number {
-  return 0.1;
+  return Math.floor(baseWithPotential * (1 + (level - 1) * 0.02));
 }
 
 export function calculateAllStats(playerSpirit: PlayerSpirit) {
@@ -175,7 +168,7 @@ export function calculateAllStats(playerSpirit: PlayerSpirit) {
       baseSpirit.baseStats.health,
       playerSpirit.level,
       playerSpirit.potentialFactors.health,
-    ) + 10;
+    ) + 10; // Base health addition is kept
 
   let elementalAffinity = calculateStat(
     baseSpirit.baseStats.elementalAffinity,
@@ -183,7 +176,7 @@ export function calculateAllStats(playerSpirit: PlayerSpirit) {
     playerSpirit.potentialFactors.elementalAffinity,
   );
 
-  // Apply active effects (stat buffs/debuffs)
+  // Apply active effects (stat buffs/debuffs) - This logic is unchanged
   const activeEffects = playerSpirit.activeEffects || [];
   activeEffects.forEach((effect) => {
     if (
@@ -211,22 +204,44 @@ export function calculateAllStats(playerSpirit: PlayerSpirit) {
     }
   });
 
-  const passiveBonus = getPassiveBonus(baseSpirit.passiveAbility);
+  // --- REPLACEMENT LOGIC FOR PASSIVES ---
+  // This block replaces the old switch statement
 
+  // Create a mutable stats object from the values calculated so far
+  const stats = { attack, defense, health, elementalAffinity };
+
+  // Apply passive abilities
+  if (baseSpirit.passiveAbilities && passivesData) {
+    for (const passiveId of baseSpirit.passiveAbilities) {
+      // Find the passive by its ID (e.g., "health_focus")
+      const passive = (passivesData as any)[passiveId] as PassiveAbility;
+
+      if (passive && passive.effects) {
+        for (const effect of passive.effects as PassiveEffect[]) {
+          // This function only handles stat boosts.
+          // Other effects like "elemental_lifesteal"
+          // will be handled in BattleScreen.tsx.
+          if (effect.type === "stat_boost") {
+            const statBoost = effect as PassiveStatBoost;
+            // Get the stat name (e.g., "health")
+            const statKey = statBoost.stat as keyof typeof stats;
+
+            if (stats[statKey]) {
+              // Apply the value from the effect (e.g., 0.1)
+              stats[statKey] *= 1 + statBoost.value;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  // Return the final, floored stats, just as the old code did
   return {
-    attack:
-      baseSpirit.passiveAbility === "attack"
-        ? Math.floor(attack * (1 + passiveBonus))
-        : attack,
-    defense:
-      baseSpirit.passiveAbility === "defense"
-        ? Math.floor(defense * (1 + passiveBonus))
-        : defense,
-    health:
-      baseSpirit.passiveAbility === "health"
-        ? Math.floor(health * (1 + passiveBonus))
-        : health,
-    elementalAffinity,
+    attack: Math.floor(stats.attack),
+    defense: Math.floor(stats.defense),
+    health: Math.floor(stats.health),
+    elementalAffinity: Math.floor(stats.elementalAffinity),
   };
 }
 
