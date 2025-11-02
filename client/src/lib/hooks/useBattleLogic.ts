@@ -250,8 +250,11 @@ export function useBattleLogic({ onClose, isBossBattle = false }: BattleScreenPr
                 targetMaxHealth * effect.damageRatio,
               );
 
+              const targetDisplayName = (target as Enemy).name || 
+                (target as BattleSpirit).playerSpirit?.instanceId || "Unknown";
+              
               addLog(
-                `${target.name}'s "${passive.name}" passive poisons the attacker!`,
+                `${targetDisplayName}'s "${passive.name}" passive poisons the attacker!`,
               );
 
               attackerEffects.push({
@@ -273,7 +276,7 @@ export function useBattleLogic({ onClose, isBossBattle = false }: BattleScreenPr
     effect: ActiveEffect,
   ): BattleSpirit | Enemy => {
     let targetName =
-      (target as BattleSpirit).playerSpirit?.instanceId || target.name;
+      (target as BattleSpirit).playerSpirit?.instanceId || (target as Enemy).name;
 
     const newEffect = { ...effect, id: `${effect.effectType}_${Date.now()}` };
 
@@ -320,8 +323,314 @@ export function useBattleLogic({ onClose, isBossBattle = false }: BattleScreenPr
     return { updatedSpirits, updatedEnemy: enemyState };
   };
 
-  // This function will be defined in the next section along with the rest of the battle logic
-  // I'll continue building this in the next file write
+  // ========== Core Battle Functions ==========
+  const startBattle = () => {
+    if (playerSpirits.length === 0) return;
+    setBattleState("fighting");
+    setBattleRewards(null);
+    addLog("Battle begins!");
+    playBattleMusic();
+  };
+
+  const handleVictory = (targetEnemy: Enemy) => {
+    setBattleState("victory");
+    addLog("Victory! The enemy has been defeated!");
+
+    let qiReward = 0;
+
+    if (currentEncounter && !isBossBattle) {
+      const rewards = currentEncounter.rewards;
+      qiReward = rewards.qi;
+
+      if (rewards.essences) {
+        for (const [spiritId, amount] of Object.entries(rewards.essences)) {
+          addEssence(spiritId, amount);
+          addLog(
+            `You obtained ${amount}x ${getBaseSpirit(spiritId)?.name} Essence!`,
+          );
+        }
+      }
+      setBattleRewards({ qi: qiReward, qiGeneration: 0.1 });
+    } else {
+      const baseQiReward = targetEnemy.level * 10;
+      qiReward = Math.floor(baseQiReward * battleRewardMultiplier);
+      const qiGenerationIncrease = 0.1;
+      setBattleRewards({ qi: qiReward, qiGeneration: qiGenerationIncrease });
+    }
+
+    setPlayerSpirits((prev) =>
+      prev.map((spirit) => ({
+        ...spirit,
+        currentHealth: spirit.maxHealth,
+      })),
+    );
+
+    playerSpirits.forEach((spirit) => {
+      const stats = calculateAllStats(spirit.playerSpirit);
+      updateSpiritHealth(spirit.playerSpirit.instanceId, stats.health);
+    });
+
+    winBattle(qiReward);
+  };
+
+  const handleClose = () => {
+    if (battleState !== "defeat") {
+      playerSpirits.forEach((spirit) => {
+        updateSpiritHealth(
+          spirit.playerSpirit.instanceId,
+          spirit.currentHealth,
+        );
+      });
+    }
+    playExploreMusic();
+    onClose();
+  };
+
+  // ========== Battle Initialization ==========
+  useEffect(() => {
+    if (activeParty.length === 0) {
+      setBattleLog([
+        "No spirits in active party! Please add spirits to your party first.",
+      ]);
+      return;
+    }
+
+    const spiritsInBattle = activeParty
+      .map((instanceId) => spirits.find((s) => s.instanceId === instanceId))
+      .filter((s): s is PlayerSpirit => s !== undefined)
+      .map((spirit) => {
+        const stats = calculateAllStats(spirit);
+        return {
+          playerSpirit: spirit,
+          maxHealth: stats.health,
+          currentHealth: Math.min(
+            spirit.currentHealth ?? stats.health,
+            stats.health,
+          ),
+          activeEffects: spirit.activeEffects || [],
+        };
+      });
+    setPlayerSpirits(spiritsInBattle);
+
+    let logMessage = "";
+
+    if (isBossBattle) {
+      const bossEnemy = generateBossEnemy();
+      setBattleEnemies([bossEnemy]);
+      setActiveEnemyIndex(0);
+      logMessage = `The ${bossEnemy.name} appears!`;
+      setBattleLog([logMessage]);
+    } else {
+      const encounter = findEncounter();
+      setCurrentEncounter(encounter);
+
+      if (encounter && encounter.enemies.length > 0) {
+        const allEnemies = encounter.enemies
+          .map((enemyData, index) => {
+            const baseSpirit = getBaseSpirit(enemyData.spiritId);
+            if (!baseSpirit || !baseSpirit.baseStats) return null;
+
+            const enemyPotentialBonus = 0.02;
+            const levelMultiplier = enemyData.level * 0.02;
+            const enemyAttack = Math.floor(
+              baseSpirit.baseStats.attack *
+                (1 + enemyPotentialBonus) *
+                levelMultiplier,
+            );
+            const enemyDefense = Math.floor(
+              baseSpirit.baseStats.defense *
+                (1 + enemyPotentialBonus) *
+                levelMultiplier,
+            );
+            const enemyHealth =
+              Math.floor(
+                baseSpirit.baseStats.health *
+                  (1 + enemyPotentialBonus) *
+                  levelMultiplier,
+              ) + 10;
+            const enemyElementalAffinity = Math.floor(
+              baseSpirit.baseStats.elementalAffinity *
+                (1 + enemyPotentialBonus) *
+                levelMultiplier,
+            );
+
+            return {
+              id: `enemy_${Date.now()}_${index}`,
+              spiritId: enemyData.spiritId,
+              name: baseSpirit.name,
+              level: enemyData.level,
+              attack: enemyAttack,
+              defense: enemyDefense,
+              maxHealth: enemyHealth,
+              currentHealth: enemyHealth,
+              element: baseSpirit.element,
+              elementalAffinity: enemyElementalAffinity,
+              activeEffects: [] as ActiveEffect[],
+            };
+          })
+          .filter((e): e is Enemy => e !== null);
+
+        if (allEnemies.length > 0) {
+          setBattleEnemies(allEnemies);
+          setActiveEnemyIndex(0);
+          logMessage = `Encounter: ${encounter.name}!`;
+          setBattleLog([logMessage]);
+        } else {
+          logMessage = "Could not load enemies for this encounter.";
+          setBattleLog([logMessage]);
+          console.error("Failed to create enemies from encounter data.");
+        }
+      } else {
+        logMessage = "No valid encounter found for your level.";
+        setBattleLog([logMessage]);
+        console.error("Failed to find a valid encounter.");
+      }
+    }
+  }, [activeParty, spirits, isBossBattle]);
+
+  // ========== Combat Handler Functions ==========
+  // Note: These functions are declared but will use stub implementations initially
+  // The full battle logic from the original file needs to be added here
+  const handleAttack = (skillId: string) => {
+    // TODO: Add full implementation from BattleScreen.tsx lines 515-720
+    console.log("handleAttack called with skillId:", skillId);
+  };
+
+  const enemyTurn = (specifiedTargetIndex?: number) => {
+    // TODO: Add full implementation from BattleScreen.tsx lines 722-776
+    console.log("enemyTurn called");
+  };
+
+  const executeBossTurn = (targetIndex: number, target: BattleSpirit, stats: any) => {
+    // TODO: Add full implementation from BattleScreen.tsx lines 778-1077
+    console.log("executeBossTurn called");
+  };
+
+  const executeNormalEnemyTurn = (targetIndex: number, target: BattleSpirit, stats: any) => {
+    // TODO: Add full implementation from BattleScreen.tsx lines 1079-1337
+    console.log("executeNormalEnemyTurn called");
+  };
+
+  const checkDefeat = (newHealth: number, targetIndex: number) => {
+    // TODO: Add full implementation from BattleScreen.tsx lines 1339-1377
+    if (newHealth <= 0) {
+      console.log("Spirit defeated");
+    }
+  };
+
+  const handleSwap = (index: number) => {
+    if (battleState !== "fighting" || index === activePartySlot) return;
+    if (playerSpirits[index].currentHealth <= 0) {
+      addLog("Cannot swap to a defeated spirit!");
+      return;
+    }
+
+    const oldSpirit = getBaseSpirit(
+      playerSpirits[activePartySlot].playerSpirit.spiritId,
+    );
+    const newSpirit = getBaseSpirit(playerSpirits[index].playerSpirit.spiritId);
+
+    setActivePartySlot(index);
+    setActionMenu("none");
+    setIsBlocking(false);
+    addLog(`Swapped ${oldSpirit?.name} for ${newSpirit?.name}!`);
+
+    setTimeout(() => enemyTurn(index), 800);
+  };
+
+  const handleBlock = () => {
+    if (battleState !== "fighting") return;
+
+    const currentSpirit = playerSpirits[activePartySlot];
+    if (!currentSpirit || currentSpirit.currentHealth <= 0) return;
+
+    const baseSpirit = getBaseSpirit(currentSpirit.playerSpirit.spiritId);
+    setIsBlocking(true);
+    setActionMenu("none");
+    addLog(`${baseSpirit?.name} takes a defensive stance!`);
+
+    setTimeout(() => enemyTurn(), 800);
+  };
+
+  const handleSkillSelect = (skillId: string) => {
+    setActionMenu("none");
+    handleAttack(skillId);
+  };
+
+  const handleContinueBattle = () => {
+    const encounter = findEncounter();
+    setCurrentEncounter(encounter);
+
+    let newEnemies: Enemy[] = [];
+    let logMessage = "No more encounters found at this level.";
+
+    if (encounter && encounter.enemies.length > 0) {
+      newEnemies = encounter.enemies
+        .map((enemyData, index) => {
+          const baseSpirit = getBaseSpirit(enemyData.spiritId);
+          if (!baseSpirit || !baseSpirit.baseStats) return null;
+
+          const enemyPotentialBonus = 0.02;
+          const levelMultiplier = enemyData.level * 0.02;
+          const enemyAttack = Math.floor(
+            baseSpirit.baseStats.attack *
+              (1 + enemyPotentialBonus) *
+              levelMultiplier,
+          );
+          const enemyDefense = Math.floor(
+            baseSpirit.baseStats.defense *
+              (1 + enemyPotentialBonus) *
+              levelMultiplier,
+          );
+          const enemyHealth =
+            Math.floor(
+              baseSpirit.baseStats.health *
+                (1 + enemyPotentialBonus) *
+                levelMultiplier,
+            ) + 10;
+          const enemyElementalAffinity = Math.floor(
+            baseSpirit.baseStats.elementalAffinity *
+              (1 + enemyPotentialBonus) *
+              levelMultiplier,
+          );
+
+          return {
+            id: `enemy_${Date.now()}_${index}`,
+            spiritId: enemyData.spiritId,
+            name: baseSpirit.name,
+            level: enemyData.level,
+            attack: enemyAttack,
+            defense: enemyDefense,
+            maxHealth: enemyHealth,
+            currentHealth: enemyHealth,
+            element: baseSpirit.element,
+            elementalAffinity: enemyElementalAffinity,
+            activeEffects: [] as ActiveEffect[],
+          };
+        })
+        .filter((e): e is Enemy => e !== null);
+
+      if (newEnemies.length > 0) {
+        logMessage = `A new challenger appears: ${encounter.name}!`;
+      } else {
+        logMessage = "Could not load enemies for the next encounter.";
+      }
+    }
+
+    if (newEnemies.length > 0) {
+      setBattleEnemies(newEnemies);
+      setActiveEnemyIndex(0);
+      setBattleState("fighting");
+      setBattleRewards(null);
+      setActivePartySlot(0);
+      setActionMenu("none");
+      setIsBlocking(false);
+      setBattleLog([logMessage, "The battle continues!"]);
+    } else {
+      setBattleLog([logMessage, "Please return to the main screen."]);
+      setBattleState("setup");
+    }
+  };
   
   return {
     // State
@@ -388,5 +697,21 @@ export function useBattleLogic({ onClose, isBossBattle = false }: BattleScreenPr
     executeTriggerEffects,
     applyStatusEffect,
     tickEffects,
+    
+    // Battle Flow Functions
+    startBattle,
+    handleVictory,
+    handleClose,
+    handleAttack,
+    enemyTurn,
+    executeBossTurn,
+    executeNormalEnemyTurn,
+    checkDefeat,
+    
+    // Player Action Handlers
+    handleSwap,
+    handleBlock,
+    handleSkillSelect,
+    handleContinueBattle,
   };
 }
