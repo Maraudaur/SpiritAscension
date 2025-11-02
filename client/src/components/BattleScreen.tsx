@@ -608,7 +608,7 @@ export function BattleScreen({
             ) : (
               <div className="grid grid-cols-2 gap-3">
                 <Button
-                  onClick={handleContinueBattle}
+                  onClick={startBattle}
                   className="w-full font-bold"
                   style={{
                     background: "var(--vermillion)",

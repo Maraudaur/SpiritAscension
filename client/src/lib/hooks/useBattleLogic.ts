@@ -349,15 +349,34 @@ export function useBattleLogic({ onClose }: BattleScreenProps) {
         }
 
         // Tick down timer
-        if (!effectIsDone) {
-          if (effect.turnsRemaining > 1) {
-            newActiveEffects.push({
-              ...effect,
-              turnsRemaining: effect.turnsRemaining - 1,
-            });
-          } else {
-            // Effect expires (if turnsRemaining was 1)
+        if (phase === "end_of_turn") {
+          if (!effectIsDone) {
+            if (effect.turnsRemaining > 1) {
+              newActiveEffects.push({
+                ...effect,
+                turnsRemaining: effect.turnsRemaining - 1,
+              });
+            } else {
+              // Effect expires (if turnsRemaining was 1)
+              // We DON'T want charges to expire here.
+              const spiritName =
+                getBaseSpirit(spirit.playerSpirit.spiritId)?.name ||
+                "Player Spirit";
+              if (effect.effectType !== "charge") {
+                addLog(
+                  `${spiritName}'s ${effect.effectType} effect has worn off.`,
+                );
+              } else {
+                // It's a charge with 1 turn left, keep it for start_of_turn
+                newActiveEffects.push(effect);
+              }
+            }
           }
+        }
+        // If it's not end_of_turn (i.e., it's start_of_turn),
+        // just keep the effect unless it was just consumed.
+        else if (!effectIsDone) {
+          newActiveEffects.push(effect);
         }
       });
 
@@ -425,15 +444,31 @@ export function useBattleLogic({ onClose }: BattleScreenProps) {
         }
 
         // Tick down timer
-        if (!effectIsDone) {
-          if (effect.turnsRemaining > 1) {
-            newActiveEffects.push({
-              ...effect,
-              turnsRemaining: effect.turnsRemaining - 1,
-            });
-          } else {
-            // Effect expires
+        if (phase === "end_of_turn") {
+          if (!effectIsDone) {
+            if (effect.turnsRemaining > 1) {
+              newActiveEffects.push({
+                ...effect,
+                turnsRemaining: effect.turnsRemaining - 1,
+              });
+            } else {
+              // Effect expires (if turnsRemaining was 1)
+              // We DON'T want charges to expire here.
+              if (effect.effectType !== "charge") {
+                addLog(
+                  `${enemy.name}'s ${effect.effectType} effect has worn off.`,
+                );
+              } else {
+                // It's a charge with 1 turn left, keep it for start_of_turn
+                newActiveEffects.push(effect);
+              }
+            }
           }
+        }
+        // If it's not end_of_turn (i.e., it's start_of_turn),
+        // just keep the effect unless it was just consumed.
+        else if (!effectIsDone) {
+          newActiveEffects.push(effect);
         }
       });
       return { ...enemy, currentHealth, activeEffects: newActiveEffects };
@@ -701,6 +736,33 @@ export function useBattleLogic({ onClose }: BattleScreenProps) {
     let skillId = enemyAiData.ai[aiTurnStep % enemyAiData.ai.length];
     setAiTurnStep((prev) => prev + 1);
 
+    // --- FIX: Handle "r000" for random AI ---
+    if (skillId === "r000") {
+      const enemyBaseSpirit = getBaseSpirit(activeEnemy.spiritId);
+      let possibleSkillIds = ["basic_attack", "block"]; // Start with basic actions
+
+      // --- FIX 2: Added safety checks ---
+      // Safely check if the spirit and its skills exist before adding them
+      if (enemyBaseSpirit && enemyBaseSpirit.skills) {
+        possibleSkillIds.push(...enemyBaseSpirit.skills);
+      }
+      // --- END FIX 2 ---
+
+      const randomIndex = Math.floor(Math.random() * possibleSkillIds.length);
+      skillId = possibleSkillIds[randomIndex];
+      addLog(`${activeEnemy.name} acts randomly... and chooses ${skillId}!`);
+    }
+    // --- END FIX ---
+
+    // Handle the chosen action
+    if (skillId === "block") {
+      // Handle block as a special action
+      setIsEnemyBlocking(true);
+      addLog(`${activeEnemy.name} takes a defensive stance!`);
+      setTurnPhase("enemy_end"); // Blocking ends the turn
+      return;
+    }
+
     const skill = getSkill(skillId);
     if (!skill) {
       addLog(
@@ -711,9 +773,7 @@ export function useBattleLogic({ onClose }: BattleScreenProps) {
     }
     handleEnemyAction(skill);
   };
-  /**
-   * (Step 7) Runs end-of-turn effects for the enemy.
-   */
+
   const runEnemyTurnEnd = () => {
     // 1. Get the results from the tick function *first*
     const { updatedEnemies } = tickEnemyEffects(
@@ -722,6 +782,9 @@ export function useBattleLogic({ onClose }: BattleScreenProps) {
     );
     // 2. Set the new state
     setBattleEnemies(updatedEnemies);
+
+    // 3. Reset block
+    setIsEnemyBlocking(false);
   };
 
   // ========== Master Turn Flow Controller ==========
