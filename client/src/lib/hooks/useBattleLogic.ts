@@ -300,38 +300,221 @@ export function useBattleLogic({
 
   const tickEffects = (
     spirits: BattleSpirit[],
-    enemyState: Enemy | null,
-  ): { updatedSpirits: BattleSpirit[]; updatedEnemy: Enemy | null } => {
-    const updatedSpirits = spirits.map((spirit) => {
-      let currentHealth = spirit.currentHealth;
+    enemies: Enemy[],
+  ): { updatedSpirits: BattleSpirit[]; updatedEnemies: Enemy[] } => {
+    let newEnemies = [...enemies]; // Create a mutable copy of enemies
 
-      // Apply DOT damage from active effects
+    const updatedSpirits = spirits.map((spirit, spiritIndex) => {
+      let currentHealth = spirit.currentHealth;
+      const newActiveEffects: ActiveEffect[] = [];
+
       spirit.activeEffects.forEach((effect) => {
+        let effectTicked = false; // Flag to see if we should tick down
+
+        // --- 1. Handle DOT ---
         if (effect.effectType === "damage_over_time" && effect.damagePerTurn) {
           const dotDamage = effect.damagePerTurn;
           currentHealth = Math.max(0, currentHealth - dotDamage);
           addLog(
             `${spirit.playerSpirit.instanceId} takes ${dotDamage} damage from ${effect.effectType}!`,
           );
+          effectTicked = true;
         }
-      });
 
-      // Decrement turnsRemaining and filter expired effects
-      const activeEffects = spirit.activeEffects
-        .map((effect) => ({
-          ...effect,
-          turnsRemaining: effect.turnsRemaining - 1,
-        }))
-        .filter((effect) => effect.turnsRemaining > 0);
+        // --- 2. Handle Charge Effect ---
+        else if (
+          effect.effectType === "charge" &&
+          effect.turnsRemaining === 1 && // This is the turn it hits
+          effect.casterStats
+        ) {
+          effectTicked = true; // Effect is "used up"
+          addLog(`${spirit.playerSpirit.instanceId} unleashes its attack!`);
+
+          const { level, attack, affinity } = effect.casterStats;
+
+          // --- A. DAMAGE COMPONENT ---
+          if (effect.damageMultiplier && effect.targetIndex !== undefined) {
+            const target = newEnemies[effect.targetIndex];
+            if (!target || target.currentHealth <= 0) {
+              addLog(`...but the target is already defeated!`);
+            } else {
+              // --- Re-run the damage calculation from handleAttack ---
+              const defense = Math.max(1, target.defense);
+              const affinityRatio = 0.25; // Base affinity ratio
+              const attackElement = effect.element || "none";
+
+              const STATIC_BASE_POWER = 60;
+              const GAME_SCALING_FACTOR = 50;
+              const levelComponent = Math.floor((2 * level) / 5) + 2;
+              const attackDefenseRatio = attack / defense;
+              const baseCalculation =
+                Math.floor(
+                  (levelComponent * STATIC_BASE_POWER * attackDefenseRatio) /
+                    GAME_SCALING_FACTOR,
+                ) + 2;
+
+              const physicalDamage = Math.max(
+                1,
+                Math.floor(baseCalculation * (effect.damageMultiplier || 1.0)),
+              );
+
+              const baseElementalDamage = Math.floor(affinity * affinityRatio);
+              const elementalMultiplier = getElementalDamageMultiplier(
+                attackElement,
+                target.element,
+              );
+
+              let totalDamage = 0;
+              if (attackElement === "none") {
+                const finalElementalDamage = Math.floor(
+                  baseElementalDamage * elementalMultiplier,
+                );
+                totalDamage = physicalDamage + finalElementalDamage;
+              } else {
+                const totalBaseDamage = physicalDamage + baseElementalDamage;
+                totalDamage = Math.max(
+                  1,
+                  Math.floor(totalBaseDamage * elementalMultiplier),
+                );
+              }
+              // --- End Damage Calc ---
+
+              const newEnemyHealth = Math.max(
+                0,
+                target.currentHealth - totalDamage,
+              );
+              addLog(`It dealt ${totalDamage} damage to ${target.name}!`);
+              playDamage();
+              setEnemyHealthBarShake(true);
+              setTimeout(() => setEnemyHealthBarShake(false), 500);
+
+              // Update the enemy in our mutable array
+              newEnemies = newEnemies.map((en, i) =>
+                i === effect.targetIndex
+                  ? { ...en, currentHealth: newEnemyHealth }
+                  : en,
+              );
+
+              // TODO: This doesn't trigger victory check.
+              // This is a known limitation for now.
+            }
+          }
+
+          // --- B. HEAL COMPONENT ---
+          if (effect.healingFlat || effect.healingAffinityRatio) {
+            const flatHeal = effect.healingFlat || 0;
+            const affinityHeal = Math.floor(
+              affinity * (effect.healingAffinityRatio || 0),
+            );
+            const totalHeal = flatHeal + affinityHeal;
+
+            if (totalHeal > 0) {
+              currentHealth = Math.min(
+                spirit.maxHealth,
+                currentHealth + totalHeal,
+              );
+              addLog(
+                `${spirit.playerSpirit.instanceId} heals for ${totalHeal} HP!`,
+              );
+              playHeal();
+              setPlayerHealthBarHeal(true);
+              setTimeout(() => setPlayerHealthBarHeal(false), 600);
+            }
+          }
+        }
+
+        // --- 3. Tick Down Timer ---
+        if (!effectTicked && effect.turnsRemaining > 1) {
+          // Effect is still charging/waiting, tick down
+          newActiveEffects.push({
+            ...effect,
+            turnsRemaining: effect.turnsRemaining - 1,
+          });
+        }
+        // If effectTicked is true OR turnsRemaining is 1, it's done.
+      });
 
       return {
         ...spirit,
         currentHealth,
-        activeEffects,
+        activeEffects: newActiveEffects,
       };
     });
 
-    return { updatedSpirits, updatedEnemy: enemyState };
+    // --- FIX: Added enemy effect ticking ---
+    const updatedEnemies = newEnemies.map((enemy) => {
+      let currentHealth = enemy.currentHealth;
+      const newActiveEffects: ActiveEffect[] = [];
+
+      enemy.activeEffects.forEach((effect) => {
+        let effectTicked = false;
+
+        // --- 1. Handle DOT ---
+        if (effect.effectType === "damage_over_time" && effect.damagePerTurn) {
+          const dotDamage = effect.damagePerTurn;
+          currentHealth = Math.max(0, currentHealth - dotDamage);
+          addLog(
+            `${enemy.name} takes ${dotDamage} damage from ${effect.effectType}!`,
+          );
+          effectTicked = true;
+        }
+
+        // --- 2. Handle Charge Effect (Enemy Caster) ---
+        else if (
+          effect.effectType === "charge" &&
+          effect.turnsRemaining === 1 && // This is the turn it hits
+          effect.casterStats
+        ) {
+          effectTicked = true; // Effect is "used up"
+          addLog(`${enemy.name} unleashes its ability!`);
+
+          const { level, attack, affinity } = effect.casterStats;
+
+          // --- A. DAMAGE COMPONENT (Enemy hits Player) ---
+          if (effect.damageMultiplier && effect.targetIndex !== undefined) {
+            // NOTE: This logic is not fully implemented, as it would require
+            // cross-modifying the `updatedSpirits` array, which is complex.
+            // For now, we assume enemy charge attacks are self-target (heals).
+            addLog(`...but enemy charge attacks are not fully implemented.`);
+          }
+
+          // --- B. HEAL COMPONENT (Enemy heals self) ---
+          if (effect.healingFlat || effect.healingAffinityRatio) {
+            const flatHeal = effect.healingFlat || 0;
+            const affinityHeal = Math.floor(
+              affinity * (effect.healingAffinityRatio || 0),
+            );
+            const totalHeal = flatHeal + affinityHeal;
+
+            if (totalHeal > 0) {
+              currentHealth = Math.min(
+                enemy.maxHealth,
+                currentHealth + totalHeal,
+              );
+              addLog(`${enemy.name} heals for ${totalHeal} HP!`);
+              playHeal();
+              // TODO: Add enemy heal flash
+            }
+          }
+        }
+
+        // --- 3. Tick Down Timer ---
+        if (!effectTicked && effect.turnsRemaining > 1) {
+          newActiveEffects.push({
+            ...effect,
+            turnsRemaining: effect.turnsRemaining - 1,
+          });
+        }
+      });
+
+      return {
+        ...enemy,
+        currentHealth,
+        activeEffects: newActiveEffects,
+      };
+    });
+
+    return { updatedSpirits, updatedEnemies };
   };
 
   // ========== Core Battle Functions ==========
@@ -654,6 +837,43 @@ export function useBattleLogic({
       setPlayerHealthBarHeal(true);
       setTimeout(() => setPlayerHealthBarHeal(false), 600);
     }
+    // --- 6. HANDLE SKILL EFFECTS (like charging) ---
+    if (skill.effects && skill.effects.length > 0) {
+      if (!activeSpirit || !activeStats || !baseSpirit) return; // Safety check
+
+      for (const skillEffect of skill.effects) {
+        if (skillEffect.type === "charge") {
+          // This is a charge move!
+          const newActiveEffect: ActiveEffect = {
+            id: `charge_${Date.now()}`,
+            effectType: "charge",
+            turnsRemaining: skillEffect.duration,
+            // Copy all relevant data from the skill
+            damageMultiplier: skillEffect.damageMultiplier,
+            healingFlat: skillEffect.healingFlat,
+            healingAffinityRatio: skillEffect.healingAffinityRatio,
+            element: skillEffect.element,
+            // Store caster's stats and target
+            casterStats: {
+              attack: activeStats.attack,
+              affinity: activeStats.elementalAffinity,
+              level: activeSpirit.playerSpirit.level,
+            },
+            targetIndex: activeEnemyIndex, // Store which enemy to hit
+          };
+
+          // Apply the charging effect to the caster (the active spirit)
+          setPlayerSpirits((prev) =>
+            prev.map((spirit, i) =>
+              i === activePartySlot
+                ? (applyStatusEffect(spirit, newActiveEffect) as BattleSpirit)
+                : spirit,
+            ),
+          );
+          addLog(`${baseSpirit.name} is gathering power!`);
+        }
+      }
+    }
 
     // Set new enemy health and check for victory
     setBattleEnemies((prevEnemies) => {
@@ -853,15 +1073,27 @@ export function useBattleLogic({
               }
             : s,
         );
-        const { updatedSpirits } = tickEffects(withDamage, activeEnemy);
-        const updatedTarget = updatedSpirits[targetIndex];
+
+        // --- FIX: Stale state bug fix ---
+        let spiritsToReturn = withDamage;
+        setBattleEnemies((currentEnemies) => {
+          const { updatedSpirits, updatedEnemies } = tickEffects(
+            withDamage,
+            currentEnemies,
+          );
+          spiritsToReturn = updatedSpirits;
+          return updatedEnemies;
+        });
+
+        const updatedTarget = spiritsToReturn[targetIndex];
         if (updatedTarget && updatedTarget.currentHealth <= 0) {
           setTimeout(
             () => checkDefeat(updatedTarget.currentHealth, targetIndex),
             0,
           );
         }
-        return updatedSpirits;
+        return spiritsToReturn;
+        // --- END FIX ---
       });
 
       if (reflectedDamage > 0 || attackerEffects.length > 0) {
@@ -993,15 +1225,27 @@ export function useBattleLogic({
                 }
               : s,
           );
-          const { updatedSpirits } = tickEffects(withDamage, activeEnemy);
-          const updatedTarget = updatedSpirits[targetIndex];
+
+          // --- FIX: Stale state bug fix ---
+          let spiritsToReturn = withDamage;
+          setBattleEnemies((currentEnemies) => {
+            const { updatedSpirits, updatedEnemies } = tickEffects(
+              withDamage,
+              currentEnemies,
+            );
+            spiritsToReturn = updatedSpirits;
+            return updatedEnemies;
+          });
+
+          const updatedTarget = spiritsToReturn[targetIndex];
           if (updatedTarget && updatedTarget.currentHealth <= 0) {
             setTimeout(
               () => checkDefeat(updatedTarget.currentHealth, targetIndex),
               0,
             );
           }
-          return updatedSpirits;
+          return spiritsToReturn;
+          // --- END FIX ---
         });
 
         if (reflectedDamage > 0 || attackerEffects.length > 0) {
@@ -1164,11 +1408,12 @@ export function useBattleLogic({
         (levelComponent * STATIC_BASE_POWER * attackDefenseRatio) /
           GAME_SCALING_FACTOR,
       ) + 2;
-    const physicalDamage = Math.max(
-      1,
-      Math.floor(baseCalculation * finalSkill.damage),
-    );
+
+    // --- FIX: Allow 0 damage for non-damage skills ---
+    const physicalDamage = Math.floor(baseCalculation * finalSkill.damage);
     const baseElementalDamage = Math.floor(affinityStat * affinityRatio);
+    // --- END FIX ---
+
     const elementalMultiplier = getElementalDamageMultiplier(
       attackElement,
       targetBase?.element || "none",
@@ -1182,6 +1427,13 @@ export function useBattleLogic({
         baseElementalDamage * elementalMultiplier,
       );
       totalDamage = physicalDamage + finalElementalDamage;
+
+      // --- FIX: Ensure 1 damage if skill is supposed to do damage ---
+      if (finalSkill.damage > 0 && totalDamage < 1) {
+        totalDamage = 1;
+      }
+      // --- END FIX ---
+
       if (finalElementalDamage > 0) {
         if (elementalMultiplier > 1.0)
           elementalMessage = " It's super effective!";
@@ -1195,10 +1447,14 @@ export function useBattleLogic({
       );
     } else {
       const totalBaseDamage = physicalDamage + baseElementalDamage;
-      totalDamage = Math.max(
-        1,
-        Math.floor(totalBaseDamage * elementalMultiplier),
-      );
+      totalDamage = Math.floor(totalBaseDamage * elementalMultiplier);
+
+      // --- FIX: Ensure 1 damage if skill is supposed to do damage ---
+      if (finalSkill.damage > 0 && totalDamage < 1) {
+        totalDamage = 1;
+      }
+      // --- END FIX ---
+
       if (elementalMultiplier > 1.0)
         elementalMessage = " It's super effective!";
       else if (elementalMultiplier < 1.0)
@@ -1209,6 +1465,45 @@ export function useBattleLogic({
           elementalMessage,
       );
     }
+
+    // --- FIX: Handle enemy skill effects (like charging "Ancestral Healing") ---
+    if (finalSkill.effects && finalSkill.effects.length > 0) {
+      if (!activeEnemy) return; // Safety check
+
+      for (const skillEffect of finalSkill.effects) {
+        if (skillEffect.type === "charge") {
+          // This is a charge move!
+          const newActiveEffect: ActiveEffect = {
+            id: `charge_${Date.now()}`,
+            effectType: "charge",
+            turnsRemaining: skillEffect.duration,
+            // Copy all relevant data from the skill
+            damageMultiplier: skillEffect.damageMultiplier,
+            healingFlat: skillEffect.healingFlat,
+            healingAffinityRatio: skillEffect.healingAffinityRatio,
+            element: skillEffect.element,
+            // Store caster's stats and target
+            casterStats: {
+              attack: activeEnemy.attack,
+              affinity: activeEnemy.elementalAffinity,
+              level: activeEnemy.level,
+            },
+            targetIndex: targetIndex, // Store which player to hit (or self to heal)
+          };
+
+          // Apply the charging effect to the caster (the active enemy)
+          setBattleEnemies((prev) =>
+            prev.map((enemy, i) =>
+              i === activeEnemyIndex
+                ? (applyStatusEffect(enemy, newActiveEffect) as Enemy)
+                : enemy,
+            ),
+          );
+          addLog(`${activeEnemy.name} is gathering power!`);
+        }
+      }
+    }
+    // --- END FIX ---
 
     let damage = totalDamage;
     if (isBlocking) {
@@ -1242,9 +1537,11 @@ export function useBattleLogic({
         ? Math.max(0, activeEnemy.currentHealth - reflectedDamage)
         : activeEnemy.currentHealth;
 
-    playDamage();
-    setPlayerHealthBarShake(true);
-    setTimeout(() => setPlayerHealthBarShake(false), 500);
+    if (damage > 0) {
+      playDamage();
+      setPlayerHealthBarShake(true);
+      setTimeout(() => setPlayerHealthBarShake(false), 500);
+    }
 
     setPlayerSpirits((prev) => {
       const withDamage = prev.map((s, i) =>
@@ -1261,15 +1558,29 @@ export function useBattleLogic({
             }
           : s,
       );
-      const { updatedSpirits } = tickEffects(withDamage, activeEnemy);
-      const updatedTarget = updatedSpirits[targetIndex];
+
+      // --- FIX: Stale state bug fix ---
+      let spiritsToReturn = withDamage;
+      setBattleEnemies((currentEnemies) => {
+        const { updatedSpirits, updatedEnemies } = tickEffects(
+          withDamage,
+          currentEnemies,
+        );
+        // --- THIS WAS THE TYPO ---
+        spiritsToReturn = updatedSpirits;
+        // --- END TYPO FIX ---
+        return updatedEnemies;
+      });
+
+      const updatedTarget = spiritsToReturn[targetIndex];
       if (updatedTarget && updatedTarget.currentHealth <= 0) {
         setTimeout(
           () => checkDefeat(updatedTarget.currentHealth, targetIndex),
           0,
         );
       }
-      return updatedSpirits;
+      return spiritsToReturn;
+      // --- END FIX ---
     });
 
     if (reflectedDamage > 0 || attackerEffects.length > 0) {

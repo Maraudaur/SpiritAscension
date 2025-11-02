@@ -53,8 +53,7 @@
     "damage": 2.0,
     "healing": 0,
     "unlockLevel": 1,
-    "element": "none",
-    "effects": []
+    "element": "none"
   },
   "metal_strike": {
     "id": "metal_strike",
@@ -86,11 +85,19 @@
   "tidal_surge": {
     "id": "tidal_surge",
     "name": "Tidal Surge",
-    "description": "Channels for one turn and crashes a powerful wave on the enemy",
-    "damage": 2.1,
+    "description": "Channels for one turn and crashes a powerful wave on the enemy.",
+    "damage": 0,
     "healing": 0,
     "unlockLevel": 1,
-    "element": "water"
+    "element": "water",
+    "effects": [
+      {
+        "type": "charge",
+        "duration": 2,
+        "damageMultiplier": 2.1,
+        "element": "water"
+      }
+    ]
   },
   "water_charge": {
     "id": "water_charge",
@@ -111,6 +118,23 @@
         "type": "basic_attack_conversion",
         "element": "water",
         "duration": 3
+      }
+    ]
+  },
+  "ancestral_healing": {
+    "id": "ancestral_healing",
+    "name": "Ancestral Healing",
+    "description": "Gathers energy for one turn, then heals for 50 HP plus a bonus from Elemental Affinity.",
+    "damage": 0,
+    "healing": 0,
+    "unlockLevel": 2,
+    "element": "wood",
+    "effects": [
+      {
+        "type": "charge",
+        "duration": 2,
+        "healingFlat": 10,
+        "healingAffinityRatio": 0.5
       }
     ]
   }

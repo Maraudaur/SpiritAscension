@@ -60,7 +60,8 @@ export type CustomEffect =
   | DOTEffect
   | ThornsEffect
   | OneTimeShieldEffect
-  | BasicAttackConversionEffect;
+  | BasicAttackConversionEffect
+  | ChargeEffect;
 
 export interface PassiveStatBoost {
   type: "stat_boost";
@@ -80,7 +81,10 @@ export interface PassiveDOTAttacker {
   duration: number;
 }
 
-export type PassiveEffect = PassiveStatBoost | PassiveElementalLifesteal| PassiveDOTAttacker;
+export type PassiveEffect =
+  | PassiveStatBoost
+  | PassiveElementalLifesteal
+  | PassiveDOTAttacker;
 
 export type CombatTrigger =
   | "on_hit"
@@ -102,6 +106,26 @@ export interface ActiveEffect {
   damagePerTurn?: number;
   damageReturnRatio?: number;
   blocksFullHit?: boolean;
+  damageMultiplier?: number;
+  healingFlat?: number;
+  healingAffinityRatio?: number;
+  element?: SkillElementId;
+  targetIndex?: number; // The enemy index to hit
+  casterStats?: {
+    // Caster's stats at the moment of casting
+    attack: number;
+    affinity: number;
+    level: number;
+  };
+}
+
+export interface ChargeEffect {
+  type: "charge";
+  duration: number; // How many turns to charge
+  damageMultiplier?: number;
+  healingFlat?: number;
+  healingAffinityRatio?: number;
+  element?: SkillElementId;
 }
 
 export interface TriggeredAbility {

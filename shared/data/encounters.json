@@ -83,5 +83,31 @@
     "penalties": {
       "qiLoss": 500
     }
+  },
+  {
+    "id": "e004",
+    "name": "Poison Wall",
+    "averageLevel": 2,
+    "enemies": [
+      {
+        "spiritId": "spirit_c05",
+        "level": 2,
+        "ai": ["ancestral_healing"]
+      },
+      {
+        "spiritId": "spirit_c05",
+        "level": 2,
+        "ai": ["ancestral_healing"]
+      }
+    ],
+    "rewards": {
+      "qi": 800,
+      "essences": {
+        "spirit_c05": 6
+      }
+    },
+    "penalties": {
+      "qiLoss": 500
+    }
   }
 ]
