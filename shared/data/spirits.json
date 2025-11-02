@@ -73,7 +73,7 @@
         "elementalAffinity": 100
       },
       "passiveAbilities": ["poison_thorns"],
-      "skills": ["ancestral_healing"]
+      "skills": ["ancestral_healing","basic_attack"]
     },
     {
       "id": "spirit_c06",

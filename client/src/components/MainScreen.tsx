@@ -51,14 +51,32 @@ export function MainScreen({ onNavigate }: MainScreenProps) {
     ascend,
     getSpiritCost,
     getMultiSummonCost,
+    activeParty,
   } = useGameState();
   const { isMuted, toggleMute } = useAudio();
   const [displayQi, setDisplayQi] = useState(qi);
+  const [isClient, setIsClient] = useState(false);
+  useEffect(() => {
+    console.log(
+      "DEBUG (MainScreen): Component Mounted. Setting isClient to true.",
+    );
+    setIsClient(true);
+  }, []);
+
+  const canEnterBattle = isClient && activeParty && activeParty.length > 0;
 
   // 0 = hidden, 1 = first warning, 2 = final warning
   const [ascendConfirmStep, setAscendConfirmStep] = useState(0);
   const [showSummonRates, setShowSummonRates] = useState(false);
   const [summonRequest, setSummonRequest] = useState<number | null>(null);
+
+  // --- DEBUG: Log state on every render ---
+  console.log("--- MainScreen Render ---");
+  console.log("isClient:", isClient);
+  console.log("activeParty:", JSON.stringify(activeParty)); // Stringify to see the array contents
+  console.log("canEnterBattle:", canEnterBattle);
+  console.log("-------------------------");
+  // --- END DEBUG ---
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -450,11 +468,21 @@ export function MainScreen({ onNavigate }: MainScreenProps) {
           </Button>
 
           <Button
-            onClick={() => onNavigate("battle")}
+            onClick={() => {
+              if (canEnterBattle) {
+                onNavigate("battle");
+              } else {
+                alert(
+                  "You must have at least one spirit in your active party to enter battle.",
+                );
+              }
+            }}
+            disabled={!canEnterBattle}
             className="p-6 flex flex-col items-center gap-2"
             style={{
               background: "var(--vermillion)",
               color: "var(--parchment)",
+              opacity: canEnterBattle ? 1 : 0.5, // <-- Add visual feedback
             }}
           >
             <Swords className="w-8 h-8" />
@@ -464,11 +492,21 @@ export function MainScreen({ onNavigate }: MainScreenProps) {
 
         {/* Boss Button */}
         <Button
-          onClick={() => onNavigate("boss")}
+          onClick={() => {
+            if (canEnterBattle) {
+              onNavigate("boss");
+            } else {
+              alert(
+                "You must have at least one spirit in your active party to challenge the boss.",
+              );
+            }
+          }}
+          disabled={!canEnterBattle}
           className="w-full p-6 flex flex-col items-center gap-2"
           style={{
             background: "linear-gradient(135deg, #8B0000 0%, #FF4500 100%)",
             color: "var(--parchment)",
+            opacity: canEnterBattle ? 1 : 0.5, // <-- Add visual feedback
           }}
         >
           <Swords className="w-10 h-10" />

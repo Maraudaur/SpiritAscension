@@ -97,7 +97,7 @@
       {
         "spiritId": "spirit_c05",
         "level": 2,
-        "ai": ["ancestral_healing"]
+        "ai": ["ancestral_healing", "basic_attack"]
       }
     ],
     "rewards": {

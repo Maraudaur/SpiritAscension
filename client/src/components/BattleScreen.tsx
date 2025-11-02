@@ -1,4 +1,10 @@
-import { getBaseSpirit, getElement, getLineage, getRarityColor } from "@/lib/spiritUtils";
+import { useState, useEffect } from "react"; // <-- ADDED useState, useEffect
+import {
+  getBaseSpirit,
+  getElement,
+  getLineage,
+  getRarityColor,
+} from "@/lib/spiritUtils";
 import { Button } from "@/components/ui/button";
 import {
   X,
@@ -8,10 +14,50 @@ import {
   Shield,
   Volume2,
   VolumeX,
+  Loader2, // <-- Added a loading icon
 } from "lucide-react";
 import { motion } from "framer-motion";
 import type { BattleScreenProps } from "@/lib/battle-types";
 import { useBattleLogic } from "@/lib/hooks/useBattleLogic";
+
+// A simple loading component
+function BattleLoadingScreen({
+  onClose,
+  isMuted,
+  toggleMute,
+}: {
+  onClose: () => void;
+  isMuted: boolean;
+  toggleMute: () => void;
+}) {
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center p-4 z-50">
+      <div className="parchment-bg chinese-border max-w-md w-full p-8 rounded-lg relative">
+        <Button
+          variant="outline"
+          size="icon"
+          onClick={toggleMute}
+          title={isMuted ? "Unmute Sound" : "Mute Sound"}
+          className="absolute top-4 left-4 bg-white/90 backdrop-blur-sm"
+        >
+          {isMuted ? <VolumeX size={18} /> : <Volume2 size={18} />}
+        </Button>
+        <button
+          onClick={onClose}
+          className="absolute top-4 right-4 parchment-text hover:opacity-70"
+        >
+          <X className="w-6 h-6" />
+        </button>
+        <div className="flex flex-col items-center justify-center min-h-[150px]">
+          <Loader2 className="w-12 h-12 parchment-text animate-spin" />
+          <p className="parchment-text text-lg font-semibold mt-4">
+            Loading Battle...
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export function BattleScreen({
   onClose,
@@ -19,15 +65,21 @@ export function BattleScreen({
 }: BattleScreenProps) {
   // Use the battle logic hook instead of managing state internally
   const logic = useBattleLogic({ onClose, isBossBattle });
-  
+
+  // --- ADD THIS FIX ---
+  const [isClient, setIsClient] = useState(false);
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+  // --- END FIX ---
+
   // Destructure all needed values from the hook
   const {
     battleState,
     activePartySlot,
+    activeParty,
     battleLog,
     playerSpirits,
-    battleEnemies,
-    activeEnemyIndex,
     activeEnemy,
     battleRewards,
     actionMenu,
@@ -35,13 +87,10 @@ export function BattleScreen({
     playerHealthBarShake,
     enemyHealthBarShake,
     playerHealthBarHeal,
-    bossState,
-    currentEncounter,
     activeSpirit,
     activeBaseSpirit,
     activeStats,
     availableSkills,
-    canStartBattle,
     setActionMenu,
     playButtonClick,
     playButtonHover,
@@ -51,12 +100,25 @@ export function BattleScreen({
     handleSwap,
     handleBlock,
     handleSkillSelect,
-    handleContinueBattle,
     handleClose,
   } = logic;
 
-  // Check if no spirits in party - this is handled by the hook
-  if (playerSpirits.length === 0) {
+  // --- ADD THIS LOADING CHECK ---
+  // Show a loading screen until the component has mounted and
+  // the useBattleLogic hook has had time to hydrate.
+  if (!isClient) {
+    return (
+      <BattleLoadingScreen
+        onClose={onClose}
+        isMuted={isMuted}
+        toggleMute={toggleMute}
+      />
+    );
+  }
+  // --- END LOADING CHECK ---
+
+  // Check if no spirits in party - this check now runs AFTER hydration
+  if (activeParty.length === 0) {
     return (
       <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center p-4 z-50">
         <div className="parchment-bg chinese-border max-w-md w-full p-8 rounded-lg relative">
