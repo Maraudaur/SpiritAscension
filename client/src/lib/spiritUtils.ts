@@ -142,7 +142,7 @@ export function calculateStat(
 ): number {
   const potentialBonus = POTENTIAL_BONUSES[potential];
   const baseWithPotential = baseStat * (1 + potentialBonus);
-  return Math.floor(baseWithPotential * (1 + (level - 1) * 0.02));
+  return Math.floor(baseWithPotential * (level * 0.02));
 }
 
 export function calculateAllStats(playerSpirit: PlayerSpirit) {
