@@ -12,7 +12,7 @@
         "health": 180,
         "elementalAffinity": 60
       },
-      "passiveAbility": "health",
+      "passiveAbilities": ["health_focus"],
       "skills": ["basic_attack", "heavy_hit", "hit_and_heal"]
     },
     {
@@ -27,7 +27,7 @@
         "health": 160,
         "elementalAffinity": 60
       },
-      "passiveAbility": "defense",
+      "passiveAbilities": ["defense_focus"],
       "skills": ["basic_attack", "heavy_hit", "hit_and_heal"]
     },
     {
@@ -42,7 +42,7 @@
         "health": 140,
         "elementalAffinity": 100
       },
-      "passiveAbility": "attack",
+      "passiveAbilities": ["attack_focus"],
       "skills": ["basic_attack", "heavy_hit", "hit_and_heal"]
     },
     {
@@ -57,7 +57,7 @@
         "health": 150,
         "elementalAffinity": 100
       },
-      "passiveAbility": "health",
+      "passiveAbilities": ["health_focus"],
       "skills": ["basic_attack", "heavy_hit", "hit_and_heal"]
     },
     {
@@ -72,7 +72,7 @@
         "health": 140,
         "elementalAffinity": 80
       },
-      "passiveAbility": "defense",
+      "passiveAbilities": ["defense_focus"],
       "skills": ["basic_attack", "heavy_hit", "hit_and_heal"]
     },
     {
@@ -87,7 +87,7 @@
         "health": 150,
         "elementalAffinity": 90
       },
-      "passiveAbility": "attack",
+      "passiveAbilities": ["attack_focus"],
       "skills": ["basic_attack", "heavy_hit", "hit_and_heal"]
     },
     {
@@ -102,7 +102,7 @@
         "health": 170,
         "elementalAffinity": 60
       },
-      "passiveAbility": "defense",
+      "passiveAbilities": ["defense_focus"],
       "skills": ["basic_attack", "heavy_hit", "hit_and_heal"]
     },
     {
@@ -117,7 +117,7 @@
         "health": 130,
         "elementalAffinity": 110
       },
-      "passiveAbility": "attack",
+      "passiveAbilities": ["attack_focus"],
       "skills": ["basic_attack", "heavy_hit", "hit_and_heal"]
     },
     {
@@ -132,7 +132,7 @@
         "health": 150,
         "elementalAffinity": 70
       },
-      "passiveAbility": "defense",
+      "passiveAbilities": ["defense_focus"],
       "skills": ["basic_attack", "heavy_hit", "hit_and_heal"]
     },
     {
@@ -147,7 +147,7 @@
         "health": 130,
         "elementalAffinity": 110
       },
-      "passiveAbility": "attack",
+      "passiveAbilities": ["attack_focus"],
       "skills": ["basic_attack", "heavy_hit", "hit_and_heal"]
     },
     {
@@ -162,7 +162,7 @@
         "health": 140,
         "elementalAffinity": 100
       },
-      "passiveAbility": "health",
+      "passiveAbilities": ["health_focus"],
       "skills": ["basic_attack", "heavy_hit", "hit_and_heal"]
     },
     {
@@ -177,7 +177,7 @@
         "health": 130,
         "elementalAffinity": 100
       },
-      "passiveAbility": "attack",
+      "passiveAbilities": ["attack_focus"],
       "skills": ["basic_attack", "heavy_hit", "hit_and_heal"]
     },
     {
@@ -192,7 +192,7 @@
         "health": 140,
         "elementalAffinity": 90
       },
-      "passiveAbility": "attack",
+      "passiveAbilities": ["attack_focus"],
       "skills": ["basic_attack", "heavy_hit", "hit_and_heal"]
     },
     {
@@ -207,7 +207,7 @@
         "health": 140,
         "elementalAffinity": 110
       },
-      "passiveAbility": "health",
+      "passiveAbilities": ["health_focus"],
       "skills": ["basic_attack", "heavy_hit", "hit_and_heal"]
     },
     {
@@ -222,7 +222,7 @@
         "health": 120,
         "elementalAffinity": 110
       },
-      "passiveAbility": "attack",
+      "passiveAbilities": ["attack_focus"],
       "skills": ["basic_attack", "heavy_hit", "hit_and_heal"]
     },
     {
@@ -237,7 +237,7 @@
         "health": 170,
         "elementalAffinity": 70
       },
-      "passiveAbility": "health",
+      "passiveAbilities": ["health_focus"],
       "skills": ["basic_attack", "heavy_hit", "hit_and_heal"]
     },
     {
@@ -252,7 +252,7 @@
         "health": 140,
         "elementalAffinity": 110
       },
-      "passiveAbility": "attack",
+      "passiveAbilities": ["attack_focus"],
       "skills": ["basic_attack", "heavy_hit", "hit_and_heal"]
     },
     {
@@ -267,7 +267,7 @@
         "health": 130,
         "elementalAffinity": 110
       },
-      "passiveAbility": "attack",
+      "passiveAbilities": ["attack_focus"],
       "skills": ["basic_attack", "heavy_hit", "hit_and_heal"]
     },
     {
@@ -282,7 +282,7 @@
         "health": 140,
         "elementalAffinity": 100
       },
-      "passiveAbility": "health",
+      "passiveAbilities": ["health_focus"],
       "skills": ["basic_attack", "heavy_hit", "hit_and_heal"]
     },
     {
@@ -297,7 +297,7 @@
         "health": 120,
         "elementalAffinity": 120
       },
-      "passiveAbility": "attack",
+      "passiveAbilities": ["attack_focus"],
       "skills": ["basic_attack", "heavy_hit", "hit_and_heal"]
     }
   ],
@@ -314,7 +314,7 @@
         "health": 200,
         "elementalAffinity": 90
       },
-      "passiveAbility": "attack",
+      "passiveAbilities": ["attack_focus"],
       "skills": ["basic_attack", "heavy_hit", "hit_and_heal"]
     },
     {
@@ -329,7 +329,7 @@
         "health": 190,
         "elementalAffinity": 70
       },
-      "passiveAbility": "defense",
+      "passiveAbilities": ["defense_focus"],
       "skills": ["basic_attack", "heavy_hit", "hit_and_heal"]
     },
     {
@@ -344,7 +344,7 @@
         "health": 170,
         "elementalAffinity": 110
       },
-      "passiveAbility": "attack",
+      "passiveAbilities": ["attack_focus"],
       "skills": ["basic_attack", "heavy_hit", "hit_and_heal"]
     },
     {
@@ -359,7 +359,7 @@
         "health": 180,
         "elementalAffinity": 110
       },
-      "passiveAbility": "health",
+      "passiveAbilities": ["health_focus"],
       "skills": ["basic_attack", "heavy_hit", "hit_and_heal"]
     },
     {
@@ -374,7 +374,7 @@
         "health": 160,
         "elementalAffinity": 110
       },
-      "passiveAbility": "attack",
+      "passiveAbilities": ["attack_focus"],
       "skills": ["basic_attack", "heavy_hit", "hit_and_heal"]
     },
     {
@@ -389,7 +389,7 @@
         "health": 180,
         "elementalAffinity": 100
       },
-      "passiveAbility": "attack",
+      "passiveAbilities": ["attack_focus"],
       "skills": ["basic_attack", "heavy_hit", "hit_and_heal"]
     },
     {
@@ -404,7 +404,7 @@
         "health": 180,
         "elementalAffinity": 60
       },
-      "passiveAbility": "defense",
+      "passiveAbilities": ["defense_focus"],
       "skills": ["basic_attack", "heavy_hit", "hit_and_heal"]
     },
     {
@@ -419,7 +419,7 @@
         "health": 160,
         "elementalAffinity": 120
       },
-      "passiveAbility": "attack",
+      "passiveAbilities": ["attack_focus"],
       "skills": ["basic_attack", "heavy_hit", "hit_and_heal"]
     },
     {
@@ -434,7 +434,7 @@
         "health": 190,
         "elementalAffinity": 100
       },
-      "passiveAbility": "health",
+      "passiveAbilities": ["health_focus"],
       "skills": ["basic_attack", "heavy_hit", "hit_and_heal"]
     },
     {
@@ -449,7 +449,7 @@
         "health": 170,
         "elementalAffinity": 90
       },
-      "passiveAbility": "defense",
+      "passiveAbilities": ["defense_focus"],
       "skills": ["basic_attack", "heavy_hit", "hit_and_heal"]
     }
   ],
@@ -466,7 +466,7 @@
         "health": 230,
         "elementalAffinity": 100
       },
-      "passiveAbility": "health",
+      "passiveAbilities": ["health_focus"],
       "skills": ["basic_attack", "heavy_hit", "hit_and_heal"]
     },
     {
@@ -481,7 +481,7 @@
         "health": 210,
         "elementalAffinity": 80
       },
-      "passiveAbility": "defense",
+      "passiveAbilities": ["defense_focus"],
       "skills": ["basic_attack", "heavy_hit", "hit_and_heal"]
     },
     {
@@ -496,7 +496,7 @@
         "health": 200,
         "elementalAffinity": 110
       },
-      "passiveAbility": "attack",
+      "passiveAbilities": ["attack_focus"],
       "skills": ["basic_attack", "heavy_hit", "hit_and_heal"]
     },
     {
@@ -511,7 +511,7 @@
         "health": 220,
         "elementalAffinity": 110
       },
-      "passiveAbility": "health",
+      "passiveAbilities": ["health_focus"],
       "skills": ["basic_attack", "heavy_hit", "hit_and_heal"]
     },
     {
@@ -526,7 +526,7 @@
         "health": 190,
         "elementalAffinity": 110
       },
-      "passiveAbility": "attack",
+      "passiveAbilities": ["attack_focus"],
       "skills": ["basic_attack", "heavy_hit", "hit_and_heal"]
     },
     {
@@ -541,7 +541,7 @@
         "health": 230,
         "elementalAffinity": 90
       },
-      "passiveAbility": "health",
+      "passiveAbilities": ["health_focus"],
       "skills": ["basic_attack", "heavy_hit", "hit_and_heal"]
     },
     {
@@ -556,7 +556,7 @@
         "health": 220,
         "elementalAffinity": 70
       },
-      "passiveAbility": "defense",
+      "passiveAbilities": ["defense_focus"],
       "skills": ["basic_attack", "heavy_hit", "hit_and_heal"]
     },
     {
@@ -571,7 +571,7 @@
         "health": 200,
         "elementalAffinity": 110
       },
-      "passiveAbility": "attack",
+      "passiveAbilities": ["attack_focus"],
       "skills": ["basic_attack", "heavy_hit", "hit_and_heal"]
     },
     {
@@ -586,7 +586,7 @@
         "health": 210,
         "elementalAffinity": 120
       },
-      "passiveAbilities": ["health_focus", "healing_waters"]
+      "passiveAbilities": ["health_focus", "healing_waters"],
       "skills": ["bubble_barrier", "tidal_surge", "water_charge"]
     },
     {
@@ -601,7 +601,7 @@
         "health": 200,
         "elementalAffinity": 110
       },
-      "passiveAbility": "attack",
+      "passiveAbilities": ["attack_focus"],
       "skills": ["basic_attack", "heavy_hit", "hit_and_heal"]
     }
   ],
@@ -618,7 +618,7 @@
         "health": 260,
         "elementalAffinity": 100
       },
-      "passiveAbility": "health",
+      "passiveAbilities": ["health_focus"],
       "skills": ["basic_attack", "heavy_hit", "hit_and_heal"]
     },
     {
@@ -633,7 +633,7 @@
         "health": 240,
         "elementalAffinity": 80
       },
-      "passiveAbility": "defense",
+      "passiveAbilities": ["defense_focus"],
       "skills": ["basic_attack", "heavy_hit", "hit_and_heal"]
     },
     {
@@ -648,7 +648,7 @@
         "health": 240,
         "elementalAffinity": 100
       },
-      "passiveAbility": "attack",
+      "passiveAbilities": ["attack_focus"],
       "skills": ["basic_attack", "heavy_hit", "hit_and_heal"]
     },
     {
@@ -663,7 +663,7 @@
         "health": 260,
         "elementalAffinity": 100
       },
-      "passiveAbility": "health",
+      "passiveAbilities": ["health_focus"],
       "skills": ["basic_attack", "heavy_hit", "hit_and_heal"]
     },
     {
@@ -678,7 +678,7 @@
         "health": 220,
         "elementalAffinity": 100
       },
-      "passiveAbility": "attack",
+      "passiveAbilities": ["attack_focus"],
       "skills": ["basic_attack", "heavy_hit", "hit_and_heal"]
     },
     {
@@ -693,7 +693,7 @@
         "health": 260,
         "elementalAffinity": 100
       },
-      "passiveAbility": "health",
+      "passiveAbilities": ["health_focus"],
       "skills": ["basic_attack", "heavy_hit", "hit_and_heal"]
     },
     {
@@ -708,7 +708,7 @@
         "health": 250,
         "elementalAffinity": 70
       },
-      "passiveAbility": "defense",
+      "passiveAbilities": ["defense_focus"],
       "skills": ["basic_attack", "heavy_hit", "hit_and_heal"]
     },
     {
@@ -723,7 +723,7 @@
         "health": 240,
         "elementalAffinity": 100
       },
-      "passiveAbility": "attack",
+      "passiveAbilities": ["attack_focus"],
       "skills": ["basic_attack", "heavy_hit", "hit_and_heal"]
     },
     {
@@ -738,7 +738,7 @@
         "health": 260,
         "elementalAffinity": 100
       },
-      "passiveAbility": "health",
+      "passiveAbilities": ["health_focus"],
       "skills": ["basic_attack", "heavy_hit", "hit_and_heal"]
     },
     {
@@ -753,7 +753,7 @@
         "health": 230,
         "elementalAffinity": 100
       },
-      "passiveAbility": "attack",
+      "passiveAbilities": ["attack_focus"],
       "skills": ["basic_attack", "heavy_hit", "hit_and_heal"]
     }
   ],
@@ -770,7 +770,7 @@
         "health": 300,
         "elementalAffinity": 100
       },
-      "passiveAbility": "health",
+      "passiveAbilities": ["health_focus"],
       "skills": ["basic_attack", "heavy_hit", "hit_and_heal"]
     },
     {
@@ -785,7 +785,7 @@
         "health": 280,
         "elementalAffinity": 80
       },
-      "passiveAbility": "defense",
+      "passiveAbilities": ["defense_focus"],
       "skills": ["basic_attack", "heavy_hit", "hit_and_heal"]
     },
     {
@@ -800,7 +800,7 @@
         "health": 280,
         "elementalAffinity": 100
       },
-      "passiveAbility": "attack",
+      "passiveAbilities": ["attack_focus"],
       "skills": ["basic_attack", "heavy_hit", "hit_and_heal"]
     },
     {
@@ -815,7 +815,7 @@
         "health": 300,
         "elementalAffinity": 100
       },
-      "passiveAbility": "health",
+      "passiveAbilities": ["health_focus"],
       "skills": ["basic_attack", "heavy_hit", "hit_and_heal"]
     },
     {
@@ -830,7 +830,7 @@
         "health": 260,
         "elementalAffinity": 100
       },
-      "passiveAbility": "attack",
+      "passiveAbilities": ["attack_focus"],
       "skills": ["basic_attack", "heavy_hit", "hit_and_heal"]
     }
   ],
@@ -847,7 +847,7 @@
         "health": 1000,
         "elementalAffinity": 50
       },
-      "passiveAbility": "health",
+      "passiveAbilities": ["health_focus"],
       "skills": ["basic_attack", "atk_buff", "charged_hit"]
     }
   ]

@@ -74,7 +74,13 @@ export interface PassiveElementalLifesteal {
   ratio: number; // 0.3 for 30%
 }
 
-export type PassiveEffect = PassiveStatBoost | PassiveElementalLifesteal;
+export interface PassiveDOTAttacker {
+  type: "dot_attacker";
+  damageRatio: number; // 0.125 for 12.5%
+  duration: number;
+}
+
+export type PassiveEffect = PassiveStatBoost | PassiveElementalLifesteal| PassiveDOTAttacker;
 
 export type CombatTrigger =
   | "on_hit"

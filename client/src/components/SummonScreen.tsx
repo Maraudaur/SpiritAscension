@@ -174,10 +174,8 @@ export function SummonScreen({ onClose, summonCount = 0 }: SummonScreenProps) {
   const element = baseSpirit ? getElement(baseSpirit.element) : null;
   const lineage = baseSpirit ? getLineage(baseSpirit.lineage) : null;
   const stats = summonedSpirit ? calculateAllStats(summonedSpirit) : null;
-  const passive =
-    baseSpirit && baseSpirit.passiveAbility
-      ? getPassiveAbility(baseSpirit.passiveAbility)
-      : null;
+  const passiveId = baseSpirit?.passiveAbilities?.[0];
+  const passive = passiveId ? getPassiveAbility(passiveId) : null;
   const rarityColor = baseSpirit
     ? RARITY_GLOW_COLORS[baseSpirit.rarity]
     : "#FFF";

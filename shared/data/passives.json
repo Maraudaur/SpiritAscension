@@ -32,5 +32,17 @@
     "effects": [
       { "type": "elemental_lifesteal", "element": "fire", "ratio": 0.3 }
     ]
+  },
+  "poison_thorns": {
+    "id": "poison_thorns",
+    "name": "Poison Thorns",
+    "description": "Attackers that damage this spirit become poisoned for 5 turns.",
+    "effects": [
+      {
+        "type": "dot_attacker",
+        "damageRatio": 0.125,
+        "duration": 5
+      }
+    ]
   }
 }

@@ -1,11 +1,29 @@
-import { useState, useEffect } from 'react';
-import { useGameState } from '@/lib/stores/useGameState';
-import { useAudio } from '@/lib/stores/useAudio';
-import { getBaseSpirit, getElement, getLineage, getRarityColor, getPotentialColor, calculateAllStats, getAvailableSkills } from '@/lib/spiritUtils';
-import { Button } from '@/components/ui/button';
-import { X, Plus, Trash2, ArrowUp, Sparkles, TrendingUp, Volume2, VolumeX } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
-import type { PlayerSpirit } from '@shared/types';
+import { useState, useEffect } from "react";
+import { useGameState } from "@/lib/stores/useGameState";
+import { useAudio } from "@/lib/stores/useAudio";
+import {
+  getBaseSpirit,
+  getElement,
+  getLineage,
+  getRarityColor,
+  getPotentialColor,
+  calculateAllStats,
+  getAvailableSkills,
+  getPassiveAbility,
+} from "@/lib/spiritUtils";
+import { Button } from "@/components/ui/button";
+import {
+  X,
+  Plus,
+  Trash2,
+  ArrowUp,
+  Sparkles,
+  TrendingUp,
+  Volume2,
+  VolumeX,
+} from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import type { PlayerSpirit } from "@shared/types";
 
 interface SpiritManagerProps {
   onClose: () => void;
@@ -19,9 +37,21 @@ interface StatComparison {
 }
 
 export function SpiritManager({ onClose }: SpiritManagerProps) {
-  const { spirits, activeParty, qi, addToParty, removeFromParty, levelUpSpirit, harmonizeSpirit, getEssenceCount, getLevelUpCost } = useGameState();
+  const {
+    spirits,
+    activeParty,
+    qi,
+    addToParty,
+    removeFromParty,
+    levelUpSpirit,
+    harmonizeSpirit,
+    getEssenceCount,
+    getLevelUpCost,
+  } = useGameState();
   const { isMuted, toggleMute } = useAudio();
-  const [selectedSpirit, setSelectedSpirit] = useState<PlayerSpirit | null>(null);
+  const [selectedSpirit, setSelectedSpirit] = useState<PlayerSpirit | null>(
+    null,
+  );
   const [showHarmonizeConfirm, setShowHarmonizeConfirm] = useState(false);
   const [levelUpAnimation, setLevelUpAnimation] = useState<{
     spirit: PlayerSpirit;
@@ -29,7 +59,9 @@ export function SpiritManager({ onClose }: SpiritManagerProps) {
     newLevel: number;
     stats: StatComparison;
   } | null>(null);
-  const [audioElement, setAudioElement] = useState<HTMLAudioElement | null>(null);
+  const [audioElement, setAudioElement] = useState<HTMLAudioElement | null>(
+    null,
+  );
 
   useEffect(() => {
     return () => {
@@ -49,7 +81,7 @@ export function SpiritManager({ onClose }: SpiritManagerProps) {
   };
 
   const handleLevelUp = (instanceId: string) => {
-    const spirit = spirits.find(s => s.instanceId === instanceId);
+    const spirit = spirits.find((s) => s.instanceId === instanceId);
     if (!spirit) return;
 
     // Calculate old stats
@@ -69,7 +101,10 @@ export function SpiritManager({ onClose }: SpiritManagerProps) {
       attack: { old: oldStats.attack, new: newStats.attack },
       defense: { old: oldStats.defense, new: newStats.defense },
       health: { old: oldStats.health, new: newStats.health },
-      elementalAffinity: { old: oldStats.elementalAffinity, new: newStats.elementalAffinity },
+      elementalAffinity: {
+        old: oldStats.elementalAffinity,
+        new: newStats.elementalAffinity,
+      },
     };
 
     // Show animation
@@ -81,7 +116,7 @@ export function SpiritManager({ onClose }: SpiritManagerProps) {
     });
 
     // Play sound effect
-    const audio = new Audio('/sounds/success.mp3');
+    const audio = new Audio("/sounds/success.mp3");
     audio.volume = 0.6;
     audio.play();
     setAudioElement(audio);
@@ -90,7 +125,9 @@ export function SpiritManager({ onClose }: SpiritManagerProps) {
   const closeLevelUpAnimation = () => {
     // Update selected spirit to reflect the new stats
     if (levelUpAnimation) {
-      const updatedSpirit = spirits.find(s => s.instanceId === levelUpAnimation.spirit.instanceId);
+      const updatedSpirit = spirits.find(
+        (s) => s.instanceId === levelUpAnimation.spirit.instanceId,
+      );
       if (updatedSpirit) {
         setSelectedSpirit(updatedSpirit);
       }
@@ -116,7 +153,7 @@ export function SpiritManager({ onClose }: SpiritManagerProps) {
         >
           {isMuted ? <VolumeX size={18} /> : <Volume2 size={18} />}
         </Button>
-        
+
         <button
           onClick={onClose}
           className="absolute top-4 right-4 parchment-text hover:opacity-70 z-10"
@@ -129,21 +166,29 @@ export function SpiritManager({ onClose }: SpiritManagerProps) {
         </h2>
 
         <div className="mb-4 p-4 bg-amber-50 rounded border-2 border-amber-700">
-          <h3 className="font-bold parchment-text mb-2">Active Battle Party ({activeParty.length}/4)</h3>
+          <h3 className="font-bold parchment-text mb-2">
+            Active Battle Party ({activeParty.length}/4)
+          </h3>
           <div className="grid grid-cols-2 gap-3">
             {[0, 1, 2, 3].map((index) => {
               const spiritInstanceId = activeParty[index];
-              const spirit = spirits.find(s => s.instanceId === spiritInstanceId);
+              const spirit = spirits.find(
+                (s) => s.instanceId === spiritInstanceId,
+              );
               const baseSpirit = spirit ? getBaseSpirit(spirit.spiritId) : null;
-              const element = spirit && baseSpirit ? getElement(baseSpirit.element) : null;
-              const lineage = spirit && baseSpirit ? getLineage(baseSpirit.lineage) : null;
+              const element =
+                spirit && baseSpirit ? getElement(baseSpirit.element) : null;
+              const lineage =
+                spirit && baseSpirit ? getLineage(baseSpirit.lineage) : null;
               const stats = spirit ? calculateAllStats(spirit) : null;
 
               return (
                 <div
                   key={index}
                   className={`p-3 rounded border-2 ${
-                    spirit ? 'border-vermillion bg-white' : 'border-dashed border-gray-400 bg-gray-100'
+                    spirit
+                      ? "border-vermillion bg-white"
+                      : "border-dashed border-gray-400 bg-gray-100"
                   } min-h-[120px] flex gap-3`}
                 >
                   {spirit && baseSpirit && element && lineage && stats ? (
@@ -158,7 +203,9 @@ export function SpiritManager({ onClose }: SpiritManagerProps) {
                           <h4 className="font-bold parchment-text text-sm truncate flex-1">
                             {baseSpirit.name}
                           </h4>
-                          <span className="text-xs parchment-text ml-2">Lv. {spirit.level}</span>
+                          <span className="text-xs parchment-text ml-2">
+                            Lv. {spirit.level}
+                          </span>
                         </div>
                         <div className="flex justify-between items-center mb-2">
                           <span className={`text-xs element-${element.id}`}>
@@ -166,7 +213,10 @@ export function SpiritManager({ onClose }: SpiritManagerProps) {
                           </span>
                           <span
                             className="text-xs font-bold px-1.5 py-0.5 rounded ml-1 flex-shrink-0"
-                            style={{ background: getRarityColor(baseSpirit.rarity), color: 'white' }}
+                            style={{
+                              background: getRarityColor(baseSpirit.rarity),
+                              color: "white",
+                            }}
                           >
                             {baseSpirit.rarity[0].toUpperCase()}
                           </span>
@@ -174,11 +224,13 @@ export function SpiritManager({ onClose }: SpiritManagerProps) {
                         <div className="w-full bg-gray-300 rounded-full h-3 mb-2">
                           <div
                             className="bg-green-600 h-3 rounded-full"
-                            style={{ width: '100%' }}
+                            style={{ width: "100%" }}
                           />
                         </div>
                         <button
-                          onClick={() => handleRemoveFromParty(spirit.instanceId)}
+                          onClick={() =>
+                            handleRemoveFromParty(spirit.instanceId)
+                          }
                           className="w-full p-1 bg-blue-600 text-white rounded text-xs font-semibold hover:bg-blue-700 flex items-center justify-center gap-1"
                         >
                           <Trash2 className="w-3 h-3" />
@@ -187,7 +239,9 @@ export function SpiritManager({ onClose }: SpiritManagerProps) {
                       </div>
                     </>
                   ) : (
-                    <p className="text-xs parchment-text opacity-50 m-auto">Empty Slot</p>
+                    <p className="text-xs parchment-text opacity-50 m-auto">
+                      Empty Slot
+                    </p>
                   )}
                 </div>
               );
@@ -215,11 +269,15 @@ export function SpiritManager({ onClose }: SpiritManagerProps) {
                     key={spirit.instanceId}
                     onClick={() => setSelectedSpirit(spirit)}
                     className={`p-3 rounded-lg cursor-pointer spirit-card ${
-                      spirit.isPrismatic ? 'prismatic-border' : 'border-2 border-amber-700'
+                      spirit.isPrismatic
+                        ? "prismatic-border"
+                        : "border-2 border-amber-700"
                     } ${
-                      selectedSpirit?.instanceId === spirit.instanceId ? 'ring-2 ring-blue-500' : ''
+                      selectedSpirit?.instanceId === spirit.instanceId
+                        ? "ring-2 ring-blue-500"
+                        : ""
                     } flex gap-3`}
-                    style={{ background: 'var(--parchment)' }}
+                    style={{ background: "var(--parchment)" }}
                   >
                     <img
                       src="/icons/placeholdericon.png"
@@ -231,7 +289,9 @@ export function SpiritManager({ onClose }: SpiritManagerProps) {
                         <h4 className="font-bold parchment-text text-sm truncate flex-1">
                           {baseSpirit.name}
                         </h4>
-                        <span className="text-xs parchment-text ml-2">Lv. {spirit.level}</span>
+                        <span className="text-xs parchment-text ml-2">
+                          Lv. {spirit.level}
+                        </span>
                       </div>
                       <div className="flex justify-between items-center mb-2">
                         <span className={`text-xs element-${element.id}`}>
@@ -239,7 +299,10 @@ export function SpiritManager({ onClose }: SpiritManagerProps) {
                         </span>
                         <span
                           className="text-xs font-bold px-1.5 py-0.5 rounded ml-1 flex-shrink-0"
-                          style={{ background: getRarityColor(baseSpirit.rarity), color: 'white' }}
+                          style={{
+                            background: getRarityColor(baseSpirit.rarity),
+                            color: "white",
+                          }}
                         >
                           {baseSpirit.rarity[0].toUpperCase()}
                         </span>
@@ -247,7 +310,7 @@ export function SpiritManager({ onClose }: SpiritManagerProps) {
                       <div className="w-full bg-gray-300 rounded-full h-3 mb-2">
                         <div
                           className="bg-green-600 h-3 rounded-full"
-                          style={{ width: '100%' }}
+                          style={{ width: "100%" }}
                         />
                       </div>
                       {!isInParty && activeParty.length < 4 && (
@@ -275,7 +338,9 @@ export function SpiritManager({ onClose }: SpiritManagerProps) {
             {spirits.length === 0 && (
               <div className="text-center py-12 parchment-text opacity-50">
                 <p>No spirits summoned yet</p>
-                <p className="text-sm mt-2">Summon spirits to build your collection</p>
+                <p className="text-sm mt-2">
+                  Summon spirits to build your collection
+                </p>
               </div>
             )}
           </div>
@@ -300,11 +365,16 @@ export function SpiritManager({ onClose }: SpiritManagerProps) {
                         className="w-20 h-20 object-contain flex-shrink-0"
                       />
                       <div className="flex-1">
-                        <h3 className="text-xl font-bold parchment-text mb-1">{baseSpirit.name}</h3>
+                        <h3 className="text-xl font-bold parchment-text mb-1">
+                          {baseSpirit.name}
+                        </h3>
                         <div className="flex gap-2">
                           <span
                             className="text-xs font-bold px-2 py-1 rounded"
-                            style={{ background: getRarityColor(baseSpirit.rarity), color: 'white' }}
+                            style={{
+                              background: getRarityColor(baseSpirit.rarity),
+                              color: "white",
+                            }}
                           >
                             {baseSpirit.rarity.toUpperCase()}
                           </span>
@@ -319,25 +389,37 @@ export function SpiritManager({ onClose }: SpiritManagerProps) {
 
                     <div className="space-y-3">
                       <div>
-                        <h4 className="font-bold parchment-text text-sm mb-1">Details</h4>
+                        <h4 className="font-bold parchment-text text-sm mb-1">
+                          Details
+                        </h4>
                         <div className="text-sm parchment-text space-y-1">
                           <div className="flex justify-between">
                             <span>Level:</span>
-                            <span className="font-semibold">{selectedSpirit.level}</span>
+                            <span className="font-semibold">
+                              {selectedSpirit.level}
+                            </span>
                           </div>
                           <div className="flex justify-between">
                             <span>Element:</span>
-                            <span className={`element-${element.id} font-semibold`}>{element.name}</span>
+                            <span
+                              className={`element-${element.id} font-semibold`}
+                            >
+                              {element.name}
+                            </span>
                           </div>
                           <div className="flex justify-between">
                             <span>Lineage:</span>
-                            <span className="font-semibold">{lineage.name}</span>
+                            <span className="font-semibold">
+                              {lineage.name}
+                            </span>
                           </div>
                         </div>
                       </div>
 
                       <div>
-                        <h4 className="font-bold parchment-text text-sm mb-1">Essence</h4>
+                        <h4 className="font-bold parchment-text text-sm mb-1">
+                          Essence
+                        </h4>
                         <div className="text-sm parchment-text space-y-1">
                           <div className="flex justify-between items-center">
                             <span>{baseSpirit.name} Essence:</span>
@@ -349,61 +431,118 @@ export function SpiritManager({ onClose }: SpiritManagerProps) {
                       </div>
 
                       <div>
-                        <h4 className="font-bold parchment-text text-sm mb-1">Combat Stats</h4>
+                        <h4 className="font-bold parchment-text text-sm mb-1">
+                          Combat Stats
+                        </h4>
                         <div className="text-sm parchment-text space-y-1">
                           <div className="flex justify-between">
                             <span>Attack:</span>
                             <span
                               className="font-semibold"
-                              style={{ color: getPotentialColor(selectedSpirit.potentialFactors.attack) }}
+                              style={{
+                                color: getPotentialColor(
+                                  selectedSpirit.potentialFactors.attack,
+                                ),
+                              }}
                             >
-                              {stats.attack} [{selectedSpirit.potentialFactors.attack}]
+                              {stats.attack} [
+                              {selectedSpirit.potentialFactors.attack}]
                             </span>
                           </div>
                           <div className="flex justify-between">
                             <span>Defense:</span>
                             <span
                               className="font-semibold"
-                              style={{ color: getPotentialColor(selectedSpirit.potentialFactors.defense) }}
+                              style={{
+                                color: getPotentialColor(
+                                  selectedSpirit.potentialFactors.defense,
+                                ),
+                              }}
                             >
-                              {stats.defense} [{selectedSpirit.potentialFactors.defense}]
+                              {stats.defense} [
+                              {selectedSpirit.potentialFactors.defense}]
                             </span>
                           </div>
                           <div className="flex justify-between">
                             <span>Health:</span>
                             <span
                               className="font-semibold"
-                              style={{ color: getPotentialColor(selectedSpirit.potentialFactors.health) }}
+                              style={{
+                                color: getPotentialColor(
+                                  selectedSpirit.potentialFactors.health,
+                                ),
+                              }}
                             >
-                              {stats.health} [{selectedSpirit.potentialFactors.health}]
+                              {stats.health} [
+                              {selectedSpirit.potentialFactors.health}]
                             </span>
                           </div>
                           <div className="flex justify-between">
                             <span>Affinity:</span>
                             <span
                               className="font-semibold"
-                              style={{ color: getPotentialColor(selectedSpirit.potentialFactors.elementalAffinity) }}
+                              style={{
+                                color: getPotentialColor(
+                                  selectedSpirit.potentialFactors
+                                    .elementalAffinity,
+                                ),
+                              }}
                             >
-                              {stats.elementalAffinity} [{selectedSpirit.potentialFactors.elementalAffinity}]
+                              {stats.elementalAffinity} [
+                              {
+                                selectedSpirit.potentialFactors
+                                  .elementalAffinity
+                              }
+                              ]
                             </span>
                           </div>
                         </div>
                       </div>
 
                       <div>
-                        <h4 className="font-bold parchment-text text-sm mb-1">Passive Ability</h4>
-                        <p className="text-sm parchment-text">
-                          +10% {baseSpirit.passiveAbility.toUpperCase()}
-                        </p>
+                        <h4 className="font-bold parchment-text text-sm mb-1">
+                          Passive Abilities
+                        </h4>
+                        <div className="text-sm parchment-text space-y-1">
+                          {baseSpirit.passiveAbilities &&
+                          baseSpirit.passiveAbilities.length > 0 ? (
+                            baseSpirit.passiveAbilities.map((passiveId) => {
+                              const passive = getPassiveAbility(passiveId);
+                              return (
+                                <div key={passiveId}>
+                                  <p className="font-semibold">
+                                    {passive ? passive.name : "Unknown Passive"}
+                                  </p>
+                                  <p className="text-xs opacity-75">
+                                    {passive ? passive.description : ""}
+                                  </p>
+                                </div>
+                              );
+                            })
+                          ) : (
+                            <p className="text-sm parchment-text opacity-75">
+                              None
+                            </p>
+                          )}
+                        </div>
                       </div>
 
                       <div>
-                        <h4 className="font-bold parchment-text text-sm mb-1">Skills</h4>
+                        <h4 className="font-bold parchment-text text-sm mb-1">
+                          Skills
+                        </h4>
                         <div className="space-y-2">
                           {skills.map((skill) => (
-                            <div key={skill.id} className="p-2 bg-white rounded border border-amber-300">
-                              <p className="font-semibold parchment-text text-xs">{skill.name}</p>
-                              <p className="text-xs parchment-text opacity-75">{skill.description}</p>
+                            <div
+                              key={skill.id}
+                              className="p-2 bg-white rounded border border-amber-300"
+                            >
+                              <p className="font-semibold parchment-text text-xs">
+                                {skill.name}
+                              </p>
+                              <p className="text-xs parchment-text opacity-75">
+                                {skill.description}
+                              </p>
                             </div>
                           ))}
                         </div>
@@ -411,31 +550,54 @@ export function SpiritManager({ onClose }: SpiritManagerProps) {
 
                       <div className="space-y-2 pt-2 border-t-2 border-amber-300">
                         {(() => {
-                          const levelUpCost = getLevelUpCost(selectedSpirit.level);
+                          const levelUpCost = getLevelUpCost(
+                            selectedSpirit.level,
+                          );
                           const essenceCount = getEssenceCount(baseSpirit.id);
-                          const canLevelUp = qi >= levelUpCost.qi && essenceCount >= levelUpCost.essence;
-                          const harmonizeReward = 5 + (selectedSpirit.level * 2);
+                          const canLevelUp =
+                            qi >= levelUpCost.qi &&
+                            essenceCount >= levelUpCost.essence;
+                          const harmonizeReward = 5 + selectedSpirit.level * 2;
 
                           return (
                             <>
                               <button
-                                onClick={() => handleLevelUp(selectedSpirit.instanceId)}
+                                onClick={() =>
+                                  handleLevelUp(selectedSpirit.instanceId)
+                                }
                                 disabled={!canLevelUp}
                                 className={`w-full p-2 rounded font-semibold text-sm flex items-center justify-center gap-2 ${
                                   canLevelUp
-                                    ? 'bg-blue-600 text-white hover:bg-blue-700'
-                                    : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                                    ? "bg-blue-600 text-white hover:bg-blue-700"
+                                    : "bg-gray-300 text-gray-500 cursor-not-allowed"
                                 }`}
                               >
                                 <ArrowUp className="w-4 h-4" />
-                                Level Up (Lv.{selectedSpirit.level} → {selectedSpirit.level + 1})
+                                Level Up (Lv.{selectedSpirit.level} →{" "}
+                                {selectedSpirit.level + 1})
                               </button>
                               <div className="text-xs parchment-text text-center space-y-0.5">
-                                <div className={qi >= levelUpCost.qi ? 'text-green-700' : 'text-red-600'}>
-                                  Cost: {levelUpCost.qi} Qi {qi < levelUpCost.qi && '(Insufficient)'}
+                                <div
+                                  className={
+                                    qi >= levelUpCost.qi
+                                      ? "text-green-700"
+                                      : "text-red-600"
+                                  }
+                                >
+                                  Cost: {levelUpCost.qi} Qi{" "}
+                                  {qi < levelUpCost.qi && "(Insufficient)"}
                                 </div>
-                                <div className={essenceCount >= levelUpCost.essence ? 'text-green-700' : 'text-red-600'}>
-                                  Cost: {levelUpCost.essence} {baseSpirit.name} Essence {essenceCount < levelUpCost.essence && '(Insufficient)'}
+                                <div
+                                  className={
+                                    essenceCount >= levelUpCost.essence
+                                      ? "text-green-700"
+                                      : "text-red-600"
+                                  }
+                                >
+                                  Cost: {levelUpCost.essence} {baseSpirit.name}{" "}
+                                  Essence{" "}
+                                  {essenceCount < levelUpCost.essence &&
+                                    "(Insufficient)"}
                                 </div>
                               </div>
 
@@ -447,7 +609,8 @@ export function SpiritManager({ onClose }: SpiritManagerProps) {
                                 Harmonize Spirit
                               </button>
                               <div className="text-xs parchment-text text-center text-purple-700">
-                                Gain +{harmonizeReward} {baseSpirit.name} Essence
+                                Gain +{harmonizeReward} {baseSpirit.name}{" "}
+                                Essence
                               </div>
                             </>
                           );
@@ -464,13 +627,18 @@ export function SpiritManager({ onClose }: SpiritManagerProps) {
         {showHarmonizeConfirm && selectedSpirit && (
           <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center rounded-lg">
             <div className="parchment-bg chinese-border p-6 rounded-lg max-w-md">
-              <h3 className="text-xl font-bold parchment-text mb-4 text-center">Harmonize Spirit?</h3>
+              <h3 className="text-xl font-bold parchment-text mb-4 text-center">
+                Harmonize Spirit?
+              </h3>
               <p className="text-sm parchment-text mb-4 text-center">
-                This will permanently remove{' '}
-                <span className="font-bold">{getBaseSpirit(selectedSpirit.spiritId)?.name}</span> from your
-                collection and grant you{' '}
+                This will permanently remove{" "}
+                <span className="font-bold">
+                  {getBaseSpirit(selectedSpirit.spiritId)?.name}
+                </span>{" "}
+                from your collection and grant you{" "}
                 <span className="font-bold text-purple-700">
-                  {5 + (selectedSpirit.level * 2)} {getBaseSpirit(selectedSpirit.spiritId)?.name} Essence
+                  {5 + selectedSpirit.level * 2}{" "}
+                  {getBaseSpirit(selectedSpirit.spiritId)?.name} Essence
                 </span>
                 .
               </p>
@@ -514,27 +682,27 @@ export function SpiritManager({ onClose }: SpiritManagerProps) {
                   {[...Array(12)].map((_, i) => (
                     <motion.div
                       key={i}
-                      initial={{ 
-                        x: '50%', 
-                        y: '50%', 
+                      initial={{
+                        x: "50%",
+                        y: "50%",
                         scale: 0,
-                        opacity: 1 
+                        opacity: 1,
                       }}
-                      animate={{ 
+                      animate={{
                         x: `${50 + Math.cos((i / 12) * Math.PI * 2) * 200}%`,
                         y: `${50 + Math.sin((i / 12) * Math.PI * 2) * 200}%`,
                         scale: [0, 1, 0],
-                        opacity: [1, 1, 0]
+                        opacity: [1, 1, 0],
                       }}
-                      transition={{ 
+                      transition={{
                         duration: 1.5,
                         delay: i * 0.05,
-                        ease: "easeOut"
+                        ease: "easeOut",
                       }}
                       className="absolute w-3 h-3 bg-blue-500 rounded-full"
-                      style={{ 
-                        boxShadow: '0 0 10px 2px rgba(59, 130, 246, 0.5)',
-                        filter: 'blur(1px)'
+                      style={{
+                        boxShadow: "0 0 10px 2px rgba(59, 130, 246, 0.5)",
+                        filter: "blur(1px)",
                       }}
                     />
                   ))}
@@ -545,7 +713,7 @@ export function SpiritManager({ onClose }: SpiritManagerProps) {
                   initial={{ opacity: 0, scale: 0.5 }}
                   animate={{ opacity: 0.3, scale: 1 }}
                   className="absolute inset-0 bg-gradient-radial from-blue-400 via-transparent to-transparent"
-                  style={{ filter: 'blur(40px)' }}
+                  style={{ filter: "blur(40px)" }}
                 />
 
                 <div className="relative z-10">
@@ -568,7 +736,8 @@ export function SpiritManager({ onClose }: SpiritManagerProps) {
                       transition={{ delay: 0.3, duration: 0.5 }}
                       className="text-lg font-bold text-blue-700 mt-2"
                     >
-                      Lv.{levelUpAnimation.oldLevel} → Lv.{levelUpAnimation.newLevel}
+                      Lv.{levelUpAnimation.oldLevel} → Lv.
+                      {levelUpAnimation.newLevel}
                     </motion.p>
                   </motion.div>
 
@@ -579,44 +748,56 @@ export function SpiritManager({ onClose }: SpiritManagerProps) {
                     transition={{ delay: 0.4 }}
                     className="bg-amber-50 rounded-lg p-4 mb-6 border-2 border-amber-300"
                   >
-                    <h4 className="font-bold parchment-text text-center mb-3">Stat Changes</h4>
+                    <h4 className="font-bold parchment-text text-center mb-3">
+                      Stat Changes
+                    </h4>
                     <div className="space-y-2">
-                      {Object.entries(levelUpAnimation.stats).map(([stat, values], index) => {
-                        const increase = values.new - values.old;
-                        return (
-                          <motion.div
-                            key={stat}
-                            initial={{ x: -20, opacity: 0 }}
-                            animate={{ x: 0, opacity: 1 }}
-                            transition={{ delay: 0.5 + index * 0.1 }}
-                            className="flex justify-between items-center"
-                          >
-                            <span className="font-semibold parchment-text capitalize">
-                              {stat === 'elementalAffinity' ? 'Affinity' : stat}:
-                            </span>
-                            <div className="flex items-center gap-2">
-                              <span className="text-gray-600">{values.old}</span>
-                              <span className="text-gray-400">→</span>
-                              <motion.span
-                                initial={{ scale: 1 }}
-                                animate={{ scale: [1, 1.3, 1] }}
-                                transition={{ delay: 0.6 + index * 0.1, duration: 0.4 }}
-                                className="font-bold text-green-700"
-                              >
-                                {values.new}
-                              </motion.span>
-                              <motion.span
-                                initial={{ opacity: 0, y: 10 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ delay: 0.6 + index * 0.1 }}
-                                className="text-green-600 font-semibold text-sm"
-                              >
-                                +{increase}
-                              </motion.span>
-                            </div>
-                          </motion.div>
-                        );
-                      })}
+                      {Object.entries(levelUpAnimation.stats).map(
+                        ([stat, values], index) => {
+                          const increase = values.new - values.old;
+                          return (
+                            <motion.div
+                              key={stat}
+                              initial={{ x: -20, opacity: 0 }}
+                              animate={{ x: 0, opacity: 1 }}
+                              transition={{ delay: 0.5 + index * 0.1 }}
+                              className="flex justify-between items-center"
+                            >
+                              <span className="font-semibold parchment-text capitalize">
+                                {stat === "elementalAffinity"
+                                  ? "Affinity"
+                                  : stat}
+                                :
+                              </span>
+                              <div className="flex items-center gap-2">
+                                <span className="text-gray-600">
+                                  {values.old}
+                                </span>
+                                <span className="text-gray-400">→</span>
+                                <motion.span
+                                  initial={{ scale: 1 }}
+                                  animate={{ scale: [1, 1.3, 1] }}
+                                  transition={{
+                                    delay: 0.6 + index * 0.1,
+                                    duration: 0.4,
+                                  }}
+                                  className="font-bold text-green-700"
+                                >
+                                  {values.new}
+                                </motion.span>
+                                <motion.span
+                                  initial={{ opacity: 0, y: 10 }}
+                                  animate={{ opacity: 1, y: 0 }}
+                                  transition={{ delay: 0.6 + index * 0.1 }}
+                                  className="text-green-600 font-semibold text-sm"
+                                >
+                                  +{increase}
+                                </motion.span>
+                              </div>
+                            </motion.div>
+                          );
+                        },
+                      )}
                     </div>
                   </motion.div>
 
