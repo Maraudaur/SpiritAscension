@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react"; // <-- ADDED useState, useEffect
+import { useState, useEffect, useRef } from "react"; // <-- ADDED useState, useEffect
 import {
   getBaseSpirit,
   getElement,
@@ -66,12 +66,12 @@ export function BattleScreen({
   // Use the battle logic hook instead of managing state internally
   const logic = useBattleLogic({ onClose, isBossBattle });
 
-  // --- ADD THIS FIX ---
+  const logContainerRef = useRef<HTMLDivElement>(null);
+
   const [isClient, setIsClient] = useState(false);
   useEffect(() => {
     setIsClient(true);
   }, []);
-  // --- END FIX ---
 
   // Destructure all needed values from the hook
   const {
@@ -84,6 +84,7 @@ export function BattleScreen({
     battleRewards,
     actionMenu,
     isBlocking,
+    isPaused,
     playerHealthBarShake,
     enemyHealthBarShake,
     playerHealthBarHeal,
@@ -102,6 +103,13 @@ export function BattleScreen({
     handleSkillSelect,
     handleClose,
   } = logic;
+
+  // Scroll to bottom of log when it updates
+  useEffect(() => {
+    if (logContainerRef.current) {
+      logContainerRef.current.scrollTop = logContainerRef.current.scrollHeight;
+    }
+  }, [battleLog]); // This effect runs every time battleLog changes
 
   // --- ADD THIS LOADING CHECK ---
   // Show a loading screen until the component has mounted and
@@ -348,7 +356,10 @@ export function BattleScreen({
         </div>
 
         {/* Battle Log */}
-        <div className="flex-1 p-3 bg-amber-50 rounded border-2 border-amber-700 scroll-container mb-4 max-h-32">
+        <div
+          ref={logContainerRef} // <-- autoscroll
+          className="flex-1 p-3 bg-amber-50 rounded border-2 border-amber-700 scroll-container mb-4 max-h-64"
+        >
           <div className="space-y-1 text-xs parchment-text">
             {battleLog.map((log, index) => (
               <p key={index} className="opacity-75">
@@ -388,6 +399,7 @@ export function BattleScreen({
                     }}
                     onMouseEnter={playButtonHover}
                     className="p-4 bg-red-600 hover:bg-red-700 text-white rounded-lg font-bold flex flex-col items-center justify-center gap-2"
+                    disabled={isPaused}
                   >
                     <Swords className="w-6 h-6" />
                     <span>Attack</span>
@@ -399,6 +411,7 @@ export function BattleScreen({
                     }}
                     onMouseEnter={playButtonHover}
                     className="p-4 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-bold flex flex-col items-center justify-center gap-2"
+                    disabled={isPaused}
                   >
                     <Shield className="w-6 h-6" />
                     <span>Block</span>
@@ -410,6 +423,7 @@ export function BattleScreen({
                     }}
                     onMouseEnter={playButtonHover}
                     className="p-4 bg-purple-600 hover:bg-purple-700 text-white rounded-lg font-bold flex flex-col items-center justify-center gap-2"
+                    disabled={isPaused}
                   >
                     <Swords className="w-6 h-6" />
                     <span>Skills</span>
@@ -421,6 +435,7 @@ export function BattleScreen({
                     }}
                     onMouseEnter={playButtonHover}
                     className="p-4 bg-green-600 hover:bg-green-700 text-white rounded-lg font-bold flex flex-col items-center justify-center gap-2"
+                    disabled={isPaused}
                   >
                     <ArrowLeftRight className="w-6 h-6" />
                     <span>Swap</span>

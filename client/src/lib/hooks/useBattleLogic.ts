@@ -89,6 +89,8 @@ export function useBattleLogic({ onClose }: BattleScreenProps) {
     playExploreMusic,
   } = useAudio();
 
+  const TURN_TRANSITION_DELAY = 1000;
+
   // ========== Battle State ==========
   const [battleState, setBattleState] = useState<BattleState>("setup");
   const [turnPhase, setTurnPhase] = useState<TurnPhase>("setup");
@@ -107,6 +109,7 @@ export function useBattleLogic({ onClose }: BattleScreenProps) {
     null,
   );
   const [aiTurnStep, setAiTurnStep] = useState(0); // For enemy AI patterns
+  const [isPaused, setIsPaused] = useState(false);
 
   // ========== Health Bar FX State ==========
   const [playerHealthBarShake, setPlayerHealthBarShake] = useState(false);
@@ -790,16 +793,17 @@ export function useBattleLogic({ onClose }: BattleScreenProps) {
   // ========== Master Turn Flow Controller ==========
 
   useEffect(() => {
-    if (battleState !== "fighting" || turnPhase === "setup") return;
-
-    // (Step 8 & 9) After any phase, check for game-ending defeat first.
-    if (checkGameEndCondition()) {
-      return; // Stop processing if game is over
-    }
+    if (isPaused || battleState !== "fighting" || turnPhase === "setup") return;
 
     // This is the core state machine
     switch (turnPhase) {
       case "player_start":
+        // Check for game-ending defeat first.
+        if (checkGameEndCondition()) {
+          return;
+        }
+        checkAndHandleSpiritDefeat("player");
+
         // (Step 3)
         const playerChargeUnleashed = runPlayerTurnStart();
         if (playerChargeUnleashed) {
@@ -812,20 +816,49 @@ export function useBattleLogic({ onClose }: BattleScreenProps) {
         break;
 
       case "player_execute":
-        if (!checkGameEndCondition()) {
-          // Check if the whole battle is over
-          checkAndHandleSpiritDefeat("enemy"); // Check if just the active enemy is dead
+        // Action was performed. Now check if the enemy was defeated.
+        // --- DEFEAT CHECK (MOVED HERE) ---
+        if (checkGameEndCondition()) {
+          return; // Game is over
         }
+        checkAndHandleSpiritDefeat("enemy");
+        // --- END DEFEAT CHECK ---
+
         setTurnPhase("player_end");
         break;
 
       case "player_end":
         // (Step 4, End)
-        runPlayerTurnEnd();
-        setTurnPhase("enemy_start"); // Move to next turn
+        runPlayerTurnEnd(); // Tick DOTs/effects
+
+        // --- DEFEAT CHECK (for poison, etc.) ---
+        // Check if poison/etc defeated the active spirit
+        if (checkGameEndCondition()) {
+          return;
+        }
+        // This check is for DOTs
+        if (checkAndHandleSpiritDefeat("player")) {
+          // Spirit was defeated by poison.
+          return;
+        }
+        // --- END DEFEAT CHECK ---
+
+        setIsPaused(true); // Pause the game
+        setTimeout(() => {
+          setTurnPhase("enemy_start"); // Move to next turn
+          setIsPaused(false); // Unpause for enemy turn
+        }, TURN_TRANSITION_DELAY);
         break;
 
       case "enemy_start":
+        // --- DEFEAT CHECK (MOVED HERE) ---
+        // Check for game-ending defeat first.
+        if (checkGameEndCondition()) {
+          return; // Stop processing if game is over
+        }
+        checkAndHandleSpiritDefeat("enemy");
+        // --- END DEFEAT CHECK ---
+
         // (Step 5)
         const enemyChargeUnleashed = runEnemyTurnStart();
         if (enemyChargeUnleashed) {
@@ -838,26 +871,42 @@ export function useBattleLogic({ onClose }: BattleScreenProps) {
 
       case "enemy_action":
         // (Step 6)
-        runEnemyAction();
-        if (!checkGameEndCondition()) {
-          // Check if the whole battle is over
-          checkAndHandleSpiritDefeat("player"); // Check if just the active player is dead
-        }
-        // `handleEnemyAction` will check for player defeat
+        runEnemyAction(); // Enemy performs its action, player health is updated via setPlayerSpirits
+
+        // --- DEFEAT CHECKS REMOVED FROM HERE ---
+        // All checks will happen at the start of player_start
+        // or the end of enemy_end.
+        // --- END DEFEAT CHECKS ---
+
         setTurnPhase("enemy_end");
         break;
 
       case "enemy_end":
         // (Step 7)
-        runEnemyTurnEnd();
-        setTurnPhase("player_start"); // Loop back to player
+        runEnemyTurnEnd(); // Tick DOTs/effects
+
+        // --- DEFEAT CHECK (for poison, etc.) ---
+        // Check if poison/etc defeated the active enemy
+        if (checkGameEndCondition()) {
+          return;
+        }
+        // This check is for DOTs
+        if (checkAndHandleSpiritDefeat("enemy")) {
+          // Enemy was defeated by poison.
+          return;
+        }
+        // --- END DEFEAT CHECK ---
+
+        setIsPaused(true); // Pause the game
+        setTimeout(() => {
+          setTurnPhase("player_start"); // Loop back to player
+          setIsPaused(false); // Unpause for player turn
+        }, TURN_TRANSITION_DELAY);
         break;
     }
     // 'player_action', 'setup', and 'game_over' are "waiting" states
     // and don't trigger further actions.
-  }, [turnPhase, battleState, playerSpirits, battleEnemies]);
-  // This dependency array is key. The effect re-runs
-  // whenever the phase changes or a spirit's state (health) changes.
+  }, [turnPhase, battleState, isPaused]);
 
   /**
    * (Step 4 & 6) The single, central function for all skill logic.
@@ -1313,6 +1362,7 @@ export function useBattleLogic({ onClose }: BattleScreenProps) {
     battleRewards,
     actionMenu,
     isBlocking,
+    isPaused,
     playerHealthBarShake,
     enemyHealthBarShake,
     playerHealthBarHeal,
