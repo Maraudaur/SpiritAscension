@@ -40,6 +40,12 @@ Preferred communication style: Simple, everyday language.
 - Vite dev middleware in development for HMR
 - Static file serving in production
 
+**Health Check**: `/health` endpoint returns status information for deployment verification. Responds with status, timestamp, and environment (development/production).
+
+**Production Mode**: Automatically detected using `REPLIT_DEPLOYMENT` environment variable or `NODE_ENV=production`. Server properly handles production builds without attempting to setup Vite dev middleware.
+
+**Error Handling**: Comprehensive error logging with graceful shutdown on startup failures. Error middleware logs errors without crashing the application.
+
 **Storage Layer**: Abstract storage interface (`IStorage`) with in-memory implementation (`MemStorage`). Designed to support future database integration while maintaining clean separation of concerns.
 
 **API Design**: RESTful API with `/api` prefix. Currently minimal implementation - routes registered in `server/routes.ts` but application logic primarily client-side for idle game mechanics.
