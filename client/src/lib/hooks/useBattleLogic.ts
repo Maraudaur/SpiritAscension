@@ -290,17 +290,21 @@ export function useBattleLogic({
     const newEffect = { ...effect, id: `${effect.effectType}_${Date.now()}` };
     addLog(`${targetName} is afflicted with ${effect.effectType}!`);
 
+    // --- FIX: Use a safe, initialized array ---
+    const currentEffects = target.activeEffects || [];
+
     // Prevent charge/buff stacking
     if (
       newEffect.effectType === "charge" ||
       newEffect.effectType === "stat_buff"
     ) {
-      const otherEffects = target.activeEffects.filter(
+      const otherEffects = currentEffects.filter(
         (e) => e.effectType !== newEffect.effectType,
       );
       return { ...target, activeEffects: [...otherEffects, newEffect] };
     }
-    return { ...target, activeEffects: [...target.activeEffects, newEffect] };
+
+    return { ...target, activeEffects: [...currentEffects, newEffect] };
   };
 
   /**
@@ -1295,16 +1299,18 @@ export function useBattleLogic({
       );
 
       if (attackerEffects.length > 0) {
-        setBattleEnemies((prev) =>
-          prev.map((enemy, i) => {
-            if (i !== activeEnemyIndex) return enemy;
-            let newEnemy = { ...enemy };
-            // --- FIX: This loop now has the correct type for `eff` ---
-            attackerEffects.forEach((eff) => {
-              newEnemy = applyStatusEffect(newEnemy, eff) as Enemy;
-            });
-            return newEnemy;
-          }),
+        setPlayerSpirits(
+          (
+            prev, // <--- FIX: Changed to setPlayerSpirits
+          ) =>
+            prev.map((spirit, i) => {
+              if (i !== activePartySlot) return spirit; // <-- FIX: Use activePartySlot
+              let newSpirit = { ...spirit };
+              attackerEffects.forEach((eff) => {
+                newSpirit = applyStatusEffect(newSpirit, eff) as BattleSpirit; // <-- FIX: Use BattleSpirit
+              });
+              return newSpirit;
+            }),
         );
       }
 

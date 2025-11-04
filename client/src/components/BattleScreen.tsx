@@ -329,23 +329,37 @@ export function BattleScreen({
                   <div>ATK: {activeEnemy.attack}</div>
                   <div>DEF: {activeEnemy.defense}</div>
                 </div>
-                {isBossBattle && (
+                {isBossBattle && activeEnemy && (
                   <div className="mt-2 space-y-1">
-                    {bossState.atkBuffTurnsRemaining > 0 && (
-                      <div className="p-2 bg-red-100 rounded border border-red-400">
-                        <p className="text-xs font-bold text-red-800">
-                          ⚡ ATK Buffed! ({bossState.atkBuffTurnsRemaining}{" "}
-                          turns)
-                        </p>
-                      </div>
-                    )}
-                    {bossState.isCharging && (
-                      <div className="p-2 bg-yellow-100 rounded border border-yellow-400">
-                        <p className="text-xs font-bold text-yellow-800 animate-pulse">
-                          ⚡ Charging...
-                        </p>
-                      </div>
-                    )}
+                    {/* --- FIX: Read from activeEnemy.activeEffects --- */}
+                    {(activeEnemy.activeEffects || [])
+                      .filter(
+                        (e) =>
+                          e.effectType === "stat_buff" && e.stat === "attack",
+                      )
+                      .map((buff) => (
+                        <div
+                          key={buff.id}
+                          className="p-2 bg-red-100 rounded border border-red-400"
+                        >
+                          <p className="text-xs font-bold text-red-800">
+                            ⚡ ATK Buffed! ({buff.turnsRemaining} turns)
+                          </p>
+                        </div>
+                      ))}
+                    {(activeEnemy.activeEffects || [])
+                      .filter((e) => e.effectType === "charge")
+                      .map((charge) => (
+                        <div
+                          key={charge.id}
+                          className="p-2 bg-yellow-100 rounded border border-yellow-400"
+                        >
+                          <p className="text-xs font-bold text-yellow-800 animate-pulse">
+                            ⚡ Charging...
+                          </p>
+                        </div>
+                      ))}
+                    {/* --- END FIX --- */}
                   </div>
                 )}
               </div>
