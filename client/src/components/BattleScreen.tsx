@@ -14,9 +14,10 @@ import {
   Shield,
   Volume2,
   VolumeX,
-  Loader2, // <-- Added a loading icon
+  Loader2,
+  ArrowUp, // <-- Added a loading icon
 } from "lucide-react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import type { BattleScreenProps } from "@/lib/battle-types";
 import { useBattleLogic } from "@/lib/hooks/useBattleLogic";
 
@@ -110,6 +111,50 @@ export function BattleScreen({
       logContainerRef.current.scrollTop = logContainerRef.current.scrollHeight;
     }
   }, [battleLog]); // This effect runs every time battleLog changes
+
+  // Store the "lagged" health value
+  const [playerLagHealth, setPlayerLagHealth] = useState(
+    activeSpirit?.currentHealth || 0,
+  );
+  const [enemyLagHealth, setEnemyLagHealth] = useState(
+    activeEnemy?.currentHealth || 0,
+  );
+
+  // Store the previous health value to detect damage vs. healing
+  const prevPlayerHealth = useRef(activeSpirit?.currentHealth || 0);
+  const prevEnemyHealth = useRef(activeEnemy?.currentHealth || 0);
+
+  // Effect for Player Health Lag
+  useEffect(() => {
+    const newHealth = activeSpirit?.currentHealth || 0;
+    if (newHealth < prevPlayerHealth.current) {
+      // Took damage: Update lag bar after a delay
+      setTimeout(() => {
+        setPlayerLagHealth(newHealth);
+      }, 500); // 500ms delay
+    } else {
+      // Healed or no change: Update lag bar instantly
+      setPlayerLagHealth(newHealth);
+    }
+    // Update ref for next render
+    prevPlayerHealth.current = newHealth;
+  }, [activeSpirit?.currentHealth]);
+
+  // Effect for Enemy Health Lag
+  useEffect(() => {
+    const newHealth = activeEnemy?.currentHealth || 0;
+    if (newHealth < prevEnemyHealth.current) {
+      // Took damage: Update lag bar after a delay
+      setTimeout(() => {
+        setEnemyLagHealth(newHealth);
+      }, 500); // 500ms delay
+    } else {
+      // Healed or no change: Update lag bar instantly
+      setEnemyLagHealth(newHealth);
+    }
+    // Update ref for next render
+    prevEnemyHealth.current = newHealth;
+  }, [activeEnemy?.currentHealth]);
 
   // --- ADD THIS LOADING CHECK ---
   // Show a loading screen until the component has mounted and
@@ -205,167 +250,258 @@ export function BattleScreen({
         {/* Spirit Info Panels */}
         <div className="grid grid-cols-2 gap-4 mb-4">
           {/* Player Spirit Info */}
-          <div className="p-4 bg-amber-50 rounded-lg border-2 border-blue-600">
+          <div className="p-4 bg-amber-50 rounded-lg border-2 border-blue-600 min-h-[220px]">
             <h3 className="font-bold parchment-text mb-2 text-blue-800">
               Your Spirit
             </h3>
-            {activeSpirit && activeBaseSpirit && activeStats ? (
-              <div>
-                <div className="flex justify-between items-start mb-2">
-                  <div>
-                    <span className="font-bold parchment-text text-lg">
-                      {activeBaseSpirit.name}
+            {/* --- ADDED ANIMATION WRAPPER --- */}
+            <AnimatePresence mode="wait">
+              {activeSpirit && activeBaseSpirit && activeStats ? (
+                <motion.div
+                  key={activeSpirit.playerSpirit.instanceId} // This is the magic key
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: 20 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  {/* All the existing spirit info content goes here */}
+                  <div className="flex justify-between items-start mb-2">
+                    <div className="flex items-center gap-1.5">
+                      <span className="font-bold parchment-text text-lg">
+                        {activeBaseSpirit.name}
+                      </span>
+                      {(activeSpirit.activeEffects || []).filter(
+                        (e) => e.effectType === "damage_over_time",
+                      ).length > 0 && (
+                        <span className="px-1.5 py-0.5 bg-purple-600 text-white text-xs font-bold rounded">
+                          PSN:{" "}
+                          {
+                            (activeSpirit.activeEffects || []).filter(
+                              (e) => e.effectType === "damage_over_time",
+                            ).length
+                          }
+                        </span>
+                      )}
+                      {(activeSpirit.activeEffects || []).some(
+                        (e) => e.effectType === "stat_buff",
+                      ) && (
+                        <span className="px-1 py-0.5 bg-green-600 text-white text-xs font-bold rounded flex items-center">
+                          <ArrowUp size={12} className="inline-block" />
+                        </span>
+                      )}
+                    </div>
+                    <span className="text-sm parchment-text">
+                      Lv. {activeSpirit.playerSpirit.level}
                     </span>
-                    <div className="text-xs parchment-text opacity-80">
-                      <span className="capitalize">
-                        Element: {activeBaseSpirit.element}
+                  </div>
+                  <div className="text-xs parchment-text opacity-80 -mt-1 mb-2">
+                    <span className="capitalize">
+                      Element: {activeBaseSpirit.element}
+                    </span>
+                  </div>
+                  <div className="mb-2">
+                    <div className="flex justify-between text-sm parchment-text mb-1">
+                      <span className="flex items-center gap-1">
+                        <Heart className="w-4 h-4" /> HP
+                      </span>
+                      <span>
+                        {activeSpirit.currentHealth} / {activeSpirit.maxHealth}
                       </span>
                     </div>
-                  </div>
-                  <span className="text-sm parchment-text">
-                    Lv. {activeSpirit.playerSpirit.level}
-                  </span>
-                </div>
-                <div className="mb-2">
-                  <div className="flex justify-between text-sm parchment-text mb-1">
-                    <span className="flex items-center gap-1">
-                      <Heart className="w-4 h-4" /> HP
-                    </span>
-                    <span>
-                      {activeSpirit.currentHealth} / {activeSpirit.maxHealth}
-                    </span>
-                  </div>
-                  <motion.div
-                    className="w-full bg-gray-300 rounded-full h-4 overflow-hidden"
-                    animate={{
-                      x: playerHealthBarShake ? [0, -4, 4, -4, 4, 0] : 0,
-                    }}
-                    transition={{ duration: 0.5 }}
-                  >
                     <motion.div
-                      className="bg-green-600 h-4 rounded-full transition-all"
-                      style={{
-                        width: `${(activeSpirit.currentHealth / activeSpirit.maxHealth) * 100}%`,
-                      }}
+                      className="w-full bg-gray-300 rounded-full h-4 overflow-hidden relative"
                       animate={{
-                        boxShadow: playerHealthBarHeal
-                          ? [
-                              "0 0 0px rgba(34, 197, 94, 0)",
-                              "0 0 15px rgba(34, 197, 94, 0.8)",
-                              "0 0 0px rgba(34, 197, 94, 0)",
-                            ]
-                          : "0 0 0px rgba(34, 197, 94, 0)",
+                        x: playerHealthBarShake ? [0, -4, 4, -4, 4, 0] : 0,
                       }}
-                      transition={{ duration: 0.6 }}
-                    />
-                  </motion.div>
-                </div>
-                <div className="grid grid-cols-2 gap-2 text-sm parchment-text">
-                  <div>ATK: {activeStats.attack}</div>
-                  <div>DEF: {activeStats.defense}</div>
-                </div>
-                {isBlocking && (
-                  <div className="mt-2 p-2 bg-blue-100 rounded border border-blue-400">
-                    <p className="text-xs font-bold text-blue-800 flex items-center gap-1">
-                      <Shield className="w-3 h-3" />
-                      Blocking!
-                    </p>
+                      transition={{ duration: 0.5 }}
+                    >
+                      <motion.div
+                        className="bg-yellow-400 h-4 rounded-full absolute top-0 left-0"
+                        style={{
+                          width: `${(playerLagHealth / activeSpirit.maxHealth) * 100}%`,
+                        }}
+                        transition={{ duration: 0.5, ease: "easeOut" }}
+                      />
+                      <motion.div
+                        className="bg-green-600 h-4 rounded-full transition-all relative"
+                        style={{
+                          width: `${(activeSpirit.currentHealth / activeSpirit.maxHealth) * 100}%`,
+                        }}
+                        animate={{
+                          boxShadow: playerHealthBarHeal
+                            ? [
+                                "0 0 0px rgba(34, 197, 94, 0)",
+                                "0 0 15px rgba(34, 197, 94, 0.8)",
+                                "0 0 0px rgba(34, 197, 94, 0)",
+                              ]
+                            : "0 0 0px rgba(34, 197, 94, 0)",
+                        }}
+                        transition={{ duration: 0.6 }}
+                      />
+                    </motion.div>
                   </div>
-                )}
-              </div>
-            ) : (
-              <p className="text-sm parchment-text opacity-50">
-                No active spirit
-              </p>
-            )}
+                  <div className="grid grid-cols-2 gap-2 text-sm parchment-text">
+                    <div>ATK: {activeStats.attack}</div>
+                    <div>DEF: {activeStats.defense}</div>
+                  </div>
+                  {isBlocking && (
+                    <div className="mt-2 p-2 bg-blue-100 rounded border border-blue-400">
+                      <p className="text-xs font-bold text-blue-800 flex items-center gap-1">
+                        <Shield className="w-3 h-3" />
+                        Blocking!
+                      </p>
+                    </div>
+                  )}
+                  {/* End of existing content */}
+                </motion.div>
+              ) : (
+                <motion.div
+                  key="no-player-spirit"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  <p className="text-sm parchment-text opacity-50 pt-4">
+                    No active spirit
+                  </p>
+                </motion.div>
+              )}
+            </AnimatePresence>
+            {/* --- END ANIMATION WRAPPER --- */}
           </div>
 
           {/* Enemy Spirit Info */}
-          <div className="p-4 bg-amber-50 rounded-lg border-2 border-red-600">
+          <div className="p-4 bg-amber-50 rounded-lg border-2 border-red-600 min-h-[220px]">
             <h3 className="font-bold parchment-text mb-2 text-red-800">
               Enemy
             </h3>
-            {activeEnemy ? (
-              <div>
-                <div className="flex justify-between items-start mb-2">
-                  <div>
-                    <span className="font-bold parchment-text text-lg">
-                      {activeEnemy.name}
+            {/* --- ADDED ANIMATION WRAPPER --- */}
+            <AnimatePresence mode="wait">
+              {activeEnemy ? (
+                <motion.div
+                  key={activeEnemy.id} // This is the magic key
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: 20 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  {/* All the existing enemy info content goes here */}
+                  <div className="flex justify-between items-start mb-2">
+                    <div className="flex items-center gap-1.5">
+                      <span className="font-bold parchment-text text-lg">
+                        {activeEnemy.name}
+                      </span>
+                      {(activeEnemy.activeEffects || []).filter(
+                        (e) => e.effectType === "damage_over_time",
+                      ).length > 0 && (
+                        <span className="px-1.5 py-0.5 bg-purple-600 text-white text-xs font-bold rounded">
+                          PSN:{" "}
+                          {
+                            (activeEnemy.activeEffects || []).filter(
+                              (e) => e.effectType === "damage_over_time",
+                            ).length
+                          }
+                        </span>
+                      )}
+                      {(activeEnemy.activeEffects || []).some(
+                        (e) => e.effectType === "stat_buff",
+                      ) && (
+                        <span className="px-1 py-0.5 bg-green-600 text-white text-xs font-bold rounded flex items-center">
+                          <ArrowUp size={12} className="inline-block" />
+                        </span>
+                      )}
+                    </div>
+                    <span className="text-sm parchment-text">
+                      Lv. {activeEnemy.level}
                     </span>
-                    {/* --- ADDED THIS LINE --- */}
-                    <div className="text-xs parchment-text opacity-80">
-                      <span className="capitalize">
-                        Element: {activeEnemy.element}
+                  </div>
+                  <div className="text-xs parchment-text opacity-80 -mt-1 mb-2">
+                    <span className="capitalize">
+                      Element: {activeEnemy.element}
+                    </span>
+                  </div>
+                  <div className="mb-2">
+                    <div className="flex justify-between text-sm parchment-text mb-1">
+                      <span>HP</span>
+                      <span>
+                        {activeEnemy.currentHealth} / {activeEnemy.maxHealth}
                       </span>
                     </div>
-                  </div>
-                  <span className="text-sm parchment-text">
-                    Lv. {activeEnemy.level}
-                  </span>
-                </div>
-                <div className="mb-2">
-                  <div className="flex justify-between text-sm parchment-text mb-1">
-                    <span>HP</span>
-                    <span>
-                      {activeEnemy.currentHealth} / {activeEnemy.maxHealth}
-                    </span>
-                  </div>
-                  <motion.div
-                    className="w-full bg-gray-300 rounded-full h-4 overflow-hidden"
-                    animate={{
-                      x: enemyHealthBarShake ? [0, -4, 4, -4, 4, 0] : 0,
-                    }}
-                    transition={{ duration: 0.5 }}
-                  >
-                    <div
-                      className="bg-red-600 h-4 rounded-full transition-all"
-                      style={{
-                        width: `${(activeEnemy.currentHealth / activeEnemy.maxHealth) * 100}%`,
+                    <motion.div
+                      className="w-full bg-gray-300 rounded-full h-4 overflow-hidden relative"
+                      animate={{
+                        x: enemyHealthBarShake ? [0, -4, 4, -4, 4, 0] : 0,
                       }}
-                    />
-                  </motion.div>
-                </div>
-                <div className="grid grid-cols-2 gap-2 text-sm parchment-text">
-                  <div>ATK: {activeEnemy.attack}</div>
-                  <div>DEF: {activeEnemy.defense}</div>
-                </div>
-                {isBossBattle && activeEnemy && (
-                  <div className="mt-2 space-y-1">
-                    {/* --- FIX: Read from activeEnemy.activeEffects --- */}
-                    {(activeEnemy.activeEffects || [])
-                      .filter(
-                        (e) =>
-                          e.effectType === "stat_buff" && e.stat === "attack",
-                      )
-                      .map((buff) => (
-                        <div
-                          key={buff.id}
-                          className="p-2 bg-red-100 rounded border border-red-400"
-                        >
-                          <p className="text-xs font-bold text-red-800">
-                            ⚡ ATK Buffed! ({buff.turnsRemaining} turns)
-                          </p>
-                        </div>
-                      ))}
-                    {(activeEnemy.activeEffects || [])
-                      .filter((e) => e.effectType === "charge")
-                      .map((charge) => (
-                        <div
-                          key={charge.id}
-                          className="p-2 bg-yellow-100 rounded border border-yellow-400"
-                        >
-                          <p className="text-xs font-bold text-yellow-800 animate-pulse">
-                            ⚡ Charging...
-                          </p>
-                        </div>
-                      ))}
-                    {/* --- END FIX --- */}
+                      transition={{ duration: 0.5 }}
+                    >
+                      <motion.div
+                        className="bg-yellow-400 h-4 rounded-full absolute top-0 left-0"
+                        style={{
+                          width: `${(enemyLagHealth / activeEnemy.maxHealth) * 100}%`,
+                        }}
+                        transition={{ duration: 0.5, ease: "easeOut" }}
+                      />
+                      <div
+                        className="bg-red-600 h-4 rounded-full transition-all relative"
+                        style={{
+                          width: `${(activeEnemy.currentHealth / activeEnemy.maxHealth) * 100}%`,
+                        }}
+                      />
+                    </motion.div>
                   </div>
-                )}
-              </div>
-            ) : (
-              <p className="text-sm parchment-text opacity-50">No enemy</p>
-            )}
+                  <div className="grid grid-cols-2 gap-2 text-sm parchment-text">
+                    <div>ATK: {activeEnemy.attack}</div>
+                    <div>DEF: {activeEnemy.defense}</div>
+                  </div>
+                  {isBossBattle && activeEnemy && (
+                    <div className="mt-2 space-y-1">
+                      {(activeEnemy.activeEffects || [])
+                        .filter(
+                          (e) =>
+                            e.effectType === "stat_buff" && e.stat === "attack",
+                        )
+                        .map((buff) => (
+                          <div
+                            key={buff.id}
+                            className="p-2 bg-red-100 rounded border border-red-400"
+                          >
+                            <p className="text-xs font-bold text-red-800">
+                              ⚡ ATK Buffed! ({buff.turnsRemaining} turns)
+                            </p>
+                          </div>
+                        ))}
+                      {(activeEnemy.activeEffects || [])
+                        .filter((e) => e.effectType === "charge")
+                        .map((charge) => (
+                          <div
+                            key={charge.id}
+                            className="p-2 bg-yellow-100 rounded border border-yellow-400"
+                          >
+                            <p className="text-xs font-bold text-yellow-800 animate-pulse">
+                              ⚡ Charging...
+                            </p>
+                          </div>
+                        ))}
+                    </div>
+                  )}
+                  {/* End of existing content */}
+                </motion.div>
+              ) : (
+                <motion.div
+                  key="no-enemy"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  <p className="text-sm parchment-text opacity-50 pt-4">
+                    No enemy
+                  </p>
+                </motion.div>
+              )}
+            </AnimatePresence>
+            {/* --- END ANIMATION WRAPPER --- */}
           </div>
         </div>
 
