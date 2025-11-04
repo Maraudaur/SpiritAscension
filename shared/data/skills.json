@@ -152,7 +152,7 @@
     "description": "Sets a trap on the user. The next spirit to swap in for the user gains +50% ATK for 5 turns. The trap lasts for 4 turns.",
     "damage": 0,
     "healing": 0,
-    "unlockLevel": 5,
+    "unlockLevel": 1,
     "element": "none",
     "effects": [
       {

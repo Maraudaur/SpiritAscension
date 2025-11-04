@@ -136,7 +136,7 @@
       "skills": ["basic_attack", "swap_atk_trap", "hit_and_heal"],
       "triggeredAbilities": [
         {
-          "trigger": "on_swap_in",
+          "trigger": "on_switch_in",
           "effects": [
             {
               "type": "heal",
