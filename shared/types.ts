@@ -1,4 +1,10 @@
-export type Rarity = "common" | "uncommon" | "rare" | "epic" | "legendary" | "boss";
+export type Rarity =
+  | "common"
+  | "uncommon"
+  | "rare"
+  | "epic"
+  | "legendary"
+  | "boss";
 
 export type ElementId = "wood" | "earth" | "fire" | "water" | "metal" | "none";
 
@@ -55,12 +61,30 @@ export interface BasicAttackConversionEffect {
   duration: number;
 }
 
+export interface SwapBuffTrapEffect {
+  type: "swap_buff_trap";
+  // Define the buff it will apply
+  stat: StatType;
+  value: number; // 0.5 for +50%
+  buffDuration: number; // e.g., 5 turns
+  // Define the trap itself
+  trapDuration: number; // e.g., 3 turns
+}
+
+export interface HealEffect {
+  type: "heal";
+  healthRatio: number; // 0.3 for 30% of max health
+  affinityRatio: number; // 0.3 for 0.3x affinity
+}
+
 export type CustomEffect =
   | StatBuffEffect
   | DOTEffect
   | ThornsEffect
   | OneTimeShieldEffect
   | BasicAttackConversionEffect
+  | HealEffect
+  | SwapBuffTrapEffect
   | ChargeEffect;
 
 export interface PassiveStatBoost {
@@ -93,6 +117,7 @@ export type CombatTrigger =
   | "on_end_turn"
   | "on_enter_battle"
   | "on_switch_out"
+  | "on_switch_in"
   | "on_knocked_out"
   | "check_party_element"
   | "check_party_lineage";
@@ -116,6 +141,11 @@ export interface ActiveEffect {
     attack: number;
     affinity: number;
     level: number;
+  };
+  storedBuff?: {
+    stat: StatType;
+    value: number; // 0.5 for +50%
+    duration: number; // 5 turns
   };
 }
 

@@ -7,12 +7,16 @@
       {
         "spiritId": "spirit_c01",
         "level": 1,
-        "ai": ["r000"]
+        "ai": [
+          "r000"
+        ]
       },
       {
         "spiritId": "spirit_c02",
         "level": 1,
-        "ai": ["r000"]
+        "ai": [
+          "r000"
+        ]
       }
     ],
     "rewards": {
@@ -34,17 +38,23 @@
       {
         "spiritId": "spirit_c03",
         "level": 1,
-        "ai": ["r000"]
+        "ai": [
+          "r000"
+        ]
       },
       {
         "spiritId": "spirit_c03",
         "level": 1,
-        "ai": ["r000"]
+        "ai": [
+          "r000"
+        ]
       },
       {
         "spiritId": "spirit_c03",
         "level": 2,
-        "ai": ["r000"]
+        "ai": [
+          "r000"
+        ]
       }
     ],
     "rewards": {
@@ -65,12 +75,16 @@
       {
         "spiritId": "spirit_c07",
         "level": 3,
-        "ai": ["basic_attack"]
+        "ai": [
+          "basic_attack"
+        ]
       },
       {
         "spiritId": "spirit_c06",
         "level": 3,
-        "ai": ["basic_attack"]
+        "ai": [
+          "basic_attack"
+        ]
       }
     ],
     "rewards": {
@@ -92,12 +106,18 @@
       {
         "spiritId": "spirit_c05",
         "level": 2,
-        "ai": ["ancestral_healing", "basic_attack"]
+        "ai": [
+          "ancestral_healing",
+          "basic_attack"
+        ]
       },
       {
         "spiritId": "spirit_c05",
         "level": 2,
-        "ai": ["ancestral_healing", "basic_attack"]
+        "ai": [
+          "ancestral_healing",
+          "basic_attack"
+        ]
       }
     ],
     "rewards": {
@@ -118,7 +138,11 @@
       {
         "spiritId": "boss_01",
         "level": 10,
-        "ai": ["basic_attack", "atk_buff", "charged_hit"]
+        "ai": [
+          "basic_attack",
+          "atk_buff",
+          "charged_hit"
+        ]
       }
     ],
     "rewards": {

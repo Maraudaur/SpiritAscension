@@ -16,6 +16,7 @@ import type {
   PassiveAbility,
   PassiveElementalLifesteal,
   Skill,
+  CombatTrigger,
 } from "@shared/types";
 import passivesData from "@shared/data/passives.json";
 import type { Encounter } from "@shared/types";
@@ -305,6 +306,87 @@ export function useBattleLogic({
     }
 
     return { ...target, activeEffects: [...currentEffects, newEffect] };
+  };
+
+  /**
+   * A generic function to find and execute triggered abilities for a spirit.
+   */
+  const runTriggeredAbilities = (
+    trigger: CombatTrigger,
+    spiritIndex: number, // The index *in playerSpirits*
+    targetIndex?: number, // The index of the enemy
+  ) => {
+    const spirit = playerSpirits[spiritIndex];
+    // Safety check in case spirit isn't fully loaded (e.g., during a swap)
+    if (!spirit) return;
+
+    const baseSpirit = getBaseSpirit(spirit.playerSpirit.spiritId);
+    if (!baseSpirit || !baseSpirit.triggeredAbilities) {
+      return;
+    }
+
+    const abilities = baseSpirit.triggeredAbilities.filter(
+      (ab) => ab.trigger === trigger,
+    );
+
+    if (abilities.length === 0) {
+      return;
+    }
+
+    const spiritStats = calculateAllStats(spirit.playerSpirit);
+
+    abilities.forEach((ability) => {
+      ability.effects.forEach((effect) => {
+        // --- Handle HEAL effect ---
+        if (effect.type === "heal") {
+          const maxHeal = spiritStats.health * effect.healthRatio;
+          const affinityHeal =
+            spiritStats.elementalAffinity * effect.affinityRatio;
+          const totalHeal = Math.floor(maxHeal + affinityHeal);
+
+          if (totalHeal > 0) {
+            setPlayerSpirits((prevSpirits) =>
+              prevSpirits.map((sp, i) => {
+                if (i === spiritIndex) {
+                  const newHealth = Math.min(
+                    sp.maxHealth,
+                    sp.currentHealth + totalHeal,
+                  );
+                  return { ...sp, currentHealth: newHealth };
+                }
+                return sp;
+              }),
+            );
+            addLog(
+              `${baseSpirit.name}'s passive ability heals for ${totalHeal} HP!`,
+            );
+            playHeal();
+            setPlayerHealthBarHeal(true);
+            setTimeout(() => setPlayerHealthBarHeal(false), 600);
+          }
+        }
+
+        // --- Handle STAT_BUFF effect ---
+        if (effect.type === "stat_buff") {
+          const newActiveEffect: ActiveEffect = {
+            id: `${effect.stat}_${Date.now()}`,
+            effectType: "stat_buff",
+            turnsRemaining: effect.duration,
+            stat: effect.stat,
+            statMultiplier: 1 + effect.value, // Note: Assumes 'value' is 0.5 for +50%
+          };
+          setPlayerSpirits((prevSpirits) =>
+            prevSpirits.map((sp, i) =>
+              i === spiritIndex
+                ? (applyStatusEffect(sp, newActiveEffect) as BattleSpirit)
+                : sp,
+            ),
+          );
+        }
+
+        // --- You can add more effect handlers here (e.g., DOT, etc.) ---
+      });
+    });
   };
 
   /**
@@ -1253,6 +1335,19 @@ export function useBattleLogic({
           };
           effectsToApplyToCaster.push(newActiveEffect);
           logMessages.push(`${attacker.name} is gathering power!`);
+        } else if (skillEffect.type === "swap_buff_trap") {
+          const newActiveEffect: ActiveEffect = {
+            id: `swap_trap_${Date.now()}`,
+            effectType: "swap_buff_trap",
+            turnsRemaining: skillEffect.trapDuration,
+            storedBuff: {
+              stat: skillEffect.stat,
+              value: skillEffect.value,
+              duration: skillEffect.buffDuration,
+            },
+          };
+          effectsToApplyToCaster.push(newActiveEffect);
+          logMessages.push(`${attacker.name} sets a swap trap!`);
         }
       }
     }
@@ -1530,11 +1625,74 @@ export function useBattleLogic({
     }
 
     const oldSpirit = activeBaseSpirit;
-    const newSpirit = getBaseSpirit(playerSpirits[index].playerSpirit.spiritId);
+    const newSpiritBase = getBaseSpirit(
+      playerSpirits[index].playerSpirit.spiritId,
+    );
+
+    if (!newSpiritBase) {
+      console.error(
+        `Failed to find base spirit for ID: ${playerSpirits[index].playerSpirit.spiritId}`,
+      );
+      addLog("Error: Could not swap to spirit.");
+      return;
+    }
+    const outgoingSpirit = playerSpirits[activePartySlot]; // Get the full BattleSpirit
+
+    if (outgoingSpirit && outgoingSpirit.activeEffects) {
+      // Find the first swap trap on the outgoing spirit
+      const swapTrap = outgoingSpirit.activeEffects.find(
+        (e) => e.effectType === "swap_buff_trap",
+      );
+
+      if (swapTrap && swapTrap.storedBuff) {
+        const buff = swapTrap.storedBuff;
+        addLog(`The ${swapTrap.effectType} on ${oldSpirit?.name} springs!`);
+
+        // Create the new buff for the INCOMING spirit
+        const newBuffEffect: ActiveEffect = {
+          id: `swap_buff_${buff.stat}_${Date.now()}`,
+          effectType: "stat_buff",
+          turnsRemaining: buff.duration,
+          stat: buff.stat,
+          statMultiplier: 1 + buff.value,
+        };
+
+        // Apply the buff to the incoming spirit and remove the trap
+        setPlayerSpirits((prevSpirits) =>
+          prevSpirits.map((spirit, i) => {
+            if (i === index) {
+              // This is the INCOMING spirit
+              addLog(`${newSpiritBase.name} receives a ${buff.stat} buff!`);
+              return applyStatusEffect(spirit, newBuffEffect) as BattleSpirit;
+            }
+            if (i === activePartySlot) {
+              // This is the OUTGOING spirit, remove the trap
+              return {
+                ...spirit,
+                activeEffects: (spirit.activeEffects || []).filter(
+                  (e) => e.id !== swapTrap.id,
+                ),
+              };
+            }
+            return spirit;
+          }),
+        );
+      }
+    }
+
+    // --- NEW GENERIC TRIGGER ---
+    // Run triggers for the spirit swapping *in*
+    runTriggeredAbilities("on_switch_in", index);
+
+    // Run triggers for the spirit swapping *out*
+    // (We use activePartySlot here because it's the index of the spirit LEAVING)
+    runTriggeredAbilities("on_switch_out", activePartySlot);
+    // --- END NEW LOGIC ---
+
     setActivePartySlot(index);
     setActionMenu("none");
     setIsBlocking(false); // Swapping cancels block
-    addLog(`Swapped ${oldSpirit?.name} for ${newSpirit?.name}!`);
+    addLog(`Swapped ${oldSpirit?.name} for ${newSpiritBase.name}!`);
     setTurnPhase("player_execute"); // Swapping counts as the action
   };
 

@@ -3,10 +3,6 @@
 @tailwind utilities;
 
 @layer base {
-  * {
-    @apply border-border;
-  }
-
   :root {
     --parchment: #f5e6d3;
     --parchment-dark: #e8d4b8;

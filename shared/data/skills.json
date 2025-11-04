@@ -3,7 +3,7 @@
     "id": "basic_attack",
     "name": "Basic Strike",
     "description": "A simple attack dealing moderate damage",
-    "damage": 1.0,
+    "damage": 1,
     "healing": 0,
     "unlockLevel": 1,
     "element": "none",
@@ -23,7 +23,7 @@
     "id": "hit_and_heal",
     "name": "Draining Strike",
     "description": "Attack that heals the user for a portion of damage dealt",
-    "damage": 1.0,
+    "damage": 1,
     "healing": 0.3,
     "unlockLevel": 3,
     "element": "none",
@@ -58,7 +58,7 @@
       {
         "type": "charge",
         "duration": 2,
-        "damageMultiplier": 2.0,
+        "damageMultiplier": 2,
         "element": "none"
       }
     ]
@@ -143,6 +143,24 @@
         "duration": 2,
         "healingFlat": 10,
         "healingAffinityRatio": 0.5
+      }
+    ]
+  },
+  "swap_atk_trap": {
+    "id": "swap_atk_trap",
+    "name": "Swap Trap (ATK)",
+    "description": "Sets a trap on the user. The next spirit to swap in for the user gains +50% ATK for 5 turns. The trap lasts for 4 turns.",
+    "damage": 0,
+    "healing": 0,
+    "unlockLevel": 5,
+    "element": "none",
+    "effects": [
+      {
+        "type": "swap_buff_trap",
+        "stat": "attack",
+        "value": 0.5,
+        "buffDuration": 5,
+        "trapDuration": 4
       }
     ]
   }
