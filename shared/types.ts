@@ -1,4 +1,4 @@
-export type Rarity = "common" | "uncommon" | "rare" | "epic" | "legendary";
+export type Rarity = "common" | "uncommon" | "rare" | "epic" | "legendary" | "boss";
 
 export type ElementId = "wood" | "earth" | "fire" | "water" | "metal" | "none";
 

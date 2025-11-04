@@ -847,7 +847,7 @@
         "health": 1000,
         "elementalAffinity": 50
       },
-      "passiveAbilities": ["health_focus"],
+      "passiveAbilities": ["boss_massive_health"],
       "skills": ["basic_attack", "atk_buff", "charged_hit"]
     }
   ]

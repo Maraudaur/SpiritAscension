@@ -66,7 +66,10 @@ type TurnPhase =
   | "enemy_end"
   | "game_over";
 
-export function useBattleLogic({ onClose }: BattleScreenProps) {
+export function useBattleLogic({
+  onClose,
+  isBossBattle = false,
+}: BattleScreenProps) {
   // ========== Game State Hooks ==========
   const {
     spirits,
@@ -153,21 +156,43 @@ export function useBattleLogic({ onClose }: BattleScreenProps) {
   };
 
   const findEncounter = (): Encounter | null => {
-    const playerLevel = getPlayerAverageLevel();
     const encounterData = (allEncounters as any)?.default || allEncounters;
     if (!encounterData) {
       console.error("CRITICAL: encounters.json data is not loaded.");
       return null;
     }
+
+    // --- NEW BOSS LOGIC ---
+    if (isBossBattle) {
+      const bossEncounter = (encounterData as Encounter[]).find(
+        (enc) => enc.id === "e_boss_01", // <-- Your boss encounter ID
+      );
+      if (bossEncounter) {
+        return bossEncounter;
+      }
+      console.error("CRITICAL: Boss encounter 'e_boss_01' not found!");
+      // Fallback to random if boss is missing, just in case
+    }
+    // --- END BOSS LOGIC ---
+
+    const playerLevel = getPlayerAverageLevel();
     const levelRange = { min: playerLevel - 1, max: playerLevel + 1 };
+
+    // --- MODIFIED: Filter out the boss encounter from random finds ---
     const validEncounters = (encounterData as Encounter[]).filter(
       (encounter) =>
+        !encounter.id.startsWith("e_boss_") && // <-- Don't randomly find bosses
         encounter.averageLevel >= levelRange.min &&
         encounter.averageLevel <= levelRange.max,
     );
+
     if (validEncounters.length === 0) {
       console.warn(`No encounters found for player level ${playerLevel}`);
-      return (encounterData as Encounter[])[0] || null;
+      // Find a non-boss fallback
+      const fallback = (encounterData as Encounter[]).find(
+        (enc) => !enc.id.startsWith("e_boss_"),
+      );
+      return fallback || (encounterData as Encounter[])[0] || null;
     }
     const randomIndex = Math.floor(Math.random() * validEncounters.length);
     return validEncounters[randomIndex];

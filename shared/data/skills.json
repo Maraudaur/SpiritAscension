@@ -50,10 +50,18 @@
     "id": "charged_hit",
     "name": "Charged Hit",
     "description": "Charges for one turn, then unleashes a devastating strike with 2x damage",
-    "damage": 2.0,
+    "damage": 0,
     "healing": 0,
     "unlockLevel": 1,
-    "element": "none"
+    "element": "none",
+    "effects": [
+      {
+        "type": "charge",
+        "duration": 2,
+        "damageMultiplier": 2.0,
+        "element": "none"
+      }
+    ]
   },
   "metal_strike": {
     "id": "metal_strike",

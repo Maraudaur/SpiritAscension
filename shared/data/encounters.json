@@ -92,7 +92,7 @@
       {
         "spiritId": "spirit_c05",
         "level": 2,
-        "ai": ["ancestral_healing"]
+        "ai": ["ancestral_healing", "basic_attack"]
       },
       {
         "spiritId": "spirit_c05",
@@ -108,6 +108,24 @@
     },
     "penalties": {
       "qiLoss": 500
+    }
+  },
+  {
+    "id": "e_boss_01",
+    "name": "Heavenly Warlord",
+    "averageLevel": 10,
+    "enemies": [
+      {
+        "spiritId": "boss_01",
+        "level": 10,
+        "ai": ["basic_attack", "atk_buff", "charged_hit"]
+      }
+    ],
+    "rewards": {
+      "qi": 10000
+    },
+    "penalties": {
+      "qiLoss": 1000
     }
   }
 ]

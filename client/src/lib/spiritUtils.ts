@@ -261,6 +261,7 @@ export function getRarityColor(rarity: string): string {
     rare: "#3b82f6",
     epic: "#a855f7",
     legendary: "#f59e0b",
+    boss: "#8B0000",
   };
   return colors[rarity] || colors.common;
 }
