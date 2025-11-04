@@ -312,9 +312,15 @@ export function useBattleLogic({
    */
   const tickPlayerEffects = (
     spirits: BattleSpirit[],
+    enemies: Enemy[],
     phase: "start_of_turn" | "end_of_turn",
-  ): { updatedSpirits: BattleSpirit[]; chargeUnleashed: boolean } => {
+  ): {
+    updatedSpirits: BattleSpirit[];
+    updatedEnemies: Enemy[];
+    chargeUnleashed: boolean;
+  } => {
     let chargeUnleashed = false;
+    let updatedEnemies = [...enemies];
     const updatedSpirits = spirits.map((spirit) => {
       // Only tick effects for the ACTIVE spirit
       if (
@@ -359,9 +365,7 @@ export function useBattleLogic({
             "Player Spirit";
           addLog(`${spiritName} unleashes their ability!`);
 
-          // TODO: Implement charge attack/heal logic here
-          // This would involve a `calculateAttackResult` call
-          // and applying damage/heals.
+          // This is the original healing logic
           if (effect.healingFlat) {
             const totalHeal =
               effect.healingFlat +
@@ -378,7 +382,90 @@ export function useBattleLogic({
             setPlayerHealthBarHeal(true);
             setTimeout(() => setPlayerHealthBarHeal(false), 600);
           }
-        }
+
+          // --- BEGIN NEW CHARGE DAMAGE LOGIC ---
+          if (effect.damageMultiplier && effect.targetIndex !== undefined) {
+            const attackerSpirit = spirit;
+            const targetEnemy = enemies[effect.targetIndex]; // Get the target
+
+            if (attackerSpirit && targetEnemy) {
+              const attackerBase = getBaseSpirit(
+                attackerSpirit.playerSpirit.spiritId,
+              );
+              const attackerStats = calculateAllStats(
+                attackerSpirit.playerSpirit,
+              );
+
+              if (attackerBase && attackerStats) {
+                // 1. Prepare data
+                const attackerData: CombatantStats = {
+                  id: attackerSpirit.playerSpirit.instanceId,
+                  name: attackerBase.name,
+                  spiritId: attackerSpirit.playerSpirit.spiritId,
+                  level: attackerSpirit.playerSpirit.level,
+                  attack: attackerStats.attack,
+                  defense: attackerStats.defense,
+                  elementalAffinity: attackerStats.elementalAffinity,
+                  element: attackerBase.element,
+                  currentHealth: attackerSpirit.currentHealth,
+                  maxHealth: attackerSpirit.maxHealth,
+                };
+                const targetData: CombatantStats = {
+                  id: targetEnemy.id,
+                  name: targetEnemy.name,
+                  spiritId: targetEnemy.spiritId,
+                  level: targetEnemy.level,
+                  attack: targetEnemy.attack,
+                  defense: targetEnemy.defense,
+                  elementalAffinity: targetEnemy.elementalAffinity,
+                  element: targetEnemy.element,
+                  currentHealth: targetEnemy.currentHealth,
+                  maxHealth: targetEnemy.maxHealth,
+                };
+
+                // 2. Create a "dummy" skill for the charge attack
+                const chargeSkill: Skill = {
+                  id: `charge_unleash_${effect.id}`,
+                  name: "Unleashed Charge",
+                  description: "A powerful charged attack",
+                  damage: effect.damageMultiplier, // Use the multiplier as the skill's damage
+                  healing: 0,
+                  unlockLevel: 1,
+                  element: effect.element || "none",
+                };
+
+                // 3. Get results
+                const result = calculateAttackResult(
+                  attackerData,
+                  targetData,
+                  chargeSkill,
+                );
+                result.logMessages.forEach(addLog);
+
+                let damage = result.totalDamage;
+                // Note: We don't check for enemy block, as charge attacks are special
+
+                if (damage > 0) {
+                  playDamage();
+                  setEnemyHealthBarShake(true);
+                  setTimeout(() => setEnemyHealthBarShake(false), 500);
+                }
+
+                // 4. Apply damage to the target enemy
+                updatedEnemies = updatedEnemies.map((en, index) => {
+                  if (index === effect.targetIndex) {
+                    const newHealth = Math.max(0, en.currentHealth - damage);
+                    return { ...en, currentHealth: newHealth };
+                  }
+                  return en;
+                });
+
+                // TODO: Apply trigger effects, healing, etc. (if any)
+              }
+            }
+          }
+          // --- END NEW CHARGE DAMAGE LOGIC ---
+        } // <-- This closes the `else if (phase === "start_of_turn" ...)` block
 
         // Tick down timer
         if (phase === "end_of_turn") {
@@ -414,7 +501,7 @@ export function useBattleLogic({
 
       return { ...spirit, currentHealth, activeEffects: newActiveEffects };
     });
-    return { updatedSpirits, chargeUnleashed };
+    return { updatedSpirits, updatedEnemies, chargeUnleashed };
   };
 
   /**
@@ -422,9 +509,15 @@ export function useBattleLogic({
    */
   const tickEnemyEffects = (
     enemies: Enemy[],
+    spirits: BattleSpirit[],
     phase: "start_of_turn" | "end_of_turn",
-  ): { updatedEnemies: Enemy[]; chargeUnleashed: boolean } => {
+  ): {
+    updatedEnemies: Enemy[];
+    updatedSpirits: BattleSpirit[];
+    chargeUnleashed: boolean;
+  } => {
     let chargeUnleashed = false;
+    let updatedSpirits = [...spirits];
     const updatedEnemies = enemies.map((enemy) => {
       // Only tick effects for the ACTIVE enemy
       if (enemy.id !== activeEnemy.id) return enemy;
@@ -473,6 +566,82 @@ export function useBattleLogic({
             addLog(`${enemy.name} heals for ${totalHeal} HP!`);
             playHeal();
           }
+          if (effect.damageMultiplier && effect.targetIndex !== undefined) {
+            const attackerEnemy = enemy;
+            const targetSpirit = spirits[effect.targetIndex]; // Get the target
+
+            if (attackerEnemy && targetSpirit) {
+              const targetBase = getBaseSpirit(
+                targetSpirit.playerSpirit.spiritId,
+              );
+              const targetStats = calculateAllStats(targetSpirit.playerSpirit);
+
+              if (targetBase && targetStats) {
+                // 1. Prepare data
+                const attackerData: CombatantStats = {
+                  id: attackerEnemy.id,
+                  name: attackerEnemy.name,
+                  spiritId: attackerEnemy.spiritId,
+                  level: attackerEnemy.level,
+                  attack: attackerEnemy.attack,
+                  defense: attackerEnemy.defense,
+                  elementalAffinity: attackerEnemy.elementalAffinity,
+                  element: attackerEnemy.element,
+                  currentHealth: attackerEnemy.currentHealth,
+                  maxHealth: attackerEnemy.maxHealth,
+                };
+                const targetData: CombatantStats = {
+                  id: targetSpirit.playerSpirit.instanceId,
+                  name: targetBase.name,
+                  spiritId: targetSpirit.playerSpirit.spiritId,
+                  level: targetSpirit.playerSpirit.level,
+                  attack: targetStats.attack,
+                  defense: targetStats.defense,
+                  elementalAffinity: targetStats.elementalAffinity,
+                  element: targetBase.element,
+                  currentHealth: targetSpirit.currentHealth,
+                  maxHealth: targetSpirit.maxHealth,
+                };
+
+                // 2. Create a "dummy" skill for the charge attack
+                const chargeSkill: Skill = {
+                  id: `charge_unleash_${effect.id}`,
+                  name: "Unleashed Charge",
+                  description: "A powerful charged attack",
+                  damage: effect.damageMultiplier, // Use the multiplier as the skill's damage
+                  healing: 0,
+                  unlockLevel: 1,
+                  element: effect.element || "none",
+                };
+
+                // 3. Get results
+                const result = calculateAttackResult(
+                  attackerData,
+                  targetData,
+                  chargeSkill,
+                );
+                result.logMessages.forEach(addLog);
+
+                let damage = result.totalDamage;
+                // Note: We don't check for player block, as charge attacks are special
+
+                if (damage > 0) {
+                  playDamage();
+                  setPlayerHealthBarShake(true);
+                  setTimeout(() => setPlayerHealthBarShake(false), 500);
+                }
+
+                // 4. Apply damage to the target spirit
+                updatedSpirits = updatedSpirits.map((sp, index) => {
+                  if (index === effect.targetIndex) {
+                    const newHealth = Math.max(0, sp.currentHealth - damage);
+                    return { ...sp, currentHealth: newHealth };
+                  }
+                  return sp;
+                });
+              }
+            }
+          }
         }
 
         // Tick down timer
@@ -505,7 +674,7 @@ export function useBattleLogic({
       });
       return { ...enemy, currentHealth, activeEffects: newActiveEffects };
     });
-    return { updatedEnemies, chargeUnleashed };
+    return { updatedEnemies, updatedSpirits, chargeUnleashed };
   };
 
   // ========== Battle Flow Functions ==========
@@ -712,13 +881,16 @@ export function useBattleLogic({
     setIsBlocking(false);
 
     // 1. Get the results from the tick function *first*
-    const { updatedSpirits, chargeUnleashed } = tickPlayerEffects(
-      playerSpirits, // <-- Use the current state
-      "start_of_turn",
-    );
+    const { updatedSpirits, updatedEnemies, chargeUnleashed } =
+      tickPlayerEffects(
+        playerSpirits,
+        battleEnemies, // <-- Pass enemies
+        "start_of_turn",
+      );
 
     // 2. Set the new state
     setPlayerSpirits(updatedSpirits);
+    setBattleEnemies(updatedEnemies); // <-- Set enemies
 
     // 3. Return the result
     return chargeUnleashed;
@@ -728,13 +900,13 @@ export function useBattleLogic({
    * (Step 4, End) Runs end-of-turn effects for the player.
    */
   const runPlayerTurnEnd = () => {
-    // 1. Get the results from the tick function *first*
-    const { updatedSpirits } = tickPlayerEffects(
-      playerSpirits, // <-- Use the current state
+    const { updatedSpirits, updatedEnemies } = tickPlayerEffects(
+      playerSpirits,
+      battleEnemies, // <-- Pass enemies
       "end_of_turn",
     );
-    // 2. Set the new state
     setPlayerSpirits(updatedSpirits);
+    setBattleEnemies(updatedEnemies); // <-- Set enemies
   };
 
   /**
@@ -742,18 +914,18 @@ export function useBattleLogic({
    */
   const runEnemyTurnStart = () => {
     addLog(`--- ${activeEnemy.name}'s Turn ---`);
-    setIsEnemyBlocking(false); // <-- ADD THIS
+    setIsEnemyBlocking(false);
 
-    // 1. Get the results from the tick function *first*
-    const { updatedEnemies, chargeUnleashed } = tickEnemyEffects(
-      battleEnemies, // <-- Use the current state
-      "start_of_turn",
-    );
+    const { updatedEnemies, updatedSpirits, chargeUnleashed } =
+      tickEnemyEffects(
+        battleEnemies,
+        playerSpirits, // <-- Pass spirits
+        "start_of_turn",
+      );
 
-    // 2. Set the new state
     setBattleEnemies(updatedEnemies);
+    setPlayerSpirits(updatedSpirits); // <-- Set spirits
 
-    // 3. Return the result
     return chargeUnleashed;
   };
 
@@ -807,13 +979,13 @@ export function useBattleLogic({
   };
 
   const runEnemyTurnEnd = () => {
-    // 1. Get the results from the tick function *first*
-    const { updatedEnemies } = tickEnemyEffects(
-      battleEnemies, // <-- Use the current state
+    const { updatedEnemies, updatedSpirits } = tickEnemyEffects(
+      battleEnemies,
+      playerSpirits, // <-- Pass spirits
       "end_of_turn",
     );
-    // 2. Set the new state
     setBattleEnemies(updatedEnemies);
+    setPlayerSpirits(updatedSpirits); // <-- Set spirits
 
     // 3. Reset block
     setIsEnemyBlocking(false);
@@ -982,7 +1154,8 @@ export function useBattleLogic({
           GAME_SCALING_FACTOR,
       ) + 2;
     const physicalDamage = Math.floor(baseCalculation * skill.damage);
-    const baseElementalDamage = Math.floor(affinityStat * affinityRatio);
+    const baseElementalDamage =
+      skill.damage > 0 ? Math.floor(affinityStat * affinityRatio) : 0;
 
     // --- 3. Calculate Final Damage
     const elementalMultiplier = getElementalDamageMultiplier(
