@@ -15,15 +15,10 @@ export function SpiritSpriteAnimation({
   const canvasRef = useRef<HTMLDivElement>(null);
   const appRef = useRef<PIXI.Application | null>(null);
 
-  console.log(`SpiritSpriteAnimation: Rendering with spiritId="${spiritId}", position="${position}"`);
-
   useEffect(() => {
     if (!canvasRef.current) {
-      console.log("SpiritSpriteAnimation: No canvas ref");
       return;
     }
-
-    console.log(`SpiritSpriteAnimation: Initializing for ${spiritId}, position: ${position}`);
 
     const initPixi = async () => {
       try {
@@ -37,18 +32,14 @@ export function SpiritSpriteAnimation({
         });
 
         if (!canvasRef.current) {
-          console.log("SpiritSpriteAnimation: Canvas ref disappeared during init");
           return;
         }
 
         canvasRef.current.appendChild(app.canvas);
         appRef.current = app;
-        console.log("SpiritSpriteAnimation: PixiJS app created");
 
         if (spiritId === "spirit_c03") {
-          console.log("SpiritSpriteAnimation: Loading Ember Fox sprite...");
           const texture = await PIXI.Assets.load("/sprites/cinderpaw_idle.png");
-          console.log("SpiritSpriteAnimation: Texture loaded", texture);
           
           const frames: PIXI.Texture[] = [];
           const frameWidth = 128;
@@ -68,8 +59,6 @@ export function SpiritSpriteAnimation({
             frames.push(frame);
           }
 
-          console.log(`SpiritSpriteAnimation: Created ${frames.length} frames`);
-
           const animatedSprite = new PIXI.AnimatedSprite(frames);
           animatedSprite.animationSpeed = 0.1;
           animatedSprite.play();
@@ -86,7 +75,6 @@ export function SpiritSpriteAnimation({
           }
 
           app.stage.addChild(animatedSprite);
-          console.log("SpiritSpriteAnimation: Animated sprite added to stage");
         }
       } catch (error) {
         console.error("SpiritSpriteAnimation: Error initializing PixiJS:", error);
@@ -97,7 +85,6 @@ export function SpiritSpriteAnimation({
 
     return () => {
       if (appRef.current) {
-        console.log("SpiritSpriteAnimation: Cleaning up PixiJS app");
         appRef.current.destroy(true, { children: true });
         appRef.current = null;
       }
@@ -105,11 +92,8 @@ export function SpiritSpriteAnimation({
   }, [spiritId, position, size]);
 
   if (spiritId !== "spirit_c03") {
-    console.log(`SpiritSpriteAnimation: Skipping render for spiritId="${spiritId}" (not Ember Fox)`);
     return null;
   }
-
-  console.log("SpiritSpriteAnimation: Rendering canvas container for Ember Fox");
 
   return (
     <div
@@ -119,7 +103,6 @@ export function SpiritSpriteAnimation({
         height: `${size}px`,
         position: "relative",
         pointerEvents: "none",
-        border: "2px solid red", // Debug: make it visible
       }}
     />
   );
