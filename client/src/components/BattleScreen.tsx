@@ -238,14 +238,22 @@ export function BattleScreen({
         </h2>
 
         {/* Battle Scene */}
-        <div className="w-full h-64 bg-gradient-to-b from-amber-100 to-amber-200 rounded-lg border-4 border-amber-700 mb-4 flex items-center justify-between relative overflow-hidden px-8">
+        <div className="w-full h-64 bg-gradient-to-b from-amber-100 to-amber-200 rounded-lg border-4 border-amber-700 mb-4 relative overflow-hidden">
           <div className="absolute inset-0 opacity-10">
             <div className="absolute top-10 left-10 w-20 h-20 bg-amber-800 rounded-full blur-xl"></div>
             <div className="absolute bottom-10 right-10 w-32 h-32 bg-amber-800 rounded-full blur-xl"></div>
           </div>
           
           {/* Player Spirit Sprite (Left) */}
-          <div className="relative z-10 flex items-end" style={{ height: "100%" }}>
+          <div 
+            className="absolute z-10 flex items-center justify-center" 
+            style={{ 
+              left: "15%", 
+              bottom: "10px", 
+              width: "200px", 
+              height: "200px" 
+            }}
+          >
             {activeSpirit && activeBaseSpirit && (
               <SpiritSpriteAnimation
                 spiritId={activeBaseSpirit.id}
@@ -256,7 +264,15 @@ export function BattleScreen({
           </div>
           
           {/* Enemy Spirit Sprite (Right) */}
-          <div className="relative z-10 flex items-end" style={{ height: "100%" }}>
+          <div 
+            className="absolute z-10 flex items-center justify-center" 
+            style={{ 
+              right: "15%", 
+              bottom: "10px", 
+              width: "200px", 
+              height: "200px" 
+            }}
+          >
             {activeEnemy && (
               <SpiritSpriteAnimation
                 spiritId={activeEnemy.spiritId}

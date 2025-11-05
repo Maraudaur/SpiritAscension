@@ -117,7 +117,7 @@ export function SpiritSpriteAnimation({
       style={{
         width: `${size}px`,
         height: `${size}px`,
-        position: "absolute",
+        position: "relative",
         pointerEvents: "none",
         border: "2px solid red", // Debug: make it visible
       }}
