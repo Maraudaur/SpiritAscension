@@ -98,54 +98,31 @@ function App() {
     <div
       style={{
         width: "100vw",
-        minHeight: "100vh",
+        height: "100vh",
         position: "relative",
         overflow: "auto",
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "flex-start",
-        padding: "20px",
-        boxSizing: "border-box",
       }}
     >
-      <div
-        style={{
-          width: "100%",
-          maxWidth: "1200px",
-          aspectRatio: "16 / 9",
-          position: "relative",
-        }}
-      >
-        <div
-          style={{
-            width: "100%",
-            height: "100%",
-            position: "relative",
-            overflow: "auto",
-          }}
-        >
-          <MainScreen onNavigate={setCurrentScreen} />
+      <MainScreen onNavigate={setCurrentScreen} />
 
-          {currentScreen === "summon" && (
-            <SummonScreen onClose={() => setCurrentScreen("main")} />
-          )}
+      {currentScreen === "summon" && (
+        <SummonScreen onClose={() => setCurrentScreen("main")} />
+      )}
 
-          {currentScreen === "spirits" && (
-            <SpiritManager onClose={() => setCurrentScreen("main")} />
-          )}
+      {currentScreen === "spirits" && (
+        <SpiritManager onClose={() => setCurrentScreen("main")} />
+      )}
 
-          {currentScreen === "battle" && (
-            <BattleScreen onClose={() => setCurrentScreen("main")} />
-          )}
+      {currentScreen === "battle" && (
+        <BattleScreen onClose={() => setCurrentScreen("main")} />
+      )}
 
-          {currentScreen === "boss" && (
-            <BattleScreen
-              onClose={() => setCurrentScreen("main")}
-              isBossBattle={true}
-            />
-          )}
-        </div>
-      </div>
+      {currentScreen === "boss" && (
+        <BattleScreen
+          onClose={() => setCurrentScreen("main")}
+          isBossBattle={true}
+        />
+      )}
     </div>
   );
 }
