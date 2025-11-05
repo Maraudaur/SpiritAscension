@@ -149,7 +149,7 @@ export function MainScreen({ onNavigate }: MainScreenProps) {
   };
 
   return (
-    <div className="w-full h-full flex items-center justify-center p-4 relative">
+    <div className="w-full min-h-screen flex items-center justify-center p-4 relative">
       <div className="parchment-bg chinese-border max-w-2xl w-full p-8 rounded-lg relative">
         {/* Volume button in top-right corner of main area */}
         <div className="absolute top-4 right-4 z-10">
