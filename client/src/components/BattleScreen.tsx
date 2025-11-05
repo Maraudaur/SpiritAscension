@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react"; // <-- ADDED useState, useEffect
+import { useState, useEffect, useRef } from "react";
 import {
   getBaseSpirit,
   getElement,
@@ -15,11 +15,12 @@ import {
   Volume2,
   VolumeX,
   Loader2,
-  ArrowUp, // <-- Added a loading icon
+  ArrowUp,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import type { BattleScreenProps } from "@/lib/battle-types";
 import { useBattleLogic } from "@/lib/hooks/useBattleLogic";
+import { SpiritSpriteAnimation } from "./SpiritSpriteAnimation";
 
 // A simple loading component
 function BattleLoadingScreen({
@@ -236,15 +237,34 @@ export function BattleScreen({
           {isBossBattle ? "⚔️ Boss Battle ⚔️" : "Cultivation Battle"}
         </h2>
 
-        {/* Battle Scene Placeholder */}
-        <div className="w-full h-64 bg-gradient-to-b from-amber-100 to-amber-200 rounded-lg border-4 border-amber-700 mb-4 flex items-center justify-center relative overflow-hidden">
+        {/* Battle Scene */}
+        <div className="w-full h-64 bg-gradient-to-b from-amber-100 to-amber-200 rounded-lg border-4 border-amber-700 mb-4 flex items-center justify-between relative overflow-hidden px-8">
           <div className="absolute inset-0 opacity-10">
             <div className="absolute top-10 left-10 w-20 h-20 bg-amber-800 rounded-full blur-xl"></div>
             <div className="absolute bottom-10 right-10 w-32 h-32 bg-amber-800 rounded-full blur-xl"></div>
           </div>
-          <p className="text-2xl font-bold parchment-text opacity-30 italic z-10">
-            Battle Scene
-          </p>
+          
+          {/* Player Spirit Sprite (Left) */}
+          <div className="relative z-10 flex items-end" style={{ height: "100%" }}>
+            {activeSpirit && activeBaseSpirit && (
+              <SpiritSpriteAnimation
+                spiritId={activeBaseSpirit.id}
+                position="left"
+                size={200}
+              />
+            )}
+          </div>
+          
+          {/* Enemy Spirit Sprite (Right) */}
+          <div className="relative z-10 flex items-end" style={{ height: "100%" }}>
+            {activeEnemy && (
+              <SpiritSpriteAnimation
+                spiritId={activeEnemy.spiritId}
+                position="right"
+                size={200}
+              />
+            )}
+          </div>
         </div>
 
         {/* Spirit Info Panels */}
