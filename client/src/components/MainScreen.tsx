@@ -12,6 +12,12 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { getRarityColor } from "@/lib/spiritUtils";
 import { motion, AnimatePresence } from "framer-motion";
 import { SummonScreen } from "./SummonScreen";
@@ -149,8 +155,9 @@ export function MainScreen({ onNavigate }: MainScreenProps) {
   };
 
   return (
-    <div className="w-full min-h-screen flex flex-col items-center px-4 relative overflow-y-auto">
-      <div className="parchment-bg chinese-border max-w-2xl w-full p-8 rounded-lg my-4 relative">
+    <TooltipProvider delayDuration={200}>
+      <div className="w-full min-h-screen flex flex-col items-center px-4 relative overflow-y-auto">
+        <div className="parchment-bg chinese-border max-w-2xl w-full p-8 rounded-lg my-4 relative">
         {/* Volume button in top-right corner of main area */}
         <div className="absolute top-4 right-4 z-10">
           <Button
@@ -258,32 +265,52 @@ export function MainScreen({ onNavigate }: MainScreenProps) {
             </div>
 
             {/* Button 1: Base Production */}
-            <Button
-              onClick={upgradeQiProduction}
-              disabled={!canUpgradeBaseProduction}
-              className="w-full mt-4"
-              style={{
-                background: canUpgradeBaseProduction
-                  ? "var(--vermillion)"
-                  : "#999",
-                color: "var(--parchment)",
-              }}
-            >
-              Enhance Base ({baseProductionUpgradeCost} Qi)
-            </Button>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  onClick={upgradeQiProduction}
+                  disabled={!canUpgradeBaseProduction}
+                  className="w-full mt-4 transition-all hover:-translate-y-0.5 hover:shadow-lg disabled:hover:translate-y-0 disabled:hover:shadow-none"
+                  style={{
+                    background: canUpgradeBaseProduction
+                      ? "var(--vermillion)"
+                      : "#999",
+                    color: "var(--parchment)",
+                    boxShadow: canUpgradeBaseProduction ? "0 4px 6px rgba(193, 39, 45, 0.3)" : "none",
+                  }}
+                >
+                  Enhance Base ({baseProductionUpgradeCost} Qi)
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent className="parchment-bg border-2 border-amber-700">
+                <p className="parchment-text text-xs">
+                  Current: {qiUpgrades.baseProduction} → Next: {qiUpgrades.baseProduction + 1}
+                </p>
+              </TooltipContent>
+            </Tooltip>
 
             {/* Button 2: Multiplier */}
-            <Button
-              onClick={upgradeQiMultiplier}
-              disabled={!canUpgradeMultiplier}
-              className="w-full mt-4"
-              style={{
-                background: canUpgradeMultiplier ? "var(--vermillion)" : "#999",
-                color: "var(--parchment)",
-              }}
-            >
-              Amplify Multiplier ({multiplierUpgradeCost} Qi)
-            </Button>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  onClick={upgradeQiMultiplier}
+                  disabled={!canUpgradeMultiplier}
+                  className="w-full mt-4 transition-all hover:-translate-y-0.5 hover:shadow-lg disabled:hover:translate-y-0 disabled:hover:shadow-none"
+                  style={{
+                    background: canUpgradeMultiplier ? "var(--vermillion)" : "#999",
+                    color: "var(--parchment)",
+                    boxShadow: canUpgradeMultiplier ? "0 4px 6px rgba(193, 39, 45, 0.3)" : "none",
+                  }}
+                >
+                  Amplify Multiplier ({multiplierUpgradeCost} Qi)
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent className="parchment-bg border-2 border-amber-700">
+                <p className="parchment-text text-xs">
+                  Current: {qiUpgrades.multiplier.toFixed(1)}x → Next: {(qiUpgrades.multiplier + 0.1).toFixed(1)}x
+                </p>
+              </TooltipContent>
+            </Tooltip>
           </div>
 
           {/* --- Block 2: Ascension (NEW) --- */}
@@ -347,17 +374,27 @@ export function MainScreen({ onNavigate }: MainScreenProps) {
                 </p>
 
                 {/* Ascend Button */}
-                <Button
-                  onClick={handleAscendClick}
-                  disabled={!canAscend}
-                  className="w-full mt-auto"
-                  style={{
-                    background: canAscend ? "var(--azure)" : "#999",
-                    color: "var(--parchment)",
-                  }}
-                >
-                  Ascend (Cost: {ascensionCost} Qi)
-                </Button>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      onClick={handleAscendClick}
+                      disabled={!canAscend}
+                      className="w-full mt-auto transition-all hover:-translate-y-0.5 hover:shadow-lg disabled:hover:translate-y-0 disabled:hover:shadow-none"
+                      style={{
+                        background: canAscend ? "var(--azure)" : "#999",
+                        color: "var(--parchment)",
+                        boxShadow: canAscend ? "0 4px 6px rgba(58, 110, 165, 0.4)" : "none",
+                      }}
+                    >
+                      Ascend (Cost: {ascensionCost} Qi)
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent className="parchment-bg border-2 border-amber-700">
+                    <p className="parchment-text text-xs">
+                      Ascend to next tier for enhanced buffs!
+                    </p>
+                  </TooltipContent>
+                </Tooltip>
               </>
             ) : (
               <p className="font-bold parchment-text text-center my-4">
@@ -392,19 +429,29 @@ export function MainScreen({ onNavigate }: MainScreenProps) {
                 Each upgrade increases battle Qi rewards by 10%
               </p>
             </div>
-            <Button
-              onClick={upgradeBattleReward}
-              disabled={!canUpgradeBattleReward}
-              className="w-full mt-4"
-              style={{
-                background: canUpgradeBattleReward
-                  ? "var(--vermillion)"
-                  : "#999",
-                color: "var(--parchment)",
-              }}
-            >
-              Enhance Battle Mastery ({battleRewardUpgradeCost} Qi)
-            </Button>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  onClick={upgradeBattleReward}
+                  disabled={!canUpgradeBattleReward}
+                  className="w-full mt-4 transition-all hover:-translate-y-0.5 hover:shadow-lg disabled:hover:translate-y-0 disabled:hover:shadow-none"
+                  style={{
+                    background: canUpgradeBattleReward
+                      ? "var(--vermillion)"
+                      : "#999",
+                    color: "var(--parchment)",
+                    boxShadow: canUpgradeBattleReward ? "0 4px 6px rgba(193, 39, 45, 0.3)" : "none",
+                  }}
+                >
+                  Enhance Battle Mastery ({battleRewardUpgradeCost} Qi)
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent className="parchment-bg border-2 border-amber-700">
+                <p className="parchment-text text-xs">
+                  Current: {(battleRewardMultiplier * 100).toFixed(0)}% → Next: {((battleRewardMultiplier + 0.1) * 100).toFixed(0)}%
+                </p>
+              </TooltipContent>
+            </Tooltip>
           </div>
 
           {/* Block 2: Spirit Summoning (NEW) */}
@@ -468,29 +515,49 @@ export function MainScreen({ onNavigate }: MainScreenProps) {
             ) : null}
 
             <div className="space-y-3">
-              <Button
-                onClick={() => setSummonRequest(1)} // Opens modal
-                disabled={!canSummonOne}
-                className="w-full p-5 text-base font-bold"
-                style={{
-                  background: canSummonOne ? "var(--jade-green)" : "#999",
-                  color: "var(--parchment)",
-                }}
-              >
-                Summon Spirit ({spiritCost} Qi)
-              </Button>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    onClick={() => setSummonRequest(1)} // Opens modal
+                    disabled={!canSummonOne}
+                    className="w-full p-5 text-base font-bold transition-all hover:-translate-y-0.5 hover:shadow-lg disabled:hover:translate-y-0 disabled:hover:shadow-none"
+                    style={{
+                      background: canSummonOne ? "var(--jade-green)" : "#999",
+                      color: "var(--parchment)",
+                      boxShadow: canSummonOne ? "0 4px 6px rgba(76, 132, 119, 0.4)" : "none",
+                    }}
+                  >
+                    Summon Spirit ({spiritCost} Qi)
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent className="parchment-bg border-2 border-amber-700">
+                  <p className="parchment-text text-xs">
+                    Rates: Common (60%), Uncommon (25%), Rare (10%), Epic (4%), Legendary (1%), Prismatic (0.1%)
+                  </p>
+                </TooltipContent>
+              </Tooltip>
               {/* --- CHANGED: onClick handler --- */}
-              <Button
-                onClick={() => setSummonRequest(10)} // Opens modal
-                disabled={!canSummonTen}
-                className="w-full p-5 text-base font-bold"
-                style={{
-                  background: canSummonTen ? "var(--jade-green)" : "#999",
-                  color: "var(--parchment)",
-                }}
-              >
-                Summon 10 Spirits ({multiSummonCost} Qi)
-              </Button>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    onClick={() => setSummonRequest(10)} // Opens modal
+                    disabled={!canSummonTen}
+                    className="w-full p-5 text-base font-bold transition-all hover:-translate-y-0.5 hover:shadow-lg disabled:hover:translate-y-0 disabled:hover:shadow-none"
+                    style={{
+                      background: canSummonTen ? "var(--jade-green)" : "#999",
+                      color: "var(--parchment)",
+                      boxShadow: canSummonTen ? "0 4px 6px rgba(76, 132, 119, 0.4)" : "none",
+                    }}
+                  >
+                    Summon 10 Spirits ({multiSummonCost} Qi)
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent className="parchment-bg border-2 border-amber-700">
+                  <p className="parchment-text text-xs">
+                    Bonus: Guarantees at least 1 Rare or higher spirit
+                  </p>
+                </TooltipContent>
+              </Tooltip>
             </div>
           </div>
         </div>
@@ -499,58 +566,82 @@ export function MainScreen({ onNavigate }: MainScreenProps) {
         <div className="grid grid-cols-2 gap-4 mb-4">
           <Button
             onClick={() => onNavigate("spirits")}
-            className="p-6 flex flex-col items-center gap-2"
-            style={{ background: "var(--azure)", color: "var(--parchment)" }}
+            className="p-6 flex flex-col items-center gap-2 transition-all hover:-translate-y-0.5 hover:shadow-lg"
+            style={{ 
+              background: "var(--azure)", 
+              color: "var(--parchment)",
+              boxShadow: "0 4px 6px rgba(58, 110, 165, 0.4)"
+            }}
           >
             <Users className="w-8 h-8" />
             <span className="text-sm font-semibold">Manage Spirits</span>
           </Button>
 
-          <Button
-            onClick={() => {
-              if (canEnterBattle) {
-                onNavigate("battle");
-              } else {
-                alert(
-                  "You must have at least one spirit in your active party to enter battle.",
-                );
-              }
-            }}
-            disabled={!canEnterBattle}
-            className="p-6 flex flex-col items-center gap-2"
-            style={{
-              background: "var(--vermillion)",
-              color: "var(--parchment)",
-              opacity: canEnterBattle ? 1 : 0.5, // <-- Add visual feedback
-            }}
-          >
-            <Swords className="w-8 h-8" />
-            <span className="text-sm font-semibold">Enter Battle</span>
-          </Button>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                onClick={() => {
+                  if (canEnterBattle) {
+                    onNavigate("battle");
+                  } else {
+                    alert(
+                      "You must have at least one spirit in your active party to enter battle.",
+                    );
+                  }
+                }}
+                disabled={!canEnterBattle}
+                className="p-6 flex flex-col items-center gap-2 transition-all hover:-translate-y-0.5 hover:shadow-lg disabled:hover:translate-y-0 disabled:hover:shadow-none"
+                style={{
+                  background: "var(--vermillion)",
+                  color: "var(--parchment)",
+                  opacity: canEnterBattle ? 1 : 0.5,
+                  boxShadow: canEnterBattle ? "0 4px 6px rgba(193, 39, 45, 0.3)" : "none",
+                }}
+              >
+                <Swords className="w-8 h-8" />
+                <span className="text-sm font-semibold">Enter Battle</span>
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent className="parchment-bg border-2 border-amber-700">
+              <p className="parchment-text text-xs">
+                Party: {activeParty.length}/4 Ready
+              </p>
+            </TooltipContent>
+          </Tooltip>
         </div>
 
         {/* Boss Button */}
-        <Button
-          onClick={() => {
-            if (canEnterBattle) {
-              onNavigate("boss");
-            } else {
-              alert(
-                "You must have at least one spirit in your active party to challenge the boss.",
-              );
-            }
-          }}
-          disabled={!canEnterBattle}
-          className="w-full p-6 flex flex-col items-center gap-2"
-          style={{
-            background: "linear-gradient(135deg, #8B0000 0%, #FF4500 100%)",
-            color: "var(--parchment)",
-            opacity: canEnterBattle ? 1 : 0.5, // <-- Add visual feedback
-          }}
-        >
-          <Swords className="w-10 h-10" />
-          <span className="text-lg font-bold">⚔️ Challenge Boss ⚔️</span>
-        </Button>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              onClick={() => {
+                if (canEnterBattle) {
+                  onNavigate("boss");
+                } else {
+                  alert(
+                    "You must have at least one spirit in your active party to challenge the boss.",
+                  );
+                }
+              }}
+              disabled={!canEnterBattle}
+              className="w-full p-6 flex flex-col items-center gap-2 transition-all hover:-translate-y-0.5 hover:shadow-xl disabled:hover:translate-y-0 disabled:hover:shadow-none"
+              style={{
+                background: "linear-gradient(135deg, #8B0000 0%, #FF4500 100%)",
+                color: "var(--parchment)",
+                opacity: canEnterBattle ? 1 : 0.5,
+                boxShadow: canEnterBattle ? "0 6px 12px rgba(139, 0, 0, 0.5)" : "none",
+              }}
+            >
+              <Swords className="w-10 h-10" />
+              <span className="text-lg font-bold">⚔️ Challenge Boss ⚔️</span>
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent className="parchment-bg border-2 border-amber-700">
+            <p className="parchment-text text-xs">
+              Reward: Huge Qi gain on victory. Must win to Ascend past Tier 3
+            </p>
+          </TooltipContent>
+        </Tooltip>
 
         {/* Reset Button */}
         <Button
@@ -630,6 +721,7 @@ export function MainScreen({ onNavigate }: MainScreenProps) {
           summonCount={summonRequest || 0}
         />
       )}
-    </div>
+      </div>
+    </TooltipProvider>
   );
 }
