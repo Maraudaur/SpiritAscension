@@ -97,10 +97,9 @@ function App() {
   return (
     <div
       style={{
-        width: "100vw",
+        width: "100%", // Use 100% instead of 100vw if the body has 100vw
         minHeight: "100vh",
         position: "relative",
-        overflow: "auto",
       }}
     >
       <MainScreen onNavigate={setCurrentScreen} />

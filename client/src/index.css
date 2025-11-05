@@ -17,9 +17,8 @@
     @apply font-sans antialiased;
     margin: 0;
     padding: 0;
-    overflow: hidden;
     width: 100vw;
-    height: 100vh;
+    min-height: 100vh;
     background: linear-gradient(135deg, #2a1810 0%, #1a1410 100%);
     color: var(--parchment);
   }
@@ -28,7 +27,6 @@
 #root {
   width: 100%;
   height: 100%;
-  position: fixed;
 }
 
 .parchment-bg {
@@ -82,44 +80,47 @@
 }
 
 .qi-sprite {
-/* The size of ONE frame */
-width: 128px;
-height: 128px;
+  /* The size of ONE frame */
+  width: 128px;
+  height: 128px;
 
-background-image: url('/powerupsheet.png');
-background-size: 200% 100%;
-background-repeat: no-repeat;
+  background-image: url('/powerupsheet.png');
+  background-size: 200% 100%;
+  background-repeat: no-repeat;
 
   /* * NOTE: We removed 'steps(2, start)' from this line.
    * We will define the steps in the keyframes instead.
    */
-animation: qi-sprite-animation 1s infinite;
+  animation: qi-sprite-animation 1s infinite;
 }
 
 /*
  * This is the "manual" version of steps(2, start)
  */
 @keyframes qi-sprite-animation {
+
   /* * Frame 1 (no dots)
    * Show from the beginning (0%) until just before 50%
    */
-0% {
-background-position: 0% 0;
-}
-49.9% {
-background-position: 0% 0;
-}
+  0% {
+    background-position: 0% 0;
+  }
+
+  49.9% {
+    background-position: 0% 0;
+  }
 
   /* * Frame 2 (with dots)
    * Show from 50% until the end (100%)
    */
-50% {
+  50% {
     /* 100% position shows the 2nd frame */
-background-position: 100% 0; 
-}
-100% {
-background-position: 100% 0;
-}
+    background-position: 100% 0;
+  }
+
+  100% {
+    background-position: 100% 0;
+  }
 }
 
 .element-wood {

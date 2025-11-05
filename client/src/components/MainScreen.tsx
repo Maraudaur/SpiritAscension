@@ -149,7 +149,7 @@ export function MainScreen({ onNavigate }: MainScreenProps) {
   };
 
   return (
-    <div className="w-full min-h-screen flex flex-col items-center px-4 relative">
+    <div className="w-full min-h-screen flex flex-col items-center px-4 relative overflow-y-auto">
       <div className="parchment-bg chinese-border max-w-2xl w-full p-8 rounded-lg my-4 relative">
         {/* Volume button in top-right corner of main area */}
         <div className="absolute top-4 right-4 z-10">
@@ -162,7 +162,7 @@ export function MainScreen({ onNavigate }: MainScreenProps) {
           >
             {isMuted ? <VolumeX size={20} /> : <Volume2 size={20} />}
           </Button>
-          
+
           {/* Volume Slider Popup */}
           <AnimatePresence>
             {showVolumeSlider && (
@@ -175,7 +175,9 @@ export function MainScreen({ onNavigate }: MainScreenProps) {
               >
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
-                    <span className="text-sm font-semibold parchment-text">Volume</span>
+                    <span className="text-sm font-semibold parchment-text">
+                      Volume
+                    </span>
                     <span className="text-xs parchment-text">{volume}%</span>
                   </div>
                   <Slider
@@ -198,7 +200,7 @@ export function MainScreen({ onNavigate }: MainScreenProps) {
             )}
           </AnimatePresence>
         </div>
-        
+
         <h1 className="text-5xl font-bold text-center mb-2 parchment-text brush-stroke">
           天道修真
         </h1>
