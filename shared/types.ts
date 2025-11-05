@@ -77,6 +77,32 @@ export interface HealEffect {
   affinityRatio: number; // 0.3 for 0.3x affinity
 }
 
+export interface CritChanceBuffEffect {
+  type: "crit_chance_buff";
+  value: number; // 0.5 for +50%
+  duration: number;
+}
+
+export interface LifestealBuffEffect {
+  type: "lifesteal_buff";
+  value: number; // 0.5 for 50% lifesteal
+  duration: number;
+}
+
+export interface DamageReflectBuffEffect {
+  type: "damage_reflect_buff";
+  ratio: number; // 0.3 for 30% reflection
+  duration: number;
+}
+
+export interface ApplyDotStackEffect {
+  type: "apply_dot_stack";
+  damageRatio: number; // 0.05 for 5% max HP per turn
+  duration: number;
+  stacks: number; // Number of stacks to apply
+  maxStacks: number; // Maximum allowed stacks
+}
+
 export type CustomEffect =
   | StatBuffEffect
   | DOTEffect
@@ -85,7 +111,11 @@ export type CustomEffect =
   | BasicAttackConversionEffect
   | HealEffect
   | SwapBuffTrapEffect
-  | ChargeEffect;
+  | ChargeEffect
+  | CritChanceBuffEffect
+  | LifestealBuffEffect
+  | DamageReflectBuffEffect
+  | ApplyDotStackEffect;
 
 export interface PassiveStatBoost {
   type: "stat_boost";
@@ -105,10 +135,28 @@ export interface PassiveDOTAttacker {
   duration: number;
 }
 
+export interface PassiveCritChanceBoost {
+  type: "crit_chance_boost";
+  value: number; // 0.2 for 20%
+}
+
+export interface PassiveDotDamageBoost {
+  type: "dot_damage_boost";
+  value: number; // 0.3 for 30% boost
+}
+
+export interface PassiveDamageReflect {
+  type: "damage_reflect_passive";
+  ratio: number; // 0.15 for 15% reflection
+}
+
 export type PassiveEffect =
   | PassiveStatBoost
   | PassiveElementalLifesteal
-  | PassiveDOTAttacker;
+  | PassiveDOTAttacker
+  | PassiveCritChanceBoost
+  | PassiveDotDamageBoost
+  | PassiveDamageReflect;
 
 export type CombatTrigger =
   | "on_hit"
@@ -147,6 +195,12 @@ export interface ActiveEffect {
     value: number; // 0.5 for +50%
     duration: number; // 5 turns
   };
+  critChanceBoost?: number; // For crit_chance_buff
+  lifestealRatio?: number; // For lifesteal_buff
+  damageReflectRatio?: number; // For damage_reflect_buff
+  dotStacks?: number; // For tracking DoT stacks
+  casterSpiritId?: string; // For DoT amplification - the spirit that cast this effect
+  casterHasDotAmplification?: boolean; // Whether the caster has dot_amplification passive
 }
 
 export interface ChargeEffect {

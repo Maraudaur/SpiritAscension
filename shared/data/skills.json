@@ -163,5 +163,71 @@
         "trapDuration": 4
       }
     ]
+  },
+  "crit_setup": {
+    "id": "crit_setup",
+    "name": "Aura of Precision",
+    "description": "Applies a Crit Chance Up buff (+50%) to the user for 3 turns.",
+    "damage": 0,
+    "healing": 0,
+    "unlockLevel": 1,
+    "element": "metal",
+    "effects": [
+      {
+        "type": "crit_chance_buff",
+        "value": 0.5,
+        "duration": 3
+      }
+    ]
+  },
+  "def_shred_dot": {
+    "id": "def_shred_dot",
+    "name": "Venomous Sap",
+    "description": "Deals light wood damage and applies 2 stacks of Poison (5% Max HP/turn) for 3 turns. Max 5 stacks.",
+    "damage": 0.5,
+    "healing": 0,
+    "unlockLevel": 2,
+    "element": "wood",
+    "effects": [
+      {
+        "type": "apply_dot_stack",
+        "damageRatio": 0.05,
+        "duration": 3,
+        "stacks": 2,
+        "maxStacks": 5
+      }
+    ]
+  },
+  "lifesteal_buff": {
+    "id": "lifesteal_buff",
+    "name": "Blood Surge",
+    "description": "Grants the user 50% Lifesteal on all damage dealt for 4 turns.",
+    "damage": 0,
+    "healing": 0,
+    "unlockLevel": 3,
+    "element": "fire",
+    "effects": [
+      {
+        "type": "lifesteal_buff",
+        "value": 0.5,
+        "duration": 4
+      }
+    ]
+  },
+  "thorns_buff": {
+    "id": "thorns_buff",
+    "name": "Reflective Shell",
+    "description": "Applies a buff that reflects 30% of incoming damage for 5 turns.",
+    "damage": 0,
+    "healing": 0,
+    "unlockLevel": 2,
+    "element": "earth",
+    "effects": [
+      {
+        "type": "damage_reflect_buff",
+        "ratio": 0.3,
+        "duration": 5
+      }
+    ]
   }
 }

@@ -82,5 +82,38 @@
         "value": 20
       }
     ]
+  },
+  "crit_mastery": {
+    "id": "crit_mastery",
+    "name": "Crit Mastery",
+    "description": "Grants 20% Critical Hit Chance.",
+    "effects": [
+      {
+        "type": "crit_chance_boost",
+        "value": 0.2
+      }
+    ]
+  },
+  "dot_amplification": {
+    "id": "dot_amplification",
+    "name": "DoT Amplification",
+    "description": "Increases Damage-over-Time dealt by 30%.",
+    "effects": [
+      {
+        "type": "dot_damage_boost",
+        "value": 0.3
+      }
+    ]
+  },
+  "damage_reflect": {
+    "id": "damage_reflect",
+    "name": "Stone Scale",
+    "description": "Reflects 15% of all incoming damage back to the attacker.",
+    "effects": [
+      {
+        "type": "damage_reflect_passive",
+        "ratio": 0.15
+      }
+    ]
   }
 }

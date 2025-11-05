@@ -28,7 +28,7 @@
         "elementalAffinity": 60
       },
       "passiveAbilities": ["defense_focus"],
-      "skills": ["basic_attack", "heavy_hit", "hit_and_heal"]
+      "skills": ["basic_attack", "bubble_barrier", "hit_and_heal"]
     },
     {
       "id": "spirit_c03",
@@ -42,7 +42,7 @@
         "health": 140,
         "elementalAffinity": 100
       },
-      "passiveAbilities": ["attack_focus"],
+      "passiveAbilities": ["attack_focus", "crit_mastery"],
       "skills": ["basic_attack", "heavy_hit", "hit_and_heal"]
     },
     {
@@ -57,8 +57,8 @@
         "health": 150,
         "elementalAffinity": 100
       },
-      "passiveAbilities": ["health_focus"],
-      "skills": ["basic_attack", "heavy_hit", "hit_and_heal"]
+      "passiveAbilities": ["health_focus", "healing_waters"],
+      "skills": ["basic_attack", "heavy_hit", "water_charge"]
     },
     {
       "id": "spirit_c05",
@@ -72,8 +72,8 @@
         "health": 140,
         "elementalAffinity": 100
       },
-      "passiveAbilities": ["poison_thorns"],
-      "skills": ["ancestral_healing","basic_attack"]
+      "passiveAbilities": ["damage_reflect", "defense_focus"],
+      "skills": ["basic_attack", "thorns_buff"]
     },
     {
       "id": "spirit_c06",
@@ -133,7 +133,7 @@
         "elementalAffinity": 70
       },
       "passiveAbilities": ["defense_focus"],
-      "skills": ["basic_attack", "swap_atk_trap", "hit_and_heal"],
+      "skills": ["basic_attack", "bubble_barrier", "hit_and_heal"],
       "triggeredAbilities": [
         {
           "trigger": "on_switch_in",
@@ -160,7 +160,7 @@
         "elementalAffinity": 110
       },
       "passiveAbilities": ["attack_focus"],
-      "skills": ["basic_attack", "heavy_hit", "hit_and_heal"]
+      "skills": ["basic_attack", "swap_atk_trap", "crit_setup"]
     },
     {
       "id": "spirit_c11",
@@ -174,8 +174,8 @@
         "health": 140,
         "elementalAffinity": 100
       },
-      "passiveAbilities": ["health_focus"],
-      "skills": ["basic_attack", "heavy_hit", "hit_and_heal"]
+      "passiveAbilities": ["dot_amplification"],
+      "skills": ["basic_attack", "def_shred_dot", "hit_and_heal"]
     },
     {
       "id": "spirit_c12",
@@ -189,8 +189,8 @@
         "health": 130,
         "elementalAffinity": 100
       },
-      "passiveAbilities": ["attack_focus"],
-      "skills": ["basic_attack", "heavy_hit", "hit_and_heal"]
+      "passiveAbilities": ["poison_thorns"],
+      "skills": ["basic_attack", "def_shred_dot", "heavy_hit"]
     },
     {
       "id": "spirit_c13",
@@ -326,8 +326,8 @@
         "health": 200,
         "elementalAffinity": 90
       },
-      "passiveAbilities": ["attack_focus"],
-      "skills": ["basic_attack", "heavy_hit", "hit_and_heal"]
+      "passiveAbilities": ["attack_focus", "healing_flames"],
+      "skills": ["basic_attack", "heavy_hit", "lifesteal_buff"]
     },
     {
       "id": "spirit_u02",
@@ -356,8 +356,8 @@
         "health": 170,
         "elementalAffinity": 110
       },
-      "passiveAbilities": ["attack_focus"],
-      "skills": ["basic_attack", "heavy_hit", "hit_and_heal"]
+      "passiveAbilities": ["attack_focus", "crit_mastery"],
+      "skills": ["basic_attack", "heavy_hit", "crit_setup"]
     },
     {
       "id": "spirit_u04",
@@ -416,8 +416,8 @@
         "health": 180,
         "elementalAffinity": 60
       },
-      "passiveAbilities": ["defense_focus"],
-      "skills": ["basic_attack", "heavy_hit", "hit_and_heal"]
+      "passiveAbilities": ["defense_focus", "damage_reflect"],
+      "skills": ["basic_attack", "thorns_buff", "bubble_barrier"]
     },
     {
       "id": "spirit_u08",
@@ -598,8 +598,8 @@
         "health": 210,
         "elementalAffinity": 120
       },
-      "passiveAbilities": ["health_focus", "healing_waters"],
-      "skills": ["bubble_barrier", "tidal_surge", "water_charge"]
+      "passiveAbilities": ["health_focus", "dot_amplification"],
+      "skills": ["bubble_barrier", "tidal_surge", "def_shred_dot"]
     },
     {
       "id": "spirit_r10",
