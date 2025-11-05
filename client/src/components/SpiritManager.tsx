@@ -324,16 +324,16 @@ export function SpiritManager({ onClose }: SpiritManagerProps) {
                       Element
                     </label>
                     <Select value={elementFilter} onValueChange={setElementFilter}>
-                      <SelectTrigger className="h-9 text-xs bg-white border-2 border-amber-600 font-semibold">
+                      <SelectTrigger className="h-9 text-xs font-semibold border-2 text-[#1A1A1A]" style={{ background: "#F5E6D3", borderColor: "#1A1A1A" }}>
                         <SelectValue />
                       </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="all">All Elements</SelectItem>
-                        <SelectItem value="wood">Wood</SelectItem>
-                        <SelectItem value="fire">Fire</SelectItem>
-                        <SelectItem value="earth">Earth</SelectItem>
-                        <SelectItem value="metal">Metal</SelectItem>
-                        <SelectItem value="water">Water</SelectItem>
+                      <SelectContent className="border-2" style={{ background: "#F5E6D3", borderColor: "#1A1A1A" }}>
+                        <SelectItem value="all" className="hover:bg-[#C1272D] hover:text-[#F5E6D3] focus:bg-[#C1272D] focus:text-[#F5E6D3]">All Elements</SelectItem>
+                        <SelectItem value="wood" className="hover:bg-[#C1272D] hover:text-[#F5E6D3] focus:bg-[#C1272D] focus:text-[#F5E6D3]">Wood</SelectItem>
+                        <SelectItem value="fire" className="hover:bg-[#C1272D] hover:text-[#F5E6D3] focus:bg-[#C1272D] focus:text-[#F5E6D3]">Fire</SelectItem>
+                        <SelectItem value="earth" className="hover:bg-[#C1272D] hover:text-[#F5E6D3] focus:bg-[#C1272D] focus:text-[#F5E6D3]">Earth</SelectItem>
+                        <SelectItem value="metal" className="hover:bg-[#C1272D] hover:text-[#F5E6D3] focus:bg-[#C1272D] focus:text-[#F5E6D3]">Metal</SelectItem>
+                        <SelectItem value="water" className="hover:bg-[#C1272D] hover:text-[#F5E6D3] focus:bg-[#C1272D] focus:text-[#F5E6D3]">Water</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
@@ -343,17 +343,17 @@ export function SpiritManager({ onClose }: SpiritManagerProps) {
                       Lineage
                     </label>
                     <Select value={lineageFilter} onValueChange={setLineageFilter}>
-                      <SelectTrigger className="h-9 text-xs bg-white border-2 border-amber-600 font-semibold">
+                      <SelectTrigger className="h-9 text-xs font-semibold border-2 text-[#1A1A1A]" style={{ background: "#F5E6D3", borderColor: "#1A1A1A" }}>
                         <SelectValue />
                       </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="all">All Lineages</SelectItem>
-                        <SelectItem value="tiger">Tiger</SelectItem>
-                        <SelectItem value="dragon">Dragon</SelectItem>
-                        <SelectItem value="ox">Ox</SelectItem>
-                        <SelectItem value="serpent">Serpent</SelectItem>
-                        <SelectItem value="horse">Horse</SelectItem>
-                        <SelectItem value="monkey">Monkey</SelectItem>
+                      <SelectContent className="border-2" style={{ background: "#F5E6D3", borderColor: "#1A1A1A" }}>
+                        <SelectItem value="all" className="hover:bg-[#C1272D] hover:text-[#F5E6D3] focus:bg-[#C1272D] focus:text-[#F5E6D3]">All Lineages</SelectItem>
+                        <SelectItem value="tiger" className="hover:bg-[#C1272D] hover:text-[#F5E6D3] focus:bg-[#C1272D] focus:text-[#F5E6D3]">Tiger</SelectItem>
+                        <SelectItem value="dragon" className="hover:bg-[#C1272D] hover:text-[#F5E6D3] focus:bg-[#C1272D] focus:text-[#F5E6D3]">Dragon</SelectItem>
+                        <SelectItem value="ox" className="hover:bg-[#C1272D] hover:text-[#F5E6D3] focus:bg-[#C1272D] focus:text-[#F5E6D3]">Ox</SelectItem>
+                        <SelectItem value="serpent" className="hover:bg-[#C1272D] hover:text-[#F5E6D3] focus:bg-[#C1272D] focus:text-[#F5E6D3]">Serpent</SelectItem>
+                        <SelectItem value="horse" className="hover:bg-[#C1272D] hover:text-[#F5E6D3] focus:bg-[#C1272D] focus:text-[#F5E6D3]">Horse</SelectItem>
+                        <SelectItem value="monkey" className="hover:bg-[#C1272D] hover:text-[#F5E6D3] focus:bg-[#C1272D] focus:text-[#F5E6D3]">Monkey</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
@@ -363,13 +363,13 @@ export function SpiritManager({ onClose }: SpiritManagerProps) {
                       Sort By
                     </label>
                     <Select value={sortBy} onValueChange={setSortBy}>
-                      <SelectTrigger className="h-9 text-xs bg-white border-2 border-amber-600 font-semibold">
+                      <SelectTrigger className="h-9 text-xs font-semibold border-2 text-[#1A1A1A]" style={{ background: "#F5E6D3", borderColor: "#1A1A1A" }}>
                         <SelectValue />
                       </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="name">Name</SelectItem>
-                        <SelectItem value="level">Level</SelectItem>
-                        <SelectItem value="rarity">Rarity</SelectItem>
+                      <SelectContent className="border-2" style={{ background: "#F5E6D3", borderColor: "#1A1A1A" }}>
+                        <SelectItem value="name" className="hover:bg-[#C1272D] hover:text-[#F5E6D3] focus:bg-[#C1272D] focus:text-[#F5E6D3]">Name</SelectItem>
+                        <SelectItem value="level" className="hover:bg-[#C1272D] hover:text-[#F5E6D3] focus:bg-[#C1272D] focus:text-[#F5E6D3]">Level</SelectItem>
+                        <SelectItem value="rarity" className="hover:bg-[#C1272D] hover:text-[#F5E6D3] focus:bg-[#C1272D] focus:text-[#F5E6D3]">Rarity</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
