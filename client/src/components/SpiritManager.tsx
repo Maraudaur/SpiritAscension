@@ -307,66 +307,72 @@ export function SpiritManager({ onClose }: SpiritManagerProps) {
 
         <div className="flex-1 overflow-hidden flex gap-4">
           <div className="flex-1 scroll-container pr-2">
-            <div className="sticky top-0 bg-parchment py-2 space-y-3 z-10">
-              <h3 className="font-bold parchment-text">
+            <div className="sticky top-0 bg-parchment pb-3 z-10">
+              <h3 className="font-bold parchment-text mb-3 text-lg">
                 All Spirits ({filteredAndSortedSpirits.length}/{spirits.length})
               </h3>
               
               {/* Filter and Sort Controls */}
-              <div className="grid grid-cols-3 gap-2">
-                <div>
-                  <label className="text-xs parchment-text font-semibold mb-1 block">
-                    Element
-                  </label>
-                  <Select value={elementFilter} onValueChange={setElementFilter}>
-                    <SelectTrigger className="h-8 text-xs">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">All Elements</SelectItem>
-                      <SelectItem value="wood">Wood</SelectItem>
-                      <SelectItem value="fire">Fire</SelectItem>
-                      <SelectItem value="earth">Earth</SelectItem>
-                      <SelectItem value="metal">Metal</SelectItem>
-                      <SelectItem value="water">Water</SelectItem>
-                    </SelectContent>
-                  </Select>
+              <div className="bg-amber-50 border-2 border-amber-700 rounded-lg p-3 shadow-md">
+                <div className="flex items-center gap-2 mb-2">
+                  <Filter className="w-4 h-4 text-amber-800" />
+                  <span className="font-bold text-sm parchment-text">Filter & Sort</span>
                 </div>
-                
-                <div>
-                  <label className="text-xs parchment-text font-semibold mb-1 block">
-                    Lineage
-                  </label>
-                  <Select value={lineageFilter} onValueChange={setLineageFilter}>
-                    <SelectTrigger className="h-8 text-xs">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">All Lineages</SelectItem>
-                      <SelectItem value="tiger">Tiger</SelectItem>
-                      <SelectItem value="dragon">Dragon</SelectItem>
-                      <SelectItem value="ox">Ox</SelectItem>
-                      <SelectItem value="serpent">Serpent</SelectItem>
-                      <SelectItem value="horse">Horse</SelectItem>
-                      <SelectItem value="monkey">Monkey</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                
-                <div>
-                  <label className="text-xs parchment-text font-semibold mb-1 block">
-                    Sort By
-                  </label>
-                  <Select value={sortBy} onValueChange={setSortBy}>
-                    <SelectTrigger className="h-8 text-xs">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="name">Name</SelectItem>
-                      <SelectItem value="level">Level</SelectItem>
-                      <SelectItem value="rarity">Rarity</SelectItem>
-                    </SelectContent>
-                  </Select>
+                <div className="grid grid-cols-3 gap-3">
+                  <div>
+                    <label className="text-xs parchment-text font-bold mb-1.5 block">
+                      Element
+                    </label>
+                    <Select value={elementFilter} onValueChange={setElementFilter}>
+                      <SelectTrigger className="h-9 text-xs bg-white border-2 border-amber-600 font-semibold">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">All Elements</SelectItem>
+                        <SelectItem value="wood">Wood</SelectItem>
+                        <SelectItem value="fire">Fire</SelectItem>
+                        <SelectItem value="earth">Earth</SelectItem>
+                        <SelectItem value="metal">Metal</SelectItem>
+                        <SelectItem value="water">Water</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  
+                  <div>
+                    <label className="text-xs parchment-text font-bold mb-1.5 block">
+                      Lineage
+                    </label>
+                    <Select value={lineageFilter} onValueChange={setLineageFilter}>
+                      <SelectTrigger className="h-9 text-xs bg-white border-2 border-amber-600 font-semibold">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">All Lineages</SelectItem>
+                        <SelectItem value="tiger">Tiger</SelectItem>
+                        <SelectItem value="dragon">Dragon</SelectItem>
+                        <SelectItem value="ox">Ox</SelectItem>
+                        <SelectItem value="serpent">Serpent</SelectItem>
+                        <SelectItem value="horse">Horse</SelectItem>
+                        <SelectItem value="monkey">Monkey</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  
+                  <div>
+                    <label className="text-xs parchment-text font-bold mb-1.5 block">
+                      Sort By
+                    </label>
+                    <Select value={sortBy} onValueChange={setSortBy}>
+                      <SelectTrigger className="h-9 text-xs bg-white border-2 border-amber-600 font-semibold">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="name">Name</SelectItem>
+                        <SelectItem value="level">Level</SelectItem>
+                        <SelectItem value="rarity">Rarity</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
                 </div>
               </div>
             </div>
