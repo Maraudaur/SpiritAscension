@@ -15,6 +15,8 @@ export function SpiritSpriteAnimation({
   const canvasRef = useRef<HTMLDivElement>(null);
   const appRef = useRef<PIXI.Application | null>(null);
 
+  console.log(`SpiritSpriteAnimation: Rendering with spiritId="${spiritId}", position="${position}"`);
+
   useEffect(() => {
     if (!canvasRef.current) {
       console.log("SpiritSpriteAnimation: No canvas ref");
@@ -103,8 +105,11 @@ export function SpiritSpriteAnimation({
   }, [spiritId, position, size]);
 
   if (spiritId !== "spirit_c03") {
+    console.log(`SpiritSpriteAnimation: Skipping render for spiritId="${spiritId}" (not Ember Fox)`);
     return null;
   }
+
+  console.log("SpiritSpriteAnimation: Rendering canvas container for Ember Fox");
 
   return (
     <div
@@ -114,6 +119,7 @@ export function SpiritSpriteAnimation({
         height: `${size}px`,
         position: "absolute",
         pointerEvents: "none",
+        border: "2px solid red", // Debug: make it visible
       }}
     />
   );
