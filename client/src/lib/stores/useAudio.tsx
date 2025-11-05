@@ -10,6 +10,7 @@ interface AudioState {
   clickSound: HTMLAudioElement | null;
   hoverSound: HTMLAudioElement | null;
   isMuted: boolean;
+  volume: number; // 0-100
   currentMusic: 'explore' | 'battle' | null;
   
   // Setter functions
@@ -24,6 +25,7 @@ interface AudioState {
   
   // Control functions
   toggleMute: () => void;
+  setVolume: (volume: number) => void;
   playExploreMusic: () => void;
   playBattleMusic: () => void;
   stopAllMusic: () => void;
@@ -44,7 +46,8 @@ export const useAudio = create<AudioState>((set, get) => ({
   healSound: null,
   clickSound: null,
   hoverSound: null,
-  isMuted: false, // Start unmuted so sounds play by default
+  isMuted: false,
+  volume: 50, // Default to 50%
   currentMusic: null,
   
   setBackgroundMusic: (music) => set({ backgroundMusic: music }),
@@ -57,19 +60,38 @@ export const useAudio = create<AudioState>((set, get) => ({
   setHoverSound: (sound) => set({ hoverSound: sound }),
   
   toggleMute: () => {
-    const { isMuted, exploreMusic, battleMusic } = get();
+    const { isMuted, exploreMusic, battleMusic, volume } = get();
     const newMutedState = !isMuted;
     
-    // Adjust music volume based on mute state
-    if (exploreMusic) exploreMusic.volume = newMutedState ? 0 : 0.3;
-    if (battleMusic) battleMusic.volume = newMutedState ? 0 : 0.4;
+    // Adjust music volume based on mute state and volume slider
+    const volumeMultiplier = volume / 100;
+    if (exploreMusic) exploreMusic.volume = newMutedState ? 0 : 0.3 * volumeMultiplier;
+    if (battleMusic) battleMusic.volume = newMutedState ? 0 : 0.4 * volumeMultiplier;
     
     set({ isMuted: newMutedState });
     console.log(`Sound ${newMutedState ? 'muted' : 'unmuted'}`);
   },
   
-  playExploreMusic: () => {
+  setVolume: (newVolume) => {
     const { exploreMusic, battleMusic, isMuted, currentMusic } = get();
+    const volumeMultiplier = newVolume / 100;
+    
+    // Update music volumes if playing and not muted
+    if (!isMuted) {
+      if (currentMusic === 'explore' && exploreMusic) {
+        exploreMusic.volume = 0.3 * volumeMultiplier;
+      }
+      if (currentMusic === 'battle' && battleMusic) {
+        battleMusic.volume = 0.4 * volumeMultiplier;
+      }
+    }
+    
+    set({ volume: newVolume });
+    console.log(`Volume set to ${newVolume}%`);
+  },
+  
+  playExploreMusic: () => {
+    const { exploreMusic, battleMusic, isMuted, currentMusic, volume } = get();
     
     // Don't restart if already playing
     if (currentMusic === 'explore' && exploreMusic && !exploreMusic.paused) {
@@ -90,7 +112,8 @@ export const useAudio = create<AudioState>((set, get) => ({
     // Play explore music
     if (exploreMusic) {
       exploreMusic.loop = true;
-      exploreMusic.volume = isMuted ? 0 : 0.3;
+      const volumeMultiplier = volume / 100;
+      exploreMusic.volume = isMuted ? 0 : 0.3 * volumeMultiplier;
       exploreMusic.play().catch(() => console.log('Explore music autoplay prevented'));
       set({ currentMusic: 'explore' });
       console.log('🎵 Playing explore music');
@@ -98,7 +121,7 @@ export const useAudio = create<AudioState>((set, get) => ({
   },
   
   playBattleMusic: () => {
-    const { exploreMusic, battleMusic, isMuted, currentMusic } = get();
+    const { exploreMusic, battleMusic, isMuted, currentMusic, volume } = get();
     
     // Don't restart if already playing
     if (currentMusic === 'battle' && battleMusic && !battleMusic.paused) {
@@ -119,7 +142,8 @@ export const useAudio = create<AudioState>((set, get) => ({
     // Play battle music
     if (battleMusic) {
       battleMusic.loop = true;
-      battleMusic.volume = isMuted ? 0 : 0.4;
+      const volumeMultiplier = volume / 100;
+      battleMusic.volume = isMuted ? 0 : 0.4 * volumeMultiplier;
       battleMusic.play().catch(() => console.log('Battle music autoplay prevented'));
       set({ currentMusic: 'battle' });
       console.log('⚔️ Playing battle music');
@@ -143,7 +167,7 @@ export const useAudio = create<AudioState>((set, get) => ({
   },
   
   playHit: () => {
-    const { hitSound, isMuted } = get();
+    const { hitSound, isMuted, volume } = get();
     if (hitSound) {
       // If sound is muted, don't play anything
       if (isMuted) {
@@ -153,7 +177,8 @@ export const useAudio = create<AudioState>((set, get) => ({
       
       // Clone the sound to allow overlapping playback
       const soundClone = hitSound.cloneNode() as HTMLAudioElement;
-      soundClone.volume = 0.3;
+      const volumeMultiplier = volume / 100;
+      soundClone.volume = 0.3 * volumeMultiplier;
       soundClone.play().catch(error => {
         console.log("Hit sound play prevented:", error);
       });
@@ -161,7 +186,7 @@ export const useAudio = create<AudioState>((set, get) => ({
   },
   
   playSuccess: () => {
-    const { successSound, isMuted } = get();
+    const { successSound, isMuted, volume } = get();
     if (successSound) {
       // If sound is muted, don't play anything
       if (isMuted) {
@@ -169,6 +194,8 @@ export const useAudio = create<AudioState>((set, get) => ({
         return;
       }
       
+      const volumeMultiplier = volume / 100;
+      successSound.volume = 1.0 * volumeMultiplier;
       successSound.currentTime = 0;
       successSound.play().catch(error => {
         console.log("Success sound play prevented:", error);
@@ -177,7 +204,7 @@ export const useAudio = create<AudioState>((set, get) => ({
   },
   
   playButtonClick: () => {
-    const { clickSound, isMuted } = get();
+    const { clickSound, isMuted, volume } = get();
     console.log('🔊 playButtonClick called:', { 
       hasSound: !!clickSound, 
       isMuted,
@@ -188,7 +215,8 @@ export const useAudio = create<AudioState>((set, get) => ({
     });
     if (clickSound && !isMuted) {
       const soundClone = clickSound.cloneNode() as HTMLAudioElement;
-      soundClone.volume = 0.4;
+      const volumeMultiplier = volume / 100;
+      soundClone.volume = 0.4 * volumeMultiplier;
       soundClone.play()
         .then(() => {
           console.log('✅ Click sound played!', {
@@ -202,7 +230,7 @@ export const useAudio = create<AudioState>((set, get) => ({
   },
   
   playButtonHover: () => {
-    const { hoverSound, isMuted } = get();
+    const { hoverSound, isMuted, volume } = get();
     console.log('🔊 playButtonHover called:', { 
       hasSound: !!hoverSound, 
       isMuted,
@@ -212,7 +240,8 @@ export const useAudio = create<AudioState>((set, get) => ({
     });
     if (hoverSound && !isMuted) {
       const soundClone = hoverSound.cloneNode() as HTMLAudioElement;
-      soundClone.volume = 0.2;
+      const volumeMultiplier = volume / 100;
+      soundClone.volume = 0.2 * volumeMultiplier;
       soundClone.play()
         .then(() => {
           console.log('✅ Hover sound played!', {
@@ -226,20 +255,22 @@ export const useAudio = create<AudioState>((set, get) => ({
   },
   
   playDamage: () => {
-    const { hitSound, isMuted } = get();
+    const { hitSound, isMuted, volume } = get();
     if (hitSound && !isMuted) {
       const soundClone = hitSound.cloneNode() as HTMLAudioElement;
-      soundClone.volume = 0.4;
+      const volumeMultiplier = volume / 100;
+      soundClone.volume = 0.4 * volumeMultiplier;
       soundClone.playbackRate = 0.9;
       soundClone.play().catch(() => {});
     }
   },
   
   playHeal: () => {
-    const { healSound, isMuted } = get();
+    const { healSound, isMuted, volume } = get();
     if (healSound && !isMuted) {
       const soundClone = healSound.cloneNode() as HTMLAudioElement;
-      soundClone.volume = 0.3;
+      const volumeMultiplier = volume / 100;
+      soundClone.volume = 0.3 * volumeMultiplier;
       soundClone.currentTime = 0;
       soundClone.play().catch(() => {});
     }

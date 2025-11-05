@@ -11,6 +11,7 @@ import {
   Info,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Slider } from "@/components/ui/slider";
 import { getRarityColor } from "@/lib/spiritUtils";
 import { motion, AnimatePresence } from "framer-motion";
 import { SummonScreen } from "./SummonScreen";
@@ -53,9 +54,10 @@ export function MainScreen({ onNavigate }: MainScreenProps) {
     getMultiSummonCost,
     activeParty,
   } = useGameState();
-  const { isMuted, toggleMute } = useAudio();
+  const { isMuted, toggleMute, volume, setVolume } = useAudio();
   const [displayQi, setDisplayQi] = useState(qi);
   const [isClient, setIsClient] = useState(false);
+  const [showVolumeSlider, setShowVolumeSlider] = useState(false);
   useEffect(() => {
     console.log(
       "DEBUG (MainScreen): Component Mounted. Setting isClient to true.",
@@ -148,20 +150,55 @@ export function MainScreen({ onNavigate }: MainScreenProps) {
 
   return (
     <div className="w-full h-full flex items-center justify-center p-4 relative">
-      {/* Sound toggle button in top-right corner */}
-      <div className="fixed top-4 right-4 z-50">
-        <Button
-          variant="outline"
-          size="icon"
-          onClick={toggleMute}
-          title={isMuted ? "Unmute Sound" : "Mute Sound"}
-          className="bg-white/90 backdrop-blur-sm"
-        >
-          {isMuted ? <VolumeX size={20} /> : <Volume2 size={20} />}
-        </Button>
-      </div>
-
-      <div className="parchment-bg chinese-border max-w-2xl w-full p-8 rounded-lg">
+      <div className="parchment-bg chinese-border max-w-2xl w-full p-8 rounded-lg relative">
+        {/* Volume button in top-right corner of main area */}
+        <div className="absolute top-4 right-4 z-10">
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={() => setShowVolumeSlider(!showVolumeSlider)}
+            title="Volume Control"
+            className="bg-white/90 backdrop-blur-sm"
+          >
+            {isMuted ? <VolumeX size={20} /> : <Volume2 size={20} />}
+          </Button>
+          
+          {/* Volume Slider Popup */}
+          <AnimatePresence>
+            {showVolumeSlider && (
+              <motion.div
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                className="absolute top-14 right-0 bg-white/95 backdrop-blur-sm p-4 rounded-lg shadow-lg border-2 border-amber-700"
+                style={{ width: "200px" }}
+              >
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-semibold parchment-text">Volume</span>
+                    <span className="text-xs parchment-text">{volume}%</span>
+                  </div>
+                  <Slider
+                    value={[volume]}
+                    onValueChange={(values) => setVolume(values[0])}
+                    max={100}
+                    step={1}
+                    className="w-full"
+                  />
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={toggleMute}
+                    className="w-full text-xs"
+                  >
+                    {isMuted ? "Unmute" : "Mute"}
+                  </Button>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+        
         <h1 className="text-5xl font-bold text-center mb-2 parchment-text brush-stroke">
           天道修真
         </h1>
