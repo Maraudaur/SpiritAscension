@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useGameState } from "@/lib/stores/useGameState";
 import { useAudio } from "@/lib/stores/useAudio";
 import {
@@ -13,6 +13,13 @@ import {
 } from "@/lib/spiritUtils";
 import { Button } from "@/components/ui/button";
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
   X,
   Plus,
   Trash2,
@@ -21,6 +28,7 @@ import {
   TrendingUp,
   Volume2,
   VolumeX,
+  Filter,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import type { PlayerSpirit } from "@shared/types";
@@ -62,6 +70,11 @@ export function SpiritManager({ onClose }: SpiritManagerProps) {
   const [audioElement, setAudioElement] = useState<HTMLAudioElement | null>(
     null,
   );
+  
+  // Filter and sort state
+  const [elementFilter, setElementFilter] = useState<string>("all");
+  const [lineageFilter, setLineageFilter] = useState<string>("all");
+  const [sortBy, setSortBy] = useState<string>("name");
 
   useEffect(() => {
     return () => {
@@ -71,6 +84,49 @@ export function SpiritManager({ onClose }: SpiritManagerProps) {
       }
     };
   }, [audioElement]);
+  
+  // Apply filters and sorting
+  const filteredAndSortedSpirits = useMemo(() => {
+    let filtered = [...spirits];
+    
+    // Apply element filter
+    if (elementFilter !== "all") {
+      filtered = filtered.filter((spirit) => {
+        const baseSpirit = getBaseSpirit(spirit.spiritId);
+        return baseSpirit?.element === elementFilter;
+      });
+    }
+    
+    // Apply lineage filter
+    if (lineageFilter !== "all") {
+      filtered = filtered.filter((spirit) => {
+        const baseSpirit = getBaseSpirit(spirit.spiritId);
+        return baseSpirit?.lineage === lineageFilter;
+      });
+    }
+    
+    // Apply sorting
+    filtered.sort((a, b) => {
+      const baseA = getBaseSpirit(a.spiritId);
+      const baseB = getBaseSpirit(b.spiritId);
+      if (!baseA || !baseB) return 0;
+      
+      switch (sortBy) {
+        case "name":
+          return baseA.name.localeCompare(baseB.name);
+        case "level":
+          return b.level - a.level;
+        case "rarity": {
+          const rarityOrder: Record<string, number> = { common: 0, uncommon: 1, rare: 2, epic: 3, legendary: 4, boss: 5 };
+          return (rarityOrder[baseB.rarity] || 0) - (rarityOrder[baseA.rarity] || 0);
+        }
+        default:
+          return 0;
+      }
+    });
+    
+    return filtered;
+  }, [spirits, elementFilter, lineageFilter, sortBy]);
 
   const handleAddToParty = (instanceId: string) => {
     addToParty(instanceId);
@@ -251,11 +307,72 @@ export function SpiritManager({ onClose }: SpiritManagerProps) {
 
         <div className="flex-1 overflow-hidden flex gap-4">
           <div className="flex-1 scroll-container pr-2">
-            <h3 className="font-bold parchment-text mb-2 sticky top-0 bg-parchment py-2">
-              All Spirits ({spirits.length})
-            </h3>
-            <div className="grid grid-cols-2 gap-3">
-              {spirits.map((spirit) => {
+            <div className="sticky top-0 bg-parchment py-2 space-y-3 z-10">
+              <h3 className="font-bold parchment-text">
+                All Spirits ({filteredAndSortedSpirits.length}/{spirits.length})
+              </h3>
+              
+              {/* Filter and Sort Controls */}
+              <div className="grid grid-cols-3 gap-2">
+                <div>
+                  <label className="text-xs parchment-text font-semibold mb-1 block">
+                    Element
+                  </label>
+                  <Select value={elementFilter} onValueChange={setElementFilter}>
+                    <SelectTrigger className="h-8 text-xs">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All Elements</SelectItem>
+                      <SelectItem value="wood">Wood</SelectItem>
+                      <SelectItem value="fire">Fire</SelectItem>
+                      <SelectItem value="earth">Earth</SelectItem>
+                      <SelectItem value="metal">Metal</SelectItem>
+                      <SelectItem value="water">Water</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                
+                <div>
+                  <label className="text-xs parchment-text font-semibold mb-1 block">
+                    Lineage
+                  </label>
+                  <Select value={lineageFilter} onValueChange={setLineageFilter}>
+                    <SelectTrigger className="h-8 text-xs">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All Lineages</SelectItem>
+                      <SelectItem value="tiger">Tiger</SelectItem>
+                      <SelectItem value="dragon">Dragon</SelectItem>
+                      <SelectItem value="ox">Ox</SelectItem>
+                      <SelectItem value="serpent">Serpent</SelectItem>
+                      <SelectItem value="horse">Horse</SelectItem>
+                      <SelectItem value="monkey">Monkey</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                
+                <div>
+                  <label className="text-xs parchment-text font-semibold mb-1 block">
+                    Sort By
+                  </label>
+                  <Select value={sortBy} onValueChange={setSortBy}>
+                    <SelectTrigger className="h-8 text-xs">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="name">Name</SelectItem>
+                      <SelectItem value="level">Level</SelectItem>
+                      <SelectItem value="rarity">Rarity</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-2 gap-3 mt-3">
+              {filteredAndSortedSpirits.map((spirit) => {
                 const baseSpirit = getBaseSpirit(spirit.spiritId);
                 if (!baseSpirit) return null;
 
@@ -335,6 +452,14 @@ export function SpiritManager({ onClose }: SpiritManagerProps) {
                 );
               })}
             </div>
+            {filteredAndSortedSpirits.length === 0 && spirits.length > 0 && (
+              <div className="text-center py-12 parchment-text opacity-50">
+                <p>No spirits match the selected filters</p>
+                <p className="text-sm mt-2">
+                  Try adjusting your filter settings
+                </p>
+              </div>
+            )}
             {spirits.length === 0 && (
               <div className="text-center py-12 parchment-text opacity-50">
                 <p>No spirits summoned yet</p>
