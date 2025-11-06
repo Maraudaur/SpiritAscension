@@ -12,6 +12,8 @@ This is a cultivation/spirit-summoning idle game inspired by Asian mythology and
 - Refactored MainScreen (Cultivation) to use recommended two-column layout: Ascension Progress (left) and Qi Upgrades (right)
 - Updated all screens to work within bounded 16:9 container
 - Boss battles now handled via state management instead of separate navigation screen
+- Added persistent HUD at top of all screens displaying Qi Energy counter and generation rate per second
+- Completely restructured Spirit Manager to use fixed Left Panel (Active 4-Spirit Party) and large Main Panel (Scrollable Spirit Inventory) with detailed inspection as Layer 2 modal overlay
 
 # User Preferences
 
