@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { Sidebar } from "./components/Sidebar";
+import { QiHUD } from "./components/QiHUD";
 import { StoryScreen } from "./components/StoryScreen";
 import { MainScreen } from "./components/MainScreen";
 import { SummonScreen } from "./components/SummonScreen";
@@ -131,45 +132,51 @@ function App() {
             boxShadow: "0 8px 24px rgba(0, 0, 0, 0.3)",
             overflow: "hidden",
             position: "relative",
+            display: "flex",
+            flexDirection: "column",
           }}
         >
-          {currentScreen === "story" && <StoryScreen />}
+          <QiHUD />
           
-          {currentScreen === "cultivation" && !isBossBattle && (
-            <div className="w-full h-full overflow-y-auto">
-              <MainScreen 
-                onNavigate={setCurrentScreen}
-                onBossBattle={() => {
-                  setIsBossBattle(true);
-                  setCurrentScreen("battle");
-                }}
-              />
-            </div>
-          )}
+          <div style={{ flex: 1, overflow: "hidden", position: "relative" }}>
+            {currentScreen === "story" && <StoryScreen />}
+            
+            {currentScreen === "cultivation" && !isBossBattle && (
+              <div className="w-full h-full overflow-y-auto">
+                <MainScreen 
+                  onNavigate={setCurrentScreen}
+                  onBossBattle={() => {
+                    setIsBossBattle(true);
+                    setCurrentScreen("battle");
+                  }}
+                />
+              </div>
+            )}
 
-          {currentScreen === "spirits" && (
-            <div className="w-full h-full overflow-hidden">
-              <SpiritManager onClose={() => setCurrentScreen("cultivation")} />
-            </div>
-          )}
+            {currentScreen === "spirits" && (
+              <div className="w-full h-full overflow-hidden">
+                <SpiritManager onClose={() => setCurrentScreen("cultivation")} />
+              </div>
+            )}
 
-          {currentScreen === "summon" && (
-            <div className="w-full h-full overflow-hidden">
-              <SummonScreen onClose={() => setCurrentScreen("cultivation")} />
-            </div>
-          )}
+            {currentScreen === "summon" && (
+              <div className="w-full h-full overflow-hidden">
+                <SummonScreen onClose={() => setCurrentScreen("cultivation")} />
+              </div>
+            )}
 
-          {currentScreen === "battle" && (
-            <div className="w-full h-full overflow-hidden">
-              <BattleScreen 
-                onClose={() => {
-                  setCurrentScreen("cultivation");
-                  setIsBossBattle(false);
-                }} 
-                isBossBattle={isBossBattle}
-              />
-            </div>
-          )}
+            {currentScreen === "battle" && (
+              <div className="w-full h-full overflow-hidden">
+                <BattleScreen 
+                  onClose={() => {
+                    setCurrentScreen("cultivation");
+                    setIsBossBattle(false);
+                  }} 
+                  isBossBattle={isBossBattle}
+                />
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </div>
