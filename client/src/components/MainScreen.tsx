@@ -1,12 +1,9 @@
 import { useState, useEffect } from "react";
 import { useGameState } from "@/lib/stores/useGameState";
-import { useAudio } from "@/lib/stores/useAudio";
 import {
-  Sparkles,
   Swords,
   Users,
   Star,
-  Info,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -15,9 +12,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { getRarityColor } from "@/lib/spiritUtils";
 import { motion, AnimatePresence } from "framer-motion";
-import { SummonScreen } from "./SummonScreen";
 
 interface MainScreenProps {
   onNavigate: (
@@ -41,10 +36,10 @@ export function MainScreen({ onNavigate, onBossBattle }: MainScreenProps) {
     qiPerSecond,
     updateQi,
     qiUpgrades,
-    upgradeQiProduction, // Assumes this now ONLY upgrades base production
-    upgradeQiMultiplier, // NEW: You must add this function to useGameState
-    getBaseProductionUpgradeCost, // NEW: You must add this
-    getMultiplierUpgradeCost, // NEW: You must add this
+    upgradeQiProduction,
+    upgradeQiMultiplier,
+    getBaseProductionUpgradeCost,
+    getMultiplierUpgradeCost,
     battlesWon,
     battleRewardMultiplier,
     upgradeBattleReward,
@@ -54,11 +49,8 @@ export function MainScreen({ onNavigate, onBossBattle }: MainScreenProps) {
     getAscensionCost,
     getAscensionBuffs,
     ascend,
-    getSpiritCost,
-    getMultiSummonCost,
     activeParty,
   } = useGameState();
-  const { isMuted, toggleMute, volume, setVolume } = useAudio();
   const [displayQi, setDisplayQi] = useState(qi);
   const [isClient, setIsClient] = useState(false);
   useEffect(() => {
@@ -70,10 +62,7 @@ export function MainScreen({ onNavigate, onBossBattle }: MainScreenProps) {
 
   const canEnterBattle = isClient && activeParty && activeParty.length > 0;
 
-  // 0 = hidden, 1 = first warning, 2 = final warning
   const [ascendConfirmStep, setAscendConfirmStep] = useState(0);
-  const [showSummonRates, setShowSummonRates] = useState(false);
-  const [summonRequest, setSummonRequest] = useState<number | null>(null);
 
   // --- DEBUG: Log state on every render ---
   console.log("--- MainScreen Render ---");
@@ -111,13 +100,6 @@ export function MainScreen({ onNavigate, onBossBattle }: MainScreenProps) {
   const currentTierData = TIER_DATA[ascensionTier] || TIER_DATA[0];
   const isPrismatic = ascensionTier === 5; // Special class for max tier
   const progressPercent = Math.min((qi / ascensionCost) * 100, 100);
-
-  // --- NEW: Summoning Costs ---
-  const spiritCost = getSpiritCost();
-  const canSummonOne = qi >= spiritCost;
-  // This new function calculates the total cost for 10 summons
-  const multiSummonCost = getMultiSummonCost(10);
-  const canSummonTen = qi >= multiSummonCost;
 
   const handleResetGame = () => {
     if (
@@ -385,112 +367,6 @@ export function MainScreen({ onNavigate, onBossBattle }: MainScreenProps) {
           </div>
         </div>
 
-        {/* Spirit Summoning Section (Outside Grid) */}
-        <div className="p-4 parchment-bg rounded border-2 border-amber-700">
-          <div className="flex justify-between items-center mb-3">
-            <h3 className="text-lg font-bold parchment-text">
-              Spirit Summoning
-            </h3>
-            <Button
-              size="icon"
-              variant="outline"
-              onClick={() => setShowSummonRates(!showSummonRates)}
-              className="bg-white/80"
-            >
-              <Info size={18} />
-            </Button>
-          </div>
-
-          {showSummonRates ? (
-            <motion.div
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: "auto" }}
-              exit={{ opacity: 0, height: 0 }}
-              className="mb-4 overflow-hidden"
-            >
-              <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-sm parchment-text">
-                <div className="flex justify-between">
-                  <span style={{ color: getRarityColor("common") }}>
-                    Common:
-                  </span>
-                  <span>60%</span>
-                </div>
-                <div className="flex justify-between">
-                  <span style={{ color: getRarityColor("uncommon") }}>
-                    Uncommon:
-                  </span>
-                  <span>25%</span>
-                </div>
-                <div className="flex justify-between">
-                  <span style={{ color: getRarityColor("rare") }}>Rare:</span>
-                  <span>10%</span>
-                </div>
-                <div className="flex justify-between">
-                  <span style={{ color: getRarityColor("epic") }}>Epic:</span>
-                  <span>4%</span>
-                </div>
-                <div className="flex justify-between">
-                  <span style={{ color: getRarityColor("legendary") }}>
-                    Legendary:
-                  </span>
-                  <span>1%</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="prismatic-border px-1 rounded">
-                    Prismatic:
-                  </span>
-                  <span>0.1%</span>
-                </div>
-              </div>
-            </motion.div>
-          ) : null}
-
-          <div className="grid grid-cols-2 gap-4">
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  onClick={() => setSummonRequest(1)}
-                  disabled={!canSummonOne}
-                  className="w-full p-5 text-base font-bold transition-all hover:-translate-y-0.5 hover:shadow-lg disabled:hover:translate-y-0 disabled:hover:shadow-none"
-                  style={{
-                    background: canSummonOne ? "var(--jade-green)" : "#999",
-                    color: "var(--parchment)",
-                    boxShadow: canSummonOne ? "0 4px 6px rgba(76, 132, 119, 0.4)" : "none",
-                  }}
-                >
-                  Summon Spirit ({spiritCost} Qi)
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent className="parchment-bg border-2 border-amber-700">
-                <p className="parchment-text text-xs">
-                  Rates: Common (60%), Uncommon (25%), Rare (10%), Epic (4%), Legendary (1%), Prismatic (0.1%)
-                </p>
-              </TooltipContent>
-            </Tooltip>
-
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  onClick={() => setSummonRequest(10)}
-                  disabled={!canSummonTen}
-                  className="w-full p-5 text-base font-bold transition-all hover:-translate-y-0.5 hover:shadow-lg disabled:hover:translate-y-0 disabled:hover:shadow-none"
-                  style={{
-                    background: canSummonTen ? "var(--jade-green)" : "#999",
-                    color: "var(--parchment)",
-                    boxShadow: canSummonTen ? "0 4px 6px rgba(76, 132, 119, 0.4)" : "none",
-                  }}
-                >
-                  Summon 10 Spirits ({multiSummonCost} Qi)
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent className="parchment-bg border-2 border-amber-700">
-                <p className="parchment-text text-xs">
-                  Bonus: Guarantees at least 1 Rare or higher spirit
-                </p>
-              </TooltipContent>
-            </Tooltip>
-          </div>
-        </div>
 
         {/* Navigation Buttons */}
         <div className="grid grid-cols-2 gap-4">
@@ -643,14 +519,6 @@ export function MainScreen({ onNavigate, onBossBattle }: MainScreenProps) {
           </motion.div>
         )}
       </AnimatePresence>
-      {/* Summon Screen Modal */}
-      {/* This renders the SummonScreen when summonRequest is 1 or 10 */}
-      {summonRequest !== null && (
-        <SummonScreen
-          onClose={() => setSummonRequest(null)}
-          summonCount={summonRequest || 0}
-        />
-      )}
     </TooltipProvider>
   );
 }

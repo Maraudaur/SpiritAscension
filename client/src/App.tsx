@@ -161,7 +161,7 @@ function App() {
 
             {currentScreen === "summon" && (
               <div className="w-full h-full overflow-hidden">
-                <SummonScreen onClose={() => setCurrentScreen("cultivation")} />
+                <SummonScreen onNavigate={setCurrentScreen} />
               </div>
             )}
 

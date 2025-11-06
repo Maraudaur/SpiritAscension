@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import { useGameState } from "@/lib/stores/useGameState";
-import { useAudio } from "@/lib/stores/useAudio";
 import {
   getBaseSpirit,
   getElement,
@@ -11,14 +10,15 @@ import {
   getPassiveAbility,
 } from "@/lib/spiritUtils";
 import { Button } from "@/components/ui/button";
-import { X, Sparkles, Volume2, VolumeX } from "lucide-react";
+import { Sparkles, Info } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import type { PlayerSpirit, Rarity } from "@shared/types";
-
-interface SummonScreenProps {
-  onClose: () => void;
-  summonCount?: number; // NEW: Number of summons to perform
-}
 
 type SummonStage = "idle" | "channeling" | "revealing" | "revealed";
 
@@ -28,41 +28,44 @@ const RARITY_GLOW_COLORS: Record<Rarity, string> = {
   rare: "#3B82F6",
   epic: "#A855F7",
   legendary: "#F59E0B",
+  boss: "#E11D48",
 };
 
-export function SummonScreen({ onClose, summonCount = 0 }: SummonScreenProps) {
+interface SummonScreenProps {
+  onNavigate: (screen: "story" | "cultivation" | "spirits" | "summon" | "battle") => void;
+}
+
+export function SummonScreen({ onNavigate }: SummonScreenProps) {
   const {
-    summonSpirit, // Used for single summons
+    summonSpirit,
     spendQi,
     getSpiritCost,
     qi,
     addEssence,
-    getMultiSummonCost, // NEW
-    summonMultipleSpirits, // NEW
+    getMultiSummonCost,
+    summonMultipleSpirits,
   } = useGameState();
-  const { isMuted, toggleMute } = useAudio();
+  
   const [summonedSpirit, setSummonedSpirit] = useState<PlayerSpirit | null>(
     null,
   );
-  const [stage, setStage] = useState<SummonStage>(
-    summonCount > 0 ? "channeling" : "idle",
-  );
+  const [stage, setStage] = useState<SummonStage>("idle");
   const [audioElement, setAudioElement] = useState<HTMLAudioElement | null>(
     null,
   );
-
-  // NEW: State for multi-summon queue
   const [summonQueue, setSummonQueue] = useState<PlayerSpirit[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [showSummonRates, setShowSummonRates] = useState(false);
 
   const spiritCost = getSpiritCost();
+  const multiSummonCost = getMultiSummonCost(10);
+  const canSummonOne = qi >= spiritCost;
+  const canSummonTen = qi >= multiSummonCost;
 
-  // This function starts the reveal animation for a given spirit
   const startReveal = (spirit: PlayerSpirit) => {
     setSummonedSpirit(spirit);
     setStage("channeling");
 
-    // Channeling phase (1.5 seconds)
     setTimeout(() => {
       setStage("revealing");
 
@@ -74,65 +77,45 @@ export function SummonScreen({ onClose, summonCount = 0 }: SummonScreenProps) {
         setAudioElement(audio);
       }
 
-      // Reveal phase (2 seconds)
       setTimeout(() => {
         setStage("revealed");
       }, 2000);
     }, 1500);
   };
 
-  // This handles a single summon (called from 'idle' screen or useEffect)
   const handleSingleSummon = () => {
     const cost = getSpiritCost();
     if (spendQi(cost)) {
-      const spirit = summonSpirit(); // This adds spirit to state
+      const spirit = summonSpirit();
 
-      // Grant essence
       const baseSpirit = getBaseSpirit(spirit.spiritId);
       if (baseSpirit) {
-        const reward = 5 + spirit.level * 2; // 7
+        const reward = 5 + spirit.level * 2;
         addEssence(baseSpirit.id, reward);
       }
 
       startReveal(spirit);
-    } else {
-      // Not enough Qi, just close
-      onClose();
     }
   };
 
-  // This handles a multi-summon (called from useEffect)
   const handleMultiSummon = (count: number) => {
     const cost = getMultiSummonCost(count);
     if (spendQi(cost)) {
-      const newSpirits = summonMultipleSpirits(count); // Adds spirits to state
+      const newSpirits = summonMultipleSpirits(count);
 
-      // Grant essence for all new spirits
       newSpirits.forEach((spirit) => {
         const baseSpirit = getBaseSpirit(spirit.spiritId);
         if (baseSpirit) {
-          const reward = 5 + spirit.level * 2; // 7
+          const reward = 5 + spirit.level * 2;
           addEssence(baseSpirit.id, reward);
         }
       });
 
       setSummonQueue(newSpirits);
       setCurrentIndex(0);
-      startReveal(newSpirits[0]); // Start reveal for the first spirit
-    } else {
-      onClose();
+      startReveal(newSpirits[0]);
     }
   };
-
-  // NEW: useEffect to trigger summon on load
-  useEffect(() => {
-    if (summonCount === 1) {
-      handleSingleSummon();
-    } else if (summonCount > 1) {
-      handleMultiSummon(summonCount);
-    }
-    // If summonCount is 0, it stays on 'idle' stage (set in useState)
-  }, [summonCount]);
 
   useEffect(() => {
     return () => {
@@ -143,28 +126,23 @@ export function SummonScreen({ onClose, summonCount = 0 }: SummonScreenProps) {
     };
   }, [audioElement]);
 
-  // This is what the 'Continue' button does
   const handleContinue = () => {
     if (audioElement) {
       audioElement.pause();
       audioElement.currentTime = 0;
     }
 
-    // Check if we are in a multi-summon queue
     if (summonQueue.length > 0) {
       const nextIndex = currentIndex + 1;
       if (nextIndex < summonQueue.length) {
-        // More spirits to show
         setCurrentIndex(nextIndex);
         startReveal(summonQueue[nextIndex]);
       } else {
-        // End of queue
-        setSummonQueue([]); // Clear queue
-        onClose();
+        setSummonQueue([]);
+        setStage("idle");
       }
     } else {
-      // Was a single summon
-      onClose();
+      setStage("idle");
     }
   };
 
@@ -181,32 +159,8 @@ export function SummonScreen({ onClose, summonCount = 0 }: SummonScreenProps) {
     : "#FFF";
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center p-4 z-50">
-      <div className="parchment-bg chinese-border max-w-2xl w-full p-8 rounded-lg relative">
-        <Button
-          variant="outline"
-          size="icon"
-          onClick={toggleMute}
-          title={isMuted ? "Unmute Sound" : "Mute Sound"}
-          className="absolute top-4 left-4 bg-white/90 backdrop-blur-sm"
-        >
-          {isMuted ? <VolumeX size={18} /> : <Volume2 size={18} />}
-        </Button>
-
-        <button
-          onClick={onClose}
-          className="absolute top-4 right-4 parchment-text hover:opacity-70"
-        >
-          <X className="w-6 h-6" />
-        </button>
-
-        <h2 className="text-3xl font-bold text-center mb-6 parchment-text brush-stroke">
-          {/* NEW: Show summon count if multi-summoning */}
-          {summonQueue.length > 0
-            ? `Summoning (${currentIndex + 1}/${summonQueue.length})`
-            : "Spirit Summoning Circle"}
-        </h2>
-
+    <TooltipProvider delayDuration={200}>
+      <div className="w-full h-full flex flex-col p-6 overflow-y-auto" style={{ background: "#F5E6D3" }}>
         <AnimatePresence mode="wait">
           {stage === "idle" && (
             <motion.div
@@ -214,83 +168,179 @@ export function SummonScreen({ onClose, summonCount = 0 }: SummonScreenProps) {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="text-center"
+              className="flex-1 flex flex-col items-center justify-center"
             >
-              {/* ... (This is the original idle screen content) ... */}
-              <div className="mb-6">
-                <div className="w-48 h-48 mx-auto rounded-full border-4 border-vermillion bg-gradient-to-br from-amber-100 to-amber-200 flex items-center justify-center">
-                  <Sparkles
-                    className="w-24 h-24"
-                    style={{ color: "var(--imperial-gold)" }}
-                  />
-                </div>
-              </div>
-              <div className="mb-6 parchment-text space-y-2">
-                <p className="text-lg font-semibold">
-                  Summon a new spirit to aid your cultivation
-                </p>
-                <p className="text-sm opacity-75">
-                  Cost: {spiritCost} Qi (Current: {Math.floor(qi)})
-                </p>
-              </div>
-              {/* ... (Summoning Rates box) ... */}
-              <div className="mb-6 p-4 bg-amber-50 rounded border-2 border-amber-300">
-                <h3 className="font-bold parchment-text mb-2">
-                  Summoning Rates
-                </h3>
-                <div className="grid grid-cols-2 gap-2 text-sm parchment-text">
-                  {/* ... (rates) ... */}
-                </div>
-              </div>
+              {/* Main Summon Area */}
+              <div className="max-w-2xl w-full parchment-bg chinese-border p-8 rounded-lg mb-6">
+                <h2 className="text-3xl font-bold text-center mb-6 parchment-text brush-stroke">
+                  Spirit Summoning Circle
+                </h2>
 
-              <Button
-                onClick={handleSingleSummon} // Changed from handleSummon
-                className="w-full p-6 text-lg font-bold"
-                style={{
-                  background: "var(--jade-green)",
-                  color: "var(--parchment)",
-                }}
-                disabled={qi < spiritCost}
-              >
-                Summon Spirit
-              </Button>
+                <div className="mb-6">
+                  <div className="w-48 h-48 mx-auto rounded-full border-4 border-vermillion bg-gradient-to-br from-amber-100 to-amber-200 flex items-center justify-center">
+                    <Sparkles
+                      className="w-24 h-24"
+                      style={{ color: "var(--imperial-gold)" }}
+                    />
+                  </div>
+                </div>
+
+                <div className="mb-6 parchment-text text-center space-y-2">
+                  <p className="text-lg font-semibold">
+                    Summon powerful spirits to aid your cultivation
+                  </p>
+                  <p className="text-sm opacity-75">
+                    Current Qi: {Math.floor(qi)}
+                  </p>
+                </div>
+
+                {/* Summoning Rates Info */}
+                <div className="mb-6">
+                  <div className="flex justify-between items-center mb-2">
+                    <h3 className="font-bold parchment-text">Summoning Rates</h3>
+                    <Button
+                      size="icon"
+                      variant="outline"
+                      onClick={() => setShowSummonRates(!showSummonRates)}
+                      className="bg-white/80 h-8 w-8"
+                    >
+                      <Info size={16} />
+                    </Button>
+                  </div>
+                  
+                  {showSummonRates && (
+                    <motion.div
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: "auto" }}
+                      exit={{ opacity: 0, height: 0 }}
+                      className="p-4 bg-amber-50 rounded border-2 border-amber-300 overflow-hidden"
+                    >
+                      <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-sm parchment-text">
+                        <div className="flex justify-between">
+                          <span style={{ color: getRarityColor("common") }}>Common:</span>
+                          <span>60%</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span style={{ color: getRarityColor("uncommon") }}>Uncommon:</span>
+                          <span>25%</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span style={{ color: getRarityColor("rare") }}>Rare:</span>
+                          <span>10%</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span style={{ color: getRarityColor("epic") }}>Epic:</span>
+                          <span>4%</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span style={{ color: getRarityColor("legendary") }}>Legendary:</span>
+                          <span>1%</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="prismatic-border px-1 rounded">Prismatic:</span>
+                          <span>0.1%</span>
+                        </div>
+                      </div>
+                    </motion.div>
+                  )}
+                </div>
+
+                {/* Summon Buttons */}
+                <div className="grid grid-cols-2 gap-4">
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        onClick={handleSingleSummon}
+                        disabled={!canSummonOne}
+                        className="w-full p-6 text-lg font-bold transition-all hover:-translate-y-0.5 hover:shadow-lg disabled:hover:translate-y-0 disabled:hover:shadow-none"
+                        style={{
+                          background: canSummonOne ? "var(--jade-green)" : "#999",
+                          color: "var(--parchment)",
+                          boxShadow: canSummonOne ? "0 4px 6px rgba(76, 132, 119, 0.4)" : "none",
+                        }}
+                      >
+                        Summon Spirit
+                        <div className="text-sm font-normal mt-1">({spiritCost} Qi)</div>
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent className="parchment-bg border-2 border-amber-700">
+                      <p className="parchment-text text-xs">
+                        Summon a single spirit
+                      </p>
+                    </TooltipContent>
+                  </Tooltip>
+
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        onClick={() => handleMultiSummon(10)}
+                        disabled={!canSummonTen}
+                        className="w-full p-6 text-lg font-bold transition-all hover:-translate-y-0.5 hover:shadow-lg disabled:hover:translate-y-0 disabled:hover:shadow-none"
+                        style={{
+                          background: canSummonTen ? "var(--jade-green)" : "#999",
+                          color: "var(--parchment)",
+                          boxShadow: canSummonTen ? "0 4px 6px rgba(76, 132, 119, 0.4)" : "none",
+                        }}
+                      >
+                        Summon 10 Spirits
+                        <div className="text-sm font-normal mt-1">({multiSummonCost} Qi)</div>
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent className="parchment-bg border-2 border-amber-700">
+                      <p className="parchment-text text-xs">
+                        Guarantees at least 1 Rare or higher spirit
+                      </p>
+                    </TooltipContent>
+                  </Tooltip>
+                </div>
+              </div>
             </motion.div>
           )}
 
-          {/*Channeling Phase*/}
+          {/* Channeling Phase */}
           {stage === "channeling" && (
             <motion.div
               key="channeling"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="text-center h-96 flex flex-col items-center justify-center parchment-text"
+              className="flex-1 flex flex-col items-center justify-center parchment-text"
             >
-              <motion.div
-                animate={{
-                  rotate: [0, 360],
-                  scale: [1, 1.2, 1],
-                  opacity: [0.8, 1, 0.8],
-                }}
-                transition={{
-                  duration: 1.5,
-                  repeat: Infinity,
-                  ease: "easeInOut",
-                }}
-                className="w-48 h-48 rounded-full border-8 border-t-imperial-gold border-vermillion bg-gradient-to-br from-amber-100 to-amber-200 flex items-center justify-center"
-              >
-                <Sparkles
-                  className="w-24 h-24"
-                  style={{ color: "var(--imperial-gold)" }}
-                />
-              </motion.div>
-              <p className="text-lg font-semibold mt-6">
-                Channeling spiritual energy...
-              </p>
+              <div className="max-w-2xl w-full parchment-bg chinese-border p-8 rounded-lg">
+                <h2 className="text-3xl font-bold text-center mb-8 parchment-text brush-stroke">
+                  {summonQueue.length > 0
+                    ? `Summoning (${currentIndex + 1}/${summonQueue.length})`
+                    : "Spirit Summoning Circle"}
+                </h2>
+                
+                <div className="h-96 flex flex-col items-center justify-center">
+                  <motion.div
+                    animate={{
+                      rotate: [0, 360],
+                      scale: [1, 1.2, 1],
+                      opacity: [0.8, 1, 0.8],
+                    }}
+                    transition={{
+                      duration: 1.5,
+                      repeat: Infinity,
+                      ease: "easeInOut",
+                    }}
+                    className="w-48 h-48 rounded-full border-8 border-t-imperial-gold border-vermillion bg-gradient-to-br from-amber-100 to-amber-200 flex items-center justify-center"
+                  >
+                    <Sparkles
+                      className="w-24 h-24"
+                      style={{ color: "var(--imperial-gold)" }}
+                    />
+                  </motion.div>
+                  <p className="text-lg font-semibold mt-6">
+                    Channeling spiritual energy...
+                  </p>
+                </div>
+              </div>
             </motion.div>
           )}
 
-          {/*Revealing Phase*/}
+          {/* Revealing Phase */}
           {stage === "revealing" && baseSpirit && (
             <motion.div
               key="revealing"
@@ -298,50 +348,62 @@ export function SummonScreen({ onClose, summonCount = 0 }: SummonScreenProps) {
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.8 }}
               transition={{ duration: 0.5, ease: "backOut" }}
-              className="text-center h-96 flex flex-col items-center justify-center"
+              className="flex-1 flex flex-col items-center justify-center"
             >
-              <motion.div
-                key={summonedSpirit?.instanceId} // Force remount for animation
-                initial={{ scale: 0, rotate: -180, opacity: 0 }}
-                animate={{ scale: 1, rotate: 0, opacity: 1 }}
-                transition={{
-                  type: "spring",
-                  stiffness: 260,
-                  damping: 20,
-                  delay: 0.2,
-                }}
-                style={{
-                  boxShadow: `0 0 40px 15px ${rarityColor}, 0 0 10px 5px ${rarityColor} inset`,
-                }}
-                className="w-48 h-48 rounded-full flex items-center justify-center"
-              >
-                <img
-                  src={`/images/spirits/${baseSpirit.id}.png`}
-                  alt={baseSpirit.name}
-                  className="w-36 h-36"
-                />
-              </motion.div>
-              <motion.h3
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.5 }}
-                className="text-3xl font-bold parchment-text mt-6"
-                style={{ color: rarityColor }}
-              >
-                {baseSpirit.name}
-              </motion.h3>
-              <motion.p
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.7 }}
-                className="text-xl parchment-text"
-                style={{ color: getRarityColor(baseSpirit.rarity) }}
-              >
-                {baseSpirit.rarity.charAt(0).toUpperCase() +
-                  baseSpirit.rarity.slice(1)}
-              </motion.p>
+              <div className="max-w-2xl w-full parchment-bg chinese-border p-8 rounded-lg">
+                <h2 className="text-3xl font-bold text-center mb-8 parchment-text brush-stroke">
+                  {summonQueue.length > 0
+                    ? `Summoning (${currentIndex + 1}/${summonQueue.length})`
+                    : "Spirit Summoning Circle"}
+                </h2>
+                
+                <div className="h-96 flex flex-col items-center justify-center">
+                  <motion.div
+                    key={summonedSpirit?.instanceId}
+                    initial={{ scale: 0, rotate: -180, opacity: 0 }}
+                    animate={{ scale: 1, rotate: 0, opacity: 1 }}
+                    transition={{
+                      type: "spring",
+                      stiffness: 260,
+                      damping: 20,
+                      delay: 0.2,
+                    }}
+                    style={{
+                      boxShadow: `0 0 40px 15px ${rarityColor}, 0 0 10px 5px ${rarityColor} inset`,
+                    }}
+                    className="w-48 h-48 rounded-full flex items-center justify-center"
+                  >
+                    <img
+                      src={`/images/spirits/${baseSpirit.id}.png`}
+                      alt={baseSpirit.name}
+                      className="w-36 h-36"
+                    />
+                  </motion.div>
+                  <motion.h3
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.5 }}
+                    className="text-3xl font-bold parchment-text mt-6"
+                    style={{ color: rarityColor }}
+                  >
+                    {baseSpirit.name}
+                  </motion.h3>
+                  <motion.p
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.7 }}
+                    className="text-xl parchment-text"
+                    style={{ color: getRarityColor(baseSpirit.rarity) }}
+                  >
+                    {baseSpirit.rarity.charAt(0).toUpperCase() +
+                      baseSpirit.rarity.slice(1)}
+                  </motion.p>
+                </div>
+              </div>
             </motion.div>
           )}
+
+          {/* Revealed Phase */}
           {stage === "revealed" &&
             summonedSpirit &&
             baseSpirit &&
@@ -352,192 +414,198 @@ export function SummonScreen({ onClose, summonCount = 0 }: SummonScreenProps) {
                 key="revealed"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0 }} // <-- The exit prop is key!
-                className="space-y-4"
+                exit={{ opacity: 0 }}
+                className="flex-1 flex flex-col items-center justify-center overflow-y-auto"
               >
-                {/* --- START: Spirit Details Box Content --- */}
-                <div className="grid grid-cols-3 gap-4">
-                  {/* Left Column: Image */}
-                  <div className="flex flex-col items-center justify-center">
-                    <div
-                      className="w-32 h-32 rounded-full flex items-center justify-center"
+                <div className="max-w-2xl w-full parchment-bg chinese-border p-8 rounded-lg">
+                  <h2 className="text-3xl font-bold text-center mb-6 parchment-text brush-stroke">
+                    {summonQueue.length > 0
+                      ? `Summoning (${currentIndex + 1}/${summonQueue.length})`
+                      : "Spirit Summoned"}
+                  </h2>
+
+                  <div className="grid grid-cols-3 gap-4 mb-4">
+                    <div className="flex flex-col items-center justify-center">
+                      <div
+                        className="w-32 h-32 rounded-full flex items-center justify-center"
+                        style={{
+                          boxShadow: `0 0 20px 8px ${rarityColor}, 0 0 5px 2px ${rarityColor} inset`,
+                        }}
+                      >
+                        <img
+                          src={`/images/spirits/${baseSpirit.id}.png`}
+                          alt={baseSpirit.name}
+                          className="w-24 h-24"
+                        />
+                      </div>
+                      {summonedSpirit.isPrismatic && (
+                        <span className="prismatic-text font-bold text-sm mt-2">
+                          PRISMATIC
+                        </span>
+                      )}
+                    </div>
+
+                    <div className="col-span-2 space-y-2">
+                      <h3
+                        className="text-3xl font-bold parchment-text"
+                        style={{ color: rarityColor }}
+                      >
+                        {baseSpirit.name}
+                      </h3>
+
+                      <p className="text-lg font-semibold parchment-text -mt-1">
+                        Level {summonedSpirit.level}
+                      </p>
+
+                      <div className="flex gap-4 text-sm parchment-text">
+                        <span
+                          className="font-semibold px-2 py-0.5 rounded"
+                          style={{
+                            backgroundColor: getRarityColor(baseSpirit.rarity),
+                            color:
+                              baseSpirit.rarity === "common" ? "#111" : "#FFF",
+                          }}
+                        >
+                          {baseSpirit.rarity.toUpperCase()}
+                        </span>
+                        <span
+                          className="font-semibold px-2 py-0.5 rounded"
+                          style={{
+                            backgroundColor: element.color,
+                            color: "#FFF",
+                          }}
+                        >
+                          {element.name.toUpperCase()}
+                        </span>
+                      </div>
+                      <p className="text-sm parchment-text opacity-80 italic">
+                        {lineage.description}
+                      </p>
+
+                      <div className="pt-1">
+                        <p className="text-sm parchment-text font-bold">
+                          Passive: {passive ? passive.name : "None"}
+                        </p>
+                        <p className="text-xs parchment-text opacity-80">
+                          {passive ? passive.description : ""}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="mt-4 pt-4 border-t-2 border-amber-700/50">
+                    <h4 className="font-semibold mb-2 text-center text-lg parchment-text">
+                      Stats
+                    </h4>
+                    <div className="parchment-text space-y-1 max-w-xs mx-auto">
+                      <div className="flex justify-between text-base">
+                        <span>HP:</span>
+                        <span className="font-medium">
+                          {stats.health}{" "}
+                          <span
+                            className="font-bold"
+                            style={{
+                              color: getPotentialColor(
+                                summonedSpirit.potentialFactors.health,
+                              ),
+                            }}
+                          >
+                            ({summonedSpirit.potentialFactors.health})
+                          </span>
+                        </span>
+                      </div>
+
+                      <div className="flex justify-between text-base">
+                        <span>ATK:</span>
+                        <span className="font-medium">
+                          {stats.attack}{" "}
+                          <span
+                            className="font-bold"
+                            style={{
+                              color: getPotentialColor(
+                                summonedSpirit.potentialFactors.attack,
+                              ),
+                            }}
+                          >
+                            ({summonedSpirit.potentialFactors.attack})
+                          </span>
+                        </span>
+                      </div>
+
+                      <div className="flex justify-between text-base">
+                        <span>DEF:</span>
+                        <span className="font-medium">
+                          {stats.defense}{" "}
+                          <span
+                            className="font-bold"
+                            style={{
+                              color: getPotentialColor(
+                                summonedSpirit.potentialFactors.defense,
+                              ),
+                            }}
+                          >
+                            ({summonedSpirit.potentialFactors.defense})
+                          </span>
+                        </span>
+                      </div>
+
+                      <div className="flex justify-between text-base">
+                        <span>AFFINITY:</span>
+                        <span className="font-medium">
+                          {stats.elementalAffinity}{" "}
+                          <span
+                            className="font-bold"
+                            style={{
+                              color: getPotentialColor(
+                                summonedSpirit.potentialFactors.elementalAffinity,
+                              ),
+                            }}
+                          >
+                            ({summonedSpirit.potentialFactors.elementalAffinity})
+                          </span>
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="mt-4 pt-4 border-t-2 border-amber-700/50 text-center parchment-text text-sm italic">
+                    You received{" "}
+                    <span className="font-bold">
+                      {5 + summonedSpirit.level * 2} {baseSpirit.name} Essence
+                    </span>{" "}
+                    for this summon.
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4 mt-6">
+                    <Button
+                      onClick={handleContinue}
+                      className="w-full p-4 text-lg font-bold"
                       style={{
-                        boxShadow: `0 0 20px 8px ${rarityColor}, 0 0 5px 2px ${rarityColor} inset`,
+                        background: "var(--vermillion)",
+                        color: "var(--parchment)",
                       }}
                     >
-                      <img
-                        src={`/images/spirits/${baseSpirit.id}.png`}
-                        alt={baseSpirit.name}
-                        className="w-24 h-24"
-                      />
-                    </div>
-                    {summonedSpirit.isPrismatic && (
-                      <span className="prismatic-text font-bold text-sm mt-2">
-                        PRISMATIC
-                      </span>
-                    )}
-                  </div>
-
-                  {/* Middle Column: Info */}
-                  <div className="col-span-2 space-y-2">
-                    <h3
-                      className="text-3xl font-bold parchment-text"
-                      style={{ color: rarityColor }}
+                      {summonQueue.length > 0 &&
+                      currentIndex < summonQueue.length - 1
+                        ? `Next (${currentIndex + 2}/${summonQueue.length})`
+                        : "Summon Again"}
+                    </Button>
+                    <Button
+                      onClick={() => onNavigate("cultivation")}
+                      className="w-full p-4 text-lg font-bold"
+                      style={{
+                        background: "var(--azure)",
+                        color: "var(--parchment)",
+                      }}
                     >
-                      {baseSpirit.name}
-                    </h3>
-
-                    {/* ADDED: Level */}
-                    <p className="text-lg font-semibold parchment-text -mt-1">
-                      Level {summonedSpirit.level}
-                    </p>
-
-                    <div className="flex gap-4 text-sm parchment-text">
-                      <span
-                        className="font-semibold px-2 py-0.5 rounded"
-                        style={{
-                          backgroundColor: getRarityColor(baseSpirit.rarity),
-                          color:
-                            baseSpirit.rarity === "common" ? "#111" : "#FFF",
-                        }}
-                      >
-                        {baseSpirit.rarity.toUpperCase()}
-                      </span>
-                      <span
-                        className="font-semibold px-2 py-0.5 rounded"
-                        style={{
-                          backgroundColor: element.color,
-                          color: "#FFF",
-                        }}
-                      >
-                        {element.name.toUpperCase()}
-                      </span>
-                    </div>
-                    <p className="text-sm parchment-text opacity-80 italic">
-                      {lineage.description}
-                    </p>
-
-                    {/* ADDED: Passive Info */}
-                    <div className="pt-1">
-                      <p className="text-sm parchment-text font-bold">
-                        Passive: {passive ? passive.name : "None"}
-                      </p>
-                      <p className="text-xs parchment-text opacity-80">
-                        {passive ? passive.description : ""}
-                      </p>
-                    </div>
+                      Return to Cultivation
+                    </Button>
                   </div>
                 </div>
-
-                {/* MODIFIED: Stats Section */}
-                <div className="mt-4 pt-4 border-t-2 border-amber-700/50">
-                  {/* Changed "Base Stats" to "Stats" and centered */}
-                  <h4 className="font-semibold mb-2 text-center text-lg parchment-text">
-                    Stats
-                  </h4>
-                  <div className="parchment-text space-y-1 max-w-xs mx-auto">
-                    {/* HP with Potential */}
-                    <div className="flex justify-between text-base">
-                      <span>HP:</span>
-                      <span className="font-medium">
-                        {stats.health}{" "}
-                        <span
-                          className="font-bold"
-                          style={{
-                            color: getPotentialColor(
-                              summonedSpirit.potentialFactors.health,
-                            ),
-                          }}
-                        >
-                          ({summonedSpirit.potentialFactors.health})
-                        </span>
-                      </span>
-                    </div>
-
-                    {/* ATK with Potential */}
-                    <div className="flex justify-between text-base">
-                      <span>ATK:</span>
-                      <span className="font-medium">
-                        {stats.attack}{" "}
-                        <span
-                          className="font-bold"
-                          style={{
-                            color: getPotentialColor(
-                              summonedSpirit.potentialFactors.attack,
-                            ),
-                          }}
-                        >
-                          ({summonedSpirit.potentialFactors.attack})
-                        </span>
-                      </span>
-                    </div>
-
-                    {/* DEF with Potential */}
-                    <div className="flex justify-between text-base">
-                      <span>DEF:</span>
-                      <span className="font-medium">
-                        {stats.defense}{" "}
-                        <span
-                          className="font-bold"
-                          style={{
-                            color: getPotentialColor(
-                              summonedSpirit.potentialFactors.defense,
-                            ),
-                          }}
-                        >
-                          ({summonedSpirit.potentialFactors.defense})
-                        </span>
-                      </span>
-                    </div>
-
-                    {/* ADDED: AFFINITY with Potential */}
-                    <div className="flex justify-between text-base">
-                      <span>AFFINITY:</span>
-                      <span className="font-medium">
-                        {stats.elementalAffinity}{" "}
-                        <span
-                          className="font-bold"
-                          style={{
-                            color: getPotentialColor(
-                              summonedSpirit.potentialFactors.elementalAffinity,
-                            ),
-                          }}
-                        >
-                          ({summonedSpirit.potentialFactors.elementalAffinity})
-                        </span>
-                      </span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* ADDED: Harmonize Reward Text */}
-                <div className="mt-4 pt-4 border-t-2 border-amber-700/50 text-center parchment-text text-sm italic">
-                  You received{" "}
-                  <span className="font-bold">
-                    {/* This calculation is from your handleSummon functions */}
-                    {5 + summonedSpirit.level * 2} {baseSpirit.name} Essence
-                  </span>{" "}
-                  for this summon.
-                </div>
-                {/* --- END: Spirit Details Box Content --- */}
-                <Button
-                  onClick={handleContinue} // This button now correctly handles queues
-                  className="w-full p-4 text-lg font-bold"
-                  style={{
-                    background: "var(--vermillion)",
-                    color: "var(--parchment)",
-                  }}
-                >
-                  {/* NEW: Change button text if in queue */}
-                  {summonQueue.length > 0 &&
-                  currentIndex < summonQueue.length - 1
-                    ? `Next (${currentIndex + 2}/${summonQueue.length})`
-                    : "Continue"}
-                </Button>
               </motion.div>
             )}
         </AnimatePresence>
       </div>
-    </div>
+    </TooltipProvider>
   );
 }
