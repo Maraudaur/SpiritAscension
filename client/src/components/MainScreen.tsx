@@ -24,8 +24,9 @@ import { SummonScreen } from "./SummonScreen";
 
 interface MainScreenProps {
   onNavigate: (
-    screen: "main" | "spirits" | "battle" | "summon" | "boss",
+    screen: "story" | "cultivation" | "spirits" | "summon" | "battle",
   ) => void;
+  onBossBattle?: () => void;
 }
 
 const TIER_DATA = [
@@ -37,7 +38,7 @@ const TIER_DATA = [
   { tier: 5, color: "#E11D48" }, // Prismatic (using a bright red as placeholder)
 ];
 
-export function MainScreen({ onNavigate }: MainScreenProps) {
+export function MainScreen({ onNavigate, onBossBattle }: MainScreenProps) {
   const {
     qi,
     qiPerSecond,
@@ -238,89 +239,16 @@ export function MainScreen({ onNavigate }: MainScreenProps) {
           </div>
         </div>
 
-        {/* --- MODIFIED LAYOUT: Wrapped Cultivation and Ascension in a Grid --- */}
+        {/* --- MODIFIED LAYOUT: Wrapped Ascension and Cultivation in a Grid --- */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-          {/* --- Block 1: Cultivation Progress (Existing) --- */}
-          <div className="p-4 parchment-bg rounded border-2 border-amber-700">
-            <h3 className="text-lg font-bold parchment-text mb-3">
-              Cultivation Progress
-            </h3>
-            <div className="space-y-2 mb-4">
-              <div className="flex justify-between parchment-text text-sm">
-                <span>Base Production:</span>
-                <span className="font-semibold">
-                  {qiUpgrades.baseProduction}
-                </span>
-              </div>
-              <div className="flex justify-between parchment-text text-sm">
-                <span>Multiplier:</span>
-                <span className="font-semibold">
-                  {qiUpgrades.multiplier.toFixed(1)}x
-                </span>
-              </div>
-              <div className="flex justify-between parchment-text text-sm">
-                <span>Battles Won:</span>
-                <span className="font-semibold">{battlesWon}</span>
-              </div>
-            </div>
-
-            {/* Button 1: Base Production */}
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  onClick={upgradeQiProduction}
-                  disabled={!canUpgradeBaseProduction}
-                  className="w-full mt-4 transition-all hover:-translate-y-0.5 hover:shadow-lg disabled:hover:translate-y-0 disabled:hover:shadow-none"
-                  style={{
-                    background: canUpgradeBaseProduction
-                      ? "var(--vermillion)"
-                      : "#999",
-                    color: "var(--parchment)",
-                    boxShadow: canUpgradeBaseProduction ? "0 4px 6px rgba(193, 39, 45, 0.3)" : "none",
-                  }}
-                >
-                  Enhance Base ({baseProductionUpgradeCost} Qi)
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent className="parchment-bg border-2 border-amber-700">
-                <p className="parchment-text text-xs">
-                  Current: {qiUpgrades.baseProduction} → Next: {qiUpgrades.baseProduction + 1}
-                </p>
-              </TooltipContent>
-            </Tooltip>
-
-            {/* Button 2: Multiplier */}
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  onClick={upgradeQiMultiplier}
-                  disabled={!canUpgradeMultiplier}
-                  className="w-full mt-4 transition-all hover:-translate-y-0.5 hover:shadow-lg disabled:hover:translate-y-0 disabled:hover:shadow-none"
-                  style={{
-                    background: canUpgradeMultiplier ? "var(--vermillion)" : "#999",
-                    color: "var(--parchment)",
-                    boxShadow: canUpgradeMultiplier ? "0 4px 6px rgba(193, 39, 45, 0.3)" : "none",
-                  }}
-                >
-                  Amplify Multiplier ({multiplierUpgradeCost} Qi)
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent className="parchment-bg border-2 border-amber-700">
-                <p className="parchment-text text-xs">
-                  Current: {qiUpgrades.multiplier.toFixed(1)}x → Next: {(qiUpgrades.multiplier + 0.1).toFixed(1)}x
-                </p>
-              </TooltipContent>
-            </Tooltip>
-          </div>
-
-          {/* --- Block 2: Ascension (NEW) --- */}
+          {/* --- Block 1: Ascension (LEFT) --- */}
           <div className="p-4 parchment-bg rounded border-2 border-amber-700 flex flex-col">
             <h3 className="text-lg font-bold parchment-text mb-3">Ascension</h3>
 
             {/* Tier Display */}
             <div className="flex items-center gap-2 mb-3">
               <Star
-                className={isPrismatic ? "prismatic-text-fill" : ""} // Assumes you have a CSS class for this
+                className={isPrismatic ? "prismatic-text-fill" : ""}
                 style={{
                   color: isPrismatic ? undefined : currentTierData.color,
                 }}
@@ -408,6 +336,79 @@ export function MainScreen({ onNavigate }: MainScreenProps) {
               Multiplier, Battles Won). Summon cost resets. You keep spirits and
               gain a new Ascension buff.
             </p>
+          </div>
+
+          {/* --- Block 2: Cultivation Progress (RIGHT) --- */}
+          <div className="p-4 parchment-bg rounded border-2 border-amber-700">
+            <h3 className="text-lg font-bold parchment-text mb-3">
+              Qi Upgrades
+            </h3>
+            <div className="space-y-2 mb-4">
+              <div className="flex justify-between parchment-text text-sm">
+                <span>Base Production:</span>
+                <span className="font-semibold">
+                  {qiUpgrades.baseProduction}
+                </span>
+              </div>
+              <div className="flex justify-between parchment-text text-sm">
+                <span>Multiplier:</span>
+                <span className="font-semibold">
+                  {qiUpgrades.multiplier.toFixed(1)}x
+                </span>
+              </div>
+              <div className="flex justify-between parchment-text text-sm">
+                <span>Battles Won:</span>
+                <span className="font-semibold">{battlesWon}</span>
+              </div>
+            </div>
+
+            {/* Button 1: Base Production */}
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  onClick={upgradeQiProduction}
+                  disabled={!canUpgradeBaseProduction}
+                  className="w-full mt-4 transition-all hover:-translate-y-0.5 hover:shadow-lg disabled:hover:translate-y-0 disabled:hover:shadow-none"
+                  style={{
+                    background: canUpgradeBaseProduction
+                      ? "var(--vermillion)"
+                      : "#999",
+                    color: "var(--parchment)",
+                    boxShadow: canUpgradeBaseProduction ? "0 4px 6px rgba(193, 39, 45, 0.3)" : "none",
+                  }}
+                >
+                  Enhance Base ({baseProductionUpgradeCost} Qi)
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent className="parchment-bg border-2 border-amber-700">
+                <p className="parchment-text text-xs">
+                  Current: {qiUpgrades.baseProduction} → Next: {qiUpgrades.baseProduction + 1}
+                </p>
+              </TooltipContent>
+            </Tooltip>
+
+            {/* Button 2: Multiplier */}
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  onClick={upgradeQiMultiplier}
+                  disabled={!canUpgradeMultiplier}
+                  className="w-full mt-4 transition-all hover:-translate-y-0.5 hover:shadow-lg disabled:hover:translate-y-0 disabled:hover:shadow-none"
+                  style={{
+                    background: canUpgradeMultiplier ? "var(--vermillion)" : "#999",
+                    color: "var(--parchment)",
+                    boxShadow: canUpgradeMultiplier ? "0 4px 6px rgba(193, 39, 45, 0.3)" : "none",
+                  }}
+                >
+                  Amplify Multiplier ({multiplierUpgradeCost} Qi)
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent className="parchment-bg border-2 border-amber-700">
+                <p className="parchment-text text-xs">
+                  Current: {qiUpgrades.multiplier.toFixed(1)}x → Next: {(qiUpgrades.multiplier + 0.1).toFixed(1)}x
+                </p>
+              </TooltipContent>
+            </Tooltip>
           </div>
         </div>
         {/* --- END GRID WRAPPER --- */}
@@ -616,7 +617,7 @@ export function MainScreen({ onNavigate }: MainScreenProps) {
             <Button
               onClick={() => {
                 if (canEnterBattle) {
-                  onNavigate("boss");
+                  onBossBattle?.();
                 } else {
                   alert(
                     "You must have at least one spirit in your active party to challenge the boss.",

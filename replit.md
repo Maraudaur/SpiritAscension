@@ -2,6 +2,17 @@
 
 This is a cultivation/spirit-summoning idle game inspired by Asian mythology and martial arts cultivation themes. Players collect and battle with spirits based on Chinese zodiac animals and Wu Xing (five elements), manage a party of spirits, and engage in turn-based battles. The game features an incremental Qi (energy) generation system used to summon new spirits with randomized stats and potential grades.
 
+**UI Design**: PC game interface with persistent left sidebar navigation (100px width) and 16:9 aspect ratio main content container. Five distinct game screens accessible via icon-driven sidebar buttons: Story (home), Cultivation (incremental loop), Spirit Manager, Summon (gacha), and Battle. Story screen features a two-layer system (Story Map + Visual Novel Scene). All screens maintain Xianxia/Chinese Imperial Fantasy aesthetic with parchment textures, vermillion, jade, and gold accents.
+
+# Recent Changes (November 6, 2025)
+
+- Implemented persistent left sidebar navigation with 5 icon buttons (Story, Cultivation, Spirits, Summon, Battle)
+- Restructured App.tsx to use sidebar + 16:9 aspect ratio content container layout
+- Created Story Screen with two-layer system: Story Map (progression nodes) and Visual Novel Scene (full-screen immersion)
+- Refactored MainScreen (Cultivation) to use recommended two-column layout: Ascension Progress (left) and Qi Upgrades (right)
+- Updated all screens to work within bounded 16:9 container
+- Boss battles now handled via state management instead of separate navigation screen
+
 # User Preferences
 
 Preferred communication style: Simple, everyday language.
@@ -19,11 +30,11 @@ Preferred communication style: Simple, everyday language.
 - `useGame`: Handles game phase transitions (ready/playing/ended)
 - `useAudio`: Controls audio playback and muting
 
-**Routing**: Single-page application with screen-based navigation managed through React state. No traditional routing library used; navigation handled via conditional rendering in `App.tsx`.
+**Routing**: Single-page application with persistent sidebar navigation. Screen type: `"story" | "cultivation" | "spirits" | "summon" | "battle"`. Navigation handled via Sidebar component and conditional rendering in `App.tsx`. Content displayed in bounded 16:9 aspect ratio container with sidebar always visible on the left.
 
 **3D Graphics**: Integration with React Three Fiber (@react-three/fiber) and drei helpers for potential 3D visualization features, though not actively implemented in current screens.
 
-**Design System**: Custom parchment-themed aesthetic with Chinese calligraphy influences. CSS custom properties for theming (parchment colors, vermillion, imperial gold, jade green, azure).
+**Design System**: Custom parchment-themed aesthetic with Chinese calligraphy influences. CSS custom properties for theming (parchment colors, vermillion, imperial gold, jade green, azure). Persistent 100px left sidebar with gradient parchment background. Main content area uses 16:9 aspect ratio container (max-width 1920px) with parchment border and shadow for contained, professional PC game appearance. All interactive buttons feature hover effects (elevation, glow) and tooltips for enhanced UX.
 
 ## Backend Architecture
 

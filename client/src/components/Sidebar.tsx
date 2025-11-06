@@ -1,0 +1,98 @@
+import { BookOpen, Zap, Users, Sparkles, Swords } from "lucide-react";
+
+type Screen = "story" | "cultivation" | "spirits" | "summon" | "battle";
+
+interface SidebarProps {
+  currentScreen: Screen;
+  onNavigate: (screen: Screen) => void;
+}
+
+export function Sidebar({ currentScreen, onNavigate }: SidebarProps) {
+  const handleNavigate = (screen: Screen) => {
+    onNavigate(screen);
+  };
+
+  const navItems = [
+    { id: "story" as Screen, icon: BookOpen, label: "Story", color: "#D4AF37" },
+    { id: "cultivation" as Screen, icon: Zap, label: "Cultivation", color: "#4C8477" },
+    { id: "spirits" as Screen, icon: Users, label: "Spirits", color: "#3A6EA5" },
+    { id: "summon" as Screen, icon: Sparkles, label: "Summon", color: "#9B4DCA" },
+    { id: "battle" as Screen, icon: Swords, label: "Battle", color: "#C1272D" },
+  ];
+
+  return (
+    <div
+      className="fixed left-0 top-0 h-screen flex flex-col items-center py-8 gap-6 border-r-4"
+      style={{
+        width: "100px",
+        background: "linear-gradient(180deg, #F5E6D3 0%, #E8D4B8 100%)",
+        borderColor: "#8B4513",
+        boxShadow: "4px 0 12px rgba(0, 0, 0, 0.15)",
+      }}
+    >
+      {/* Logo/Title Area */}
+      <div className="text-center px-2">
+        <h1
+          className="text-2xl font-bold"
+          style={{
+            color: "#8B4513",
+            fontFamily: "serif",
+            textShadow: "2px 2px 4px rgba(139, 69, 19, 0.3)",
+          }}
+        >
+          昇
+        </h1>
+        <p className="text-xs" style={{ color: "#8B4513" }}>
+          Ascension
+        </p>
+      </div>
+
+      {/* Divider */}
+      <div
+        className="w-16 h-1 rounded"
+        style={{ background: "#8B4513" }}
+      />
+
+      {/* Navigation Buttons */}
+      <nav className="flex flex-col gap-4 w-full px-3">
+        {navItems.map((item) => {
+          const Icon = item.icon;
+          const isActive = currentScreen === item.id;
+
+          return (
+            <button
+              key={item.id}
+              onClick={() => handleNavigate(item.id)}
+              className="flex flex-col items-center gap-1 p-3 rounded-lg transition-all hover:-translate-y-1 hover:shadow-lg active:scale-95"
+              style={{
+                background: isActive
+                  ? item.color
+                  : "rgba(245, 230, 211, 0.5)",
+                color: isActive ? "#F5E6D3" : "#8B4513",
+                border: isActive
+                  ? `2px solid ${item.color}`
+                  : "2px solid transparent",
+                boxShadow: isActive
+                  ? `0 4px 8px ${item.color}40`
+                  : "0 2px 4px rgba(0, 0, 0, 0.1)",
+              }}
+            >
+              <Icon className="w-6 h-6" strokeWidth={2.5} />
+              <span className="text-[10px] font-bold">{item.label}</span>
+            </button>
+          );
+        })}
+      </nav>
+
+      {/* Spacer */}
+      <div className="flex-1" />
+
+      {/* Footer/Version */}
+      <div className="text-center px-2">
+        <p className="text-[10px]" style={{ color: "#8B4513" }}>
+          v1.0
+        </p>
+      </div>
+    </div>
+  );
+}

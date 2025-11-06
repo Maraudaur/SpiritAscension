@@ -1,4 +1,6 @@
-import { useState, useEffect, useRef } from "react"; // Import useRef
+import { useState, useEffect, useRef } from "react";
+import { Sidebar } from "./components/Sidebar";
+import { StoryScreen } from "./components/StoryScreen";
 import { MainScreen } from "./components/MainScreen";
 import { SummonScreen } from "./components/SummonScreen";
 import { SpiritManager } from "./components/SpiritManager";
@@ -6,10 +8,11 @@ import { BattleScreen } from "./components/BattleScreen";
 import { useAudio } from "./lib/stores/useAudio";
 import "@fontsource/inter";
 
-type Screen = "main" | "spirits" | "battle" | "summon" | "boss";
+type Screen = "story" | "cultivation" | "spirits" | "summon" | "battle";
 
 function App() {
-  const [currentScreen, setCurrentScreen] = useState<Screen>("main");
+  const [currentScreen, setCurrentScreen] = useState<Screen>("story");
+  const [isBossBattle, setIsBossBattle] = useState(false);
 
   // Get all functions from the store
   const {
@@ -97,31 +100,78 @@ function App() {
   return (
     <div
       style={{
-        width: "100%", // Use 100% instead of 100vw if the body has 100vw
-        minHeight: "100vh",
-        position: "relative",
+        width: "100vw",
+        height: "100vh",
+        display: "flex",
+        overflow: "hidden",
+        background: "linear-gradient(135deg, #1A0F0A 0%, #2C1810 100%)",
       }}
     >
-      <MainScreen onNavigate={setCurrentScreen} />
+      <Sidebar currentScreen={currentScreen} onNavigate={setCurrentScreen} />
 
-      {currentScreen === "summon" && (
-        <SummonScreen onClose={() => setCurrentScreen("main")} />
-      )}
+      <div
+        style={{
+          marginLeft: "100px",
+          flex: 1,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          padding: "20px",
+        }}
+      >
+        <div
+          style={{
+            width: "100%",
+            maxWidth: "1920px",
+            aspectRatio: "16/9",
+            maxHeight: "100%",
+            background: "#F5E6D3",
+            borderRadius: "8px",
+            border: "4px solid #8B4513",
+            boxShadow: "0 8px 24px rgba(0, 0, 0, 0.3)",
+            overflow: "hidden",
+            position: "relative",
+          }}
+        >
+          {currentScreen === "story" && <StoryScreen />}
+          
+          {currentScreen === "cultivation" && !isBossBattle && (
+            <div className="w-full h-full overflow-y-auto">
+              <MainScreen 
+                onNavigate={setCurrentScreen}
+                onBossBattle={() => {
+                  setIsBossBattle(true);
+                  setCurrentScreen("battle");
+                }}
+              />
+            </div>
+          )}
 
-      {currentScreen === "spirits" && (
-        <SpiritManager onClose={() => setCurrentScreen("main")} />
-      )}
+          {currentScreen === "spirits" && (
+            <div className="w-full h-full overflow-hidden">
+              <SpiritManager onClose={() => setCurrentScreen("cultivation")} />
+            </div>
+          )}
 
-      {currentScreen === "battle" && (
-        <BattleScreen onClose={() => setCurrentScreen("main")} />
-      )}
+          {currentScreen === "summon" && (
+            <div className="w-full h-full overflow-hidden">
+              <SummonScreen onClose={() => setCurrentScreen("cultivation")} />
+            </div>
+          )}
 
-      {currentScreen === "boss" && (
-        <BattleScreen
-          onClose={() => setCurrentScreen("main")}
-          isBossBattle={true}
-        />
-      )}
+          {currentScreen === "battle" && (
+            <div className="w-full h-full overflow-hidden">
+              <BattleScreen 
+                onClose={() => {
+                  setCurrentScreen("cultivation");
+                  setIsBossBattle(false);
+                }} 
+                isBossBattle={isBossBattle}
+              />
+            </div>
+          )}
+        </div>
+      </div>
     </div>
   );
 }
