@@ -2,18 +2,24 @@
 
 This is a cultivation/spirit-summoning idle game inspired by Asian mythology and martial arts cultivation themes. Players collect and battle with spirits based on Chinese zodiac animals and Wu Xing (five elements), manage a party of spirits, and engage in turn-based battles. The game features an incremental Qi (energy) generation system used to summon new spirits with randomized stats and potential grades.
 
-**UI Design**: PC game interface with persistent left sidebar navigation (100px width) and 16:9 aspect ratio main content container. Five distinct game screens accessible via icon-driven sidebar buttons: Story (home), Cultivation (incremental loop), Spirit Manager, Summon (gacha), and Battle. Story screen features a two-layer system (Story Map + Visual Novel Scene). All screens maintain Xianxia/Chinese Imperial Fantasy aesthetic with parchment textures, vermillion, jade, and gold accents.
+**UI Design**: PC game interface with persistent left sidebar navigation (100px width) and 16:9 aspect ratio main content container. Persistent HUD at top displays volume control (left), Qi Energy counter with generation rate (center), and screen title (right). Five distinct game screens accessible via icon-driven sidebar buttons: Story (home), Cultivation (incremental loop), Spirit Manager, Summon (gacha), and Battle. Cultivation screen uses three-column layout: Ascension (left), Basic Generators (middle), Advanced Generators (right). Story screen features a two-layer system (Story Map + Visual Novel Scene). All screens maintain Xianxia/Chinese Imperial Fantasy aesthetic with parchment textures, vermillion, jade, and gold accents.
 
 # Recent Changes (November 6, 2025)
 
 - Implemented persistent left sidebar navigation with 5 icon buttons (Story, Cultivation, Spirits, Summon, Battle)
 - Restructured App.tsx to use sidebar + 16:9 aspect ratio content container layout
 - Created Story Screen with two-layer system: Story Map (progression nodes) and Visual Novel Scene (full-screen immersion)
-- Refactored MainScreen (Cultivation) to use recommended two-column layout: Ascension Progress (left) and Qi Upgrades (right)
 - Updated all screens to work within bounded 16:9 container
 - Boss battles now handled via state management instead of separate navigation screen
-- Added persistent HUD at top of all screens displaying Qi Energy counter and generation rate per second
-- Completely restructured Spirit Manager to use fixed Left Panel (Active 4-Spirit Party) and large Main Panel (Scrollable Spirit Inventory) with detailed inspection as Layer 2 modal overlay
+- **Persistent HUD Implementation**: Added HUD at top of all screens with three sections:
+  - Left: Volume control button with slider dropdown
+  - Center: Qi Energy counter and generation rate per second
+  - Right: Dynamic screen title (Journey, Ascension, Spirit Manager, Summoning, Battle)
+- **Cultivation Page Three-Column Layout**: Restructured MainScreen to professional PC game interface:
+  - Left Column: Ascension tier progression with buffs and progress tracking
+  - Middle Column: "Basic Generators" section containing Qi Upgrades (base production, multiplier) and Battle Mastery
+  - Right Column: "Advanced Generators" section (placeholder for future features)
+- **Spirit Manager Full-Page Layout**: Restructured to use fixed Left Panel (Active 4-Spirit Party, 320px) and large Main Panel (Scrollable Spirit Inventory with filters) with detailed inspection as Layer 2 modal overlay
 
 # User Preferences
 

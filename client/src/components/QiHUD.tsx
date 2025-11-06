@@ -21,17 +21,9 @@ interface QiHUDProps {
 }
 
 export function QiHUD({ currentScreen }: QiHUDProps) {
-  const { qi, qiPerSecond, updateQi } = useGameState();
+  const { qi, qiPerSecond } = useGameState();
   const { isMuted, toggleMute, volume, setVolume } = useAudio();
   const [showVolumeSlider, setShowVolumeSlider] = useState(false);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      updateQi();
-    }, 100);
-
-    return () => clearInterval(interval);
-  }, [updateQi]);
 
   const formatNumber = (num: number): string => {
     if (num >= 1_000_000_000) {
