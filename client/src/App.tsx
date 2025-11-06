@@ -136,7 +136,7 @@ function App() {
             flexDirection: "column",
           }}
         >
-          <QiHUD />
+          <QiHUD currentScreen={currentScreen} />
           
           <div style={{ flex: 1, overflow: "hidden", position: "relative" }}>
             {currentScreen === "story" && <StoryScreen />}

@@ -1,9 +1,29 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useGameState } from "@/lib/stores/useGameState";
-import { Sparkles } from "lucide-react";
+import { useAudio } from "@/lib/stores/useAudio";
+import { Sparkles, Volume2, VolumeX } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Slider } from "@/components/ui/slider";
+import { motion, AnimatePresence } from "framer-motion";
 
-export function QiHUD() {
+type Screen = "story" | "cultivation" | "spirits" | "summon" | "battle";
+
+const SCREEN_TITLES: Record<Screen, string> = {
+  story: "Journey",
+  cultivation: "Ascension",
+  spirits: "Spirit Manager",
+  summon: "Summoning",
+  battle: "Battle",
+};
+
+interface QiHUDProps {
+  currentScreen: Screen;
+}
+
+export function QiHUD({ currentScreen }: QiHUDProps) {
   const { qi, qiPerSecond, updateQi } = useGameState();
+  const { isMuted, toggleMute, volume, setVolume } = useAudio();
+  const [showVolumeSlider, setShowVolumeSlider] = useState(false);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -26,71 +46,136 @@ export function QiHUD() {
 
   return (
     <div
-      className="flex items-center justify-center gap-8 px-6 py-3"
+      className="flex items-center justify-between gap-8 px-6 py-3 relative"
       style={{
         background: "linear-gradient(135deg, #D4B896 0%, #C1A877 50%, #D4B896 100%)",
         borderBottom: "3px solid #8B4513",
         boxShadow: "0 2px 8px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.3)",
       }}
     >
-      <div className="flex items-center gap-3">
-        <div
-          className="p-2 rounded-full"
-          style={{
-            background: "linear-gradient(135deg, #FFD700 0%, #FFA500 100%)",
-            boxShadow: "0 2px 6px rgba(255, 215, 0, 0.4)",
-          }}
+      {/* LEFT: Volume Control */}
+      <div className="relative">
+        <Button
+          variant="outline"
+          size="icon"
+          onClick={() => setShowVolumeSlider(!showVolumeSlider)}
+          title="Volume Control"
+          className="bg-white/90 backdrop-blur-sm"
         >
-          <Sparkles className="w-5 h-5 text-white" strokeWidth={2.5} />
-        </div>
-        
-        <div className="flex flex-col">
-          <span
-            className="text-xs font-semibold tracking-wide"
-            style={{ color: "#5D4037" }}
-          >
-            QI ENERGY
-          </span>
-          <span
-            className="text-2xl font-bold tracking-tight"
-            style={{
-              color: "#C1272D",
-              textShadow: "0 1px 2px rgba(0, 0, 0, 0.1)",
-            }}
-          >
-            {formatNumber(qi)}
-          </span>
-        </div>
+          {isMuted ? <VolumeX size={20} /> : <Volume2 size={20} />}
+        </Button>
+
+        <AnimatePresence>
+          {showVolumeSlider && (
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              className="absolute top-14 left-0 bg-white/95 backdrop-blur-sm p-4 rounded-lg shadow-lg border-2 border-amber-700 z-50"
+              style={{ width: "200px" }}
+            >
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm font-semibold parchment-text">
+                    Volume
+                  </span>
+                  <span className="text-xs parchment-text">{volume}%</span>
+                </div>
+                <Slider
+                  value={[volume]}
+                  onValueChange={(values) => setVolume(values[0])}
+                  max={100}
+                  step={1}
+                  className="w-full"
+                />
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={toggleMute}
+                  className="w-full text-xs"
+                >
+                  {isMuted ? "Unmute" : "Mute"}
+                </Button>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
 
-      <div
-        className="h-10 w-px"
-        style={{ background: "linear-gradient(to bottom, transparent, #8B4513, transparent)" }}
-      />
-
-      <div className="flex items-center gap-2">
-        <div className="flex flex-col items-end">
-          <span
-            className="text-xs font-semibold tracking-wide"
-            style={{ color: "#5D4037" }}
+      {/* CENTER: Qi Energy Display */}
+      <div className="flex items-center gap-8">
+        <div className="flex items-center gap-3">
+          <div
+            className="p-2 rounded-full"
+            style={{
+              background: "linear-gradient(135deg, #FFD700 0%, #FFA500 100%)",
+              boxShadow: "0 2px 6px rgba(255, 215, 0, 0.4)",
+            }}
           >
-            GENERATION
-          </span>
-          <div className="flex items-baseline gap-1">
+            <Sparkles className="w-5 h-5 text-white" strokeWidth={2.5} />
+          </div>
+          
+          <div className="flex flex-col">
             <span
-              className="text-lg font-bold"
+              className="text-xs font-semibold tracking-wide"
+              style={{ color: "#5D4037" }}
+            >
+              QI ENERGY
+            </span>
+            <span
+              className="text-2xl font-bold tracking-tight"
               style={{
-                color: "#2E7D32",
+                color: "#C1272D",
                 textShadow: "0 1px 2px rgba(0, 0, 0, 0.1)",
               }}
             >
-              +{formatNumber(qiPerSecond)}
-            </span>
-            <span className="text-xs font-medium" style={{ color: "#5D4037" }}>
-              /sec
+              {formatNumber(qi)}
             </span>
           </div>
         </div>
+
+        <div
+          className="h-10 w-px"
+          style={{ background: "linear-gradient(to bottom, transparent, #8B4513, transparent)" }}
+        />
+
+        <div className="flex items-center gap-2">
+          <div className="flex flex-col items-end">
+            <span
+              className="text-xs font-semibold tracking-wide"
+              style={{ color: "#5D4037" }}
+            >
+              GENERATION
+            </span>
+            <div className="flex items-baseline gap-1">
+              <span
+                className="text-lg font-bold"
+                style={{
+                  color: "#2E7D32",
+                  textShadow: "0 1px 2px rgba(0, 0, 0, 0.1)",
+                }}
+              >
+                +{formatNumber(qiPerSecond)}
+              </span>
+              <span className="text-xs font-medium" style={{ color: "#5D4037" }}>
+                /sec
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* RIGHT: Screen Title */}
+      <div className="flex items-center">
+        <h2
+          className="text-2xl font-bold tracking-tight"
+          style={{
+            color: "#5D4037",
+            textShadow: "0 1px 2px rgba(0, 0, 0, 0.1)",
+          }}
+        >
+          {SCREEN_TITLES[currentScreen]}
+        </h2>
       </div>
     </div>
   );

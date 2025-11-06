@@ -5,13 +5,10 @@ import {
   Sparkles,
   Swords,
   Users,
-  Volume2,
-  VolumeX,
   Star,
   Info,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Slider } from "@/components/ui/slider";
 import {
   Tooltip,
   TooltipContent,
@@ -64,7 +61,6 @@ export function MainScreen({ onNavigate, onBossBattle }: MainScreenProps) {
   const { isMuted, toggleMute, volume, setVolume } = useAudio();
   const [displayQi, setDisplayQi] = useState(qi);
   const [isClient, setIsClient] = useState(false);
-  const [showVolumeSlider, setShowVolumeSlider] = useState(false);
   useEffect(() => {
     console.log(
       "DEBUG (MainScreen): Component Mounted. Setting isClient to true.",
@@ -157,414 +153,347 @@ export function MainScreen({ onNavigate, onBossBattle }: MainScreenProps) {
 
   return (
     <TooltipProvider delayDuration={200}>
-      <div className="w-full min-h-screen flex flex-col items-center px-4 relative overflow-y-auto">
-        <div className="parchment-bg chinese-border max-w-2xl w-full p-8 rounded-lg my-4 relative">
-        {/* Volume button in top-right corner of main area */}
-        <div className="absolute top-4 right-4 z-10">
-          <Button
-            variant="outline"
-            size="icon"
-            onClick={() => setShowVolumeSlider(!showVolumeSlider)}
-            title="Volume Control"
-            className="bg-white/90 backdrop-blur-sm"
-          >
-            {isMuted ? <VolumeX size={20} /> : <Volume2 size={20} />}
-          </Button>
+      <div className="w-full h-full flex flex-col gap-4 p-6 overflow-y-auto" style={{ background: "#F5E6D3" }}>
+        {/* Three-Column Grid */}
+        <div className="flex-1 grid grid-cols-3 gap-4">
+          {/* LEFT COLUMN: Ascension */}
+          <div className="flex flex-col gap-4">
+            <div className="p-4 parchment-bg rounded border-2 border-amber-700 flex flex-col">
+              <h3 className="text-lg font-bold parchment-text mb-3">Ascension</h3>
 
-          {/* Volume Slider Popup */}
-          <AnimatePresence>
-            {showVolumeSlider && (
-              <motion.div
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                className="absolute top-14 right-0 bg-white/95 backdrop-blur-sm p-4 rounded-lg shadow-lg border-2 border-amber-700"
-                style={{ width: "200px" }}
-              >
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm font-semibold parchment-text">
-                      Volume
+              {/* Tier Display */}
+              <div className="flex items-center gap-2 mb-3">
+                <Star
+                  className={isPrismatic ? "prismatic-text-fill" : ""}
+                  style={{
+                    color: isPrismatic ? undefined : currentTierData.color,
+                  }}
+                  size={28}
+                  fill={
+                    isPrismatic
+                      ? "url(#prismatic-gradient)"
+                      : currentTierData.color
+                  }
+                />
+                <span className="text-xl font-bold parchment-text">
+                  Tier {ascensionTier}
+                </span>
+              </div>
+
+              {/* Buffs Display */}
+              <div className="parchment-text text-sm mb-3 space-y-1">
+                {currentAscensionBuffs.qiMultiplier > 1 && (
+                  <div className="flex justify-between">
+                    <span>Qi Multiplier:</span>
+                    <span className="font-semibold">
+                      {currentAscensionBuffs.qiMultiplier}x
                     </span>
-                    <span className="text-xs parchment-text">{volume}%</span>
                   </div>
-                  <Slider
-                    value={[volume]}
-                    onValueChange={(values) => setVolume(values[0])}
-                    max={100}
-                    step={1}
-                    className="w-full"
-                  />
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={toggleMute}
-                    className="w-full text-xs"
-                  >
-                    {isMuted ? "Unmute" : "Mute"}
-                  </Button>
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
-
-        <h1 className="text-5xl font-bold text-center mb-2 parchment-text brush-stroke">
-          天道修真
-        </h1>
-        <p className="text-2xl text-center mb-8 parchment-text">Ascension</p>
-
-        <div className="mb-8 p-6 bg-gradient-to-br from-yellow-50 to-yellow-100 rounded-lg chinese-border flex gap-4">
-          <div className="qi-sprite flex-shrink-0" />
-          <div className="flex-1">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-xl parchment-text font-bold">
-                Qi Energy
-              </span>
-              <span
-                className="text-3xl font-bold qi-glow"
-                style={{ color: "var(--imperial-gold)" }}
-              >
-                {Math.floor(displayQi)}
-              </span>
-            </div>
-            <div className="flex items-center justify-between">
-              <span className="text-sm parchment-text opacity-75">
-                Generation Rate
-              </span>
-              <span className="text-lg parchment-text font-semibold">
-                {qiPerSecond.toFixed(1)} / sec
-              </span>
-            </div>
-          </div>
-        </div>
-
-        {/* --- MODIFIED LAYOUT: Wrapped Ascension and Cultivation in a Grid --- */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-          {/* --- Block 1: Ascension (LEFT) --- */}
-          <div className="p-4 parchment-bg rounded border-2 border-amber-700 flex flex-col">
-            <h3 className="text-lg font-bold parchment-text mb-3">Ascension</h3>
-
-            {/* Tier Display */}
-            <div className="flex items-center gap-2 mb-3">
-              <Star
-                className={isPrismatic ? "prismatic-text-fill" : ""}
-                style={{
-                  color: isPrismatic ? undefined : currentTierData.color,
-                }}
-                size={28}
-                fill={
-                  isPrismatic
-                    ? "url(#prismatic-gradient)"
-                    : currentTierData.color
-                }
-              />
-              <span className="text-xl font-bold parchment-text">
-                Tier {ascensionTier}
-              </span>
-            </div>
-
-            {/* Buffs Display */}
-            <div className="parchment-text text-sm mb-3 space-y-1">
-              {currentAscensionBuffs.qiMultiplier > 1 && (
-                <div className="flex justify-between">
-                  <span>Qi Multiplier:</span>
-                  <span className="font-semibold">
-                    {currentAscensionBuffs.qiMultiplier}x
-                  </span>
-                </div>
-              )}
-              {currentAscensionBuffs.battleMultiplier > 0 && (
-                <div className="flex justify-between">
-                  <span>Battle Win Bonus:</span>
-                  <span className="font-semibold">
-                    +{currentAscensionBuffs.battleMultiplier}x
-                  </span>
-                </div>
-              )}
-              {currentAscensionBuffs.qiMultiplier <= 1 &&
-                currentAscensionBuffs.battleMultiplier <= 0 && (
-                  <span className="opacity-75">No buffs at this tier.</span>
                 )}
-            </div>
+                {currentAscensionBuffs.battleMultiplier > 0 && (
+                  <div className="flex justify-between">
+                    <span>Battle Win Bonus:</span>
+                    <span className="font-semibold">
+                      +{currentAscensionBuffs.battleMultiplier}x
+                    </span>
+                  </div>
+                )}
+                {currentAscensionBuffs.qiMultiplier <= 1 &&
+                  currentAscensionBuffs.battleMultiplier <= 0 && (
+                    <span className="opacity-75">No buffs at this tier.</span>
+                  )}
+              </div>
 
-            {/* Progress Bar */}
-            {ascensionTier < TIER_DATA.length - 1 ? (
-              <>
-                <div className="w-full bg-gray-300 rounded-full h-2.5 mb-1 border border-gray-400">
-                  <div
-                    className="bg-blue-600 h-full rounded-full"
-                    style={{ width: `${progressPercent}%` }}
-                  ></div>
-                </div>
-                <p className="text-xs parchment-text text-center mb-3">
-                  {Math.floor(qi)} / {ascensionCost} Qi
+              {/* Progress Bar */}
+              {ascensionTier < TIER_DATA.length - 1 ? (
+                <>
+                  <div className="w-full bg-gray-300 rounded-full h-2.5 mb-1 border border-gray-400">
+                    <div
+                      className="bg-blue-600 h-full rounded-full"
+                      style={{ width: `${progressPercent}%` }}
+                    ></div>
+                  </div>
+                  <p className="text-xs parchment-text text-center mb-3">
+                    {Math.floor(qi)} / {ascensionCost} Qi
+                  </p>
+
+                  {/* Ascend Button */}
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        onClick={handleAscendClick}
+                        disabled={!canAscend}
+                        className="w-full mt-auto transition-all hover:-translate-y-0.5 hover:shadow-lg disabled:hover:translate-y-0 disabled:hover:shadow-none"
+                        style={{
+                          background: canAscend ? "var(--azure)" : "#999",
+                          color: "var(--parchment)",
+                          boxShadow: canAscend ? "0 4px 6px rgba(58, 110, 165, 0.4)" : "none",
+                        }}
+                      >
+                        Ascend (Cost: {ascensionCost} Qi)
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent className="parchment-bg border-2 border-amber-700">
+                      <p className="parchment-text text-xs">
+                        Ascend to next tier for enhanced buffs!
+                      </p>
+                    </TooltipContent>
+                  </Tooltip>
+                </>
+              ) : (
+                <p className="font-bold parchment-text text-center my-4">
+                  You have reached the final Ascension!
                 </p>
+              )}
 
-                {/* Ascend Button */}
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button
-                      onClick={handleAscendClick}
-                      disabled={!canAscend}
-                      className="w-full mt-auto transition-all hover:-translate-y-0.5 hover:shadow-lg disabled:hover:translate-y-0 disabled:hover:shadow-none"
-                      style={{
-                        background: canAscend ? "var(--azure)" : "#999",
-                        color: "var(--parchment)",
-                        boxShadow: canAscend ? "0 4px 6px rgba(58, 110, 165, 0.4)" : "none",
-                      }}
-                    >
-                      Ascend (Cost: {ascensionCost} Qi)
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent className="parchment-bg border-2 border-amber-700">
-                    <p className="parchment-text text-xs">
-                      Ascend to next tier for enhanced buffs!
-                    </p>
-                  </TooltipContent>
-                </Tooltip>
-              </>
-            ) : (
-              <p className="font-bold parchment-text text-center my-4">
-                You have reached the final Ascension!
-              </p>
-            )}
-
-            {/* Description */}
-            <p className="text-xs parchment-text opacity-75 italic mt-3">
-              When you ascend you lose all Cultivation progress (Base,
-              Multiplier, Battles Won). Summon cost resets. You keep spirits and
-              gain a new Ascension buff.
-            </p>
-          </div>
-
-          {/* --- Block 2: Cultivation Progress (RIGHT) --- */}
-          <div className="p-4 parchment-bg rounded border-2 border-amber-700">
-            <h3 className="text-lg font-bold parchment-text mb-3">
-              Qi Upgrades
-            </h3>
-            <div className="space-y-2 mb-4">
-              <div className="flex justify-between parchment-text text-sm">
-                <span>Base Production:</span>
-                <span className="font-semibold">
-                  {qiUpgrades.baseProduction}
-                </span>
-              </div>
-              <div className="flex justify-between parchment-text text-sm">
-                <span>Multiplier:</span>
-                <span className="font-semibold">
-                  {qiUpgrades.multiplier.toFixed(1)}x
-                </span>
-              </div>
-              <div className="flex justify-between parchment-text text-sm">
-                <span>Battles Won:</span>
-                <span className="font-semibold">{battlesWon}</span>
-              </div>
-            </div>
-
-            {/* Button 1: Base Production */}
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  onClick={upgradeQiProduction}
-                  disabled={!canUpgradeBaseProduction}
-                  className="w-full mt-4 transition-all hover:-translate-y-0.5 hover:shadow-lg disabled:hover:translate-y-0 disabled:hover:shadow-none"
-                  style={{
-                    background: canUpgradeBaseProduction
-                      ? "var(--vermillion)"
-                      : "#999",
-                    color: "var(--parchment)",
-                    boxShadow: canUpgradeBaseProduction ? "0 4px 6px rgba(193, 39, 45, 0.3)" : "none",
-                  }}
-                >
-                  Enhance Base ({baseProductionUpgradeCost} Qi)
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent className="parchment-bg border-2 border-amber-700">
-                <p className="parchment-text text-xs">
-                  Current: {qiUpgrades.baseProduction} → Next: {qiUpgrades.baseProduction + 1}
-                </p>
-              </TooltipContent>
-            </Tooltip>
-
-            {/* Button 2: Multiplier */}
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  onClick={upgradeQiMultiplier}
-                  disabled={!canUpgradeMultiplier}
-                  className="w-full mt-4 transition-all hover:-translate-y-0.5 hover:shadow-lg disabled:hover:translate-y-0 disabled:hover:shadow-none"
-                  style={{
-                    background: canUpgradeMultiplier ? "var(--vermillion)" : "#999",
-                    color: "var(--parchment)",
-                    boxShadow: canUpgradeMultiplier ? "0 4px 6px rgba(193, 39, 45, 0.3)" : "none",
-                  }}
-                >
-                  Amplify Multiplier ({multiplierUpgradeCost} Qi)
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent className="parchment-bg border-2 border-amber-700">
-                <p className="parchment-text text-xs">
-                  Current: {qiUpgrades.multiplier.toFixed(1)}x → Next: {(qiUpgrades.multiplier + 0.1).toFixed(1)}x
-                </p>
-              </TooltipContent>
-            </Tooltip>
-          </div>
-        </div>
-        {/* --- END GRID WRAPPER --- */}
-        {/* --- MODIFIED: Battle Mastery & Summoning Grid --- */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-          {/* Block 1: Battle Mastery */}
-          <div className="p-4 parchment-bg rounded border-2 border-amber-700">
-            <h3 className="text-lg font-bold parchment-text mb-3">
-              Battle Mastery
-            </h3>
-            <div className="space-y-2">
-              <div className="flex justify-between parchment-text text-sm">
-                <span>Battle Reward Multiplier:</span>
-                <span className="font-semibold">
-                  {(battleRewardMultiplier * 100).toFixed(0)}%
-                </span>
-              </div>
-              <p className="text-xs parchment-text opacity-75 italic">
-                Each upgrade increases battle Qi rewards by 10%
+              {/* Description */}
+              <p className="text-xs parchment-text opacity-75 italic mt-3">
+                When you ascend you lose all Cultivation progress (Base,
+                Multiplier, Battles Won). Summon cost resets. You keep spirits and
+                gain a new Ascension buff.
               </p>
             </div>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  onClick={upgradeBattleReward}
-                  disabled={!canUpgradeBattleReward}
-                  className="w-full mt-4 transition-all hover:-translate-y-0.5 hover:shadow-lg disabled:hover:translate-y-0 disabled:hover:shadow-none"
-                  style={{
-                    background: canUpgradeBattleReward
-                      ? "var(--vermillion)"
-                      : "#999",
-                    color: "var(--parchment)",
-                    boxShadow: canUpgradeBattleReward ? "0 4px 6px rgba(193, 39, 45, 0.3)" : "none",
-                  }}
-                >
-                  Enhance Battle Mastery ({battleRewardUpgradeCost} Qi)
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent className="parchment-bg border-2 border-amber-700">
-                <p className="parchment-text text-xs">
-                  Current: {(battleRewardMultiplier * 100).toFixed(0)}% → Next: {((battleRewardMultiplier + 0.1) * 100).toFixed(0)}%
-                </p>
-              </TooltipContent>
-            </Tooltip>
           </div>
 
-          {/* Block 2: Spirit Summoning (NEW) */}
-          <div className="p-4 parchment-bg rounded border-2 border-amber-700">
-            <div className="flex justify-between items-center mb-3">
-              <h3 className="text-lg font-bold parchment-text">
-                Spirit Summoning
+          {/* MIDDLE COLUMN: Basic Generators */}
+          <div className="flex flex-col gap-4">
+            <h2 className="text-xl font-bold parchment-text">Basic Generators</h2>
+            
+            {/* Qi Upgrades */}
+            <div className="p-4 parchment-bg rounded border-2 border-amber-700">
+              <h3 className="text-lg font-bold parchment-text mb-3">
+                Qi Upgrades
               </h3>
-              <Button
-                size="icon"
-                variant="outline"
-                onClick={() => setShowSummonRates(!showSummonRates)}
-                className="bg-white/80"
-              >
-                <Info size={18} />
-              </Button>
-            </div>
-
-            {showSummonRates ? (
-              <motion.div
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: "auto" }}
-                exit={{ opacity: 0, height: 0 }}
-                className="mb-4 overflow-hidden"
-              >
-                <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-sm parchment-text">
-                  <div className="flex justify-between">
-                    <span style={{ color: getRarityColor("common") }}>
-                      Common:
-                    </span>
-                    <span>60%</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span style={{ color: getRarityColor("uncommon") }}>
-                      Uncommon:
-                    </span>
-                    <span>25%</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span style={{ color: getRarityColor("rare") }}>Rare:</span>
-                    <span>10%</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span style={{ color: getRarityColor("epic") }}>Epic:</span>
-                    <span>4%</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span style={{ color: getRarityColor("legendary") }}>
-                      Legendary:
-                    </span>
-                    <span>1%</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="prismatic-border px-1 rounded">
-                      Prismatic:
-                    </span>
-                    <span>0.1%</span>
-                  </div>
+              <div className="space-y-2 mb-4">
+                <div className="flex justify-between parchment-text text-sm">
+                  <span>Base Production:</span>
+                  <span className="font-semibold">
+                    {qiUpgrades.baseProduction}
+                  </span>
                 </div>
-              </motion.div>
-            ) : null}
+                <div className="flex justify-between parchment-text text-sm">
+                  <span>Multiplier:</span>
+                  <span className="font-semibold">
+                    {qiUpgrades.multiplier.toFixed(1)}x
+                  </span>
+                </div>
+                <div className="flex justify-between parchment-text text-sm">
+                  <span>Battles Won:</span>
+                  <span className="font-semibold">{battlesWon}</span>
+                </div>
+              </div>
 
-            <div className="space-y-3">
+              {/* Button 1: Base Production */}
               <Tooltip>
                 <TooltipTrigger asChild>
                   <Button
-                    onClick={() => setSummonRequest(1)} // Opens modal
-                    disabled={!canSummonOne}
-                    className="w-full p-5 text-base font-bold transition-all hover:-translate-y-0.5 hover:shadow-lg disabled:hover:translate-y-0 disabled:hover:shadow-none"
+                    onClick={upgradeQiProduction}
+                    disabled={!canUpgradeBaseProduction}
+                    className="w-full mt-4 transition-all hover:-translate-y-0.5 hover:shadow-lg disabled:hover:translate-y-0 disabled:hover:shadow-none"
                     style={{
-                      background: canSummonOne ? "var(--jade-green)" : "#999",
+                      background: canUpgradeBaseProduction
+                        ? "var(--vermillion)"
+                        : "#999",
                       color: "var(--parchment)",
-                      boxShadow: canSummonOne ? "0 4px 6px rgba(76, 132, 119, 0.4)" : "none",
+                      boxShadow: canUpgradeBaseProduction ? "0 4px 6px rgba(193, 39, 45, 0.3)" : "none",
                     }}
                   >
-                    Summon Spirit ({spiritCost} Qi)
+                    Enhance Base ({baseProductionUpgradeCost} Qi)
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent className="parchment-bg border-2 border-amber-700">
                   <p className="parchment-text text-xs">
-                    Rates: Common (60%), Uncommon (25%), Rare (10%), Epic (4%), Legendary (1%), Prismatic (0.1%)
+                    Current: {qiUpgrades.baseProduction} → Next: {qiUpgrades.baseProduction + 1}
                   </p>
                 </TooltipContent>
               </Tooltip>
-              {/* --- CHANGED: onClick handler --- */}
+
+              {/* Button 2: Multiplier */}
               <Tooltip>
                 <TooltipTrigger asChild>
                   <Button
-                    onClick={() => setSummonRequest(10)} // Opens modal
-                    disabled={!canSummonTen}
-                    className="w-full p-5 text-base font-bold transition-all hover:-translate-y-0.5 hover:shadow-lg disabled:hover:translate-y-0 disabled:hover:shadow-none"
+                    onClick={upgradeQiMultiplier}
+                    disabled={!canUpgradeMultiplier}
+                    className="w-full mt-4 transition-all hover:-translate-y-0.5 hover:shadow-lg disabled:hover:translate-y-0 disabled:hover:shadow-none"
                     style={{
-                      background: canSummonTen ? "var(--jade-green)" : "#999",
+                      background: canUpgradeMultiplier ? "var(--vermillion)" : "#999",
                       color: "var(--parchment)",
-                      boxShadow: canSummonTen ? "0 4px 6px rgba(76, 132, 119, 0.4)" : "none",
+                      boxShadow: canUpgradeMultiplier ? "0 4px 6px rgba(193, 39, 45, 0.3)" : "none",
                     }}
                   >
-                    Summon 10 Spirits ({multiSummonCost} Qi)
+                    Amplify Multiplier ({multiplierUpgradeCost} Qi)
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent className="parchment-bg border-2 border-amber-700">
                   <p className="parchment-text text-xs">
-                    Bonus: Guarantees at least 1 Rare or higher spirit
+                    Current: {qiUpgrades.multiplier.toFixed(1)}x → Next: {(qiUpgrades.multiplier + 0.1).toFixed(1)}x
+                  </p>
+                </TooltipContent>
+              </Tooltip>
+            </div>
+
+            {/* Battle Mastery */}
+            <div className="p-4 parchment-bg rounded border-2 border-amber-700">
+              <h3 className="text-lg font-bold parchment-text mb-3">
+                Battle Mastery
+              </h3>
+              <div className="space-y-2">
+                <div className="flex justify-between parchment-text text-sm">
+                  <span>Battle Reward Multiplier:</span>
+                  <span className="font-semibold">
+                    {(battleRewardMultiplier * 100).toFixed(0)}%
+                  </span>
+                </div>
+                <p className="text-xs parchment-text opacity-75 italic">
+                  Each upgrade increases battle Qi rewards by 10%
+                </p>
+              </div>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    onClick={upgradeBattleReward}
+                    disabled={!canUpgradeBattleReward}
+                    className="w-full mt-4 transition-all hover:-translate-y-0.5 hover:shadow-lg disabled:hover:translate-y-0 disabled:hover:shadow-none"
+                    style={{
+                      background: canUpgradeBattleReward
+                        ? "var(--vermillion)"
+                        : "#999",
+                      color: "var(--parchment)",
+                      boxShadow: canUpgradeBattleReward ? "0 4px 6px rgba(193, 39, 45, 0.3)" : "none",
+                    }}
+                  >
+                    Enhance Battle Mastery ({battleRewardUpgradeCost} Qi)
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent className="parchment-bg border-2 border-amber-700">
+                  <p className="parchment-text text-xs">
+                    Current: {(battleRewardMultiplier * 100).toFixed(0)}% → Next: {((battleRewardMultiplier + 0.1) * 100).toFixed(0)}%
                   </p>
                 </TooltipContent>
               </Tooltip>
             </div>
           </div>
+
+          {/* RIGHT COLUMN: Advanced Generators */}
+          <div className="flex flex-col gap-4">
+            <h2 className="text-xl font-bold parchment-text">Advanced Generators</h2>
+            
+            {/* Coming Soon Placeholder */}
+            <div className="p-8 parchment-bg rounded border-2 border-amber-700 flex items-center justify-center">
+              <p className="text-lg parchment-text opacity-75 italic">Coming Soon...</p>
+            </div>
+          </div>
         </div>
 
-        {/* --- MODIFIED: Navigation Buttons (2-col) --- */}
-        <div className="grid grid-cols-2 gap-4 mb-4">
+        {/* Spirit Summoning Section (Outside Grid) */}
+        <div className="p-4 parchment-bg rounded border-2 border-amber-700">
+          <div className="flex justify-between items-center mb-3">
+            <h3 className="text-lg font-bold parchment-text">
+              Spirit Summoning
+            </h3>
+            <Button
+              size="icon"
+              variant="outline"
+              onClick={() => setShowSummonRates(!showSummonRates)}
+              className="bg-white/80"
+            >
+              <Info size={18} />
+            </Button>
+          </div>
+
+          {showSummonRates ? (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
+              exit={{ opacity: 0, height: 0 }}
+              className="mb-4 overflow-hidden"
+            >
+              <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-sm parchment-text">
+                <div className="flex justify-between">
+                  <span style={{ color: getRarityColor("common") }}>
+                    Common:
+                  </span>
+                  <span>60%</span>
+                </div>
+                <div className="flex justify-between">
+                  <span style={{ color: getRarityColor("uncommon") }}>
+                    Uncommon:
+                  </span>
+                  <span>25%</span>
+                </div>
+                <div className="flex justify-between">
+                  <span style={{ color: getRarityColor("rare") }}>Rare:</span>
+                  <span>10%</span>
+                </div>
+                <div className="flex justify-between">
+                  <span style={{ color: getRarityColor("epic") }}>Epic:</span>
+                  <span>4%</span>
+                </div>
+                <div className="flex justify-between">
+                  <span style={{ color: getRarityColor("legendary") }}>
+                    Legendary:
+                  </span>
+                  <span>1%</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="prismatic-border px-1 rounded">
+                    Prismatic:
+                  </span>
+                  <span>0.1%</span>
+                </div>
+              </div>
+            </motion.div>
+          ) : null}
+
+          <div className="grid grid-cols-2 gap-4">
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  onClick={() => setSummonRequest(1)}
+                  disabled={!canSummonOne}
+                  className="w-full p-5 text-base font-bold transition-all hover:-translate-y-0.5 hover:shadow-lg disabled:hover:translate-y-0 disabled:hover:shadow-none"
+                  style={{
+                    background: canSummonOne ? "var(--jade-green)" : "#999",
+                    color: "var(--parchment)",
+                    boxShadow: canSummonOne ? "0 4px 6px rgba(76, 132, 119, 0.4)" : "none",
+                  }}
+                >
+                  Summon Spirit ({spiritCost} Qi)
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent className="parchment-bg border-2 border-amber-700">
+                <p className="parchment-text text-xs">
+                  Rates: Common (60%), Uncommon (25%), Rare (10%), Epic (4%), Legendary (1%), Prismatic (0.1%)
+                </p>
+              </TooltipContent>
+            </Tooltip>
+
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  onClick={() => setSummonRequest(10)}
+                  disabled={!canSummonTen}
+                  className="w-full p-5 text-base font-bold transition-all hover:-translate-y-0.5 hover:shadow-lg disabled:hover:translate-y-0 disabled:hover:shadow-none"
+                  style={{
+                    background: canSummonTen ? "var(--jade-green)" : "#999",
+                    color: "var(--parchment)",
+                    boxShadow: canSummonTen ? "0 4px 6px rgba(76, 132, 119, 0.4)" : "none",
+                  }}
+                >
+                  Summon 10 Spirits ({multiSummonCost} Qi)
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent className="parchment-bg border-2 border-amber-700">
+                <p className="parchment-text text-xs">
+                  Bonus: Guarantees at least 1 Rare or higher spirit
+                </p>
+              </TooltipContent>
+            </Tooltip>
+          </div>
+        </div>
+
+        {/* Navigation Buttons */}
+        <div className="grid grid-cols-2 gap-4">
           <Button
             onClick={() => onNavigate("spirits")}
             className="p-6 flex flex-col items-center gap-2 transition-all hover:-translate-y-0.5 hover:shadow-lg"
@@ -648,7 +577,7 @@ export function MainScreen({ onNavigate, onBossBattle }: MainScreenProps) {
         <Button
           onClick={handleResetGame}
           variant="destructive"
-          className="w-full p-4 mt-4"
+          className="w-full p-4"
         >
           <span className="text-sm font-semibold">RESET GAME (DEBUG)</span>
         </Button>
@@ -722,7 +651,6 @@ export function MainScreen({ onNavigate, onBossBattle }: MainScreenProps) {
           summonCount={summonRequest || 0}
         />
       )}
-      </div>
     </TooltipProvider>
   );
 }
