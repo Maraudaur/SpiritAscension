@@ -60,11 +60,14 @@ export function StoryScreen({ onClose, onNavigate }: StoryScreenProps) {
   const handleNodeComplete = () => {
     if (currentNodeId === null || !currentNode) return;
 
+    // Check if this is the first time completing this node
+    const isFirstCompletion = !isStoryNodeCompleted(currentNodeId);
+
     // Mark node as completed
     completeStoryNode(currentNodeId);
 
-    // Check if this node triggers an encounter
-    if (currentNode.encounterId !== null) {
+    // Only trigger encounter on first completion
+    if (isFirstCompletion && currentNode.encounterId !== null) {
       // Set the encounter ID in global state
       setCurrentEncounterId(currentNode.encounterId);
       
@@ -74,7 +77,7 @@ export function StoryScreen({ onClose, onNavigate }: StoryScreenProps) {
         onNavigate("battle");
       }
     } else {
-      // Just return to map
+      // Just return to map (replay or no encounter)
       setStoryLayer("map");
     }
   };
