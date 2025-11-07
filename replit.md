@@ -4,7 +4,21 @@ This is a cultivation/spirit-summoning idle game inspired by Asian mythology and
 
 **UI Design**: PC game interface with persistent left sidebar navigation (100px width) and 16:9 aspect ratio main content container. Persistent HUD at top displays volume control (left), Qi Energy counter with generation rate (center), and screen title (right). Five distinct game screens accessible via icon-driven sidebar buttons: Story (home), Cultivation (incremental loop), Spirit Manager, Summon (gacha), and Battle. Cultivation screen uses three-column layout: Ascension (left), Basic Generators (middle), Advanced Generators (right). Summon and Battle screens are full-page interfaces matching the 16:9 container aesthetic. Story screen features a two-layer system (Story Map + Visual Novel Scene). All screens maintain Xianxia/Chinese Imperial Fantasy aesthetic with parchment textures, vermillion, jade, and gold accents. Navigation between screens handled exclusively via sidebar, with no in-page navigation buttons.
 
-# Recent Changes (November 6, 2025)
+# Recent Changes (November 7, 2025)
+
+## Story Screen Enhancement
+- **Interactive Story Nodes**: All available story nodes are now clickable to view or replay content
+- **Multiple Dialogues Per Node**: Each story node supports up to 5 different text dialogues that players click through
+- **Visual Novel Format**: Dialogue scenes use a visual novel layout with:
+  - Upper 2/3 of screen reserved for scene and character visualization
+  - Lower 1/3 dialogue box with speaker name, text, and progress indicators
+  - Animated dialogue transitions using Framer Motion
+- **Encounter Triggers**: Story nodes can trigger battle encounters upon completion via `encounterAfter` flag
+- **Sequential Unlocking**: Story nodes unlock sequentially - all previous nodes must be completed before accessing later ones
+- **Progress Tracking**: Game state now tracks completed story nodes with persistence across sessions
+- **Story Data**: Created `shared/data/story.json` with 5 story nodes including "The Awakening", "First Cultivation", "Spirit Bonding", "The Trial", and "Ancient Wisdom"
+
+# Previous Changes (November 6, 2025)
 
 - Implemented persistent left sidebar navigation with 5 icon buttons (Story, Cultivation, Spirits, Summon, Battle)
 - Restructured App.tsx to use sidebar + 16:9 aspect ratio content container layout
