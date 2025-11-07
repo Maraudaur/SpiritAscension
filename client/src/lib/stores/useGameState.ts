@@ -120,6 +120,9 @@ interface GameStore extends GameState {
   ascend: () => void;
   getMultiSummonCost: (count: number) => number;
   summonMultipleSpirits: (count: number) => PlayerSpirit[];
+  completedStoryNodes: number[];
+  completeStoryNode: (nodeId: number) => void;
+  isStoryNodeCompleted: (nodeId: number) => boolean;
 }
 
 const BASE_SPIRIT_COST = 100;
@@ -145,6 +148,7 @@ const getInitialState = () => ({
   essences: {},
   summonCount: 0,
   ascensionTier: 0,
+  completedStoryNodes: [0],
 });
 
 export const useGameState = create<GameStore>()(
@@ -587,6 +591,17 @@ export const useGameState = create<GameStore>()(
             currentHealth: undefined,
           })),
         }));
+      },
+      completeStoryNode: (nodeId: number) => {
+        set((state) => ({
+          completedStoryNodes: state.completedStoryNodes.includes(nodeId)
+            ? state.completedStoryNodes
+            : [...state.completedStoryNodes, nodeId],
+        }));
+      },
+      isStoryNodeCompleted: (nodeId: number) => {
+        const state = get();
+        return state.completedStoryNodes.includes(nodeId);
       },
       resetGame: () => {
         set(getInitialState());
