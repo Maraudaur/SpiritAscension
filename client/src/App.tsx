@@ -138,7 +138,7 @@ function App() {
           <QiHUD currentScreen={currentScreen} />
           
           <div style={{ flex: 1, overflow: "hidden", position: "relative" }}>
-            {currentScreen === "story" && <StoryScreen />}
+            {currentScreen === "story" && <StoryScreen onNavigate={setCurrentScreen} />}
             
             {currentScreen === "cultivation" && (
               <div className="w-full h-full overflow-y-auto">

@@ -16,6 +16,7 @@ const RARITY_CHANCES: Record<Rarity, number> = {
   rare: 0.1,
   epic: 0.04,
   legendary: 0.01,
+  boss: 0,
 };
 
 const PRISMATIC_CHANCE = 1 / 1024;
@@ -148,7 +149,7 @@ const getInitialState = () => ({
   essences: {},
   summonCount: 0,
   ascensionTier: 0,
-  completedStoryNodes: [0],
+  completedStoryNodes: [],
 });
 
 export const useGameState = create<GameStore>()(
