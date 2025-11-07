@@ -11,6 +11,8 @@ export type BattleState = "setup" | "fighting" | "victory" | "defeat";
 export interface BattleScreenProps {
   onClose: () => void;
   isBossBattle?: boolean;
+  returnTo?: "cultivation" | "story";
+  autoStart?: boolean;
 }
 
 export interface BattleSpirit {

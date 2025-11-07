@@ -37,6 +37,8 @@ function BattleLoadingScreen() {
 
 export function BattleScreen({
   onClose,
+  returnTo = "cultivation",
+  autoStart = false,
 }: BattleScreenProps) {
   // Use the battle logic hook instead of managing state internally
   const logic = useBattleLogic({ onClose, isBossBattle: false });
@@ -78,6 +80,13 @@ export function BattleScreen({
     handleSkillSelect,
     handleClose,
   } = logic;
+
+  // Auto-start battle if autoStart is true
+  useEffect(() => {
+    if (autoStart && battleState === "setup") {
+      startBattle();
+    }
+  }, [autoStart, battleState, startBattle]);
 
   // Scroll to bottom of log when it updates
   useEffect(() => {
@@ -152,7 +161,7 @@ export function BattleScreen({
               color: "var(--parchment)",
             }}
           >
-            Return to Cultivation
+            Return to {returnTo === "story" ? "Story" : "Cultivation"}
           </Button>
         </div>
       </div>
@@ -709,7 +718,7 @@ export function BattleScreen({
                   color: "var(--parchment)",
                 }}
               >
-                Return to Cultivation
+                Return to {returnTo === "story" ? "Story" : "Cultivation"}
               </Button>
             </div>
           </div>
@@ -725,8 +734,10 @@ export function BattleScreen({
               All your spirits have been defeated.
             </p>
             <p className="text-sm text-red-700 mb-4 text-center italic">
-              Return to cultivation and strengthen your spirits before trying
-              again.
+              {returnTo === "story" 
+                ? "Return to your journey and prepare for the trial ahead."
+                : "Return to cultivation and strengthen your spirits before trying again."
+              }
             </p>
             <Button
               onClick={handleClose}
@@ -736,7 +747,7 @@ export function BattleScreen({
                 color: "var(--parchment)",
               }}
             >
-              Return to Cultivation
+              Return to {returnTo === "story" ? "Story" : "Cultivation"}
             </Button>
           </div>
         )}

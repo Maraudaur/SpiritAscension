@@ -13,6 +13,7 @@ type Screen = "story" | "cultivation" | "spirits" | "summon" | "battle";
 
 function App() {
   const [currentScreen, setCurrentScreen] = useState<Screen>("story");
+  const [battleSource, setBattleSource] = useState<"story" | "sidebar">("sidebar");
 
   // Get all functions from the store
   const {
@@ -107,7 +108,15 @@ function App() {
         background: "linear-gradient(135deg, #1A0F0A 0%, #2C1810 100%)",
       }}
     >
-      <Sidebar currentScreen={currentScreen} onNavigate={setCurrentScreen} />
+      <Sidebar 
+        currentScreen={currentScreen} 
+        onNavigate={(screen) => {
+          if (screen === "battle") {
+            setBattleSource("sidebar");
+          }
+          setCurrentScreen(screen);
+        }} 
+      />
 
       <div
         style={{
@@ -138,7 +147,16 @@ function App() {
           <QiHUD currentScreen={currentScreen} />
           
           <div style={{ flex: 1, overflow: "hidden", position: "relative" }}>
-            {currentScreen === "story" && <StoryScreen onNavigate={setCurrentScreen} />}
+            {currentScreen === "story" && (
+              <StoryScreen 
+                onNavigate={(screen) => {
+                  if (screen === "battle") {
+                    setBattleSource("story");
+                  }
+                  setCurrentScreen(screen);
+                }} 
+              />
+            )}
             
             {currentScreen === "cultivation" && (
               <div className="w-full h-full overflow-y-auto">
@@ -158,9 +176,34 @@ function App() {
               </div>
             )}
 
-            {currentScreen === "battle" && (
+            {currentScreen === "battle" && battleSource === "sidebar" && (
               <div className="w-full h-full overflow-hidden">
-                <BattleScreen onClose={() => setCurrentScreen("cultivation")} />
+                <BattleScreen 
+                  onClose={() => {
+                    setBattleSource("sidebar");
+                    setCurrentScreen("cultivation");
+                  }}
+                  returnTo="cultivation"
+                  autoStart={false}
+                />
+              </div>
+            )}
+            
+            {battleSource === "story" && (
+              <div 
+                className="absolute inset-0 z-50 flex items-center justify-center"
+                style={{ background: "rgba(0, 0, 0, 0.8)" }}
+              >
+                <div className="w-full h-full">
+                  <BattleScreen 
+                    onClose={() => {
+                      setBattleSource("sidebar");
+                      setCurrentScreen("story");
+                    }}
+                    returnTo="story"
+                    autoStart={true}
+                  />
+                </div>
               </div>
             )}
           </div>
