@@ -1,0 +1,230 @@
+﻿Yes, I can. You need to add the new state to useGameState.ts first, then modify StoryScreen.tsx to set that state, and finally modify useBattleLogic.ts to read it.
+Here is the step-by-step guide to connect everything.
+________________
+
+
+Step 1: Modify useGameState.ts (This File)
+You need to add currentEncounterId to your store so it can be accessed globally.
+A. Add to the GameStore Interface
+Near line 107, add the new state and its setter function to your interface:
+TypeScript
+// ... (near line 107)
+  getMultiSummonCost: (count: number) => number;
+  summonMultipleSpirits: (count: number) => PlayerSpirit[];
+  completedStoryNodes: number[];
+  completeStoryNode: (nodeId: number) => void;
+  isStoryNodeCompleted: (nodeId: number) => boolean;
+
+
+  // 👇 ADD THESE TWO LINES
+  currentEncounterId: string | null;
+  setCurrentEncounterId: (id: string | null) => void;
+}
+
+
+const BASE_SPIRIT_COST = 100;
+// ...
+
+
+B. Add to the Initial State
+Near line 135, add the default value for the new state inside getInitialState:
+TypeScript
+// ... (near line 135)
+  ascensionTier: 0,
+  completedStoryNodes: [],
+  
+  // 👇 ADD THIS LINE
+  currentEncounterId: null, 
+});
+
+
+export const useGameState = create<GameStore>()(
+// ...
+
+
+C. Add the Setter Function
+Near line 520, add the setCurrentEncounterId function itself. A good place is near your other story functions.
+TypeScript
+// ... (near line 520)
+      isStoryNodeCompleted: (nodeId: number) => {
+        const state = get();
+        return state.completedStoryNodes.includes(nodeId);
+      },
+
+
+      // 👇 ADD THIS FUNCTION
+      setCurrentEncounterId: (id) => set({ currentEncounterId: id }),
+
+
+      resetGame: () => {
+        set(getInitialState());
+      },
+// ...
+
+
+________________
+
+
+Step 2: Modify StoryScreen.tsx (The "Setter")
+Now, update your StoryScreen to use the new function.
+A. First, update your story.json
+This is not a code change, but a data change. You must modify your story.json file to use encounterId (as a string, to match your battle logic) instead of encounterAfter.
+Old story.json (Node 3):
+JSON
+ {
+    "id": 3,
+    "title": "The Trial",
+    "encounterAfter": true 
+  }
+
+
+New story.json (Node 3):
+JSON
+ {
+    "id": 3,
+    "title": "The Trial",
+    "encounterId": "e_trial_01" // 👈 Use an actual ID from encounters.json
+  }
+
+
+(Make sure to use null for nodes with no encounter, e.g., "encounterId": null)
+B. Update the StoryNode Interface
+In StoryScreen.tsx, change the interface to match your new story.json structure.
+TypeScript
+// ... (near line 18)
+interface StoryNode {
+  id: number;
+  title: string;
+  description: string;
+  dialogues: StoryDialogue[];
+  encounterId: string | null; // 👈 CHANGED from encounterAfter: boolean
+}
+
+
+C. Import the New Function
+Import setCurrentEncounterId from your useGameState store.
+TypeScript
+// ... (near line 6)
+import { useGameState } from "../lib/stores/useGameState";
+
+
+// ... (near line 30)
+  const { 
+    completedStoryNodes, 
+    completeStoryNode, 
+    isStoryNodeCompleted,
+    setCurrentEncounterId // 👈 ADD THIS
+  } = useGameState();
+
+
+D. Update handleNodeComplete
+This is the function you asked about. Change it to use encounterId and call the new setter.
+TypeScript
+// ... (near line 46)
+  const handleNodeComplete = () => {
+    if (currentNodeId === null || !currentNode) return;
+
+
+    // Mark node as completed
+    completeStoryNode(currentNodeId);
+
+
+    // Check if this node triggers an encounter
+    if (currentNode.encounterId !== null) { // 👈 CHANGED
+      
+      // 1. Set the encounter ID in your global state
+      setCurrentEncounterId(currentNode.encounterId); // 👈 ADDED
+
+
+      // 2. Trigger battle encounter
+      setStoryLayer("map");
+      if (onNavigate) {
+        onNavigate("battle");
+      }
+    } else {
+      // Just return to map
+      setStoryLayer("map");
+    }
+  };
+
+
+E. (Optional) Update the "Next" Button
+This makes your UI match the logic.
+TypeScript
+// ... (near line 177)
+<Button
+  onClick={handleContinueDialogue}
+  // ...
+>
+  {isLastDialogue ? (
+    currentNode.encounterId !== null ? ( // 👈 CHANGED
+      <>Begin Trial <ArrowRight className="w-4 h-4" /></>
+    ) : (
+      <>Complete <ArrowRight className="w-4 h-4" /></>
+    )
+  ) : (
+    <>Next <ChevronRight className="w-4 h-4" /></>
+  )}
+</Button>
+
+
+________________
+
+
+Step 3: Modify useBattleLogic.ts (The "Reader")
+Finally, make your battle logic read the ID you just set.
+A. Import the State and Setter
+In useBattleLogic.ts, import currentEncounterId and setCurrentEncounterId from useGameState.
+TypeScript
+// ... (near line 118)
+  const {
+    spirits,
+    activeParty,
+    // ...
+    healAllSpirits,
+    currentEncounterId,    // 👈 ADD THIS
+    setCurrentEncounterId, // 👈 ADD THIS
+  } = useGameState();
+
+
+B. Modify the findEncounter() Function
+This is the most important change. You must modify findEncounter to look for currentEncounterId before it does anything else.
+TypeScript
+// ... (near line 175)
+  const findEncounter = (): Encounter | null => {
+    const encounterData = (allEncounters as any)?.default || allEncounters;
+    if (!encounterData) {
+      console.error("CRITICAL: encounters.json data is not loaded.");
+      return null;
+    }
+
+
+    // --- 👇 ADD THIS ENTIRE BLOCK ---
+    // Priority 1: Check for a story-driven encounter
+    if (currentEncounterId) {
+      const storyEncounter = (encounterData as Encounter[]).find(
+        (enc) => enc.id === currentEncounterId,
+      );
+      
+      // IMPORTANT: Clear the ID so it's not reused on the next battle
+      setCurrentEncounterId(null); 
+
+
+      if (storyEncounter) {
+        return storyEncounter;
+      }
+      
+      console.error(
+        `CRITICAL: Story encounter '${currentEncounterId}' not found! Falling back to random.`
+      );
+    }
+    // --- END NEW BLOCK ---
+
+
+    // --- NEW BOSS LOGIC ---
+    if (isBossBattle) {
+    // ... (rest of the function is unchanged)
+
+
+These changes create the full loop: StoryScreen sets a global ID, and useBattleLogic reads and clears that ID to load the correct fight.
+Would you like me to create an example e_trial_01 encounter for your encounters.json file?

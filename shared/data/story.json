@@ -25,7 +25,7 @@
         "text": "I am Elder Chen, guardian of this realm. Your journey to immortality begins now. First, you must learn to sense and gather Qi."
       }
     ],
-    "encounterAfter": false
+    "encounterAfter": true
   },
   {
     "id": 1,
