@@ -124,6 +124,8 @@ interface GameStore extends GameState {
   completedStoryNodes: number[];
   completeStoryNode: (nodeId: number) => void;
   isStoryNodeCompleted: (nodeId: number) => boolean;
+  currentEncounterId: string | null;
+  setCurrentEncounterId: (id: string | null) => void;
 }
 
 const BASE_SPIRIT_COST = 100;
@@ -150,6 +152,7 @@ const getInitialState = () => ({
   summonCount: 0,
   ascensionTier: 0,
   completedStoryNodes: [],
+  currentEncounterId: null,
 });
 
 export const useGameState = create<GameStore>()(
@@ -604,6 +607,7 @@ export const useGameState = create<GameStore>()(
         const state = get();
         return state.completedStoryNodes.includes(nodeId);
       },
+      setCurrentEncounterId: (id) => set({ currentEncounterId: id }),
       resetGame: () => {
         set(getInitialState());
       },

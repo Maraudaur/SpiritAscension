@@ -15,23 +15,30 @@ interface StoryNode {
   title: string;
   description: string;
   dialogues: StoryDialogue[];
-  encounterAfter: boolean;
+  encounterId: number | null;
 }
 
 interface StoryScreenProps {
   onClose?: () => void;
-  onNavigate?: (screen: "story" | "cultivation" | "spirits" | "summon" | "battle") => void;
+  onNavigate?: (
+    screen: "story" | "cultivation" | "spirits" | "summon" | "battle",
+  ) => void;
 }
 
 export function StoryScreen({ onClose, onNavigate }: StoryScreenProps) {
   const [storyLayer, setStoryLayer] = useState<"map" | "scene">("map");
   const [currentNodeId, setCurrentNodeId] = useState<number | null>(null);
   const [currentDialogueIndex, setCurrentDialogueIndex] = useState(0);
-  
-  const { completedStoryNodes, completeStoryNode, isStoryNodeCompleted } = useGameState();
+
+  const {
+    completedStoryNodes,
+    completeStoryNode,
+    isStoryNodeCompleted,
+    setCurrentEncounterId,
+  } = useGameState();
 
   const storyNodes = storyData as StoryNode[];
-  const currentNode = storyNodes.find(n => n.id === currentNodeId);
+  const currentNode = storyNodes.find((n) => n.id === currentNodeId);
 
   const handleNodeClick = (nodeId: number) => {
     setCurrentNodeId(nodeId);
@@ -57,8 +64,13 @@ export function StoryScreen({ onClose, onNavigate }: StoryScreenProps) {
     completeStoryNode(currentNodeId);
 
     // Check if this node triggers an encounter
-    if (currentNode.encounterAfter) {
-      // Trigger battle encounter
+    if (currentNode.encounterId !== null) {
+      // 👈 CHANGED
+
+      // 1. Set the encounter ID in your global state
+      setCurrentEncounterId(currentNode.encounterId); // 👈 ADDED
+
+      // 2. Trigger battle encounter
       setStoryLayer("map");
       if (onNavigate) {
         onNavigate("battle");
@@ -74,14 +86,15 @@ export function StoryScreen({ onClose, onNavigate }: StoryScreenProps) {
   };
 
   const getNextIncompleteNode = () => {
-    return storyNodes.find(node => !isStoryNodeCompleted(node.id));
+    return storyNodes.find((node) => !isStoryNodeCompleted(node.id));
   };
 
   const nextNode = getNextIncompleteNode();
 
   if (storyLayer === "scene" && currentNode) {
     const currentDialogue = currentNode.dialogues[currentDialogueIndex];
-    const isLastDialogue = currentDialogueIndex === currentNode.dialogues.length - 1;
+    const isLastDialogue =
+      currentDialogueIndex === currentNode.dialogues.length - 1;
 
     return (
       <div
@@ -140,7 +153,9 @@ export function StoryScreen({ onClose, onNavigate }: StoryScreenProps) {
                     fontFamily: "serif",
                   }}
                 >
-                  <span className="font-bold text-lg">{currentDialogue.speaker}</span>
+                  <span className="font-bold text-lg">
+                    {currentDialogue.speaker}
+                  </span>
                 </div>
 
                 {/* Dialogue Text */}
@@ -159,7 +174,8 @@ export function StoryScreen({ onClose, onNavigate }: StoryScreenProps) {
                         key={index}
                         className="w-3 h-3 rounded-full border"
                         style={{
-                          background: index <= currentDialogueIndex ? "#4C8477" : "#999",
+                          background:
+                            index <= currentDialogueIndex ? "#4C8477" : "#999",
                           borderColor: "#5C4033",
                         }}
                       />
@@ -188,12 +204,18 @@ export function StoryScreen({ onClose, onNavigate }: StoryScreenProps) {
                     >
                       {isLastDialogue ? (
                         currentNode.encounterAfter ? (
-                          <>Begin Trial <ArrowRight className="w-4 h-4" /></>
+                          <>
+                            Begin Trial <ArrowRight className="w-4 h-4" />
+                          </>
                         ) : (
-                          <>Complete <ArrowRight className="w-4 h-4" /></>
+                          <>
+                            Complete <ArrowRight className="w-4 h-4" />
+                          </>
                         )
                       ) : (
-                        <>Next <ChevronRight className="w-4 h-4" /></>
+                        <>
+                          Next <ChevronRight className="w-4 h-4" />
+                        </>
                       )}
                     </Button>
                   </div>
@@ -231,7 +253,8 @@ export function StoryScreen({ onClose, onNavigate }: StoryScreenProps) {
         <div
           className="relative p-8 rounded-lg border-4 mb-8"
           style={{
-            background: "linear-gradient(135deg, #F5E6D3 0%, #E8D4B8 50%, #F5E6D3 100%)",
+            background:
+              "linear-gradient(135deg, #F5E6D3 0%, #E8D4B8 50%, #F5E6D3 100%)",
             borderColor: "#8B4513",
             minHeight: "500px",
             boxShadow: "inset 0 2px 8px rgba(139, 69, 19, 0.1)",
@@ -240,18 +263,27 @@ export function StoryScreen({ onClose, onNavigate }: StoryScreenProps) {
           <div className="flex flex-col gap-6">
             {storyNodes.map((node, index) => {
               const isCompleted = isStoryNodeCompleted(node.id);
-              const isAvailable = index === 0 || storyNodes.slice(0, index).every(n => isStoryNodeCompleted(n.id));
-              
+              const isAvailable =
+                index === 0 ||
+                storyNodes
+                  .slice(0, index)
+                  .every((n) => isStoryNodeCompleted(n.id));
+
               return (
-                <div
-                  key={node.id}
-                  className="flex items-center gap-4"
-                >
+                <div key={node.id} className="flex items-center gap-4">
                   <div
                     className="w-16 h-16 rounded-full flex items-center justify-center border-4 font-bold text-xl shrink-0"
                     style={{
-                      background: isCompleted ? "#4C8477" : isAvailable ? "#D4AF37" : "#999",
-                      borderColor: isCompleted ? "#2C5347" : isAvailable ? "#8B7500" : "#666",
+                      background: isCompleted
+                        ? "#4C8477"
+                        : isAvailable
+                          ? "#D4AF37"
+                          : "#999",
+                      borderColor: isCompleted
+                        ? "#2C5347"
+                        : isAvailable
+                          ? "#8B7500"
+                          : "#666",
                       color: "#F5E6D3",
                     }}
                   >
@@ -264,10 +296,7 @@ export function StoryScreen({ onClose, onNavigate }: StoryScreenProps) {
                     >
                       {node.title}
                     </h3>
-                    <p
-                      className="text-sm"
-                      style={{ color: "#5C4033" }}
-                    >
+                    <p className="text-sm" style={{ color: "#5C4033" }}>
                       {node.description}
                     </p>
                   </div>
@@ -309,16 +338,10 @@ export function StoryScreen({ onClose, onNavigate }: StoryScreenProps) {
             }}
             onClick={() => handleNodeClick(nextNode.id)}
           >
-            <p
-              className="text-lg font-bold mb-2"
-              style={{ color: "#4C8477" }}
-            >
+            <p className="text-lg font-bold mb-2" style={{ color: "#4C8477" }}>
               Next: {nextNode.title}
             </p>
-            <p
-              className="text-sm"
-              style={{ color: "#5C4033" }}
-            >
+            <p className="text-sm" style={{ color: "#5C4033" }}>
               Click to continue your journey
             </p>
           </div>
@@ -332,16 +355,10 @@ export function StoryScreen({ onClose, onNavigate }: StoryScreenProps) {
               borderColor: "#D4AF37",
             }}
           >
-            <p
-              className="text-sm italic"
-              style={{ color: "#8B4513" }}
-            >
+            <p className="text-sm italic" style={{ color: "#8B4513" }}>
               "The journey of a thousand li begins with a single step."
             </p>
-            <p
-              className="text-xs mt-2"
-              style={{ color: "#5C4033" }}
-            >
+            <p className="text-xs mt-2" style={{ color: "#5C4033" }}>
               - Ancient Proverb
             </p>
           </div>

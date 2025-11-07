@@ -82,6 +82,8 @@ export function useBattleLogic({
     updateSpiritHealth,
     battleRewardMultiplier,
     healAllSpirits,
+    currentEncounterId,
+    setCurrentEncounterId,
   } = useGameState();
 
   const {
@@ -165,6 +167,25 @@ export function useBattleLogic({
       return null;
     }
 
+    // --- 👇 ADD THIS ENTIRE BLOCK ---
+    // Priority 1: Check for a story-driven encounter
+    if (currentEncounterId) {
+      const storyEncounter = (encounterData as Encounter[]).find(
+        (enc) => enc.id === currentEncounterId,
+      );
+
+      // IMPORTANT: Clear the ID so it's not reused on the next battle
+      setCurrentEncounterId(null);
+
+      if (storyEncounter) {
+        return storyEncounter;
+      }
+
+      console.error(
+        `CRITICAL: Story encounter '${currentEncounterId}' not found! Falling back to random.`,
+      );
+    }
+
     // --- NEW BOSS LOGIC ---
     if (isBossBattle) {
       const bossEncounter = (encounterData as Encounter[]).find(
@@ -233,7 +254,9 @@ export function useBattleLogic({
             effect.damageReflectRatio &&
             damage
           ) {
-            const reflectAmount = Math.floor(damage * effect.damageReflectRatio);
+            const reflectAmount = Math.floor(
+              damage * effect.damageReflectRatio,
+            );
             reflectedDamage += reflectAmount;
             addLog(
               `${getBaseSpirit(battleSpirit.playerSpirit.spiritId)?.name}'s reflective barrier deflects damage!`,
@@ -287,7 +310,8 @@ export function useBattleLogic({
               reflectedDamage += reflectAmount;
               const targetDisplayName =
                 (target as Enemy).name ||
-                getBaseSpirit((target as BattleSpirit).playerSpirit?.spiritId)?.name ||
+                getBaseSpirit((target as BattleSpirit).playerSpirit?.spiritId)
+                  ?.name ||
                 "Unknown";
               addLog(
                 `${targetDisplayName}'s "${passive.name}" passive reflects damage!`,
@@ -448,13 +472,13 @@ export function useBattleLogic({
           effect.damagePerTurn
         ) {
           let dotDamage = effect.damagePerTurn;
-          
+
           // Apply DoT amplification if the caster has it
           if (effect.casterHasDotAmplification) {
             // Apply 30% amplification (from dot_amplification passive)
             dotDamage = Math.floor(dotDamage * 1.3);
           }
-          
+
           const spiritName =
             getBaseSpirit(spirit.playerSpirit.spiritId)?.name ||
             "Player Spirit";
@@ -648,13 +672,13 @@ export function useBattleLogic({
           effect.damagePerTurn
         ) {
           let dotDamage = effect.damagePerTurn;
-          
+
           // Apply DoT amplification if the caster has it
           if (effect.casterHasDotAmplification) {
             // Apply 30% amplification (from dot_amplification passive)
             dotDamage = Math.floor(dotDamage * 1.3);
           }
-          
+
           currentHealth = Math.max(0, currentHealth - dotDamage);
           addLog(
             `${enemy.name} takes ${dotDamage} damage from ${effect.effectType}!`,
@@ -1285,7 +1309,9 @@ export function useBattleLogic({
     let critChance = 0.05; // Base 5% crit chance
     if (baseSpirit.passiveAbilities) {
       for (const passiveId of baseSpirit.passiveAbilities) {
-        const passive = (passivesData as Record<string, PassiveAbility>)[passiveId];
+        const passive = (passivesData as Record<string, PassiveAbility>)[
+          passiveId
+        ];
         if (!passive || !passive.effects) continue;
         for (const effect of passive.effects) {
           if (effect.type === "crit_chance_boost") {
@@ -1295,7 +1321,10 @@ export function useBattleLogic({
       }
     }
     for (const activeEffect of attackerActiveEffects) {
-      if (activeEffect.effectType === "crit_chance_buff" && activeEffect.critChanceBoost) {
+      if (
+        activeEffect.effectType === "crit_chance_buff" &&
+        activeEffect.critChanceBoost
+      ) {
         critChance += activeEffect.critChanceBoost;
       }
     }
@@ -1365,7 +1394,7 @@ export function useBattleLogic({
         );
       }
     }
-    
+
     // Elemental Lifesteal (from passives)
     if (baseSpirit.passiveAbilities && totalDamage > 0) {
       for (const passiveId of baseSpirit.passiveAbilities) {
@@ -1391,12 +1420,17 @@ export function useBattleLogic({
         }
       }
     }
-    
+
     // Lifesteal from buff (active effects)
     if (totalDamage > 0) {
       for (const activeEffect of attackerActiveEffects) {
-        if (activeEffect.effectType === "lifesteal_buff" && activeEffect.lifestealRatio) {
-          const lifestealHealing = Math.floor(totalDamage * activeEffect.lifestealRatio);
+        if (
+          activeEffect.effectType === "lifesteal_buff" &&
+          activeEffect.lifestealRatio
+        ) {
+          const lifestealHealing = Math.floor(
+            totalDamage * activeEffect.lifestealRatio,
+          );
           if (lifestealHealing > 0) {
             totalHealing += lifestealHealing;
             logMessages.push(
@@ -1470,14 +1504,18 @@ export function useBattleLogic({
           logMessages.push(`${attacker.name} activates a reflective barrier!`);
         } else if (skillEffect.type === "apply_dot_stack") {
           // Calculate damage per turn based on target's max health
-          const damagePerTurn = Math.floor(target.maxHealth * skillEffect.damageRatio);
+          const damagePerTurn = Math.floor(
+            target.maxHealth * skillEffect.damageRatio,
+          );
           const stacksToApply = skillEffect.stacks;
-          
+
           // Check if caster has DoT amplification passive
           let casterHasDotAmplification = false;
           if (baseSpirit.passiveAbilities) {
             for (const passiveId of baseSpirit.passiveAbilities) {
-              const passive = (passivesData as Record<string, PassiveAbility>)[passiveId];
+              const passive = (passivesData as Record<string, PassiveAbility>)[
+                passiveId
+              ];
               if (!passive || !passive.effects) continue;
               for (const effect of passive.effects) {
                 if (effect.type === "dot_damage_boost") {
@@ -1488,15 +1526,21 @@ export function useBattleLogic({
               if (casterHasDotAmplification) break;
             }
           }
-          
+
           // Find existing DoT on target
-          const existingDot = effectsToApplyToTarget.find(e => e.effectType === "damage_over_time");
-          
-          if (existingDot && existingDot.dotStacks && existingDot.damagePerTurn) {
+          const existingDot = effectsToApplyToTarget.find(
+            (e) => e.effectType === "damage_over_time",
+          );
+
+          if (
+            existingDot &&
+            existingDot.dotStacks &&
+            existingDot.damagePerTurn
+          ) {
             // Stack with existing
             const newStacks = Math.min(
               (existingDot.dotStacks || 0) + stacksToApply,
-              skillEffect.maxStacks
+              skillEffect.maxStacks,
             );
             existingDot.dotStacks = newStacks;
             existingDot.damagePerTurn = damagePerTurn * newStacks;
@@ -1504,7 +1548,7 @@ export function useBattleLogic({
             existingDot.casterSpiritId = attacker.spiritId;
             existingDot.casterHasDotAmplification = casterHasDotAmplification;
             logMessages.push(
-              `${target.name} is poisoned! (${newStacks}/${skillEffect.maxStacks} stacks)`
+              `${target.name} is poisoned! (${newStacks}/${skillEffect.maxStacks} stacks)`,
             );
           } else {
             // Create new DoT
@@ -1519,14 +1563,21 @@ export function useBattleLogic({
             };
             effectsToApplyToTarget.push(newActiveEffect);
             logMessages.push(
-              `${target.name} is poisoned! (${stacksToApply}/${skillEffect.maxStacks} stacks)`
+              `${target.name} is poisoned! (${stacksToApply}/${skillEffect.maxStacks} stacks)`,
             );
           }
         }
       }
     }
 
-    return { totalDamage, totalHealing, logMessages, effectsToApplyToCaster, effectsToApplyToTarget, wasCritical };
+    return {
+      totalDamage,
+      totalHealing,
+      logMessages,
+      effectsToApplyToCaster,
+      effectsToApplyToTarget,
+      wasCritical,
+    };
   };
 
   /**
@@ -1573,10 +1624,10 @@ export function useBattleLogic({
 
     // 2. Get results
     const result = calculateAttackResult(
-      attackerData, 
-      targetData, 
+      attackerData,
+      targetData,
       skill,
-      activeSpirit.activeEffects || []
+      activeSpirit.activeEffects || [],
     );
     result.logMessages.forEach(addLog);
 
@@ -1616,10 +1667,7 @@ export function useBattleLogic({
 
     setBattleEnemies((prevEnemies) => {
       const targetEnemy = prevEnemies[activeEnemyIndex];
-      let newHealth = Math.max(
-        0,
-        targetEnemy.currentHealth - damage,
-      );
+      let newHealth = Math.max(0, targetEnemy.currentHealth - damage);
 
       const { reflectedDamage, attackerEffects } = executeTriggerEffects(
         "on_get_hit",
@@ -1627,9 +1675,12 @@ export function useBattleLogic({
         targetEnemy, // Target
         damage,
       );
-      
+
       // Apply effects to target (e.g., DoT stacks)
-      let updatedEnemy = { ...prevEnemies[activeEnemyIndex], currentHealth: newHealth };
+      let updatedEnemy = {
+        ...prevEnemies[activeEnemyIndex],
+        currentHealth: newHealth,
+      };
       result.effectsToApplyToTarget.forEach((eff) => {
         updatedEnemy = applyStatusEffect(updatedEnemy, eff) as Enemy;
       });
@@ -1653,11 +1704,16 @@ export function useBattleLogic({
         setPlayerSpirits((prev) =>
           prev.map((spirit, i) => {
             if (i !== activePartySlot) return spirit;
-            const newHealth = Math.max(0, spirit.currentHealth - reflectedDamage);
+            const newHealth = Math.max(
+              0,
+              spirit.currentHealth - reflectedDamage,
+            );
             return { ...spirit, currentHealth: newHealth };
           }),
         );
-        addLog(`${activeBaseSpirit.name} takes ${reflectedDamage} reflected damage!`);
+        addLog(
+          `${activeBaseSpirit.name} takes ${reflectedDamage} reflected damage!`,
+        );
       }
 
       return prevEnemies.map((en, index) =>
