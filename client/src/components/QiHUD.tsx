@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useGameState } from "@/lib/stores/useGameState";
 import { useAudio } from "@/lib/stores/useAudio";
-import { Sparkles, Volume2, VolumeX } from "lucide-react";
+import { Sparkles, Volume2, VolumeX, Bug } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
 import { motion, AnimatePresence } from "framer-motion";
@@ -21,9 +21,10 @@ interface QiHUDProps {
 }
 
 export function QiHUD({ currentScreen }: QiHUDProps) {
-  const { qi, qiPerSecond } = useGameState();
+  const { qi, qiPerSecond, resetGame, resetStory } = useGameState();
   const { isMuted, toggleMute, volume, setVolume } = useAudio();
   const [showVolumeSlider, setShowVolumeSlider] = useState(false);
+  const [showDebugMenu, setShowDebugMenu] = useState(false);
 
   const formatNumber = (num: number): string => {
     if (num >= 1_000_000_000) {
@@ -158,7 +159,7 @@ export function QiHUD({ currentScreen }: QiHUDProps) {
       </div>
 
       {/* RIGHT: Screen Title */}
-      <div className="flex items-center">
+      <div className="flex items-center gap-4">
         <h2
           className="text-2xl font-bold tracking-tight"
           style={{
@@ -168,6 +169,78 @@ export function QiHUD({ currentScreen }: QiHUDProps) {
         >
           {SCREEN_TITLES[currentScreen]}
         </h2>
+
+        {/* ========== DEBUG BUTTON - REMOVE IN PRODUCTION ========== */}
+        <div className="relative">
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={() => setShowDebugMenu(!showDebugMenu)}
+            title="Debug Menu"
+            className="bg-orange-100/90 backdrop-blur-sm border-orange-400 hover:bg-orange-200"
+          >
+            <Bug size={20} className="text-orange-600" />
+          </Button>
+
+          <AnimatePresence>
+            {showDebugMenu && (
+              <motion.div
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                className="absolute top-14 right-0 bg-white/95 backdrop-blur-sm p-4 rounded-lg shadow-lg border-2 border-orange-600 z-50"
+                style={{ width: "220px" }}
+              >
+                <div className="space-y-2">
+                  <div className="text-sm font-bold text-orange-700 mb-3 border-b border-orange-300 pb-2">
+                    Debug Controls
+                  </div>
+                  
+                  <Button
+                    variant="destructive"
+                    size="sm"
+                    onClick={() => {
+                      if (
+                        window.confirm(
+                          "Are you sure you want to reset all game progress? This cannot be undone."
+                        )
+                      ) {
+                        console.log("--- RESETTING GAME ---");
+                        resetGame();
+                        console.log("In-memory state reset. Reloading page...");
+                        window.location.reload();
+                      }
+                    }}
+                    className="w-full text-xs"
+                  >
+                    Reset Game
+                  </Button>
+
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      if (
+                        window.confirm(
+                          "Reset story progress? You'll be able to replay all story nodes."
+                        )
+                      ) {
+                        console.log("--- RESETTING STORY ---");
+                        resetStory();
+                        setShowDebugMenu(false);
+                        console.log("Story progress reset.");
+                      }
+                    }}
+                    className="w-full text-xs border-orange-400 text-orange-700 hover:bg-orange-50"
+                  >
+                    Reset Story
+                  </Button>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+        {/* ========== END DEBUG BUTTON ========== */}
       </div>
     </div>
   );

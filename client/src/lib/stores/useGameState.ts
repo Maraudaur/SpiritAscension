@@ -115,6 +115,7 @@ interface GameStore extends GameState {
   getLevelUpCost: (level: number) => { qi: number; essence: number };
   healAllSpirits: () => void;
   resetGame: () => void;
+  resetStory: () => void;
   ascensionTier: number;
   getAscensionCost: () => number;
   getAscensionBuffs: () => { qiMultiplier: number; battleMultiplier: number };
@@ -610,6 +611,9 @@ export const useGameState = create<GameStore>()(
       setCurrentEncounterId: (id) => set({ currentEncounterId: id }),
       resetGame: () => {
         set(getInitialState());
+      },
+      resetStory: () => {
+        set({ completedStoryNodes: [] });
       },
     }),
     // --- THIS IS THE NEW, ENCRYPTED CONFIG ---
