@@ -35,6 +35,9 @@ This is a cultivation/spirit-summoning idle game inspired by Asian mythology and
   - useBattleLogic prioritizes `currentEncounterId` over random encounter selection
   - Encounter ID automatically clears after use to prevent reuse in subsequent battles
   - Falls back to regular encounter logic when no story encounter is set
+- **First-Completion Logic**: Encounters only trigger the FIRST time a story node is completed
+  - Replaying completed nodes no longer re-triggers battles
+  - Prevents duplicate encounter loading when revisiting story content
 
 # Previous Changes (November 6, 2025)
 
