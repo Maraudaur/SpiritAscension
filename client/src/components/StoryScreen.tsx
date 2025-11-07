@@ -15,7 +15,7 @@ interface StoryNode {
   title: string;
   description: string;
   dialogues: StoryDialogue[];
-  encounterAfter: boolean;
+  encounterId: string | null;
 }
 
 interface StoryScreenProps {
@@ -34,6 +34,7 @@ export function StoryScreen({ onClose, onNavigate }: StoryScreenProps) {
     completedStoryNodes,
     completeStoryNode,
     isStoryNodeCompleted,
+    setCurrentEncounterId,
   } = useGameState();
 
   const storyNodes = storyData as StoryNode[];
@@ -63,7 +64,10 @@ export function StoryScreen({ onClose, onNavigate }: StoryScreenProps) {
     completeStoryNode(currentNodeId);
 
     // Check if this node triggers an encounter
-    if (currentNode.encounterAfter) {
+    if (currentNode.encounterId !== null) {
+      // Set the encounter ID in global state
+      setCurrentEncounterId(currentNode.encounterId);
+      
       // Trigger battle encounter
       setStoryLayer("map");
       if (onNavigate) {
@@ -197,7 +201,7 @@ export function StoryScreen({ onClose, onNavigate }: StoryScreenProps) {
                       }}
                     >
                       {isLastDialogue ? (
-                        currentNode.encounterAfter ? (
+                        currentNode.encounterId !== null ? (
                           <>
                             Begin Trial <ArrowRight className="w-4 h-4" />
                           </>
