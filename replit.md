@@ -18,6 +18,17 @@ This is a cultivation/spirit-summoning idle game inspired by Asian mythology and
 - **Progress Tracking**: Game state now tracks completed story nodes with persistence across sessions
 - **Story Data**: Created `shared/data/story.json` with 5 story nodes including "The Awakening", "First Cultivation", "Spirit Bonding", "The Trial", and "Ancient Wisdom"
 
+## Story-Triggered Battle Flow
+- **Battle Source Tracking**: App.tsx now tracks battle origin via `battleSource` state ("story" vs "sidebar")
+- **Dual Battle Presentation**: 
+  - Story-triggered battles: Full-screen overlay with auto-start functionality
+  - Sidebar-triggered battles: Standard full-page layout with manual start
+- **Context-Aware Navigation**: 
+  - Return buttons dynamically display "Return to Story" or "Return to Cultivation" based on battle source
+  - Defeat messages contextually adjust based on origin
+- **BattleScreen Props**: Extended with `returnTo` and `autoStart` props for flexible battle presentation
+- **Seamless Story Integration**: Completing story nodes with `encounterAfter: true` automatically triggers battle overlay with proper return navigation
+
 # Previous Changes (November 6, 2025)
 
 - Implemented persistent left sidebar navigation with 5 icon buttons (Story, Cultivation, Spirits, Summon, Battle)
