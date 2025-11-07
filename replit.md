@@ -13,7 +13,10 @@ This is a cultivation/spirit-summoning idle game inspired by Asian mythology and
   - Upper 2/3 of screen reserved for scene and character visualization
   - Lower 1/3 dialogue box with speaker name, text, and progress indicators
   - Animated dialogue transitions using Framer Motion
-- **Encounter Triggers**: Story nodes can trigger battle encounters upon completion via `encounterAfter` flag
+- **Encounter ID System**: Story nodes can trigger specific battle encounters via `encounterId` field
+  - Set to specific encounter ID string (e.g., "e001", "e002") to trigger that exact encounter
+  - Set to `null` for story nodes without battles
+  - Provides full control over which battles appear at which story points
 - **Sequential Unlocking**: Story nodes unlock sequentially - all previous nodes must be completed before accessing later ones
 - **Progress Tracking**: Game state now tracks completed story nodes with persistence across sessions
 - **Story Data**: Created `shared/data/story.json` with 5 story nodes including "The Awakening", "First Cultivation", "Spirit Bonding", "The Trial", and "Ancient Wisdom"
@@ -27,7 +30,11 @@ This is a cultivation/spirit-summoning idle game inspired by Asian mythology and
   - Return buttons dynamically display "Return to Story" or "Return to Cultivation" based on battle source
   - Defeat messages contextually adjust based on origin
 - **BattleScreen Props**: Extended with `returnTo` and `autoStart` props for flexible battle presentation
-- **Seamless Story Integration**: Completing story nodes with `encounterAfter: true` automatically triggers battle overlay with proper return navigation
+- **Encounter ID Integration**: 
+  - StoryScreen sets `currentEncounterId` in global state when completing nodes with encounters
+  - useBattleLogic prioritizes `currentEncounterId` over random encounter selection
+  - Encounter ID automatically clears after use to prevent reuse in subsequent battles
+  - Falls back to regular encounter logic when no story encounter is set
 
 # Previous Changes (November 6, 2025)
 
