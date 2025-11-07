@@ -15,7 +15,7 @@ interface StoryNode {
   title: string;
   description: string;
   dialogues: StoryDialogue[];
-  encounterId: number | null;
+  encounterAfter: boolean;
 }
 
 interface StoryScreenProps {
@@ -34,7 +34,6 @@ export function StoryScreen({ onClose, onNavigate }: StoryScreenProps) {
     completedStoryNodes,
     completeStoryNode,
     isStoryNodeCompleted,
-    setCurrentEncounterId,
   } = useGameState();
 
   const storyNodes = storyData as StoryNode[];
@@ -64,13 +63,8 @@ export function StoryScreen({ onClose, onNavigate }: StoryScreenProps) {
     completeStoryNode(currentNodeId);
 
     // Check if this node triggers an encounter
-    if (currentNode.encounterId !== null) {
-      // 👈 CHANGED
-
-      // 1. Set the encounter ID in your global state
-      setCurrentEncounterId(currentNode.encounterId); // 👈 ADDED
-
-      // 2. Trigger battle encounter
+    if (currentNode.encounterAfter) {
+      // Trigger battle encounter
       setStoryLayer("map");
       if (onNavigate) {
         onNavigate("battle");
