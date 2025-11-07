@@ -1,8 +1,6 @@
 import { useState, useEffect } from "react";
 import { useGameState } from "@/lib/stores/useGameState";
 import {
-  Swords,
-  Users,
   Star,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -18,7 +16,6 @@ interface MainScreenProps {
   onNavigate: (
     screen: "story" | "cultivation" | "spirits" | "summon" | "battle",
   ) => void;
-  onBossBattle?: () => void;
 }
 
 const TIER_DATA = [
@@ -30,7 +27,7 @@ const TIER_DATA = [
   { tier: 5, color: "#E11D48" }, // Prismatic (using a bright red as placeholder)
 ];
 
-export function MainScreen({ onNavigate, onBossBattle }: MainScreenProps) {
+export function MainScreen({ onNavigate }: MainScreenProps) {
   const {
     qi,
     qiPerSecond,
@@ -52,25 +49,8 @@ export function MainScreen({ onNavigate, onBossBattle }: MainScreenProps) {
     activeParty,
   } = useGameState();
   const [displayQi, setDisplayQi] = useState(qi);
-  const [isClient, setIsClient] = useState(false);
-  useEffect(() => {
-    console.log(
-      "DEBUG (MainScreen): Component Mounted. Setting isClient to true.",
-    );
-    setIsClient(true);
-  }, []);
-
-  const canEnterBattle = isClient && activeParty && activeParty.length > 0;
 
   const [ascendConfirmStep, setAscendConfirmStep] = useState(0);
-
-  // --- DEBUG: Log state on every render ---
-  console.log("--- MainScreen Render ---");
-  console.log("isClient:", isClient);
-  console.log("activeParty:", JSON.stringify(activeParty)); // Stringify to see the array contents
-  console.log("canEnterBattle:", canEnterBattle);
-  console.log("-------------------------");
-  // --- END DEBUG ---
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -366,88 +346,6 @@ export function MainScreen({ onNavigate, onBossBattle }: MainScreenProps) {
             </div>
           </div>
         </div>
-
-
-        {/* Navigation Buttons */}
-        <div className="grid grid-cols-2 gap-4">
-          <Button
-            onClick={() => onNavigate("spirits")}
-            className="p-6 flex flex-col items-center gap-2 transition-all hover:-translate-y-0.5 hover:shadow-lg"
-            style={{ 
-              background: "var(--azure)", 
-              color: "var(--parchment)",
-              boxShadow: "0 4px 6px rgba(58, 110, 165, 0.4)"
-            }}
-          >
-            <Users className="w-8 h-8" />
-            <span className="text-sm font-semibold">Manage Spirits</span>
-          </Button>
-
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                onClick={() => {
-                  if (canEnterBattle) {
-                    onNavigate("battle");
-                  } else {
-                    alert(
-                      "You must have at least one spirit in your active party to enter battle.",
-                    );
-                  }
-                }}
-                disabled={!canEnterBattle}
-                className="p-6 flex flex-col items-center gap-2 transition-all hover:-translate-y-0.5 hover:shadow-lg disabled:hover:translate-y-0 disabled:hover:shadow-none"
-                style={{
-                  background: "var(--vermillion)",
-                  color: "var(--parchment)",
-                  opacity: canEnterBattle ? 1 : 0.5,
-                  boxShadow: canEnterBattle ? "0 4px 6px rgba(193, 39, 45, 0.3)" : "none",
-                }}
-              >
-                <Swords className="w-8 h-8" />
-                <span className="text-sm font-semibold">Enter Battle</span>
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent className="parchment-bg border-2 border-amber-700">
-              <p className="parchment-text text-xs">
-                Party: {activeParty.length}/4 Ready
-              </p>
-            </TooltipContent>
-          </Tooltip>
-        </div>
-
-        {/* Boss Button */}
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button
-              onClick={() => {
-                if (canEnterBattle) {
-                  onBossBattle?.();
-                } else {
-                  alert(
-                    "You must have at least one spirit in your active party to challenge the boss.",
-                  );
-                }
-              }}
-              disabled={!canEnterBattle}
-              className="w-full p-6 flex flex-col items-center gap-2 transition-all hover:-translate-y-0.5 hover:shadow-xl disabled:hover:translate-y-0 disabled:hover:shadow-none"
-              style={{
-                background: "linear-gradient(135deg, #8B0000 0%, #FF4500 100%)",
-                color: "var(--parchment)",
-                opacity: canEnterBattle ? 1 : 0.5,
-                boxShadow: canEnterBattle ? "0 6px 12px rgba(139, 0, 0, 0.5)" : "none",
-              }}
-            >
-              <Swords className="w-10 h-10" />
-              <span className="text-lg font-bold">⚔️ Challenge Boss ⚔️</span>
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent className="parchment-bg border-2 border-amber-700">
-            <p className="parchment-text text-xs">
-              Reward: Huge Qi gain on victory. Must win to Ascend past Tier 3
-            </p>
-          </TooltipContent>
-        </Tooltip>
 
         {/* Reset Button */}
         <Button

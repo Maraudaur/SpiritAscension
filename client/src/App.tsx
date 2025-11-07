@@ -13,7 +13,6 @@ type Screen = "story" | "cultivation" | "spirits" | "summon" | "battle";
 
 function App() {
   const [currentScreen, setCurrentScreen] = useState<Screen>("story");
-  const [isBossBattle, setIsBossBattle] = useState(false);
 
   // Get all functions from the store
   const {
@@ -141,15 +140,9 @@ function App() {
           <div style={{ flex: 1, overflow: "hidden", position: "relative" }}>
             {currentScreen === "story" && <StoryScreen />}
             
-            {currentScreen === "cultivation" && !isBossBattle && (
+            {currentScreen === "cultivation" && (
               <div className="w-full h-full overflow-y-auto">
-                <MainScreen 
-                  onNavigate={setCurrentScreen}
-                  onBossBattle={() => {
-                    setIsBossBattle(true);
-                    setCurrentScreen("battle");
-                  }}
-                />
+                <MainScreen onNavigate={setCurrentScreen} />
               </div>
             )}
 
@@ -167,13 +160,7 @@ function App() {
 
             {currentScreen === "battle" && (
               <div className="w-full h-full overflow-hidden">
-                <BattleScreen 
-                  onClose={() => {
-                    setCurrentScreen("cultivation");
-                    setIsBossBattle(false);
-                  }} 
-                  isBossBattle={isBossBattle}
-                />
+                <BattleScreen onClose={() => setCurrentScreen("cultivation")} />
               </div>
             )}
           </div>

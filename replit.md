@@ -2,7 +2,7 @@
 
 This is a cultivation/spirit-summoning idle game inspired by Asian mythology and martial arts cultivation themes. Players collect and battle with spirits based on Chinese zodiac animals and Wu Xing (five elements), manage a party of spirits, and engage in turn-based battles. The game features an incremental Qi (energy) generation system used to summon new spirits with randomized stats and potential grades.
 
-**UI Design**: PC game interface with persistent left sidebar navigation (100px width) and 16:9 aspect ratio main content container. Persistent HUD at top displays volume control (left), Qi Energy counter with generation rate (center), and screen title (right). Five distinct game screens accessible via icon-driven sidebar buttons: Story (home), Cultivation (incremental loop), Spirit Manager, Summon (gacha), and Battle. Cultivation screen uses three-column layout: Ascension (left), Basic Generators (middle), Advanced Generators (right). Summon screen is a full-page interface with summon buttons, rates display, and animated reveal sequences. Story screen features a two-layer system (Story Map + Visual Novel Scene). All screens maintain Xianxia/Chinese Imperial Fantasy aesthetic with parchment textures, vermillion, jade, and gold accents.
+**UI Design**: PC game interface with persistent left sidebar navigation (100px width) and 16:9 aspect ratio main content container. Persistent HUD at top displays volume control (left), Qi Energy counter with generation rate (center), and screen title (right). Five distinct game screens accessible via icon-driven sidebar buttons: Story (home), Cultivation (incremental loop), Spirit Manager, Summon (gacha), and Battle. Cultivation screen uses three-column layout: Ascension (left), Basic Generators (middle), Advanced Generators (right). Summon and Battle screens are full-page interfaces matching the 16:9 container aesthetic. Story screen features a two-layer system (Story Map + Visual Novel Scene). All screens maintain Xianxia/Chinese Imperial Fantasy aesthetic with parchment textures, vermillion, jade, and gold accents. Navigation between screens handled exclusively via sidebar, with no in-page navigation buttons.
 
 # Recent Changes (November 6, 2025)
 
@@ -26,6 +26,12 @@ This is a cultivation/spirit-summoning idle game inspired by Asian mythology and
   - Collapsible summoning rates display
   - In-page animated reveal sequences (channeling → revealing → revealed)
   - Post-summon navigation: "Summon Again" or "Return to Cultivation" buttons
+- **Battle Screen Full-Page Layout**: Converted from modal popup to full-page 16:9 format:
+  - Full-page battle interface with spirit sprites, health bars, and action menu
+  - In-page victory/defeat screens with Continue Battling or Return options
+  - Removed boss battle concept - all battles are regular cultivation battles
+  - Removed all in-page navigation buttons from Cultivation screen (Manage Spirits, Enter Battle, Challenge Boss)
+  - Navigation now exclusively via sidebar buttons
 
 # User Preferences
 

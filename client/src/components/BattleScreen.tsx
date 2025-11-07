@@ -7,13 +7,10 @@ import {
 } from "@/lib/spiritUtils";
 import { Button } from "@/components/ui/button";
 import {
-  X,
   Swords,
   ArrowLeftRight,
   Heart,
   Shield,
-  Volume2,
-  VolumeX,
   Loader2,
   ArrowUp,
 } from "lucide-react";
@@ -23,33 +20,10 @@ import { useBattleLogic } from "@/lib/hooks/useBattleLogic";
 import { SpiritSpriteAnimation } from "./SpiritSpriteAnimation";
 
 // A simple loading component
-function BattleLoadingScreen({
-  onClose,
-  isMuted,
-  toggleMute,
-}: {
-  onClose: () => void;
-  isMuted: boolean;
-  toggleMute: () => void;
-}) {
+function BattleLoadingScreen() {
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center p-4 z-50">
-      <div className="parchment-bg chinese-border max-w-md w-full p-8 rounded-lg relative">
-        <Button
-          variant="outline"
-          size="icon"
-          onClick={toggleMute}
-          title={isMuted ? "Unmute Sound" : "Mute Sound"}
-          className="absolute top-4 left-4 bg-white/90 backdrop-blur-sm"
-        >
-          {isMuted ? <VolumeX size={18} /> : <Volume2 size={18} />}
-        </Button>
-        <button
-          onClick={onClose}
-          className="absolute top-4 right-4 parchment-text hover:opacity-70"
-        >
-          <X className="w-6 h-6" />
-        </button>
+    <div className="w-full h-full flex items-center justify-center p-6" style={{ background: "#F5E6D3" }}>
+      <div className="parchment-bg chinese-border max-w-md w-full p-8 rounded-lg">
         <div className="flex flex-col items-center justify-center min-h-[150px]">
           <Loader2 className="w-12 h-12 parchment-text animate-spin" />
           <p className="parchment-text text-lg font-semibold mt-4">
@@ -63,10 +37,9 @@ function BattleLoadingScreen({
 
 export function BattleScreen({
   onClose,
-  isBossBattle = false,
 }: BattleScreenProps) {
   // Use the battle logic hook instead of managing state internally
-  const logic = useBattleLogic({ onClose, isBossBattle });
+  const logic = useBattleLogic({ onClose, isBossBattle: false });
 
   const logContainerRef = useRef<HTMLDivElement>(null);
 
@@ -157,41 +130,14 @@ export function BattleScreen({
     prevEnemyHealth.current = newHealth;
   }, [activeEnemy?.currentHealth]);
 
-  // --- ADD THIS LOADING CHECK ---
-  // Show a loading screen until the component has mounted and
-  // the useBattleLogic hook has had time to hydrate.
   if (!isClient) {
-    return (
-      <BattleLoadingScreen
-        onClose={onClose}
-        isMuted={isMuted}
-        toggleMute={toggleMute}
-      />
-    );
+    return <BattleLoadingScreen />;
   }
-  // --- END LOADING CHECK ---
 
-  // Check if no spirits in party - this check now runs AFTER hydration
   if (activeParty.length === 0) {
     return (
-      <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center p-4 z-50">
-        <div className="parchment-bg chinese-border max-w-md w-full p-8 rounded-lg relative">
-          <Button
-            variant="outline"
-            size="icon"
-            onClick={toggleMute}
-            title={isMuted ? "Unmute Sound" : "Mute Sound"}
-            className="absolute top-4 left-4 bg-white/90 backdrop-blur-sm"
-          >
-            {isMuted ? <VolumeX size={18} /> : <Volume2 size={18} />}
-          </Button>
-
-          <button
-            onClick={onClose}
-            className="absolute top-4 right-4 parchment-text hover:opacity-70"
-          >
-            <X className="w-6 h-6" />
-          </button>
+      <div className="w-full h-full flex items-center justify-center p-6" style={{ background: "#F5E6D3" }}>
+        <div className="parchment-bg chinese-border max-w-md w-full p-8 rounded-lg">
           <h2 className="text-2xl font-bold text-center mb-4 parchment-text">
             Cannot Start Battle
           </h2>
@@ -206,7 +152,7 @@ export function BattleScreen({
               color: "var(--parchment)",
             }}
           >
-            Return
+            Return to Cultivation
           </Button>
         </div>
       </div>
@@ -214,27 +160,10 @@ export function BattleScreen({
   }
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center p-4 z-50">
-      <div className="parchment-bg chinese-border max-w-6xl w-full h-[90vh] p-6 rounded-lg relative flex flex-col">
-        <Button
-          variant="outline"
-          size="icon"
-          onClick={toggleMute}
-          title={isMuted ? "Unmute Sound" : "Mute Sound"}
-          className="absolute top-4 left-4 bg-white/90 backdrop-blur-sm z-10"
-        >
-          {isMuted ? <VolumeX size={18} /> : <Volume2 size={18} />}
-        </Button>
-
-        <button
-          onClick={handleClose}
-          className="absolute top-4 right-4 parchment-text hover:opacity-70 z-10"
-        >
-          <X className="w-6 h-6" />
-        </button>
-
+    <div className="w-full h-full flex flex-col p-6 overflow-y-auto" style={{ background: "#F5E6D3" }}>
+      <div className="parchment-bg chinese-border w-full max-w-6xl mx-auto p-6 rounded-lg flex flex-col flex-1">
         <h2 className="text-3xl font-bold text-center mb-4 parchment-text brush-stroke">
-          {isBossBattle ? "⚔️ Boss Battle ⚔️" : "Cultivation Battle"}
+          Cultivation Battle
         </h2>
 
         {/* Battle Scene */}
@@ -490,38 +419,6 @@ export function BattleScreen({
                     <div>ATK: {activeEnemy.attack}</div>
                     <div>DEF: {activeEnemy.defense}</div>
                   </div>
-                  {isBossBattle && activeEnemy && (
-                    <div className="mt-2 space-y-1">
-                      {(activeEnemy.activeEffects || [])
-                        .filter(
-                          (e) =>
-                            e.effectType === "stat_buff" && e.stat === "attack",
-                        )
-                        .map((buff) => (
-                          <div
-                            key={buff.id}
-                            className="p-2 bg-red-100 rounded border border-red-400"
-                          >
-                            <p className="text-xs font-bold text-red-800">
-                              ⚡ ATK Buffed! ({buff.turnsRemaining} turns)
-                            </p>
-                          </div>
-                        ))}
-                      {(activeEnemy.activeEffects || [])
-                        .filter((e) => e.effectType === "charge")
-                        .map((charge) => (
-                          <div
-                            key={charge.id}
-                            className="p-2 bg-yellow-100 rounded border border-yellow-400"
-                          >
-                            <p className="text-xs font-bold text-yellow-800 animate-pulse">
-                              ⚡ Charging...
-                            </p>
-                          </div>
-                        ))}
-                    </div>
-                  )}
-                  {/* End of existing content */}
                 </motion.div>
               ) : (
                 <motion.div
@@ -775,12 +672,10 @@ export function BattleScreen({
         {battleState === "victory" && battleRewards && (
           <div className="p-4 bg-green-100 rounded-lg border-2 border-green-600">
             <h3 className="font-bold text-green-800 text-2xl mb-3 text-center">
-              🎉 {isBossBattle ? "Boss Defeated!" : "Victory!"} 🎉
+              🎉 Victory! 🎉
             </h3>
             <p className="text-md text-green-800 mb-3 text-center font-semibold">
-              {isBossBattle
-                ? "You have defeated the mighty boss! Your cultivation deepens..."
-                : "You defeated the enemy! A new challenger approaches..."}
+              You defeated the enemy! A new challenger approaches...
             </p>
             <div className="mb-4 space-y-2 p-3 bg-white rounded border border-green-400">
               <p className="text-lg font-bold text-green-800">
@@ -795,7 +690,17 @@ export function BattleScreen({
                 All spirits have been fully healed!
               </p>
             </div>
-            {isBossBattle ? (
+            <div className="grid grid-cols-2 gap-3">
+              <Button
+                onClick={startBattle}
+                className="w-full font-bold"
+                style={{
+                  background: "var(--vermillion)",
+                  color: "var(--parchment)",
+                }}
+              >
+                Continue Battling
+              </Button>
               <Button
                 onClick={handleClose}
                 className="w-full font-bold"
@@ -806,30 +711,7 @@ export function BattleScreen({
               >
                 Return to Cultivation
               </Button>
-            ) : (
-              <div className="grid grid-cols-2 gap-3">
-                <Button
-                  onClick={startBattle}
-                  className="w-full font-bold"
-                  style={{
-                    background: "var(--vermillion)",
-                    color: "var(--parchment)",
-                  }}
-                >
-                  Continue Battling
-                </Button>
-                <Button
-                  onClick={handleClose}
-                  className="w-full font-bold"
-                  style={{
-                    background: "var(--jade-green)",
-                    color: "var(--parchment)",
-                  }}
-                >
-                  Return to Cultivation
-                </Button>
-              </div>
-            )}
+            </div>
           </div>
         )}
 
