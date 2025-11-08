@@ -19,10 +19,40 @@ import type { BattleScreenProps } from "@/lib/battle-types";
 import { useBattleLogic } from "@/lib/hooks/useBattleLogic";
 import { SpiritSpriteAnimation } from "./SpiritSpriteAnimation";
 
+// --- NEW MODAL OVERLAY COMPONENT ---
+// This will wrap Setup, Victory, and Defeat screens
+function ModalOverlay({
+  children,
+  onClose,
+}: {
+  children: React.ReactNode;
+  onClose?: () => void;
+}) {
+  return (
+    <motion.div
+      className="absolute inset-0 z-50 flex items-center justify-center bg-black/60 p-6"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      onClick={onClose} // Optional: click backdrop to close
+    >
+      <motion.div
+        className="parchment-bg chinese-border max-w-md w-full p-8 rounded-lg"
+        initial={{ scale: 0.7, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        exit={{ scale: 0.7, opacity: 0 }}
+        onClick={(e) => e.stopPropagation()} // Prevent click from bubbling to backdrop
+      >
+        {children}
+      </motion.div>
+    </motion.div>
+  );
+}
+
 // A simple loading component
 function BattleLoadingScreen() {
   return (
-    <div className="w-full h-full flex items-center justify-center p-6" style={{ background: "#F5E6D3" }}>
+    <div className="absolute inset-0 z-[100] flex items-center justify-center p-6 bg-black/80">
       <div className="parchment-bg chinese-border max-w-md w-full p-8 rounded-lg">
         <div className="flex flex-col items-center justify-center min-h-[150px]">
           <Loader2 className="w-12 h-12 parchment-text animate-spin" />
@@ -40,9 +70,7 @@ export function BattleScreen({
   returnTo = "cultivation",
   autoStart = false,
 }: BattleScreenProps) {
-  // Use the battle logic hook instead of managing state internally
   const logic = useBattleLogic({ onClose, isBossBattle: false });
-
   const logContainerRef = useRef<HTMLDivElement>(null);
 
   const [isClient, setIsClient] = useState(false);
@@ -50,7 +78,6 @@ export function BattleScreen({
     setIsClient(true);
   }, []);
 
-  // Destructure all needed values from the hook
   const {
     battleState,
     activePartySlot,
@@ -79,23 +106,21 @@ export function BattleScreen({
     handleBlock,
     handleSkillSelect,
     handleClose,
+    confirmEnemyDefeat,
   } = logic;
 
-  // Auto-start battle if autoStart is true
   useEffect(() => {
     if (autoStart && battleState === "setup") {
       startBattle();
     }
   }, [autoStart, battleState, startBattle]);
 
-  // Scroll to bottom of log when it updates
   useEffect(() => {
     if (logContainerRef.current) {
       logContainerRef.current.scrollTop = logContainerRef.current.scrollHeight;
     }
-  }, [battleLog]); // This effect runs every time battleLog changes
+  }, [battleLog]);
 
-  // Store the "lagged" health value
   const [playerLagHealth, setPlayerLagHealth] = useState(
     activeSpirit?.currentHealth || 0,
   );
@@ -103,39 +128,30 @@ export function BattleScreen({
     activeEnemy?.currentHealth || 0,
   );
 
-  // Store the previous health value to detect damage vs. healing
   const prevPlayerHealth = useRef(activeSpirit?.currentHealth || 0);
   const prevEnemyHealth = useRef(activeEnemy?.currentHealth || 0);
 
-  // Effect for Player Health Lag
   useEffect(() => {
     const newHealth = activeSpirit?.currentHealth || 0;
     if (newHealth < prevPlayerHealth.current) {
-      // Took damage: Update lag bar after a delay
       setTimeout(() => {
         setPlayerLagHealth(newHealth);
-      }, 500); // 500ms delay
+      }, 500);
     } else {
-      // Healed or no change: Update lag bar instantly
       setPlayerLagHealth(newHealth);
     }
-    // Update ref for next render
     prevPlayerHealth.current = newHealth;
   }, [activeSpirit?.currentHealth]);
 
-  // Effect for Enemy Health Lag
   useEffect(() => {
     const newHealth = activeEnemy?.currentHealth || 0;
     if (newHealth < prevEnemyHealth.current) {
-      // Took damage: Update lag bar after a delay
       setTimeout(() => {
         setEnemyLagHealth(newHealth);
-      }, 500); // 500ms delay
+      }, 500);
     } else {
-      // Healed or no change: Update lag bar instantly
       setEnemyLagHealth(newHealth);
     }
-    // Update ref for next render
     prevEnemyHealth.current = newHealth;
   }, [activeEnemy?.currentHealth]);
 
@@ -143,370 +159,223 @@ export function BattleScreen({
     return <BattleLoadingScreen />;
   }
 
-  if (activeParty.length === 0) {
-    return (
-      <div className="w-full h-full flex items-center justify-center p-6" style={{ background: "#F5E6D3" }}>
-        <div className="parchment-bg chinese-border max-w-md w-full p-8 rounded-lg">
-          <h2 className="text-2xl font-bold text-center mb-4 parchment-text">
-            Cannot Start Battle
-          </h2>
-          <p className="parchment-text text-center">
-            You need to add spirits to your active party before entering battle!
-          </p>
-          <Button
-            onClick={onClose}
-            className="w-full mt-4"
-            style={{
-              background: "var(--vermillion)",
-              color: "var(--parchment)",
-            }}
-          >
-            Return to {returnTo === "story" ? "Story" : "Cultivation"}
-          </Button>
-        </div>
-      </div>
-    );
-  }
-
   return (
-    <div className="w-full h-full flex flex-col p-6 overflow-y-auto" style={{ background: "#F5E6D3" }}>
-      <div className="parchment-bg chinese-border w-full max-w-6xl mx-auto p-6 rounded-lg flex flex-col flex-1">
-        <h2 className="text-3xl font-bold text-center mb-4 parchment-text brush-stroke">
-          Cultivation Battle
-        </h2>
+    <div
+      className="w-full h-full relative overflow-hidden"
+      style={{
+        // --- 1. BACKGROUND IMAGE ---
+        // !!! IMPORTANT: Change this path to your actual battle background !!!
+        backgroundImage: "url('/images/backgrounds/battle-bg-placeholder.png')",
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+      }}
+    >
+      {/* --- 2. SPIRITE SPOTS --- */}
 
-        {/* Battle Scene */}
-        <div className="w-full h-64 bg-gradient-to-b from-amber-100 to-amber-200 rounded-lg border-4 border-amber-700 mb-4 relative overflow-hidden">
-          <div className="absolute inset-0 opacity-10">
-            <div className="absolute top-10 left-10 w-20 h-20 bg-amber-800 rounded-full blur-xl"></div>
-            <div className="absolute bottom-10 right-10 w-32 h-32 bg-amber-800 rounded-full blur-xl"></div>
-          </div>
-          
-          {/* Player Spirit Sprite (Left) */}
-          <div 
-            className="absolute z-10 flex items-center justify-center" 
-            style={{ 
-              left: "15%", 
-              bottom: "10px", 
-              width: "200px", 
-              height: "200px" 
-            }}
-          >
-            {activeSpirit && activeBaseSpirit && (
-              <SpiritSpriteAnimation
-                spiritId={activeBaseSpirit.id}
-                position="left"
-                size={200}
-              />
-            )}
-          </div>
-          
-          {/* Enemy Spirit Sprite (Right) */}
-          <div 
-            className="absolute z-10 flex items-center justify-center" 
-            style={{ 
-              right: "15%", 
-              bottom: "10px", 
-              width: "200px", 
-              height: "200px" 
-            }}
-          >
-            {activeEnemy && (
-              <SpiritSpriteAnimation
-                spiritId={activeEnemy.spiritId}
-                position="right"
-                size={200}
-              />
-            )}
-          </div>
-        </div>
-
-        {/* Spirit Info Panels */}
-        <div className="grid grid-cols-2 gap-4 mb-4">
-          {/* Player Spirit Info */}
-          <div className="p-4 bg-amber-50 rounded-lg border-2 border-blue-600 min-h-[220px]">
-            <h3 className="font-bold parchment-text mb-2 text-blue-800">
-              Your Spirit
-            </h3>
-            {/* --- ADDED ANIMATION WRAPPER --- */}
-            <AnimatePresence mode="wait">
-              {activeSpirit && activeBaseSpirit && activeStats ? (
-                <motion.div
-                  key={activeSpirit.playerSpirit.instanceId} // This is the magic key
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: 20 }}
-                  transition={{ duration: 0.2 }}
-                >
-                  {/* All the existing spirit info content goes here */}
-                  <div className="flex justify-between items-start mb-2">
-                    <div className="flex items-center gap-1.5">
-                      <span className="font-bold parchment-text text-lg">
-                        {activeBaseSpirit.name}
-                      </span>
-                      {(activeSpirit.activeEffects || []).filter(
-                        (e) => e.effectType === "damage_over_time",
-                      ).length > 0 && (
-                        <span className="px-1.5 py-0.5 bg-purple-600 text-white text-xs font-bold rounded">
-                          PSN:{" "}
-                          {
-                            (activeSpirit.activeEffects || []).filter(
-                              (e) => e.effectType === "damage_over_time",
-                            ).length
-                          }
-                        </span>
-                      )}
-                      {(activeSpirit.activeEffects || []).some(
-                        (e) => e.effectType === "stat_buff",
-                      ) && (
-                        <span className="px-1 py-0.5 bg-green-600 text-white text-xs font-bold rounded flex items-center">
-                          <ArrowUp size={12} className="inline-block" />
-                        </span>
-                      )}
-                    </div>
-                    <span className="text-sm parchment-text">
-                      Lv. {activeSpirit.playerSpirit.level}
-                    </span>
-                  </div>
-                  <div className="text-xs parchment-text opacity-80 -mt-1 mb-2">
-                    <span className="capitalize">
-                      Element: {activeBaseSpirit.element}
-                    </span>
-                  </div>
-                  <div className="mb-2">
-                    <div className="flex justify-between text-sm parchment-text mb-1">
-                      <span className="flex items-center gap-1">
-                        <Heart className="w-4 h-4" /> HP
-                      </span>
-                      <span>
-                        {activeSpirit.currentHealth} / {activeSpirit.maxHealth}
-                      </span>
-                    </div>
-                    <motion.div
-                      className="w-full bg-gray-300 rounded-full h-4 overflow-hidden relative"
-                      animate={{
-                        x: playerHealthBarShake ? [0, -4, 4, -4, 4, 0] : 0,
-                      }}
-                      transition={{ duration: 0.5 }}
-                    >
-                      <motion.div
-                        className="bg-yellow-400 h-4 rounded-full absolute top-0 left-0"
-                        style={{
-                          width: `${(playerLagHealth / activeSpirit.maxHealth) * 100}%`,
-                        }}
-                        transition={{ duration: 0.5, ease: "easeOut" }}
-                      />
-                      <motion.div
-                        className="bg-green-600 h-4 rounded-full transition-all relative"
-                        style={{
-                          width: `${(activeSpirit.currentHealth / activeSpirit.maxHealth) * 100}%`,
-                        }}
-                        animate={{
-                          boxShadow: playerHealthBarHeal
-                            ? [
-                                "0 0 0px rgba(34, 197, 94, 0)",
-                                "0 0 15px rgba(34, 197, 94, 0.8)",
-                                "0 0 0px rgba(34, 197, 94, 0)",
-                              ]
-                            : "0 0 0px rgba(34, 197, 94, 0)",
-                        }}
-                        transition={{ duration: 0.6 }}
-                      />
-                    </motion.div>
-                  </div>
-                  <div className="grid grid-cols-2 gap-2 text-sm parchment-text">
-                    <div>ATK: {activeStats.attack}</div>
-                    <div>DEF: {activeStats.defense}</div>
-                  </div>
-                  {isBlocking && (
-                    <div className="mt-2 p-2 bg-blue-100 rounded border border-blue-400">
-                      <p className="text-xs font-bold text-blue-800 flex items-center gap-1">
-                        <Shield className="w-3 h-3" />
-                        Blocking!
-                      </p>
-                    </div>
-                  )}
-                  {/* End of existing content */}
-                </motion.div>
-              ) : (
-                <motion.div
-                  key="no-player-spirit"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ duration: 0.2 }}
-                >
-                  <p className="text-sm parchment-text opacity-50 pt-4">
-                    No active spirit
-                  </p>
-                </motion.div>
-              )}
-            </AnimatePresence>
-            {/* --- END ANIMATION WRAPPER --- */}
-          </div>
-
-          {/* Enemy Spirit Info */}
-          <div className="p-4 bg-amber-50 rounded-lg border-2 border-red-600 min-h-[220px]">
-            <h3 className="font-bold parchment-text mb-2 text-red-800">
-              Enemy
-            </h3>
-            {/* --- ADDED ANIMATION WRAPPER --- */}
-            <AnimatePresence mode="wait">
-              {activeEnemy ? (
-                <motion.div
-                  key={activeEnemy.id} // This is the magic key
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: 20 }}
-                  transition={{ duration: 0.2 }}
-                >
-                  {/* All the existing enemy info content goes here */}
-                  <div className="flex justify-between items-start mb-2">
-                    <div className="flex items-center gap-1.5">
-                      <span className="font-bold parchment-text text-lg">
-                        {activeEnemy.name}
-                      </span>
-                      {(activeEnemy.activeEffects || []).filter(
-                        (e) => e.effectType === "damage_over_time",
-                      ).length > 0 && (
-                        <span className="px-1.5 py-0.5 bg-purple-600 text-white text-xs font-bold rounded">
-                          PSN:{" "}
-                          {
-                            (activeEnemy.activeEffects || []).filter(
-                              (e) => e.effectType === "damage_over_time",
-                            ).length
-                          }
-                        </span>
-                      )}
-                      {(activeEnemy.activeEffects || []).some(
-                        (e) => e.effectType === "stat_buff",
-                      ) && (
-                        <span className="px-1 py-0.5 bg-green-600 text-white text-xs font-bold rounded flex items-center">
-                          <ArrowUp size={12} className="inline-block" />
-                        </span>
-                      )}
-                    </div>
-                    <span className="text-sm parchment-text">
-                      Lv. {activeEnemy.level}
-                    </span>
-                  </div>
-                  <div className="text-xs parchment-text opacity-80 -mt-1 mb-2">
-                    <span className="capitalize">
-                      Element: {activeEnemy.element}
-                    </span>
-                  </div>
-                  <div className="mb-2">
-                    <div className="flex justify-between text-sm parchment-text mb-1">
-                      <span>HP</span>
-                      <span>
-                        {activeEnemy.currentHealth} / {activeEnemy.maxHealth}
-                      </span>
-                    </div>
-                    <motion.div
-                      className="w-full bg-gray-300 rounded-full h-4 overflow-hidden relative"
-                      animate={{
-                        x: enemyHealthBarShake ? [0, -4, 4, -4, 4, 0] : 0,
-                      }}
-                      transition={{ duration: 0.5 }}
-                    >
-                      <motion.div
-                        className="bg-yellow-400 h-4 rounded-full absolute top-0 left-0"
-                        style={{
-                          width: `${(enemyLagHealth / activeEnemy.maxHealth) * 100}%`,
-                        }}
-                        transition={{ duration: 0.5, ease: "easeOut" }}
-                      />
-                      <div
-                        className="bg-red-600 h-4 rounded-full transition-all relative"
-                        style={{
-                          width: `${(activeEnemy.currentHealth / activeEnemy.maxHealth) * 100}%`,
-                        }}
-                      />
-                    </motion.div>
-                  </div>
-                  <div className="grid grid-cols-2 gap-2 text-sm parchment-text">
-                    <div>ATK: {activeEnemy.attack}</div>
-                    <div>DEF: {activeEnemy.defense}</div>
-                  </div>
-                </motion.div>
-              ) : (
-                <motion.div
-                  key="no-enemy"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ duration: 0.2 }}
-                >
-                  <p className="text-sm parchment-text opacity-50 pt-4">
-                    No enemy
-                  </p>
-                </motion.div>
-              )}
-            </AnimatePresence>
-            {/* --- END ANIMATION WRAPPER --- */}
-          </div>
-        </div>
-
-        {/* Battle Log */}
-        <div
-          ref={logContainerRef} // <-- autoscroll
-          className="flex-1 p-3 bg-amber-50 rounded border-2 border-amber-700 scroll-container mb-4 max-h-64"
-        >
-          <div className="space-y-1 text-xs parchment-text">
-            {battleLog.map((log, index) => (
-              <p key={index} className="opacity-75">
-                &gt; {log}
-              </p>
-            ))}
-          </div>
-        </div>
-
-        {/* Action Buttons and Submenus */}
-
-        {/* --- SETUP BLOCK --- */}
-        {battleState === "setup" && (
-          <Button
-            onClick={startBattle}
-            className="w-full p-4 text-lg font-bold"
-            style={{
-              background: "var(--vermillion)",
-              color: "var(--parchment)",
-            }}
-          >
-            Begin Battle
-          </Button>
+      {/* Player Spirit Sprite (Left) */}
+      <div
+        className="absolute z-10 flex items-center justify-center"
+        style={{
+          left: "5vw",
+          bottom: "10vh",
+          width: "30vh", // 30% of viewport height
+          height: "30vh",
+        }}
+      >
+        {activeSpirit && activeBaseSpirit && (
+          <SpiritSpriteAnimation
+            spiritId={activeBaseSpirit.id}
+            position="left"
+            size={300} // Use a fixed size or calculate based on vh
+            isTakingDamage={playerHealthBarShake}
+            isDefeated={activeSpirit.currentHealth <= 0}
+          />
         )}
+      </div>
 
-        {/* --- FIGHTING BLOCK --- */}
-        {battleState === "fighting" &&
-          activeSpirit &&
-          activeSpirit.currentHealth > 0 && (
-            <div>
+      {/* Enemy Spirit Sprite (Right) */}
+      <div
+        className="absolute z-10 flex items-center justify-center"
+        style={{
+          right: "5vw",
+          top: "15vh",
+          width: "60vh", // Larger for the boss
+          height: "60vh",
+        }}
+      >
+        {activeEnemy && (
+          <SpiritSpriteAnimation
+            spiritId={activeEnemy.spiritId}
+            position="right"
+            size={300} // Larger
+            isTakingDamage={enemyHealthBarShake}
+            isDefeated={battleState === "enemy_defeated"}
+            onDefeatAnimationComplete={confirmEnemyDefeat}
+          />
+        )}
+      </div>
+
+      {/* --- 3. UI OVERLAYS --- */}
+
+      {/* Player Spirit Info (Bottom-Left) */}
+      <div className="absolute z-20 bottom-24 left-8 w-72">
+        <AnimatePresence mode="wait">
+          {activeSpirit && activeBaseSpirit && activeStats ? (
+            <motion.div
+              key={activeSpirit.playerSpirit.instanceId}
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: 20 }}
+              transition={{ duration: 0.2 }}
+            >
+              <div className="flex justify-between items-baseline mb-1">
+                <span className="font-bold text-white text-2xl [text-shadow:0_2px_4px_rgba(0,0,0,0.7)]">
+                  {activeBaseSpirit.name}
+                </span>
+                <span className="text-lg text-white [text-shadow:0_2px_4px_rgba(0,0,0,0.7)]">
+                  Lv. {activeSpirit.playerSpirit.level}
+                </span>
+              </div>
+              {/* HP Bar */}
+              <motion.div
+                className="w-full bg-gray-900/70 rounded-full h-5 overflow-hidden relative border-2 border-white/50"
+                animate={{
+                  x: playerHealthBarShake ? [0, -4, 4, -4, 4, 0] : 0,
+                }}
+                transition={{ duration: 0.5 }}
+              >
+                {/* Lag Bar */}
+                <motion.div
+                  className="bg-yellow-400 h-full rounded-full absolute top-0 left-0"
+                  style={{
+                    width: `${(playerLagHealth / activeSpirit.maxHealth) * 100}%`,
+                  }}
+                  transition={{ duration: 0.5, ease: "easeOut" }}
+                />
+                {/* Health Bar */}
+                <motion.div
+                  className="bg-green-600 h-full rounded-full transition-all relative"
+                  style={{
+                    width: `${(activeSpirit.currentHealth / activeSpirit.maxHealth) * 100}%`,
+                  }}
+                  animate={{
+                    boxShadow: playerHealthBarHeal
+                      ? [
+                          "0 0 0px rgba(34, 197, 94, 0)",
+                          "0 0 15px rgba(34, 197, 94, 0.8)",
+                          "0 0 0px rgba(34, 197, 94, 0)",
+                        ]
+                      : "0 0 0px rgba(34, 197, 94, 0)",
+                  }}
+                  transition={{ duration: 0.6 }}
+                />
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <span className="font-bold text-white text-xs [text-shadow:0_1px_2px_rgba(0,0,0,1)]">
+                    {activeSpirit.currentHealth} / {activeSpirit.maxHealth}
+                  </span>
+                </div>
+              </motion.div>
+            </motion.div>
+          ) : (
+            <div key="no-player-spirit" /> // Empty div to maintain layout
+          )}
+        </AnimatePresence>
+      </div>
+
+      {/* Enemy Spirit Info (Top-Right) */}
+      <div className="absolute z-20 top-8 right-8 w-72">
+        <AnimatePresence mode="wait">
+          {activeEnemy ? (
+            <motion.div
+              key={activeEnemy.id}
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              transition={{ duration: 0.2 }}
+            >
+              <div className="flex justify-between items-baseline mb-1 text-right">
+                <span className="font-bold text-white text-2xl [text-shadow:0_2px_4px_rgba(0,0,0,0.7)]">
+                  {activeEnemy.name}
+                </span>
+                <span className="text-lg text-white [text-shadow:0_2px_4px_rgba(0,0,0,0.7)]">
+                  Lv. {activeEnemy.level}
+                </span>
+              </div>
+              {/* HP Bar */}
+              <motion.div
+                className="w-full bg-gray-900/70 rounded-full h-5 overflow-hidden relative border-2 border-white/50"
+                animate={{
+                  x: enemyHealthBarShake ? [0, -4, 4, -4, 4, 0] : 0,
+                }}
+                transition={{ duration: 0.5 }}
+              >
+                {/* Lag Bar */}
+                <motion.div
+                  className="bg-yellow-400 h-full rounded-full absolute top-0 left-0"
+                  style={{
+                    width: `${(enemyLagHealth / activeEnemy.maxHealth) * 100}%`,
+                  }}
+                  transition={{ duration: 0.5, ease: "easeOut" }}
+                />
+                {/* Health Bar */}
+                <div
+                  className="bg-red-600 h-full rounded-full transition-all relative"
+                  style={{
+                    width: `${(activeEnemy.currentHealth / activeEnemy.maxHealth) * 100}%`,
+                  }}
+                />
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <span className="font-bold text-white text-xs [text-shadow:0_1px_2px_rgba(0,0,0,1)]">
+                    {activeEnemy.currentHealth} / {activeEnemy.maxHealth}
+                  </span>
+                </div>
+              </motion.div>
+            </motion.div>
+          ) : (
+            <div key="no-enemy" /> // Empty div
+          )}
+        </AnimatePresence>
+      </div>
+
+      {/* Battle Log (Bottom-Right) */}
+      <div
+        ref={logContainerRef}
+        className="absolute z-20 bottom-8 right-8 w-1/3 max-w-md h-48 overflow-y-auto scroll-container p-3 bg-black/50 rounded-lg border border-white/30 text-sm text-white/90 space-y-1"
+      >
+        {battleLog.map((log, index) => (
+          <p key={index} className="text-white/70">
+            &gt; {log}
+          </p>
+        ))}
+      </div>
+
+      {/* Action Buttons and Submenus (Bottom-Left, next to Player UI) */}
+      {battleState === "fighting" &&
+        activeSpirit &&
+        activeSpirit.currentHealth > 0 && (
+          <div
+            className="absolute z-30 bottom-10"
+            style={{ left: "320px" }} // Positioned to the right of Player UI
+          >
+            <AnimatePresence mode="wait">
               {actionMenu === "none" && (
-                <div className="grid grid-cols-4 gap-3">
+                <motion.div
+                  key="main-menu"
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -20 }}
+                  className="flex flex-col items-start gap-1"
+                >
                   <button
                     onClick={() => {
                       playButtonClick();
                       handleSkillSelect("basic_attack");
                     }}
                     onMouseEnter={playButtonHover}
-                    className="p-4 bg-red-600 hover:bg-red-700 text-white rounded-lg font-bold flex flex-col items-center justify-center gap-2"
+                    className="text-white text-3xl font-bold [text-shadow:2px_2px_4px_#000] hover:text-yellow-300 transition-colors"
                     disabled={isPaused}
                   >
-                    <Swords className="w-6 h-6" />
-                    <span>Attack</span>
-                  </button>
-                  <button
-                    onClick={() => {
-                      playButtonClick();
-                      handleBlock();
-                    }}
-                    onMouseEnter={playButtonHover}
-                    className="p-4 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-bold flex flex-col items-center justify-center gap-2"
-                    disabled={isPaused}
-                  >
-                    <Shield className="w-6 h-6" />
-                    <span>Block</span>
+                    FIGHT!
                   </button>
                   <button
                     onClick={() => {
@@ -514,11 +383,10 @@ export function BattleScreen({
                       setActionMenu("skills");
                     }}
                     onMouseEnter={playButtonHover}
-                    className="p-4 bg-purple-600 hover:bg-purple-700 text-white rounded-lg font-bold flex flex-col items-center justify-center gap-2"
+                    className="text-white text-3xl font-bold [text-shadow:2px_2px_4px_#000] hover:text-yellow-300 transition-colors"
                     disabled={isPaused}
                   >
-                    <Swords className="w-6 h-6" />
-                    <span>Skills</span>
+                    SKILLS
                   </button>
                   <button
                     onClick={() => {
@@ -526,19 +394,35 @@ export function BattleScreen({
                       setActionMenu("swap");
                     }}
                     onMouseEnter={playButtonHover}
-                    className="p-4 bg-green-600 hover:bg-green-700 text-white rounded-lg font-bold flex flex-col items-center justify-center gap-2"
+                    className="text-white text-3xl font-bold [text-shadow:2px_2px_4px_#000] hover:text-yellow-300 transition-colors"
                     disabled={isPaused}
                   >
-                    <ArrowLeftRight className="w-6 h-6" />
-                    <span>Swap</span>
+                    SPIRIT
                   </button>
-                </div>
+                  <button
+                    onClick={() => {
+                      playButtonClick();
+                      handleClose();
+                    }}
+                    onMouseEnter={playButtonHover}
+                    className="text-white text-3xl font-bold [text-shadow:2px_2px_4px_#000] hover:text-yellow-300 transition-colors"
+                    disabled={isPaused}
+                  >
+                    ESCAPE
+                  </button>
+                </motion.div>
               )}
 
               {actionMenu === "skills" && (
-                <div>
+                <motion.div
+                  key="skills-menu"
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: 20 }}
+                  className="p-4 bg-black/70 rounded-lg border border-white/30 w-72"
+                >
                   <div className="flex justify-between items-center mb-3">
-                    <h3 className="font-bold parchment-text text-lg">
+                    <h3 className="font-bold text-white text-lg">
                       Select Skill
                     </h3>
                     <button
@@ -547,12 +431,12 @@ export function BattleScreen({
                         setActionMenu("none");
                       }}
                       onMouseEnter={playButtonHover}
-                      className="px-3 py-1 bg-gray-300 hover:bg-gray-400 rounded text-sm font-semibold"
+                      className="px-3 py-1 bg-gray-600 hover:bg-gray-500 rounded text-sm font-semibold text-white"
                     >
                       Back
                     </button>
                   </div>
-                  <div className="grid grid-cols-2 gap-3">
+                  <div className="flex flex-col gap-2 max-h-48 overflow-y-auto">
                     {availableSkills.map((skill) => (
                       <button
                         key={skill.id}
@@ -570,13 +454,19 @@ export function BattleScreen({
                       </button>
                     ))}
                   </div>
-                </div>
+                </motion.div>
               )}
 
               {actionMenu === "swap" && (
-                <div>
+                <motion.div
+                  key="swap-menu"
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: 20 }}
+                  className="p-4 bg-black/70 rounded-lg border border-white/30 w-[500px]" // Wider for swap
+                >
                   <div className="flex justify-between items-center mb-3">
-                    <h3 className="font-bold parchment-text text-lg">
+                    <h3 className="font-bold text-white text-lg">
                       Swap Spirit
                     </h3>
                     <button
@@ -585,21 +475,18 @@ export function BattleScreen({
                         setActionMenu("none");
                       }}
                       onMouseEnter={playButtonHover}
-                      className="px-3 py-1 bg-gray-300 hover:bg-gray-400 rounded text-sm font-semibold"
+                      className="px-3 py-1 bg-gray-600 hover:bg-gray-500 rounded text-sm font-semibold text-white"
                     >
                       Back
                     </button>
                   </div>
-                  <div className="grid grid-cols-2 gap-3">
+                  <div className="grid grid-cols-2 gap-3 max-h-64 overflow-y-auto">
                     {playerSpirits.map((spirit, index) => {
                       const baseSpirit = getBaseSpirit(
                         spirit.playerSpirit.spiritId,
                       );
                       const element = baseSpirit
                         ? getElement(baseSpirit.element)
-                        : null;
-                      const lineage = baseSpirit
-                        ? getLineage(baseSpirit.lineage)
                         : null;
                       const isActive = index === activePartySlot;
                       const isDead = spirit.currentHealth <= 0;
@@ -615,53 +502,30 @@ export function BattleScreen({
                             if (!isDead && !isActive) playButtonHover();
                           }}
                           disabled={isDead || isActive}
-                          className={`p-3 rounded-lg border-2 text-left flex gap-3 ${
+                          className={`p-2 rounded-lg border-2 text-left flex gap-2 ${
                             isActive
-                              ? "border-blue-600 bg-blue-100 cursor-not-allowed"
+                              ? "border-blue-400 bg-blue-900/50 cursor-not-allowed"
                               : isDead
-                                ? "border-gray-400 bg-gray-200 opacity-50 cursor-not-allowed"
-                                : "border-green-600 bg-white hover:bg-green-50"
+                                ? "border-gray-600 bg-gray-800/50 opacity-50 cursor-not-allowed"
+                                : "border-green-600 bg-black/50 hover:bg-green-900/50"
                           }`}
                         >
+                          {/* Note: Using placeholder, update as needed */}
                           <img
                             src="/icons/placeholdericon.png"
                             alt={baseSpirit?.name}
-                            className="w-24 h-24 object-contain flex-shrink-0"
+                            className="w-16 h-16 object-contain flex-shrink-0 bg-white/10 rounded"
                           />
-                          <div className="flex-1 flex flex-col min-w-0">
-                            <div className="flex justify-between items-start mb-1">
-                              <p className="text-sm font-bold parchment-text truncate flex-1">
-                                {baseSpirit?.name}
-                              </p>
-                              <span className="text-xs parchment-text ml-2">
-                                Lv. {spirit.playerSpirit.level}
-                              </span>
-                            </div>
-                            {element && lineage && (
-                              <div className="flex justify-between items-center mb-2">
-                                <span
-                                  className={`text-xs element-${element.id}`}
-                                >
-                                  {element.name} | {lineage.name}
-                                </span>
-                                {baseSpirit && (
-                                  <span
-                                    className="text-xs font-bold px-1.5 py-0.5 rounded ml-1 flex-shrink-0"
-                                    style={{
-                                      background: getRarityColor(
-                                        baseSpirit.rarity,
-                                      ),
-                                      color: "white",
-                                    }}
-                                  >
-                                    {baseSpirit.rarity[0].toUpperCase()}
-                                  </span>
-                                )}
-                              </div>
-                            )}
-                            <div className="w-full bg-gray-300 rounded-full h-3">
+                          <div className="flex-1 flex flex-col min-w-0 text-white">
+                            <p className="text-sm font-bold truncate">
+                              {baseSpirit?.name}
+                            </p>
+                            <span className="text-xs">
+                              Lv. {spirit.playerSpirit.level}
+                            </span>
+                            <div className="w-full bg-gray-500 rounded-full h-3 mt-1">
                               <div
-                                className={`h-3 rounded-full ${isDead ? "bg-gray-500" : "bg-green-600"}`}
+                                className={`h-3 rounded-full ${isDead ? "bg-gray-700" : "bg-green-600"}`}
                                 style={{
                                   width: `${(spirit.currentHealth / spirit.maxHealth) * 100}%`,
                                 }}
@@ -672,76 +536,46 @@ export function BattleScreen({
                       );
                     })}
                   </div>
-                </div>
+                </motion.div>
               )}
-            </div>
-          )}
-
-        {/* --- VICTORY BLOCK --- */}
-        {battleState === "victory" && battleRewards && (
-          <div className="p-4 bg-green-100 rounded-lg border-2 border-green-600">
-            <h3 className="font-bold text-green-800 text-2xl mb-3 text-center">
-              🎉 Victory! 🎉
-            </h3>
-            <p className="text-md text-green-800 mb-3 text-center font-semibold">
-              You defeated the enemy! A new challenger approaches...
-            </p>
-            <div className="mb-4 space-y-2 p-3 bg-white rounded border border-green-400">
-              <p className="text-lg font-bold text-green-800">
-                Battle Rewards:
-              </p>
-              <p className="text-md text-green-800">✦ +{battleRewards.qi} Qi</p>
-              <p className="text-md text-green-800">
-                ✦ +{battleRewards.qiGeneration.toFixed(1)} to Qi generation per
-                second
-              </p>
-              <p className="text-sm text-green-700 mt-2 italic">
-                All spirits have been fully healed!
-              </p>
-            </div>
-            <div className="grid grid-cols-2 gap-3">
-              <Button
-                onClick={startBattle}
-                className="w-full font-bold"
-                style={{
-                  background: "var(--vermillion)",
-                  color: "var(--parchment)",
-                }}
-              >
-                Continue Battling
-              </Button>
-              <Button
-                onClick={handleClose}
-                className="w-full font-bold"
-                style={{
-                  background: "var(--jade-green)",
-                  color: "var(--parchment)",
-                }}
-              >
-                Return to {returnTo === "story" ? "Story" : "Cultivation"}
-              </Button>
-            </div>
+            </AnimatePresence>
           </div>
         )}
 
-        {/* --- DEFEAT BLOCK --- */}
-        {battleState === "defeat" && (
-          <div className="p-4 bg-red-100 rounded-lg border-2 border-red-600">
-            <h3 className="font-bold text-red-800 text-2xl mb-3 text-center">
-              Defeat...
-            </h3>
-            <p className="text-md text-red-800 mb-2 text-center">
-              All your spirits have been defeated.
-            </p>
-            <p className="text-sm text-red-700 mb-4 text-center italic">
-              {returnTo === "story" 
-                ? "Return to your journey and prepare for the trial ahead."
-                : "Return to cultivation and strengthen your spirits before trying again."
-              }
+      {/* --- 4. MODALS (Setup, Victory, Defeat) --- */}
+      <AnimatePresence>
+        {/* SETUP MODAL */}
+        {battleState === "setup" && (
+          <ModalOverlay>
+            <h2 className="text-2xl font-bold text-center mb-4 parchment-text">
+              Prepare for Battle!
+            </h2>
+            <Button
+              onClick={startBattle}
+              className="w-full p-4 text-lg font-bold"
+              style={{
+                background: "var(--vermillion)",
+                color: "var(--parchment)",
+              }}
+            >
+              Begin Battle
+            </Button>
+          </ModalOverlay>
+        )}
+
+        {/* NO SPIRITS MODAL */}
+        {activeParty.length === 0 && !isClient && (
+          <ModalOverlay onClose={onClose}>
+            <h2 className="text-2xl font-bold text-center mb-4 parchment-text">
+              Cannot Start Battle
+            </h2>
+            <p className="parchment-text text-center">
+              You need to add spirits to your active party before entering
+              battle!
             </p>
             <Button
-              onClick={handleClose}
-              className="w-full font-bold"
+              onClick={onClose}
+              className="w-full mt-4"
               style={{
                 background: "var(--vermillion)",
                 color: "var(--parchment)",
@@ -749,9 +583,89 @@ export function BattleScreen({
             >
               Return to {returnTo === "story" ? "Story" : "Cultivation"}
             </Button>
-          </div>
+          </ModalOverlay>
         )}
-      </div>
+
+        {/* VICTORY MODAL */}
+        {battleState === "victory" && battleRewards && (
+          <ModalOverlay>
+            <div className="p-4">
+              <h3 className="font-bold text-green-800 text-2xl mb-3 text-center">
+                🎉 Victory! 🎉
+              </h3>
+              <p className="text-md text-green-800 mb-3 text-center font-semibold">
+                You defeated the enemy! A new challenger approaches...
+              </p>
+              <div className="mb-4 space-y-2 p-3 bg-white rounded border border-green-400">
+                <p className="text-lg font-bold text-green-800">
+                  Battle Rewards:
+                </p>
+                <p className="text-md text-green-800">
+                  ✦ +{battleRewards.qi} Qi
+                </p>
+                <p className="text-md text-green-800">
+                  ✦ +{battleRewards.qiGeneration.toFixed(1)} to Qi generation
+                  per second
+                </p>
+                <p className="text-sm text-green-700 mt-2 italic">
+                  All spirits have been fully healed!
+                </p>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <Button
+                  onClick={startBattle}
+                  className="w-full font-bold"
+                  style={{
+                    background: "var(--vermillion)",
+                    color: "var(--parchment)",
+                  }}
+                >
+                  Continue Battling
+                </Button>
+                <Button
+                  onClick={handleClose}
+                  className="w-full font-bold"
+                  style={{
+                    background: "var(--jade-green)",
+                    color: "var(--parchment)",
+                  }}
+                >
+                  Return to {returnTo === "story" ? "Story" : "Cultivation"}
+                </Button>
+              </div>
+            </div>
+          </ModalOverlay>
+        )}
+
+        {/* DEFEAT MODAL */}
+        {battleState === "defeat" && (
+          <ModalOverlay>
+            <div className="p-4">
+              <h3 className="font-bold text-red-800 text-2xl mb-3 text-center">
+                Defeat...
+              </h3>
+              <p className="text-md text-red-800 mb-2 text-center">
+                All your spirits have been defeated.
+              </p>
+              <p className="text-sm text-red-700 mb-4 text-center italic">
+                {returnTo === "story"
+                  ? "Return to your journey and prepare for the trial ahead."
+                  : "Return to cultivation and strengthen your spirits before trying again."}
+              </p>
+              <Button
+                onClick={handleClose}
+                className="w-full font-bold"
+                style={{
+                  background: "var(--vermillion)",
+                  color: "var(--parchment)",
+                }}
+              >
+                Return to {returnTo === "story" ? "Story" : "Cultivation"}
+              </Button>
+            </div>
+          </ModalOverlay>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

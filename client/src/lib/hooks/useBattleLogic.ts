@@ -941,36 +941,17 @@ export function useBattleLogic({
     // Check for enemy defeat
     const isEnemyDefeated = battleEnemies.every((e) => e.currentHealth <= 0);
     if (isEnemyDefeated && battleEnemies.length > 0) {
-      addLog("Victory! The enemy has been defeated!");
-      setBattleState("victory");
+      // --- THIS IS THE FIX ---
+      // 1. Set the "waiting" state
+      setBattleState("enemy_defeated");
+      // 2. Stop the turn loop
       setTurnPhase("game_over");
+      // 3. We NO LONGER call confirmEnemyDefeat() here.
+      //    We wait for the animation callback.
 
-      // Handle rewards
-      const rewards = currentEncounter?.rewards;
-      if (rewards) {
-        winBattle(rewards.qi);
-        if (rewards.essences) {
-          for (const [spiritId, amount] of Object.entries(rewards.essences)) {
-            addEssence(spiritId, amount);
-            addLog(
-              `You obtained ${amount}x ${getBaseSpirit(spiritId)?.name} Essence!`,
-            );
-          }
-        }
-        setBattleRewards({ qi: rewards.qi, qiGeneration: 0.1 }); // Placeholder
-      }
-
-      // Restore player health after victory
-      setPlayerSpirits((prev) =>
-        prev.map((spirit) => ({
-          ...spirit,
-          currentHealth: spirit.maxHealth,
-        })),
-      );
-      playerSpirits.forEach((spirit) => {
-        const stats = calculateAllStats(spirit.playerSpirit);
-        updateSpiritHealth(spirit.playerSpirit.instanceId, stats.health);
-      });
+      // (All the reward and healing logic has been moved
+      // to the new confirmEnemyDefeat function)
+      // --- END OF FIX ---
 
       return true;
     }
@@ -1961,6 +1942,38 @@ export function useBattleLogic({
     onClose();
   };
 
+  const confirmEnemyDefeat = () => {
+    addLog("Victory! The enemy has been defeated!");
+    setBattleState("victory"); // Now we set the final victory state
+
+    // Handle rewards (this is the logic moved from checkGameEndCondition)
+    const rewards = currentEncounter?.rewards;
+    if (rewards) {
+      winBattle(rewards.qi);
+      if (rewards.essences) {
+        for (const [spiritId, amount] of Object.entries(rewards.essences)) {
+          addEssence(spiritId, amount);
+          addLog(
+            `You obtained ${amount}x ${getBaseSpirit(spiritId)?.name} Essence!`,
+          );
+        }
+      }
+      setBattleRewards({ qi: rewards.qi, qiGeneration: 0.1 }); // Placeholder
+    }
+
+    // Restore player health after victory
+    setPlayerSpirits((prev) =>
+      prev.map((spirit) => ({
+        ...spirit,
+        currentHealth: spirit.maxHealth,
+      })),
+    );
+    playerSpirits.forEach((spirit) => {
+      const stats = calculateAllStats(spirit.playerSpirit);
+      updateSpiritHealth(spirit.playerSpirit.instanceId, stats.health);
+    });
+  };
+
   return {
     // State
     battleState,
@@ -2005,5 +2018,6 @@ export function useBattleLogic({
     handleSwap,
     handleBlock,
     handleSkillSelect,
+    confirmEnemyDefeat,
   };
 }

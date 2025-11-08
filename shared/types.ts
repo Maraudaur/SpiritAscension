@@ -150,6 +150,14 @@ export interface PassiveDamageReflect {
   ratio: number; // 0.15 for 15% reflection
 }
 
+export interface SpiritSpriteConfig {
+  textureUrl: string;
+  frameWidth: number;
+  frameHeight: number;
+  totalFrames: number;
+  animationSpeed: number;
+}
+
 export type PassiveEffect =
   | PassiveStatBoost
   | PassiveElementalLifesteal
@@ -257,6 +265,7 @@ export interface BaseSpirit {
   passiveAbilities: string[];
   skills: string[];
   triggeredAbilities?: TriggeredAbility[];
+  spriteConfig?: SpiritSpriteConfig;
 }
 
 export interface PotentialFactors {

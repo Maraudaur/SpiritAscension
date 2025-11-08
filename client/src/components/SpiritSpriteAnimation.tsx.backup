@@ -1,11 +1,12 @@
-import { useEffect, useRef, useState } from "react"; // 1. Import useState
+import { useEffect, useRef } from "react";
 import { getBaseSpirit } from "@/lib/spiritUtils";
 
-// Import PIXI modules
+// --- REMOVED 'import * as PIXI' ---
+// --- ADDED ALL MODULAR IMPORTS ---
 import { Application } from "@pixi/app";
-import { Sprite } from "@pixi/sprite";
-import { AnimatedSprite } from "@pixi/sprite-animated";
-import { Texture, Rectangle } from "@pixi/core";
+import { Sprite } from "@pixi/sprite"; // <-- We just need Sprite from here
+import { AnimatedSprite } from "@pixi/sprite-animated"; // <-- Import AnimatedSprite
+import { Texture, Rectangle } from "@pixi/core"; // <-- Import Textu
 import { Assets } from "@pixi/assets";
 import { Graphics } from "@pixi/graphics";
 import { PixelateFilter } from "@pixi/filter-pixelate";
@@ -17,7 +18,6 @@ interface SpiritSpriteAnimationProps {
   size?: number;
   isTakingDamage: boolean;
   isDefeated: boolean;
-  onDefeatAnimationComplete?: () => void;
 }
 
 export function SpiritSpriteAnimation({
@@ -26,16 +26,12 @@ export function SpiritSpriteAnimation({
   size = 256,
   isTakingDamage,
   isDefeated,
-  onDefeatAnimationComplete,
 }: SpiritSpriteAnimationProps) {
   const canvasRef = useRef<HTMLDivElement>(null);
-  const appRef = useRef<Application | null>(null);
-  const spriteRef = useRef<AnimatedSprite | null>(null);
+  const appRef = useRef<Application | null>(null); // Use 'Application' type
+  const spriteRef = useRef<AnimatedSprite | null>(null); // Use 'AnimatedSprite' type
   const originalXRef = useRef<number>(0);
-  const tickersRef = useRef<Set<TickerCallback<any>>>(new Set());
-
-  // --- 2. Add internal state to track hit animation ---
-  const [isAnimatingHit, setIsAnimatingHit] = useState(false);
+  const tickersRef = useRef<Set<TickerCallback<any>>>(new Set()); // Use 'TickerCallback' type
 
   // Helper to safely add and track tickers
   const addTicker = (fn: TickerCallback<any>) => {
@@ -56,9 +52,6 @@ export function SpiritSpriteAnimation({
   // --- Main PIXI Setup Effect ---
   useEffect(() => {
     if (!canvasRef.current) return;
-
-    // Reset hit animation state on new spirit
-    setIsAnimatingHit(false);
 
     const spiritData = getBaseSpirit(spiritId);
     if (!spiritData || !spiritData.spriteConfig) {
@@ -86,17 +79,18 @@ export function SpiritSpriteAnimation({
         canvasRef.current.appendChild(app.view as HTMLCanvasElement);
         appRef.current = app;
 
-        const texture = await Assets.load(textureUrl);
-        const frames: Texture[] = [];
+        const texture = await Assets.load(textureUrl); // Use modular 'Assets'
+        const frames: Texture[] = []; // Use modular 'Texture'
         for (let i = 0; i < totalFrames; i++) {
+          // The v7 way: new Texture(baseTexture, frameRectangle)
           const frameTexture = new Texture(
-            texture.baseTexture,
-            new Rectangle(i * frameWidth, 0, frameWidth, frameHeight),
+            texture.baseTexture, // 1. The BaseTexture
+            new Rectangle(i * frameWidth, 0, frameWidth, frameHeight), // 2. The frame
           );
           frames.push(frameTexture);
         }
 
-        const animatedSprite = new AnimatedSprite(frames);
+        const animatedSprite = new AnimatedSprite(frames); // Use modular 'AnimatedSprite'
         animatedSprite.animationSpeed = animationSpeed;
         animatedSprite.play();
         animatedSprite.anchor.set(0.5);
@@ -113,45 +107,33 @@ export function SpiritSpriteAnimation({
         originalXRef.current = animatedSprite.x;
 
         // --- SUMMON VFX ---
-        const summonDelay = 1200; // 1.2 seconds
+        const flash = new Graphics(); // Use modular 'Graphics'
+        flash.beginFill(0xffffff); // <-- Use beginFill()
+        flash.drawCircle(0, 0, size / 2);
+        flash.endFill(); // <-- Add endFill()
+        flash.x = size / 2;
+        flash.y = size / 2;
+        flash.scale.set(0);
+        flash.alpha = 0.8;
+        app.stage.addChild(flash);
 
-        setTimeout(() => {
-          const currentApp = appRef.current;
-          if (!currentApp) {
-            return;
+        let elapsed = 0;
+        const duration = 300; // 0.3 seconds
+
+        const spawnTicker: TickerCallback<any> = (delta) => {
+          elapsed += app.ticker.elapsedMS;
+          const progress = Math.min(elapsed / duration, 1);
+          const easedProgress = 1 - Math.pow(1 - progress, 3); // easeOutCubic
+
+          flash.scale.set(easedProgress * 1.5); // Scale up
+          flash.alpha = 1 - easedProgress; // Fade out
+
+          if (progress === 1) {
+            removeTicker(spawnTicker);
+            flash.destroy();
           }
-
-          const flash = new Graphics();
-          flash.beginFill(0xffffff);
-          flash.drawCircle(0, 0, size / 2);
-          flash.endFill();
-          flash.x = size / 2;
-          flash.y = size / 2;
-          flash.scale.set(0);
-          flash.alpha = 0.8;
-          currentApp.stage.addChild(flash);
-
-          let elapsed = 0;
-          const duration = 300;
-
-          const spawnTicker: TickerCallback<any> = (delta) => {
-            // Re-check the ref in case it was destroyed during the anim
-            if (!appRef.current) {
-              removeTicker(spawnTicker); // Stop the ticker
-              return;
-            }
-
-            elapsed += appRef.current.ticker.elapsedMS; // <-- Use appRef.current
-            const progress = Math.min(elapsed / duration, 1);
-            // ... (rest of ticker)
-
-            if (progress === 1) {
-              removeTicker(spawnTicker);
-              flash.destroy();
-            }
-          };
-          addTicker(spawnTicker);
-        }, summonDelay); // <-- Apply the delay here
+        };
+        addTicker(spawnTicker);
       } catch (error) {
         console.error(
           "SpiritSpriteAnimation: Error initializing PixiJS:",
@@ -163,6 +145,7 @@ export function SpiritSpriteAnimation({
     initPixi();
 
     return () => {
+      // Full cleanup
       if (appRef.current) {
         tickersRef.current.forEach((ticker) => {
           appRef.current?.ticker.remove(ticker);
@@ -178,11 +161,7 @@ export function SpiritSpriteAnimation({
 
   // --- Damage Effect (Shake/Flash) ---
   useEffect(() => {
-    // 3. We remove the '!isDefeated' check. We ALWAYS play the hit anim.
-    if (isTakingDamage && spriteRef.current) {
-      // --- 4. Tell the component we are animating ---
-      setIsAnimatingHit(true);
-
+    if (isTakingDamage && spriteRef.current && !isDefeated) {
       const sprite = spriteRef.current;
       const timeouts: NodeJS.Timeout[] = [];
 
@@ -209,23 +188,18 @@ export function SpiritSpriteAnimation({
         if (spriteRef.current) {
           spriteRef.current.tint = 0xffffff; // Reset tint
         }
-        // --- 5. We are done animating ---
-        setIsAnimatingHit(false);
-      }, 400); // After shake is done
+      }, 400);
       timeouts.push(resetTimeout);
 
       return () => {
         timeouts.forEach(clearTimeout);
-        // If effect is cancelled, make sure to reset state
-        setIsAnimatingHit(false);
       };
     }
-  }, [isTakingDamage]); // This effect *only* runs when isTakingDamage changes
+  }, [isTakingDamage, isDefeated]);
 
   // --- DEFEAT VFX (Dissolve) ---
   useEffect(() => {
-    // --- 6. Now this effect waits for isAnimatingHit to be false ---
-    if (isDefeated && !isAnimatingHit && spriteRef.current && appRef.current) {
+    if (isDefeated && spriteRef.current && appRef.current) {
       const sprite = spriteRef.current;
       const app = appRef.current;
 
@@ -234,8 +208,8 @@ export function SpiritSpriteAnimation({
       });
       tickersRef.current.clear();
 
-      const filter = new PixelateFilter(1);
-      sprite.filters = [filter];
+      const filter = new PixelateFilter(1); // Use modular 'PixelateFilter'
+      sprite.filters = [filter]; // This will now be compatible
 
       let elapsed = 0;
       const duration = 1000; // 1 second dissolve
@@ -250,9 +224,6 @@ export function SpiritSpriteAnimation({
         if (progress === 1) {
           removeTicker(defeatTicker);
           sprite.visible = false;
-          if (onDefeatAnimationComplete) {
-            onDefeatAnimationComplete();
-          }
         }
       };
 
@@ -262,8 +233,7 @@ export function SpiritSpriteAnimation({
         removeTicker(defeatTicker);
       };
     }
-    // --- 7. Add isAnimatingHit to the dependency array ---
-  }, [isDefeated, isAnimatingHit]);
+  }, [isDefeated]);
 
   return (
     <div

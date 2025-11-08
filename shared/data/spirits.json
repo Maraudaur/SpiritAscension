@@ -13,7 +13,14 @@
         "elementalAffinity": 60
       },
       "passiveAbilities": ["health_focus"],
-      "skills": ["basic_attack", "heavy_hit", "hit_and_heal"]
+      "skills": ["basic_attack", "heavy_hit", "hit_and_heal"],
+      "spriteConfig": {
+        "textureUrl": "/sprites/cinderpaw_idle.png",
+        "frameWidth": 128,
+        "frameHeight": 128,
+        "totalFrames": 8,
+        "animationSpeed": 0.1
+      }
     },
     {
       "id": "spirit_c02",
@@ -28,7 +35,14 @@
         "elementalAffinity": 60
       },
       "passiveAbilities": ["defense_focus"],
-      "skills": ["basic_attack", "bubble_barrier", "hit_and_heal"]
+      "skills": ["basic_attack", "bubble_barrier", "hit_and_heal"],
+      "spriteConfig": {
+        "textureUrl": "/sprites/cinderpaw_idle.png",
+        "frameWidth": 128,
+        "frameHeight": 128,
+        "totalFrames": 8,
+        "animationSpeed": 0.1
+      }
     },
     {
       "id": "spirit_c03",
@@ -43,7 +57,14 @@
         "elementalAffinity": 100
       },
       "passiveAbilities": ["attack_focus", "crit_mastery"],
-      "skills": ["basic_attack", "heavy_hit", "hit_and_heal"]
+      "skills": ["basic_attack", "heavy_hit", "hit_and_heal"],
+      "spriteConfig": {
+        "textureUrl": "/sprites/cinderpaw_idle.png",
+        "frameWidth": 128,
+        "frameHeight": 128,
+        "totalFrames": 8,
+        "animationSpeed": 0.1
+      }
     },
     {
       "id": "spirit_c04",
@@ -58,7 +79,14 @@
         "elementalAffinity": 100
       },
       "passiveAbilities": ["health_focus", "healing_waters"],
-      "skills": ["basic_attack", "heavy_hit", "water_charge"]
+      "skills": ["basic_attack", "heavy_hit", "water_charge"],
+      "spriteConfig": {
+        "textureUrl": "/sprites/cinderpaw_idle.png",
+        "frameWidth": 128,
+        "frameHeight": 128,
+        "totalFrames": 8,
+        "animationSpeed": 0.1
+      }
     },
     {
       "id": "spirit_c05",
@@ -73,7 +101,14 @@
         "elementalAffinity": 100
       },
       "passiveAbilities": ["damage_reflect", "defense_focus"],
-      "skills": ["basic_attack", "thorns_buff"]
+      "skills": ["basic_attack", "thorns_buff"],
+      "spriteConfig": {
+        "textureUrl": "/sprites/cinderpaw_idle.png",
+        "frameWidth": 128,
+        "frameHeight": 128,
+        "totalFrames": 8,
+        "animationSpeed": 0.1
+      }
     },
     {
       "id": "spirit_c06",
@@ -88,7 +123,14 @@
         "elementalAffinity": 90
       },
       "passiveAbilities": ["attack_focus"],
-      "skills": ["basic_attack", "heavy_hit", "hit_and_heal"]
+      "skills": ["basic_attack", "heavy_hit", "hit_and_heal"],
+      "spriteConfig": {
+        "textureUrl": "/sprites/cinderpaw_idle.png",
+        "frameWidth": 128,
+        "frameHeight": 128,
+        "totalFrames": 8,
+        "animationSpeed": 0.1
+      }
     },
     {
       "id": "spirit_c07",
@@ -103,7 +145,14 @@
         "elementalAffinity": 60
       },
       "passiveAbilities": ["defense_focus"],
-      "skills": ["basic_attack", "heavy_hit", "hit_and_heal"]
+      "skills": ["basic_attack", "heavy_hit", "hit_and_heal"],
+      "spriteConfig": {
+        "textureUrl": "/sprites/cinderpaw_idle.png",
+        "frameWidth": 128,
+        "frameHeight": 128,
+        "totalFrames": 8,
+        "animationSpeed": 0.1
+      }
     },
     {
       "id": "spirit_c08",
@@ -118,7 +167,14 @@
         "elementalAffinity": 110
       },
       "passiveAbilities": ["attack_focus"],
-      "skills": ["basic_attack", "heavy_hit", "hit_and_heal"]
+      "skills": ["basic_attack", "heavy_hit", "hit_and_heal"],
+      "spriteConfig": {
+        "textureUrl": "/sprites/cinderpaw_idle.png",
+        "frameWidth": 128,
+        "frameHeight": 128,
+        "totalFrames": 8,
+        "animationSpeed": 0.1
+      }
     },
     {
       "id": "spirit_c09",
@@ -145,7 +201,14 @@
             }
           ]
         }
-      ]
+      ],
+      "spriteConfig": {
+        "textureUrl": "/sprites/cinderpaw_idle.png",
+        "frameWidth": 128,
+        "frameHeight": 128,
+        "totalFrames": 8,
+        "animationSpeed": 0.1
+      }
     },
     {
       "id": "spirit_c10",
@@ -160,7 +223,14 @@
         "elementalAffinity": 110
       },
       "passiveAbilities": ["attack_focus"],
-      "skills": ["basic_attack", "swap_atk_trap", "crit_setup"]
+      "skills": ["basic_attack", "swap_atk_trap", "crit_setup"],
+      "spriteConfig": {
+        "textureUrl": "/sprites/cinderpaw_idle.png",
+        "frameWidth": 128,
+        "frameHeight": 128,
+        "totalFrames": 8,
+        "animationSpeed": 0.1
+      }
     },
     {
       "id": "spirit_c11",
@@ -175,7 +245,14 @@
         "elementalAffinity": 100
       },
       "passiveAbilities": ["dot_amplification"],
-      "skills": ["basic_attack", "def_shred_dot", "hit_and_heal"]
+      "skills": ["basic_attack", "def_shred_dot", "hit_and_heal"],
+      "spriteConfig": {
+        "textureUrl": "/sprites/cinderpaw_idle.png",
+        "frameWidth": 128,
+        "frameHeight": 128,
+        "totalFrames": 8,
+        "animationSpeed": 0.1
+      }
     },
     {
       "id": "spirit_c12",
@@ -190,7 +267,14 @@
         "elementalAffinity": 100
       },
       "passiveAbilities": ["poison_thorns"],
-      "skills": ["basic_attack", "def_shred_dot", "heavy_hit"]
+      "skills": ["basic_attack", "def_shred_dot", "heavy_hit"],
+      "spriteConfig": {
+        "textureUrl": "/sprites/cinderpaw_idle.png",
+        "frameWidth": 128,
+        "frameHeight": 128,
+        "totalFrames": 8,
+        "animationSpeed": 0.1
+      }
     },
     {
       "id": "spirit_c13",
@@ -205,7 +289,14 @@
         "elementalAffinity": 90
       },
       "passiveAbilities": ["attack_focus"],
-      "skills": ["basic_attack", "heavy_hit", "hit_and_heal"]
+      "skills": ["basic_attack", "heavy_hit", "hit_and_heal"],
+      "spriteConfig": {
+        "textureUrl": "/sprites/cinderpaw_idle.png",
+        "frameWidth": 128,
+        "frameHeight": 128,
+        "totalFrames": 8,
+        "animationSpeed": 0.1
+      }
     },
     {
       "id": "spirit_c14",
@@ -220,7 +311,14 @@
         "elementalAffinity": 110
       },
       "passiveAbilities": ["health_focus"],
-      "skills": ["basic_attack", "heavy_hit", "hit_and_heal"]
+      "skills": ["basic_attack", "heavy_hit", "hit_and_heal"],
+      "spriteConfig": {
+        "textureUrl": "/sprites/cinderpaw_idle.png",
+        "frameWidth": 128,
+        "frameHeight": 128,
+        "totalFrames": 8,
+        "animationSpeed": 0.1
+      }
     },
     {
       "id": "spirit_c15",
@@ -235,7 +333,14 @@
         "elementalAffinity": 110
       },
       "passiveAbilities": ["attack_focus"],
-      "skills": ["basic_attack", "heavy_hit", "hit_and_heal"]
+      "skills": ["basic_attack", "heavy_hit", "hit_and_heal"],
+      "spriteConfig": {
+        "textureUrl": "/sprites/cinderpaw_idle.png",
+        "frameWidth": 128,
+        "frameHeight": 128,
+        "totalFrames": 8,
+        "animationSpeed": 0.1
+      }
     },
     {
       "id": "spirit_c16",
@@ -250,7 +355,14 @@
         "elementalAffinity": 70
       },
       "passiveAbilities": ["health_focus"],
-      "skills": ["basic_attack", "heavy_hit", "hit_and_heal"]
+      "skills": ["basic_attack", "heavy_hit", "hit_and_heal"],
+      "spriteConfig": {
+        "textureUrl": "/sprites/cinderpaw_idle.png",
+        "frameWidth": 128,
+        "frameHeight": 128,
+        "totalFrames": 8,
+        "animationSpeed": 0.1
+      }
     },
     {
       "id": "spirit_c17",
@@ -265,7 +377,14 @@
         "elementalAffinity": 110
       },
       "passiveAbilities": ["attack_focus"],
-      "skills": ["basic_attack", "heavy_hit", "hit_and_heal"]
+      "skills": ["basic_attack", "heavy_hit", "hit_and_heal"],
+      "spriteConfig": {
+        "textureUrl": "/sprites/cinderpaw_idle.png",
+        "frameWidth": 128,
+        "frameHeight": 128,
+        "totalFrames": 8,
+        "animationSpeed": 0.1
+      }
     },
     {
       "id": "spirit_c18",
@@ -280,7 +399,14 @@
         "elementalAffinity": 110
       },
       "passiveAbilities": ["attack_focus"],
-      "skills": ["basic_attack", "heavy_hit", "hit_and_heal"]
+      "skills": ["basic_attack", "heavy_hit", "hit_and_heal"],
+      "spriteConfig": {
+        "textureUrl": "/sprites/cinderpaw_idle.png",
+        "frameWidth": 128,
+        "frameHeight": 128,
+        "totalFrames": 8,
+        "animationSpeed": 0.1
+      }
     },
     {
       "id": "spirit_c19",
@@ -295,7 +421,14 @@
         "elementalAffinity": 100
       },
       "passiveAbilities": ["health_focus"],
-      "skills": ["basic_attack", "heavy_hit", "hit_and_heal"]
+      "skills": ["basic_attack", "heavy_hit", "hit_and_heal"],
+      "spriteConfig": {
+        "textureUrl": "/sprites/cinderpaw_idle.png",
+        "frameWidth": 128,
+        "frameHeight": 128,
+        "totalFrames": 8,
+        "animationSpeed": 0.1
+      }
     },
     {
       "id": "spirit_c20",
@@ -310,7 +443,14 @@
         "elementalAffinity": 120
       },
       "passiveAbilities": ["attack_focus"],
-      "skills": ["basic_attack", "heavy_hit", "hit_and_heal"]
+      "skills": ["basic_attack", "heavy_hit", "hit_and_heal"],
+      "spriteConfig": {
+        "textureUrl": "/sprites/cinderpaw_idle.png",
+        "frameWidth": 128,
+        "frameHeight": 128,
+        "totalFrames": 8,
+        "animationSpeed": 0.1
+      }
     }
   ],
   "uncommon": [
@@ -327,7 +467,14 @@
         "elementalAffinity": 90
       },
       "passiveAbilities": ["attack_focus", "healing_flames"],
-      "skills": ["basic_attack", "heavy_hit", "lifesteal_buff"]
+      "skills": ["basic_attack", "heavy_hit", "lifesteal_buff"],
+      "spriteConfig": {
+        "textureUrl": "/sprites/cinderpaw_idle.png",
+        "frameWidth": 128,
+        "frameHeight": 128,
+        "totalFrames": 8,
+        "animationSpeed": 0.1
+      }
     },
     {
       "id": "spirit_u02",
@@ -342,7 +489,14 @@
         "elementalAffinity": 70
       },
       "passiveAbilities": ["defense_focus"],
-      "skills": ["basic_attack", "heavy_hit", "hit_and_heal"]
+      "skills": ["basic_attack", "heavy_hit", "hit_and_heal"],
+      "spriteConfig": {
+        "textureUrl": "/sprites/cinderpaw_idle.png",
+        "frameWidth": 128,
+        "frameHeight": 128,
+        "totalFrames": 8,
+        "animationSpeed": 0.1
+      }
     },
     {
       "id": "spirit_u03",
@@ -357,7 +511,14 @@
         "elementalAffinity": 110
       },
       "passiveAbilities": ["attack_focus", "crit_mastery"],
-      "skills": ["basic_attack", "heavy_hit", "crit_setup"]
+      "skills": ["basic_attack", "heavy_hit", "crit_setup"],
+      "spriteConfig": {
+        "textureUrl": "/sprites/cinderpaw_idle.png",
+        "frameWidth": 128,
+        "frameHeight": 128,
+        "totalFrames": 8,
+        "animationSpeed": 0.1
+      }
     },
     {
       "id": "spirit_u04",
@@ -372,7 +533,14 @@
         "elementalAffinity": 110
       },
       "passiveAbilities": ["health_focus"],
-      "skills": ["basic_attack", "heavy_hit", "hit_and_heal"]
+      "skills": ["basic_attack", "heavy_hit", "hit_and_heal"],
+      "spriteConfig": {
+        "textureUrl": "/sprites/cinderpaw_idle.png",
+        "frameWidth": 128,
+        "frameHeight": 128,
+        "totalFrames": 8,
+        "animationSpeed": 0.1
+      }
     },
     {
       "id": "spirit_u05",
@@ -387,7 +555,14 @@
         "elementalAffinity": 110
       },
       "passiveAbilities": ["attack_focus"],
-      "skills": ["basic_attack", "heavy_hit", "hit_and_heal"]
+      "skills": ["basic_attack", "heavy_hit", "hit_and_heal"],
+      "spriteConfig": {
+        "textureUrl": "/sprites/cinderpaw_idle.png",
+        "frameWidth": 128,
+        "frameHeight": 128,
+        "totalFrames": 8,
+        "animationSpeed": 0.1
+      }
     },
     {
       "id": "spirit_u06",
@@ -402,7 +577,14 @@
         "elementalAffinity": 100
       },
       "passiveAbilities": ["attack_focus"],
-      "skills": ["basic_attack", "heavy_hit", "hit_and_heal"]
+      "skills": ["basic_attack", "heavy_hit", "hit_and_heal"],
+      "spriteConfig": {
+        "textureUrl": "/sprites/cinderpaw_idle.png",
+        "frameWidth": 128,
+        "frameHeight": 128,
+        "totalFrames": 8,
+        "animationSpeed": 0.1
+      }
     },
     {
       "id": "spirit_u07",
@@ -417,7 +599,14 @@
         "elementalAffinity": 60
       },
       "passiveAbilities": ["defense_focus", "damage_reflect"],
-      "skills": ["basic_attack", "thorns_buff", "bubble_barrier"]
+      "skills": ["basic_attack", "thorns_buff", "bubble_barrier"],
+      "spriteConfig": {
+        "textureUrl": "/sprites/cinderpaw_idle.png",
+        "frameWidth": 128,
+        "frameHeight": 128,
+        "totalFrames": 8,
+        "animationSpeed": 0.1
+      }
     },
     {
       "id": "spirit_u08",
@@ -432,7 +621,14 @@
         "elementalAffinity": 120
       },
       "passiveAbilities": ["attack_focus"],
-      "skills": ["basic_attack", "heavy_hit", "hit_and_heal"]
+      "skills": ["basic_attack", "heavy_hit", "hit_and_heal"],
+      "spriteConfig": {
+        "textureUrl": "/sprites/cinderpaw_idle.png",
+        "frameWidth": 128,
+        "frameHeight": 128,
+        "totalFrames": 8,
+        "animationSpeed": 0.1
+      }
     },
     {
       "id": "spirit_u09",
@@ -447,7 +643,14 @@
         "elementalAffinity": 100
       },
       "passiveAbilities": ["health_focus"],
-      "skills": ["basic_attack", "heavy_hit", "hit_and_heal"]
+      "skills": ["basic_attack", "heavy_hit", "hit_and_heal"],
+      "spriteConfig": {
+        "textureUrl": "/sprites/cinderpaw_idle.png",
+        "frameWidth": 128,
+        "frameHeight": 128,
+        "totalFrames": 8,
+        "animationSpeed": 0.1
+      }
     },
     {
       "id": "spirit_u10",
@@ -462,7 +665,14 @@
         "elementalAffinity": 90
       },
       "passiveAbilities": ["defense_focus"],
-      "skills": ["basic_attack", "heavy_hit", "hit_and_heal"]
+      "skills": ["basic_attack", "heavy_hit", "hit_and_heal"],
+      "spriteConfig": {
+        "textureUrl": "/sprites/cinderpaw_idle.png",
+        "frameWidth": 128,
+        "frameHeight": 128,
+        "totalFrames": 8,
+        "animationSpeed": 0.1
+      }
     }
   ],
   "rare": [
@@ -479,7 +689,14 @@
         "elementalAffinity": 100
       },
       "passiveAbilities": ["health_focus"],
-      "skills": ["basic_attack", "heavy_hit", "hit_and_heal"]
+      "skills": ["basic_attack", "heavy_hit", "hit_and_heal"],
+      "spriteConfig": {
+        "textureUrl": "/sprites/cinderpaw_idle.png",
+        "frameWidth": 128,
+        "frameHeight": 128,
+        "totalFrames": 8,
+        "animationSpeed": 0.1
+      }
     },
     {
       "id": "spirit_r02",
@@ -494,7 +711,14 @@
         "elementalAffinity": 80
       },
       "passiveAbilities": ["defense_focus"],
-      "skills": ["basic_attack", "heavy_hit", "hit_and_heal"]
+      "skills": ["basic_attack", "heavy_hit", "hit_and_heal"],
+      "spriteConfig": {
+        "textureUrl": "/sprites/cinderpaw_idle.png",
+        "frameWidth": 128,
+        "frameHeight": 128,
+        "totalFrames": 8,
+        "animationSpeed": 0.1
+      }
     },
     {
       "id": "spirit_r03",
@@ -509,7 +733,14 @@
         "elementalAffinity": 110
       },
       "passiveAbilities": ["attack_focus"],
-      "skills": ["basic_attack", "heavy_hit", "hit_and_heal"]
+      "skills": ["basic_attack", "heavy_hit", "hit_and_heal"],
+      "spriteConfig": {
+        "textureUrl": "/sprites/cinderpaw_idle.png",
+        "frameWidth": 128,
+        "frameHeight": 128,
+        "totalFrames": 8,
+        "animationSpeed": 0.1
+      }
     },
     {
       "id": "spirit_r04",
@@ -524,7 +755,14 @@
         "elementalAffinity": 110
       },
       "passiveAbilities": ["health_focus"],
-      "skills": ["basic_attack", "heavy_hit", "hit_and_heal"]
+      "skills": ["basic_attack", "heavy_hit", "hit_and_heal"],
+      "spriteConfig": {
+        "textureUrl": "/sprites/cinderpaw_idle.png",
+        "frameWidth": 128,
+        "frameHeight": 128,
+        "totalFrames": 8,
+        "animationSpeed": 0.1
+      }
     },
     {
       "id": "spirit_r05",
@@ -539,7 +777,14 @@
         "elementalAffinity": 110
       },
       "passiveAbilities": ["attack_focus"],
-      "skills": ["basic_attack", "heavy_hit", "hit_and_heal"]
+      "skills": ["basic_attack", "heavy_hit", "hit_and_heal"],
+      "spriteConfig": {
+        "textureUrl": "/sprites/cinderpaw_idle.png",
+        "frameWidth": 128,
+        "frameHeight": 128,
+        "totalFrames": 8,
+        "animationSpeed": 0.1
+      }
     },
     {
       "id": "spirit_r06",
@@ -554,7 +799,14 @@
         "elementalAffinity": 90
       },
       "passiveAbilities": ["health_focus"],
-      "skills": ["basic_attack", "heavy_hit", "hit_and_heal"]
+      "skills": ["basic_attack", "heavy_hit", "hit_and_heal"],
+      "spriteConfig": {
+        "textureUrl": "/sprites/cinderpaw_idle.png",
+        "frameWidth": 128,
+        "frameHeight": 128,
+        "totalFrames": 8,
+        "animationSpeed": 0.1
+      }
     },
     {
       "id": "spirit_r07",
@@ -569,7 +821,14 @@
         "elementalAffinity": 70
       },
       "passiveAbilities": ["defense_focus"],
-      "skills": ["basic_attack", "heavy_hit", "hit_and_heal"]
+      "skills": ["basic_attack", "heavy_hit", "hit_and_heal"],
+      "spriteConfig": {
+        "textureUrl": "/sprites/cinderpaw_idle.png",
+        "frameWidth": 128,
+        "frameHeight": 128,
+        "totalFrames": 8,
+        "animationSpeed": 0.1
+      }
     },
     {
       "id": "spirit_r08",
@@ -584,7 +843,14 @@
         "elementalAffinity": 110
       },
       "passiveAbilities": ["attack_focus"],
-      "skills": ["basic_attack", "heavy_hit", "hit_and_heal"]
+      "skills": ["basic_attack", "heavy_hit", "hit_and_heal"],
+      "spriteConfig": {
+        "textureUrl": "/sprites/cinderpaw_idle.png",
+        "frameWidth": 128,
+        "frameHeight": 128,
+        "totalFrames": 8,
+        "animationSpeed": 0.1
+      }
     },
     {
       "id": "spirit_r09",
@@ -599,7 +865,14 @@
         "elementalAffinity": 120
       },
       "passiveAbilities": ["health_focus", "dot_amplification"],
-      "skills": ["bubble_barrier", "tidal_surge", "def_shred_dot"]
+      "skills": ["bubble_barrier", "tidal_surge", "def_shred_dot"],
+      "spriteConfig": {
+        "textureUrl": "/sprites/cinderpaw_idle.png",
+        "frameWidth": 128,
+        "frameHeight": 128,
+        "totalFrames": 8,
+        "animationSpeed": 0.1
+      }
     },
     {
       "id": "spirit_r10",
@@ -614,7 +887,14 @@
         "elementalAffinity": 110
       },
       "passiveAbilities": ["attack_focus"],
-      "skills": ["basic_attack", "heavy_hit", "hit_and_heal"]
+      "skills": ["basic_attack", "heavy_hit", "hit_and_heal"],
+      "spriteConfig": {
+        "textureUrl": "/sprites/cinderpaw_idle.png",
+        "frameWidth": 128,
+        "frameHeight": 128,
+        "totalFrames": 8,
+        "animationSpeed": 0.1
+      }
     }
   ],
   "epic": [
@@ -631,7 +911,14 @@
         "elementalAffinity": 100
       },
       "passiveAbilities": ["health_focus"],
-      "skills": ["basic_attack", "heavy_hit", "hit_and_heal"]
+      "skills": ["basic_attack", "heavy_hit", "hit_and_heal"],
+      "spriteConfig": {
+        "textureUrl": "/sprites/cinderpaw_idle.png",
+        "frameWidth": 128,
+        "frameHeight": 128,
+        "totalFrames": 8,
+        "animationSpeed": 0.1
+      }
     },
     {
       "id": "spirit_e02",
@@ -646,7 +933,14 @@
         "elementalAffinity": 80
       },
       "passiveAbilities": ["defense_focus"],
-      "skills": ["basic_attack", "heavy_hit", "hit_and_heal"]
+      "skills": ["basic_attack", "heavy_hit", "hit_and_heal"],
+      "spriteConfig": {
+        "textureUrl": "/sprites/cinderpaw_idle.png",
+        "frameWidth": 128,
+        "frameHeight": 128,
+        "totalFrames": 8,
+        "animationSpeed": 0.1
+      }
     },
     {
       "id": "spirit_e03",
@@ -661,7 +955,14 @@
         "elementalAffinity": 100
       },
       "passiveAbilities": ["attack_focus"],
-      "skills": ["basic_attack", "heavy_hit", "hit_and_heal"]
+      "skills": ["basic_attack", "heavy_hit", "hit_and_heal"],
+      "spriteConfig": {
+        "textureUrl": "/sprites/cinderpaw_idle.png",
+        "frameWidth": 128,
+        "frameHeight": 128,
+        "totalFrames": 8,
+        "animationSpeed": 0.1
+      }
     },
     {
       "id": "spirit_e04",
@@ -676,7 +977,14 @@
         "elementalAffinity": 100
       },
       "passiveAbilities": ["health_focus"],
-      "skills": ["basic_attack", "heavy_hit", "hit_and_heal"]
+      "skills": ["basic_attack", "heavy_hit", "hit_and_heal"],
+      "spriteConfig": {
+        "textureUrl": "/sprites/cinderpaw_idle.png",
+        "frameWidth": 128,
+        "frameHeight": 128,
+        "totalFrames": 8,
+        "animationSpeed": 0.1
+      }
     },
     {
       "id": "spirit_e05",
@@ -691,7 +999,14 @@
         "elementalAffinity": 100
       },
       "passiveAbilities": ["attack_focus"],
-      "skills": ["basic_attack", "heavy_hit", "hit_and_heal"]
+      "skills": ["basic_attack", "heavy_hit", "hit_and_heal"],
+      "spriteConfig": {
+        "textureUrl": "/sprites/cinderpaw_idle.png",
+        "frameWidth": 128,
+        "frameHeight": 128,
+        "totalFrames": 8,
+        "animationSpeed": 0.1
+      }
     },
     {
       "id": "spirit_e06",
@@ -706,7 +1021,14 @@
         "elementalAffinity": 100
       },
       "passiveAbilities": ["health_focus"],
-      "skills": ["basic_attack", "heavy_hit", "hit_and_heal"]
+      "skills": ["basic_attack", "heavy_hit", "hit_and_heal"],
+      "spriteConfig": {
+        "textureUrl": "/sprites/cinderpaw_idle.png",
+        "frameWidth": 128,
+        "frameHeight": 128,
+        "totalFrames": 8,
+        "animationSpeed": 0.1
+      }
     },
     {
       "id": "spirit_e07",
@@ -721,7 +1043,14 @@
         "elementalAffinity": 70
       },
       "passiveAbilities": ["defense_focus"],
-      "skills": ["basic_attack", "heavy_hit", "hit_and_heal"]
+      "skills": ["basic_attack", "heavy_hit", "hit_and_heal"],
+      "spriteConfig": {
+        "textureUrl": "/sprites/cinderpaw_idle.png",
+        "frameWidth": 128,
+        "frameHeight": 128,
+        "totalFrames": 8,
+        "animationSpeed": 0.1
+      }
     },
     {
       "id": "spirit_e08",
@@ -736,7 +1065,14 @@
         "elementalAffinity": 100
       },
       "passiveAbilities": ["attack_focus"],
-      "skills": ["basic_attack", "heavy_hit", "hit_and_heal"]
+      "skills": ["basic_attack", "heavy_hit", "hit_and_heal"],
+      "spriteConfig": {
+        "textureUrl": "/sprites/cinderpaw_idle.png",
+        "frameWidth": 128,
+        "frameHeight": 128,
+        "totalFrames": 8,
+        "animationSpeed": 0.1
+      }
     },
     {
       "id": "spirit_e09",
@@ -751,7 +1087,14 @@
         "elementalAffinity": 100
       },
       "passiveAbilities": ["health_focus"],
-      "skills": ["basic_attack", "heavy_hit", "hit_and_heal"]
+      "skills": ["basic_attack", "heavy_hit", "hit_and_heal"],
+      "spriteConfig": {
+        "textureUrl": "/sprites/cinderpaw_idle.png",
+        "frameWidth": 128,
+        "frameHeight": 128,
+        "totalFrames": 8,
+        "animationSpeed": 0.1
+      }
     },
     {
       "id": "spirit_e10",
@@ -766,7 +1109,14 @@
         "elementalAffinity": 100
       },
       "passiveAbilities": ["attack_focus"],
-      "skills": ["basic_attack", "heavy_hit", "hit_and_heal"]
+      "skills": ["basic_attack", "heavy_hit", "hit_and_heal"],
+      "spriteConfig": {
+        "textureUrl": "/sprites/cinderpaw_idle.png",
+        "frameWidth": 128,
+        "frameHeight": 128,
+        "totalFrames": 8,
+        "animationSpeed": 0.1
+      }
     }
   ],
   "legendary": [
@@ -783,7 +1133,14 @@
         "elementalAffinity": 100
       },
       "passiveAbilities": ["health_focus"],
-      "skills": ["basic_attack", "heavy_hit", "hit_and_heal"]
+      "skills": ["basic_attack", "heavy_hit", "hit_and_heal"],
+      "spriteConfig": {
+        "textureUrl": "/sprites/cinderpaw_idle.png",
+        "frameWidth": 128,
+        "frameHeight": 128,
+        "totalFrames": 8,
+        "animationSpeed": 0.1
+      }
     },
     {
       "id": "spirit_l02",
@@ -798,7 +1155,14 @@
         "elementalAffinity": 80
       },
       "passiveAbilities": ["defense_focus"],
-      "skills": ["basic_attack", "heavy_hit", "hit_and_heal"]
+      "skills": ["basic_attack", "heavy_hit", "hit_and_heal"],
+      "spriteConfig": {
+        "textureUrl": "/sprites/cinderpaw_idle.png",
+        "frameWidth": 128,
+        "frameHeight": 128,
+        "totalFrames": 8,
+        "animationSpeed": 0.1
+      }
     },
     {
       "id": "spirit_l03",
@@ -813,7 +1177,14 @@
         "elementalAffinity": 100
       },
       "passiveAbilities": ["attack_focus"],
-      "skills": ["basic_attack", "heavy_hit", "hit_and_heal"]
+      "skills": ["basic_attack", "heavy_hit", "hit_and_heal"],
+      "spriteConfig": {
+        "textureUrl": "/sprites/cinderpaw_idle.png",
+        "frameWidth": 128,
+        "frameHeight": 128,
+        "totalFrames": 8,
+        "animationSpeed": 0.1
+      }
     },
     {
       "id": "spirit_l04",
@@ -828,7 +1199,14 @@
         "elementalAffinity": 100
       },
       "passiveAbilities": ["health_focus"],
-      "skills": ["basic_attack", "heavy_hit", "hit_and_heal"]
+      "skills": ["basic_attack", "heavy_hit", "hit_and_heal"],
+      "spriteConfig": {
+        "textureUrl": "/sprites/cinderpaw_idle.png",
+        "frameWidth": 128,
+        "frameHeight": 128,
+        "totalFrames": 8,
+        "animationSpeed": 0.1
+      }
     },
     {
       "id": "spirit_l05",
@@ -843,7 +1221,14 @@
         "elementalAffinity": 100
       },
       "passiveAbilities": ["attack_focus"],
-      "skills": ["basic_attack", "heavy_hit", "hit_and_heal"]
+      "skills": ["basic_attack", "heavy_hit", "hit_and_heal"],
+      "spriteConfig": {
+        "textureUrl": "/sprites/cinderpaw_idle.png",
+        "frameWidth": 128,
+        "frameHeight": 128,
+        "totalFrames": 8,
+        "animationSpeed": 0.1
+      }
     }
   ],
   "boss": [
@@ -860,7 +1245,14 @@
         "elementalAffinity": 50
       },
       "passiveAbilities": ["boss_massive_health"],
-      "skills": ["basic_attack", "atk_buff", "charged_hit"]
+      "skills": ["basic_attack", "atk_buff", "charged_hit"],
+      "spriteConfig": {
+        "textureUrl": "/sprites/cinderpaw_idle.png",
+        "frameWidth": 128,
+        "frameHeight": 128,
+        "totalFrames": 8,
+        "animationSpeed": 0.1
+      }
     }
   ]
 }

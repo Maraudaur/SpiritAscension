@@ -1,18 +1,20 @@
-import type {
-  PlayerSpirit,
-  ActiveEffect,
-  ElementId,
-} from "@shared/types";
+import type { PlayerSpirit, ActiveEffect, ElementId } from "@shared/types";
 
 export type ActionMenu = "none" | "skills" | "swap";
 
-export type BattleState = "setup" | "fighting" | "victory" | "defeat";
+export type BattleState =
+  | "setup"
+  | "fighting"
+  | "victory"
+  | "defeat"
+  | "enemy_defeated";
 
 export interface BattleScreenProps {
   onClose: () => void;
   isBossBattle?: boolean;
   returnTo?: "cultivation" | "story";
   autoStart?: boolean;
+  onDefeatAnimationComplete?: () => void;
 }
 
 export interface BattleSpirit {
