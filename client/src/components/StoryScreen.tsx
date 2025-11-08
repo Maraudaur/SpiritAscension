@@ -5,16 +5,25 @@ import { useGameState } from "../lib/stores/useGameState";
 import storyData from "@shared/data/story.json";
 import { motion, AnimatePresence } from "framer-motion";
 
+interface StoryCharacter {
+  id: string; // e.g., "OldMan"
+  position: "left" | "right" | "center";
+}
+
 interface StoryDialogue {
-  speaker: string;
+  speakerId: string; // "OldMan", "Hero", or "Narrator"
   text: string;
+  expression: string; // e.g., "happy", "angry", "neutral"
+  background?: string;
 }
 
 interface StoryNode {
   id: number;
   title: string;
   description: string;
-  dialogues: StoryDialogue[];
+  background: string; // Path to background image
+  characters: StoryCharacter[]; // Characters in this scene
+  dialogues: StoryDialogue[]; // Dialogues for this scene
   encounterId: string | null;
 }
 
@@ -23,6 +32,12 @@ interface StoryScreenProps {
   onNavigate?: (
     screen: "story" | "cultivation" | "spirits" | "summon" | "battle",
   ) => void;
+}
+
+function getPortraitPath(characterId: string, expression: string): string {
+  // Use 'neutral' as a fallback if the specific expression doesn't exist
+  // (You'd need to handle image preloading or 404s in a real app)
+  return `/images/portraits/${characterId.toLowerCase()}/${expression}.png`;
 }
 
 export function StoryScreen({ onClose, onNavigate }: StoryScreenProps) {
@@ -70,7 +85,7 @@ export function StoryScreen({ onClose, onNavigate }: StoryScreenProps) {
     if (isFirstCompletion && currentNode.encounterId !== null) {
       // Set the encounter ID in global state
       setCurrentEncounterId(currentNode.encounterId);
-      
+
       // Trigger battle encounter
       setStoryLayer("map");
       if (onNavigate) {
@@ -98,36 +113,97 @@ export function StoryScreen({ onClose, onNavigate }: StoryScreenProps) {
       currentDialogueIndex === currentNode.dialogues.length - 1;
 
     return (
-      <div
-        className="absolute inset-0 z-10 flex flex-col"
-        style={{
-          background: "linear-gradient(180deg, #2C1810 0%, #1A0F0A 100%)",
-        }}
-      >
-        {/* Upper 2/3: Scene and Characters */}
-        <div className="flex-[2] flex items-center justify-center p-8 relative">
-          {/* Background scene decoration */}
-          <div className="absolute inset-0 opacity-20">
-            <div className="w-full h-full flex items-center justify-center">
-              <div className="text-9xl opacity-30">🏯</div>
-            </div>
-          </div>
+      <div className="absolute inset-0 z-10 flex flex-col">
+        {/* 1. Background Image (MOVED HERE) */}
+        {(() => {
+          const currentDialogue = currentNode.dialogues[currentDialogueIndex];
+          const backgroundToShow =
+            currentDialogue.background ?? currentNode.background;
 
-          {/* Character placeholder - could be spirit sprites in future */}
-          <div className="relative z-10 flex items-center justify-center gap-8">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5 }}
-              className="text-8xl opacity-80"
-            >
-              {currentDialogue.speaker === "Narrator" ? "📜" : "🧙‍♂️"}
-            </motion.div>
+          return (
+            <AnimatePresence>
+              <motion.img
+                key={backgroundToShow}
+                src={backgroundToShow}
+                alt="Scene background"
+                className="absolute inset-0 w-full h-full object-cover z-0"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.5 }}
+              />
+            </AnimatePresence>
+          );
+        })()}
+        {/* Upper 2/3: Scene and Characters */}
+        <div className="flex-[2] flex justify-center p-8 relative overflow-hidden z-10">
+          {/* 2. Character Sprites */}
+          <div className="relative z-10 w-full h-full flex items-end justify-center">
+            {currentNode.characters.map((character) => {
+              const currentDialogue =
+                currentNode.dialogues[currentDialogueIndex];
+
+              // Find out if the current speaker *has* a character sprite
+              const speakerHasSprite = currentNode.characters.some(
+                (c) => c.id === currentDialogue.speakerId,
+              );
+
+              // Is this specific character the one speaking?
+              const isSpeaking =
+                currentDialogue.speakerId.toLowerCase() ===
+                character.id.toLowerCase();
+
+              // Determine the correct expression
+              const expression = isSpeaking
+                ? currentDialogue.expression
+                : "neutral"; // Default to neutral when not speaking
+
+              // Get the image path
+              const imagePath = getPortraitPath(character.id, expression);
+
+              // Determine opacity
+              let targetOpacity = 0; // Start hidden
+              if (speakerHasSprite) {
+                targetOpacity = isSpeaking ? 1 : 0.6; // Highlight speaker, dim others
+              }
+
+              return (
+                <motion.div
+                  key={character.id}
+                  className="absolute top-1/2 -translate-y-1/2"
+                  style={{
+                    // Use custom properties for CSS-based positioning
+                    // @ts-ignore
+                    "--position-x":
+                      character.position === "left"
+                        ? "-25%"
+                        : character.position === "right"
+                          ? "80%"
+                          : "0%",
+                  }}
+                  animate={{
+                    opacity: targetOpacity, // <-- NEW LOGIC
+                    scale: isSpeaking ? 1.05 : 1,
+                    y: isSpeaking ? -10 : 0,
+                  }}
+                  transition={{ duration: 0.3 }}
+                >
+                  <img
+                    src={imagePath}
+                    alt={character.id}
+                    className="max-h-[70vh] object-contain"
+                    style={{
+                      transform: `translateX(var(--position-x))`,
+                    }}
+                  />
+                </motion.div>
+              );
+            })}
           </div>
         </div>
 
         {/* Lower 1/3: Visual Novel Dialogue Box */}
-        <div className="flex-[1] flex items-end p-6">
+        <div className="flex-[1] flex items-end p-6 relative z-10">
           <AnimatePresence mode="wait">
             <motion.div
               key={currentDialogueIndex}
@@ -155,7 +231,7 @@ export function StoryScreen({ onClose, onNavigate }: StoryScreenProps) {
                   }}
                 >
                   <span className="font-bold text-lg">
-                    {currentDialogue.speaker}
+                    {currentDialogue.speakerId}
                   </span>
                 </div>
 

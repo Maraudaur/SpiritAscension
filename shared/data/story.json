@@ -1,28 +1,37 @@
 [
   {
     "id": 0,
-    "title": "The Awakening",
-    "description": "You open your eyes to find yourself in a mystical realm...",
+    "title": "The Fall",
+    "description": "What happened...?",
+    "background": "/images/backgrounds/mountainshackbg.png",
+    "characters": [{ "id": "Droplet", "position": "right" }],
     "dialogues": [
       {
-        "speaker": "Narrator",
-        "text": "You open your eyes to find yourself in a mystical realm shrouded in ethereal mist."
+        "speakerId": "Narrator",
+        "expression": "neutral",
+        "text": "Memories flash through your mind. Mountain peak, power, ascension.",
+        "background": "/images/backgrounds/ascensionbg.png"
       },
       {
-        "speaker": "Narrator",
-        "text": "The air tingles with spiritual energy - Qi flows through everything around you like invisible rivers of power."
+        "speakerId": "Narrator",
+        "expression": "neutral",
+        "text": "Something went wrong. Falling, darkness, pain.",
+        "background": "/images/backgrounds/fallingbg.png"
       },
       {
-        "speaker": "Mysterious Voice",
-        "text": "Ah, another soul awakens to the path of cultivation. Welcome, young one."
+        "speakerId": "Mysterious Voice",
+        "expression": "neutral",
+        "text": "You're finally awake! I've been waiting for you. You need to rebuild your strength. Go to the cultivation page and upgrade you base cultivation rate. This will help you. in the next step. It will help you see me better too."
       },
       {
-        "speaker": "Narrator",
-        "text": "A figure materializes before you, draped in flowing robes that shimmer with ancient runes."
+        "speakerId": "Droplet",
+        "expression": "happy",
+        "text": "well done! now you can see me better. Something went wrong on the peak. You need to find out what happened. before we head out you need a spirit to protect yourself. Go to the summon page and summon your first spirit!"
       },
       {
-        "speaker": "Elder Chen",
-        "text": "I am Elder Chen, guardian of this realm. Your journey to immortality begins now. First, you must learn to sense and gather Qi."
+        "speakerId": "Droplet",
+        "expression": "happy",
+        "text": "We'll have to keep cultivating and summoning spirits to get stronger. Lets head out for now and start our journey!"
       }
     ],
     "encounterId": "e001"
