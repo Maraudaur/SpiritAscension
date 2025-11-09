@@ -4,13 +4,14 @@ import { immer } from "zustand/middleware/immer";
 import type {
   PotentialGrade,
   BaseSpirit,
-  GameState as GameStateData, // Import the main GameState type
+  GameState as GameStateData,
   PlayerSpirit,
+  Rarity,
 } from "@shared/types";
 import spiritsDataJson from "@shared/data/spirits.json";
 import { encrypt, decrypt } from "../encryption";
 
-// --- From your original useGameState ---
+// --- (FTUE, Spirit, AscensionBuffs types remain the same) ---
 export type FtueStep =
   | "highlightCultivation"
   | "highlightUpgradeBase"
@@ -23,26 +24,23 @@ export type Spirit = BaseSpirit & {
   level: number;
 };
 
-// --- Helper: Define Ascension Buffs ---
 interface AscensionBuffs {
   qiMultiplier: number;
   battleMultiplier: number;
 }
 
 // --- Define the full store state ---
-// This combines the data from types.ts with the FTUE state
-export interface GameStateStore
-  // --- FIX: Use Omit to remove the bad 'activeParty' before extending ---
-  extends Omit<GameStateData, "activeParty"> {
+export interface GameStateStore extends Omit<GameStateData, "activeParty"> {
   // FTUE State
   currentStoryNodeId: number | null;
   currentStoryDialogueIndex: number;
   ftueStep: FtueStep;
   hasUpgradedBase: boolean;
 
-  // --- FIX: Add the correct 'activeParty' type ---
+  // Overrides
   activeParty: (string | null)[];
 
+  // Other State
   ascensionTier: number;
   completedStoryNodes: number[];
   currentEncounterId: string | null;
@@ -51,7 +49,7 @@ export interface GameStateStore
   addQi: (amount: number) => void;
   purchaseUpgrade: (cost: number, rateIncrease: number) => boolean;
   addSpirit: (spiritId: string) => void;
-  setParty: (party: (string | null)[]) => void; // This is the action
+  setParty: (party: (string | null)[]) => void;
   isStoryNodeCompleted: (id: number) => boolean;
   completeStoryNode: (id: number) => void;
   setCurrentEncounterId: (id: string | null) => void;
@@ -59,7 +57,7 @@ export interface GameStateStore
   setFtueStep: (step: FtueStep) => void;
   setHasUpgradedBase: (status: boolean) => void;
 
-  // --- NEW ACTIONS REQUIRED BY MainScreen ---
+  // MainScreen Actions
   updateQi: () => void;
   upgradeQiProduction: () => void;
   upgradeQiMultiplier: () => void;
@@ -71,9 +69,17 @@ export interface GameStateStore
   getAscensionBuffs: (tier?: number) => AscensionBuffs;
   ascend: () => void;
   resetGame: () => void;
+
+  // Summon Actions
+  getSpiritCost: () => number;
+  getMultiSummonCost: (count: number) => number;
+  spendQi: (amount: number) => boolean;
+  addEssence: (spiritId: string, amount: number) => void;
+  summonSpirit: () => PlayerSpirit;
+  summonMultipleSpirits: (count: number) => PlayerSpirit[];
 }
 
-// --- Ascension Constants (for placeholder logic) ---
+// --- FIX: ALL CONSTANTS MOVED TO TOP-LEVEL SCOPE ---
 const TIER_DATA = [
   { tier: 0, cost: 1000, qiMult: 1, battleMult: 0 },
   { tier: 1, cost: 10000, qiMult: 1.5, battleMult: 1 },
@@ -85,27 +91,9 @@ const TIER_DATA = [
 const BASE_PROD_COST_BASE = 10;
 const MULT_COST_BASE = 50;
 const BATTLE_REWARD_COST_BASE = 100;
+const BASE_SUMMON_COST = 100; // <-- Now accessible
 
-// --- Define the initial state based on types.ts ---
-const initialState: GameStateData = {
-  qi: 0,
-  qiPerSecond: 1, // This will be calculated
-  qiUpgrades: {
-    baseProduction: 1,
-    multiplier: 1,
-    baseProductionLevel: 1,
-    multiplierLevel: 1,
-  },
-  battleRewardMultiplier: 1, // Start at 100%
-  spirits: [],
-  activeParty: [], // Satisfy the strict 'string[]' type temporarily
-  battlesWon: 0,
-  lastUpdate: Date.now(),
-  essences: {},
-  summonCount: 0,
-};
-
-const POTENTIAL_BONUSES: { [key in PotentialGrade]: number } = {
+export const POTENTIAL_BONUSES: { [key in PotentialGrade]: number } = {
   SS: 1.25,
   S: 1.2,
   A: 1.1,
@@ -113,21 +101,91 @@ const POTENTIAL_BONUSES: { [key in PotentialGrade]: number } = {
   C: 1,
 };
 
-// --- Cast the JSON data at import ---
+const POTENTIAL_GRADES: PotentialGrade[] = ["C", "B", "A", "S", "SS"];
+
+const SUMMON_RATES: { rarity: Rarity; weight: number }[] = [
+  { rarity: "common", weight: 600 },
+  { rarity: "uncommon", weight: 250 },
+  { rarity: "rare", weight: 100 },
+  { rarity: "epic", weight: 40 },
+  { rarity: "legendary", weight: 10 },
+];
+const TOTAL_WEIGHT = SUMMON_RATES.reduce((sum, rate) => sum + rate.weight, 0);
+// --- END OF CONSTANTS ---
+
+// --- Initial State ---
+const initialState: GameStateData = {
+  qi: 0,
+  qiPerSecond: 1,
+  qiUpgrades: {
+    baseProduction: 1,
+    multiplier: 1,
+    baseProductionLevel: 1,
+    multiplierLevel: 1,
+  },
+  battleRewardMultiplier: 1,
+  spirits: [],
+  activeParty: [],
+  battlesWon: 0,
+  lastUpdate: Date.now(),
+  essences: {},
+  summonCount: 0,
+};
+
 const spiritsData: Record<string, BaseSpirit[]> = spiritsDataJson as any;
 
+// --- FIX: HELPER FUNCTIONS AT TOP-LEVEL SCOPE ---
+// (These were correct, but now their constants are too)
+
+function _selectRandomRarity(): Rarity {
+  let roll = Math.random() * TOTAL_WEIGHT; // <-- Now works
+  for (const rate of SUMMON_RATES) { // <-- Now works
+    if (roll < rate.weight) {
+      return rate.rarity;
+    }
+    roll -= rate.weight;
+  }
+  return "common"; // Fallback
+}
+
+function _createRandomSpirit(rarity: Rarity): PlayerSpirit {
+  const spiritPool = spiritsData[rarity];
+  if (!spiritPool || spiritPool.length === 0) {
+    return _createRandomSpirit("common");
+  }
+
+  const baseSpirit = spiritPool[Math.floor(Math.random() * spiritPool.length)];
+  const isPrismatic = Math.random() < 0.001; // 0.1% chance
+
+  const getRandomPotential = (): PotentialGrade => {
+    return POTENTIAL_GRADES[ // <-- Now works
+      Math.floor(Math.random() * POTENTIAL_GRADES.length)
+    ];
+  };
+
+  return {
+    instanceId: crypto.randomUUID(),
+    spiritId: baseSpirit.id,
+    level: 1,
+    experience: 0,
+    isPrismatic: isPrismatic,
+    potentialFactors: {
+      attack: getRandomPotential(),
+      defense: getRandomPotential(),
+      health: getRandomPotential(),
+      elementalAffinity: getRandomPotential(),
+    },
+  };
+}
+
+// --- ZUSTAND STORE CREATION ---
 export const useGameState = create<GameStateStore>()(
   persist(
     immer((set, get) => ({
-      // --- Spread the initial game state ---
+      // --- (Initial State and FTUE State) ---
       ...initialState,
-
-      // --- Set the *actual* desired value for activeParty ---
       activeParty: [null, null, null],
-
       ascensionTier: 0,
-
-      // --- FTUE State ---
       currentStoryNodeId: null,
       currentStoryDialogueIndex: 0,
       ftueStep: null,
@@ -135,13 +193,12 @@ export const useGameState = create<GameStateStore>()(
       completedStoryNodes: [],
       currentEncounterId: null,
 
-      // --- Actions ---
+      // --- (Core Actions) ---
       addQi: (amount: number) => {
         set((state) => {
           state.qi += amount;
         });
       },
-
       purchaseUpgrade: (cost: number, rateIncrease: number) => {
         if (get().qi >= cost) {
           set((state) => {
@@ -158,11 +215,11 @@ export const useGameState = create<GameStateStore>()(
         }
         return false;
       },
-
       addSpirit: (spiritId: string) => {
+        // This function is for *giving* a spirit (e.g., from story)
+        // not for random summoning.
         const allSpirits = Object.values(spiritsData).flat();
         const spirit = allSpirits.find((s) => s.id === spiritId);
-
         if (spirit) {
           const newPlayerSpirit: PlayerSpirit = {
             instanceId: crypto.randomUUID(),
@@ -177,7 +234,6 @@ export const useGameState = create<GameStateStore>()(
               elementalAffinity: "C",
             },
           };
-
           set((state) => {
             state.spirits.push(newPlayerSpirit);
             if (state.ftueStep === "highlightSummonButton") {
@@ -186,16 +242,12 @@ export const useGameState = create<GameStateStore>()(
           });
         }
       },
-
-      // --- THE ONLY 'setParty' DEFINITION ---
       setParty: (party: (string | null)[]) => {
-        set({ activeParty: party }); // Use 'activeParty'
+        set({ activeParty: party });
       },
-
       isStoryNodeCompleted: (id: number) => {
         return get().completedStoryNodes.includes(id);
       },
-
       completeStoryNode: (id: number) => {
         if (!get().isStoryNodeCompleted(id)) {
           set((state) => {
@@ -203,31 +255,26 @@ export const useGameState = create<GameStateStore>()(
           });
         }
       },
-
       setCurrentEncounterId: (id: string | null) => {
         set({ currentEncounterId: id });
       },
-
       setStoryPosition: (nodeId: number | null, dialogueIndex: number) => {
         set({
           currentStoryNodeId: nodeId,
           currentStoryDialogueIndex: dialogueIndex,
         });
       },
-
       setFtueStep: (step: FtueStep) => {
         set({ ftueStep: step });
       },
-
       setHasUpgradedBase: (status: boolean) => {
         set({ hasUpgradedBase: status });
       },
-
       resetGame: () => {
         set((state) => {
           Object.assign(state, {
             ...initialState,
-            activeParty: [null, null, null], // Ensure reset uses correct type
+            activeParty: [null, null, null],
             ascensionTier: 0,
             currentStoryNodeId: null,
             currentStoryDialogueIndex: 0,
@@ -239,7 +286,7 @@ export const useGameState = create<GameStateStore>()(
         });
       },
 
-      // --- MainScreen Actions ---
+      // --- (MainScreen Actions) ---
       updateQi: () => {
         const state = get();
         const buffs = state.getAscensionBuffs();
@@ -252,34 +299,29 @@ export const useGameState = create<GameStateStore>()(
         const now = Date.now();
         const delta = (now - state.lastUpdate) / 1000;
         const qiToAdd = perSecond * delta;
-
         set((s) => {
           s.qi += qiToAdd;
           s.qiPerSecond = perSecond;
           s.lastUpdate = now;
         });
       },
-
       getBaseProductionUpgradeCost: () => {
         return Math.floor(
           BASE_PROD_COST_BASE *
             Math.pow(1.15, get().qiUpgrades.baseProductionLevel),
         );
       },
-
       getMultiplierUpgradeCost: () => {
         return Math.floor(
           MULT_COST_BASE * Math.pow(1.2, get().qiUpgrades.multiplierLevel),
         );
       },
-
       getBattleRewardUpgradeCost: () => {
         return Math.floor(
           BATTLE_REWARD_COST_BASE *
             Math.pow(1.25, get().battleRewardMultiplier / 0.1),
         );
       },
-
       upgradeQiProduction: () => {
         const cost = get().getBaseProductionUpgradeCost();
         if (get().qi >= cost) {
@@ -291,12 +333,11 @@ export const useGameState = create<GameStateStore>()(
               state.hasUpgradedBase = true;
             }
             if (state.ftueStep === "highlightUpgradeBase") {
-              state.ftueStep = null; // Clears the highlight
+              state.ftueStep = null;
             }
           });
         }
       },
-
       upgradeQiMultiplier: () => {
         const cost = get().getMultiplierUpgradeCost();
         if (get().qi >= cost) {
@@ -307,7 +348,6 @@ export const useGameState = create<GameStateStore>()(
           });
         }
       },
-
       upgradeBattleReward: () => {
         const cost = get().getBattleRewardUpgradeCost();
         if (get().qi >= cost) {
@@ -317,11 +357,9 @@ export const useGameState = create<GameStateStore>()(
           });
         }
       },
-
       getAscensionCost: () => {
         return TIER_DATA[get().ascensionTier]?.cost ?? Infinity;
       },
-
       getAscensionBuffs: (tier?: number) => {
         const currentTier = tier ?? get().ascensionTier;
         const data = TIER_DATA[currentTier];
@@ -330,7 +368,6 @@ export const useGameState = create<GameStateStore>()(
           battleMultiplier: data?.battleMult ?? 0,
         };
       },
-
       ascend: () => {
         const cost = get().getAscensionCost();
         if (get().qi >= cost) {
@@ -345,8 +382,81 @@ export const useGameState = create<GameStateStore>()(
           });
         }
       },
+
+      // --- SUMMONING LOGIC ---
+      getSpiritCost: () => {
+        const summonCount = get().summonCount ?? 0;
+        const increase = Math.floor(summonCount / 10) * 5;
+        // Uses BASE_SUMMON_COST from top level
+        return Math.min(BASE_SUMMON_COST + increase, 500);
+      },
+
+      getMultiSummonCost: (count: number) => {
+        return Math.floor(get().getSpiritCost() * count * 0.9);
+      },
+
+      spendQi: (amount: number) => {
+        if (get().qi >= amount) {
+          set((state) => {
+            state.qi -= amount;
+          });
+          return true;
+        }
+        return false;
+      },
+
+      addEssence: (spiritId: string, amount: number) => {
+        set((state) => {
+          const current = state.essences[spiritId] ?? 0;
+          state.essences[spiritId] = current + amount;
+        });
+      },
+
+      summonSpirit: () => {
+        // Uses helper functions from top level
+        const rarity = _selectRandomRarity();
+        const newSpirit = _createRandomSpirit(rarity);
+
+        set((state) => {
+          state.spirits.push(newSpirit);
+          state.summonCount = (state.summonCount ?? 0) + 1;
+
+          // FTUE logic
+          if (state.ftueStep === "highlightSummonButton") {
+            state.ftueStep = null;
+          }
+        });
+        return newSpirit;
+      },
+
+      summonMultipleSpirits: (count: number) => {
+        const newSpirits: PlayerSpirit[] = [];
+        let hasRare = false;
+
+        for (let i = 0; i < count; i++) {
+          // Uses helper functions from top level
+          const rarity = _selectRandomRarity();
+          if (["rare", "epic", "legendary"].includes(rarity)) {
+            hasRare = true;
+          }
+          newSpirits.push(_createRandomSpirit(rarity));
+        }
+
+        if (!hasRare) {
+          newSpirits[count - 1] = _createRandomSpirit("rare");
+        }
+
+        set((state) => {
+          state.spirits.push(...newSpirits);
+          state.summonCount = (state.summonCount ?? 0) + count;
+          if (state.ftueStep === "highlightSummonButton") {
+            state.ftueStep = null;
+          }
+        });
+        return newSpirits;
+      },
     })),
-    // --- Encryption Config ---
+    // --- (Encryption Config) ---
     {
       name: "ascension-game-state",
       storage: createJSONStorage(() => ({
@@ -371,5 +481,3 @@ export const useGameState = create<GameStateStore>()(
     },
   ),
 );
-
-export { POTENTIAL_BONUSES };
