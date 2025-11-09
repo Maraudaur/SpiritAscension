@@ -40,21 +40,26 @@
     "id": 1,
     "title": "First Cultivation",
     "description": "Learn the basics of Qi cultivation",
+    "characters": [{ "id": "Elder Chen", "position": "center" }],
     "dialogues": [
       {
-        "speaker": "Elder Chen",
+        "speakerId": "Elder Chen",
+        "expression": "neutral",
         "text": "Close your eyes and feel the flow of Qi around you. It moves like water, yet burns like fire."
       },
       {
-        "speaker": "Narrator",
+        "speakerId": "Narrator",
+        "expression": "neutral",
         "text": "You follow the Elder's guidance, feeling a warm sensation building in your core."
       },
       {
-        "speaker": "Elder Chen",
+        "speakerId": "Elder Chen",
+        "expression": "neutral",
         "text": "Good! You have a natural affinity. Now, direct that energy through your meridians."
       },
       {
-        "speaker": "Narrator",
+        "speakerId": "Narrator",
+        "expression": "neutral",
         "text": "As you practice, the Qi flows more easily. You can feel yourself growing stronger with each breath."
       }
     ],
@@ -64,25 +69,31 @@
     "id": 2,
     "title": "Spirit Bonding",
     "description": "Form your first bond with a spirit companion",
+    "characters": [{ "id": "Elder Chen", "position": "center" }],
     "dialogues": [
       {
-        "speaker": "Elder Chen",
+        "speakerId": "Elder Chen",
+        "expression": "neutral",
         "text": "Cultivators do not walk the path alone. Spirit companions will aid you on your journey."
       },
       {
-        "speaker": "Narrator",
+        "speakerId": "Narrator",
+        "expression": "neutral",
         "text": "The Elder gestures toward a glowing summoning circle etched into the ancient stones."
       },
       {
-        "speaker": "Elder Chen",
+        "speakerId": "Elder Chen",
+        "expression": "neutral",
         "text": "Use your Qi to call forth a spirit. They will sense your essence and those who resonate with you will answer."
       },
       {
-        "speaker": "Narrator",
+        "speakerId": "Narrator",
+        "expression": "neutral",
         "text": "You channel your energy into the circle. It flares with brilliant light!"
       },
       {
-        "speaker": "Narrator",
+        "speakerId": "Narrator",
+        "expression": "neutral",
         "text": "When the light fades, a magnificent spirit stands before you, ready to join your journey."
       }
     ],
@@ -92,25 +103,31 @@
     "id": 3,
     "title": "The Trial",
     "description": "Face your first challenge",
+    "characters": [{ "id": "Elder Chen", "position": "center" }],
     "dialogues": [
       {
-        "speaker": "Elder Chen",
+        "speakerId": "Elder Chen",
+        "expression": "neutral",
         "text": "You have learned well, but knowledge without practice is worthless. You must face the Trial of Initiation."
       },
       {
-        "speaker": "Narrator",
+        "speakerId": "Narrator",
+        "expression": "neutral",
         "text": "The Elder leads you to a massive stone arena, its walls covered in the names of countless cultivators who came before."
       },
       {
-        "speaker": "Elder Chen",
+        "speakerId": "Elder Chen",
+        "expression": "neutral",
         "text": "Within this arena, you will face manifestations of spiritual energy. Work with your spirit companion to overcome them."
       },
       {
-        "speaker": "Narrator",
+        "speakerId": "Narrator",
+        "expression": "neutral",
         "text": "A rift tears open in the center of the arena. Dark energy begins to coalesce into a threatening form."
       },
       {
-        "speaker": "Elder Chen",
+        "speakerId": "Elder Chen",
+        "expression": "neutral",
         "text": "Remember your training. Trust in your spirits, and victory shall be yours. Begin!"
       }
     ],
@@ -120,21 +137,26 @@
     "id": 4,
     "title": "Ancient Wisdom",
     "description": "Discover the secrets of the five elements",
+    "characters": [{ "id": "Elder Chen", "position": "center" }],
     "dialogues": [
       {
-        "speaker": "Elder Chen",
+        "speakerId": "Elder Chen",
+        "expression": "neutral",
         "text": "You have proven yourself worthy. Now I shall teach you of the Five Elements that govern all cultivation."
       },
       {
-        "speaker": "Narrator",
+        "speakerId": "Narrator",
+        "expression": "neutral",
         "text": "The Elder summons five orbs of energy, each pulsing with different colored light."
       },
       {
-        "speaker": "Elder Chen",
+        "speakerId": "Elder Chen",
+        "expression": "neutral",
         "text": "Wood feeds Fire, Fire creates Earth, Earth bears Metal, Metal collects Water, and Water nourishes Wood."
       },
       {
-        "speaker": "Elder Chen",
+        "speakerId": "Elder Chen",
+        "expression": "neutral",
         "text": "But remember - Wood also parts Earth, Earth dams Water, Water quenches Fire, Fire melts Metal, and Metal chops Wood."
       }
     ],

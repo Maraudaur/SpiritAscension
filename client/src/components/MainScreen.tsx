@@ -1,8 +1,6 @@
 import { useState, useEffect } from "react";
 import { useGameState } from "@/lib/stores/useGameState";
-import {
-  Star,
-} from "lucide-react";
+import { Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Tooltip,
@@ -11,6 +9,20 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { motion, AnimatePresence } from "framer-motion";
+
+export function CultivationScreen() {
+  const ftueStep = useGameState((s) => s.ftueStep);
+  const purchaseUpgrade = useGameState((s) => s.purchaseUpgrade); // Use the action from the store
+
+  const handleEnhanceBase = () => {
+    // The purchaseUpgrade action in the store
+    // now automatically sets hasUpgradedBase = true
+    purchaseUpgrade(10, 1); // Example cost/rate
+  };
+
+  const upgradeBaseClass =
+    ftueStep === "highlightUpgradeBase" ? "animate-pulse-bright" : "";
+}
 
 interface MainScreenProps {
   onNavigate: (
@@ -48,6 +60,8 @@ export function MainScreen({ onNavigate }: MainScreenProps) {
     ascend,
     activeParty,
   } = useGameState();
+
+  const ftueStep = useGameState((s) => s.ftueStep);
   const [displayQi, setDisplayQi] = useState(qi);
 
   const [ascendConfirmStep, setAscendConfirmStep] = useState(0);
@@ -115,13 +129,18 @@ export function MainScreen({ onNavigate }: MainScreenProps) {
 
   return (
     <TooltipProvider delayDuration={200}>
-      <div className="w-full h-full flex flex-col gap-4 p-6 overflow-y-auto" style={{ background: "#F5E6D3" }}>
+      <div
+        className="w-full h-full flex flex-col gap-4 p-6 overflow-y-auto"
+        style={{ background: "#F5E6D3" }}
+      >
         {/* Three-Column Grid */}
         <div className="flex-1 grid grid-cols-3 gap-4">
           {/* LEFT COLUMN: Ascension */}
           <div className="flex flex-col gap-4">
             <div className="p-4 parchment-bg rounded border-2 border-amber-700 flex flex-col">
-              <h3 className="text-lg font-bold parchment-text mb-3">Ascension</h3>
+              <h3 className="text-lg font-bold parchment-text mb-3">
+                Ascension
+              </h3>
 
               {/* Tier Display */}
               <div className="flex items-center gap-2 mb-3">
@@ -189,7 +208,9 @@ export function MainScreen({ onNavigate }: MainScreenProps) {
                         style={{
                           background: canAscend ? "var(--azure)" : "#999",
                           color: "var(--parchment)",
-                          boxShadow: canAscend ? "0 4px 6px rgba(58, 110, 165, 0.4)" : "none",
+                          boxShadow: canAscend
+                            ? "0 4px 6px rgba(58, 110, 165, 0.4)"
+                            : "none",
                         }}
                       >
                         Ascend (Cost: {ascensionCost} Qi)
@@ -211,16 +232,18 @@ export function MainScreen({ onNavigate }: MainScreenProps) {
               {/* Description */}
               <p className="text-xs parchment-text opacity-75 italic mt-3">
                 When you ascend you lose all Cultivation progress (Base,
-                Multiplier, Battles Won). Summon cost resets. You keep spirits and
-                gain a new Ascension buff.
+                Multiplier, Battles Won). Summon cost resets. You keep spirits
+                and gain a new Ascension buff.
               </p>
             </div>
           </div>
 
           {/* MIDDLE COLUMN: Basic Generators */}
           <div className="flex flex-col gap-4">
-            <h2 className="text-xl font-bold parchment-text">Basic Generators</h2>
-            
+            <h2 className="text-xl font-bold parchment-text">
+              Basic Generators
+            </h2>
+
             {/* Qi Upgrades */}
             <div className="p-4 parchment-bg rounded border-2 border-amber-700">
               <h3 className="text-lg font-bold parchment-text mb-3">
@@ -251,13 +274,19 @@ export function MainScreen({ onNavigate }: MainScreenProps) {
                   <Button
                     onClick={upgradeQiProduction}
                     disabled={!canUpgradeBaseProduction}
-                    className="w-full mt-4 transition-all hover:-translate-y-0.5 hover:shadow-lg disabled:hover:translate-y-0 disabled:hover:shadow-none"
+                    className={`w-full mt-4 transition-all hover:-translate-y-0.5 hover:shadow-lg disabled:hover:translate-y-0 disabled:hover:shadow-none ${
+                      ftueStep === "highlightUpgradeBase"
+                        ? "animate-pulse-bright"
+                        : ""
+                    }`}
                     style={{
                       background: canUpgradeBaseProduction
                         ? "var(--vermillion)"
                         : "#999",
                       color: "var(--parchment)",
-                      boxShadow: canUpgradeBaseProduction ? "0 4px 6px rgba(193, 39, 45, 0.3)" : "none",
+                      boxShadow: canUpgradeBaseProduction
+                        ? "0 4px 6px rgba(193, 39, 45, 0.3)"
+                        : "none",
                     }}
                   >
                     Enhance Base ({baseProductionUpgradeCost} Qi)
@@ -265,7 +294,8 @@ export function MainScreen({ onNavigate }: MainScreenProps) {
                 </TooltipTrigger>
                 <TooltipContent className="parchment-bg border-2 border-amber-700">
                   <p className="parchment-text text-xs">
-                    Current: {qiUpgrades.baseProduction} → Next: {qiUpgrades.baseProduction + 1}
+                    Current: {qiUpgrades.baseProduction} → Next:{" "}
+                    {qiUpgrades.baseProduction + 1}
                   </p>
                 </TooltipContent>
               </Tooltip>
@@ -278,9 +308,13 @@ export function MainScreen({ onNavigate }: MainScreenProps) {
                     disabled={!canUpgradeMultiplier}
                     className="w-full mt-4 transition-all hover:-translate-y-0.5 hover:shadow-lg disabled:hover:translate-y-0 disabled:hover:shadow-none"
                     style={{
-                      background: canUpgradeMultiplier ? "var(--vermillion)" : "#999",
+                      background: canUpgradeMultiplier
+                        ? "var(--vermillion)"
+                        : "#999",
                       color: "var(--parchment)",
-                      boxShadow: canUpgradeMultiplier ? "0 4px 6px rgba(193, 39, 45, 0.3)" : "none",
+                      boxShadow: canUpgradeMultiplier
+                        ? "0 4px 6px rgba(193, 39, 45, 0.3)"
+                        : "none",
                     }}
                   >
                     Amplify Multiplier ({multiplierUpgradeCost} Qi)
@@ -288,7 +322,8 @@ export function MainScreen({ onNavigate }: MainScreenProps) {
                 </TooltipTrigger>
                 <TooltipContent className="parchment-bg border-2 border-amber-700">
                   <p className="parchment-text text-xs">
-                    Current: {qiUpgrades.multiplier.toFixed(1)}x → Next: {(qiUpgrades.multiplier + 0.1).toFixed(1)}x
+                    Current: {qiUpgrades.multiplier.toFixed(1)}x → Next:{" "}
+                    {(qiUpgrades.multiplier + 0.1).toFixed(1)}x
                   </p>
                 </TooltipContent>
               </Tooltip>
@@ -321,7 +356,9 @@ export function MainScreen({ onNavigate }: MainScreenProps) {
                         ? "var(--vermillion)"
                         : "#999",
                       color: "var(--parchment)",
-                      boxShadow: canUpgradeBattleReward ? "0 4px 6px rgba(193, 39, 45, 0.3)" : "none",
+                      boxShadow: canUpgradeBattleReward
+                        ? "0 4px 6px rgba(193, 39, 45, 0.3)"
+                        : "none",
                     }}
                   >
                     Enhance Battle Mastery ({battleRewardUpgradeCost} Qi)
@@ -329,7 +366,8 @@ export function MainScreen({ onNavigate }: MainScreenProps) {
                 </TooltipTrigger>
                 <TooltipContent className="parchment-bg border-2 border-amber-700">
                   <p className="parchment-text text-xs">
-                    Current: {(battleRewardMultiplier * 100).toFixed(0)}% → Next: {((battleRewardMultiplier + 0.1) * 100).toFixed(0)}%
+                    Current: {(battleRewardMultiplier * 100).toFixed(0)}% →
+                    Next: {((battleRewardMultiplier + 0.1) * 100).toFixed(0)}%
                   </p>
                 </TooltipContent>
               </Tooltip>
@@ -338,11 +376,15 @@ export function MainScreen({ onNavigate }: MainScreenProps) {
 
           {/* RIGHT COLUMN: Advanced Generators */}
           <div className="flex flex-col gap-4">
-            <h2 className="text-xl font-bold parchment-text">Advanced Generators</h2>
-            
+            <h2 className="text-xl font-bold parchment-text">
+              Advanced Generators
+            </h2>
+
             {/* Coming Soon Placeholder */}
             <div className="p-8 parchment-bg rounded border-2 border-amber-700 flex items-center justify-center">
-              <p className="text-lg parchment-text opacity-75 italic">Coming Soon...</p>
+              <p className="text-lg parchment-text opacity-75 italic">
+                Coming Soon...
+              </p>
             </div>
           </div>
         </div>

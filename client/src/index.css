@@ -166,3 +166,23 @@
   border: 3px double var(--vermillion);
   border-radius: 8px;
 }
+
+@layer utilities {
+  .animate-pulse-bright {
+    animation: pulse-bright 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+
+  @keyframes pulse-bright {
+
+    0%,
+    100% {
+      opacity: 1;
+      box-shadow: 0 0 8px 4px rgba(255, 255, 224, 0.7);
+    }
+
+    50% {
+      opacity: 0.8;
+      box-shadow: 0 0 12px 6px rgba(255, 255, 224, 1);
+    }
+  }
+}

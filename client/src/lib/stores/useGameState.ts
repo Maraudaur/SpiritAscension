@@ -1,657 +1,371 @@
 import { create } from "zustand";
-import { persist } from "zustand/middleware";
+import { persist, createJSONStorage } from "zustand/middleware";
+import { immer } from "zustand/middleware/immer";
 import type {
-  GameState,
-  PlayerSpirit,
-  Rarity,
   PotentialGrade,
+  BaseSpirit,
+  GameState as GameStateData, // Import the main GameState type
+  PlayerSpirit,
 } from "@shared/types";
-import spiritsData from "@shared/data/spirits.json";
-import { createJSONStorage } from "zustand/middleware";
+import spiritsDataJson from "@shared/data/spirits.json";
 import { encrypt, decrypt } from "../encryption";
 
-const RARITY_CHANCES: Record<Rarity, number> = {
-  common: 0.6,
-  uncommon: 0.25,
-  rare: 0.1,
-  epic: 0.04,
-  legendary: 0.01,
-  boss: 0,
+// --- From your original useGameState ---
+export type FtueStep =
+  | "highlightCultivation"
+  | "highlightUpgradeBase"
+  | "highlightSummon"
+  | "highlightSummonButton"
+  | null;
+
+export type Spirit = BaseSpirit & {
+  potential: PotentialGrade;
+  level: number;
 };
 
-const PRISMATIC_CHANCE = 1 / 1024;
-
-const POTENTIAL_CHANCES: { grade: PotentialGrade; chance: number }[] = [
-  { grade: "C", chance: 0.4 },
-  { grade: "B", chance: 0.3 },
-  { grade: "A", chance: 0.2 },
-  { grade: "S", chance: 0.08 },
-  { grade: "SS", chance: 0.02 },
-];
-
-const POTENTIAL_BONUSES: Record<PotentialGrade, number> = {
-  C: 0.03,
-  B: 0.05,
-  A: 0.07,
-  S: 0.09,
-  SS: 0.1,
-};
-
-const ASCENSION_COSTS = [
-  50000, // Tier 0 -> 1
-  200000, // Tier 1 -> 2
-  400000, // Tier 2 -> 3
-  800000, // Tier 3 -> 4
-  2000000, // Tier 4 -> 5
-];
-
-const ASCENSION_BUFFS = [
-  // Tier 0
-  { qiMultiplier: 1, battleMultiplier: 0 },
-  // Tier 1
-  { qiMultiplier: 5, battleMultiplier: 0 },
-  // Tier 2
-  { qiMultiplier: 5, battleMultiplier: 0.2 },
-  // Tier 3
-  { qiMultiplier: 15, battleMultiplier: 0.2 },
-  // Tier 4
-  { qiMultiplier: 15, battleMultiplier: 0.6 },
-  // Tier 5
-  { qiMultiplier: 100, battleMultiplier: 0.6 },
-];
-
-function rollRarity(): Rarity {
-  const roll = Math.random();
-  let cumulative = 0;
-
-  for (const [rarity, chance] of Object.entries(RARITY_CHANCES)) {
-    cumulative += chance;
-    if (roll < cumulative) {
-      return rarity as Rarity;
-    }
-  }
-
-  return "common";
+// --- Helper: Define Ascension Buffs ---
+interface AscensionBuffs {
+  qiMultiplier: number;
+  battleMultiplier: number;
 }
 
-function rollPotentialGrade(): PotentialGrade {
-  const roll = Math.random();
-  let cumulative = 0;
+// --- Define the full store state ---
+// This combines the data from types.ts with the FTUE state
+export interface GameStateStore
+  // --- FIX: Use Omit to remove the bad 'activeParty' before extending ---
+  extends Omit<GameStateData, "activeParty"> {
+  // FTUE State
+  currentStoryNodeId: number | null;
+  currentStoryDialogueIndex: number;
+  ftueStep: FtueStep;
+  hasUpgradedBase: boolean;
 
-  for (const { grade, chance } of POTENTIAL_CHANCES) {
-    cumulative += chance;
-    if (roll < cumulative) {
-      return grade;
-    }
-  }
+  // --- FIX: Add the correct 'activeParty' type ---
+  activeParty: (string | null)[];
 
-  return "C";
-}
-
-function rollPrismatic(): boolean {
-  return Math.random() < PRISMATIC_CHANCE;
-}
-
-interface GameStore extends GameState {
-  summonSpirit: () => PlayerSpirit;
-  addToParty: (instanceId: string) => void;
-  removeFromParty: (instanceId: string) => void;
-  updateQi: () => void;
-  addQi: (amount: number) => void;
-  spendQi: (amount: number) => boolean;
-  upgradeQiProduction: () => void;
-  upgradeQiMultiplier: () => void; // NEW
-  upgradeBattleReward: () => void;
-  winBattle: (qiReward: number) => void;
-  getSpiritCost: () => number;
-  getBaseProductionUpgradeCost: () => number; // NEW
-  getMultiplierUpgradeCost: () => number; // NEW
-  getBattleRewardUpgradeCost: () => number;
-  updateSpiritHealth: (instanceId: string, health: number) => void;
-  levelUpSpirit: (instanceId: string) => void;
-  addEssence: (spiritId: string, amount: number) => void;
-  getEssenceCount: (spiritId: string) => number;
-  harmonizeSpirit: (instanceId: string) => void;
-  getLevelUpCost: (level: number) => { qi: number; essence: number };
-  healAllSpirits: () => void;
-  resetGame: () => void;
-  resetStory: () => void;
   ascensionTier: number;
-  getAscensionCost: () => number;
-  getAscensionBuffs: () => { qiMultiplier: number; battleMultiplier: number };
-  ascend: () => void;
-  getMultiSummonCost: (count: number) => number;
-  summonMultipleSpirits: (count: number) => PlayerSpirit[];
   completedStoryNodes: number[];
-  completeStoryNode: (nodeId: number) => void;
-  isStoryNodeCompleted: (nodeId: number) => boolean;
   currentEncounterId: string | null;
+
+  // Actions
+  addQi: (amount: number) => void;
+  purchaseUpgrade: (cost: number, rateIncrease: number) => boolean;
+  addSpirit: (spiritId: string) => void;
+  setParty: (party: (string | null)[]) => void; // This is the action
+  isStoryNodeCompleted: (id: number) => boolean;
+  completeStoryNode: (id: number) => void;
   setCurrentEncounterId: (id: string | null) => void;
+  setStoryPosition: (nodeId: number | null, dialogueIndex: number) => void;
+  setFtueStep: (step: FtueStep) => void;
+  setHasUpgradedBase: (status: boolean) => void;
+
+  // --- NEW ACTIONS REQUIRED BY MainScreen ---
+  updateQi: () => void;
+  upgradeQiProduction: () => void;
+  upgradeQiMultiplier: () => void;
+  getBaseProductionUpgradeCost: () => number;
+  getMultiplierUpgradeCost: () => number;
+  upgradeBattleReward: () => void;
+  getBattleRewardUpgradeCost: () => number;
+  getAscensionCost: () => number;
+  getAscensionBuffs: (tier?: number) => AscensionBuffs;
+  ascend: () => void;
+  resetGame: () => void;
 }
 
-const BASE_SPIRIT_COST = 100;
-// --- MODIFIED CONSTANTS ---
-const BASE_PRODUCTION_UPGRADE_BASE_COST = 100; // Renamed and changed
-const MULTIPLIER_UPGRADE_BASE_COST = 500; // NEW
-const BATTLE_REWARD_UPGRADE_BASE_COST = 300;
-// --------------------------
-const getInitialState = () => ({
-  qi: 1000,
-  qiPerSecond: 1,
+// --- Ascension Constants (for placeholder logic) ---
+const TIER_DATA = [
+  { tier: 0, cost: 1000, qiMult: 1, battleMult: 0 },
+  { tier: 1, cost: 10000, qiMult: 1.5, battleMult: 1 },
+  { tier: 2, cost: 100000, qiMult: 2, battleMult: 2 },
+  { tier: 3, cost: 1000000, qiMult: 2.5, battleMult: 3 },
+  { tier: 4, cost: 10000000, qiMult: 3, battleMult: 4 },
+  { tier: 5, cost: Infinity, qiMult: 5, battleMult: 5 },
+];
+const BASE_PROD_COST_BASE = 10;
+const MULT_COST_BASE = 50;
+const BATTLE_REWARD_COST_BASE = 100;
+
+// --- Define the initial state based on types.ts ---
+const initialState: GameStateData = {
+  qi: 0,
+  qiPerSecond: 1, // This will be calculated
   qiUpgrades: {
     baseProduction: 1,
+    multiplier: 1,
     baseProductionLevel: 1,
-    multiplier: 1.0,
     multiplierLevel: 1,
   },
-  battleRewardMultiplier: 1.0,
+  battleRewardMultiplier: 1, // Start at 100%
   spirits: [],
-  activeParty: [],
+  activeParty: [], // Satisfy the strict 'string[]' type temporarily
   battlesWon: 0,
   lastUpdate: Date.now(),
   essences: {},
   summonCount: 0,
-  ascensionTier: 0,
-  completedStoryNodes: [],
-  currentEncounterId: null,
-});
+};
 
-export const useGameState = create<GameStore>()(
+const POTENTIAL_BONUSES: { [key in PotentialGrade]: number } = {
+  SS: 1.25,
+  S: 1.2,
+  A: 1.1,
+  B: 1.05,
+  C: 1,
+};
+
+// --- Cast the JSON data at import ---
+const spiritsData: Record<string, BaseSpirit[]> = spiritsDataJson as any;
+
+export const useGameState = create<GameStateStore>()(
   persist(
-    (set, get) => ({
-      ...getInitialState(), // Use the initial state function
+    immer((set, get) => ({
+      // --- Spread the initial game state ---
+      ...initialState,
 
-      updateQi: () => {
-        const now = Date.now();
-        const state = get();
-        const timeDelta = (now - state.lastUpdate) / 1000;
+      // --- Set the *actual* desired value for activeParty ---
+      activeParty: [null, null, null],
 
-        // --- MODIFIED: Include ascension buffs ---
-        const { qiMultiplier, battleMultiplier } = get().getAscensionBuffs();
-        const battleBonus = state.battlesWon * battleMultiplier;
-        const totalMultiplier =
-          (state.qiUpgrades.multiplier + battleBonus) * qiMultiplier;
-        const qiPerSecond = state.qiUpgrades.baseProduction * totalMultiplier;
-        // ----------------------------------------
+      ascensionTier: 0,
 
-        const qiGained = qiPerSecond * timeDelta;
+      // --- FTUE State ---
+      currentStoryNodeId: null,
+      currentStoryDialogueIndex: 0,
+      ftueStep: null,
+      hasUpgradedBase: false,
+      completedStoryNodes: [],
+      currentEncounterId: null,
 
-        set({
-          qi: state.qi + qiGained,
-          qiPerSecond: qiPerSecond, // Ensure qiPerSecond is in sync
-          lastUpdate: now,
+      // --- Actions ---
+      addQi: (amount: number) => {
+        set((state) => {
+          state.qi += amount;
         });
       },
 
-      addQi: (amount: number) => {
-        set((state) => ({ qi: state.qi + amount }));
-      },
-
-      spendQi: (amount: number) => {
-        const state = get();
-        if (state.qi >= amount) {
-          set({ qi: state.qi - amount });
+      purchaseUpgrade: (cost: number, rateIncrease: number) => {
+        if (get().qi >= cost) {
+          set((state) => {
+            state.qi -= cost;
+            state.qiUpgrades.baseProduction += rateIncrease;
+            if (!state.hasUpgradedBase) {
+              state.hasUpgradedBase = true;
+            }
+            if (state.ftueStep === "highlightUpgradeBase") {
+              state.ftueStep = null;
+            }
+          });
           return true;
         }
         return false;
       },
 
-      getSpiritCost: () => {
-        const state = get();
-        const cost = Math.floor(
-          BASE_SPIRIT_COST * Math.pow(1.5, state.summonCount || 0),
-        );
-        return cost;
+      addSpirit: (spiritId: string) => {
+        const allSpirits = Object.values(spiritsData).flat();
+        const spirit = allSpirits.find((s) => s.id === spiritId);
+
+        if (spirit) {
+          const newPlayerSpirit: PlayerSpirit = {
+            instanceId: crypto.randomUUID(),
+            spiritId: spirit.id,
+            level: 1,
+            experience: 0,
+            isPrismatic: false,
+            potentialFactors: {
+              attack: "C",
+              defense: "C",
+              health: "C",
+              elementalAffinity: "C",
+            },
+          };
+
+          set((state) => {
+            state.spirits.push(newPlayerSpirit);
+            if (state.ftueStep === "highlightSummonButton") {
+              state.ftueStep = null;
+            }
+          });
+        }
       },
 
-      getMultiSummonCost: (count: number) => {
-        const state = get();
-        let totalCost = 0;
-        const currentSummonCount = state.summonCount || 0;
+      // --- THE ONLY 'setParty' DEFINITION ---
+      setParty: (party: (string | null)[]) => {
+        set({ activeParty: party }); // Use 'activeParty'
+      },
 
-        // This is the same formula used in getSpiritCost
-        const costFormula = (summonIndex: number) =>
-          Math.floor(BASE_SPIRIT_COST * Math.pow(1.5, summonIndex));
+      isStoryNodeCompleted: (id: number) => {
+        return get().completedStoryNodes.includes(id);
+      },
 
-        for (let i = 0; i < count; i++) {
-          totalCost += costFormula(currentSummonCount + i);
+      completeStoryNode: (id: number) => {
+        if (!get().isStoryNodeCompleted(id)) {
+          set((state) => {
+            state.completedStoryNodes.push(id);
+          });
         }
+      },
 
-        return totalCost;
+      setCurrentEncounterId: (id: string | null) => {
+        set({ currentEncounterId: id });
+      },
+
+      setStoryPosition: (nodeId: number | null, dialogueIndex: number) => {
+        set({
+          currentStoryNodeId: nodeId,
+          currentStoryDialogueIndex: dialogueIndex,
+        });
+      },
+
+      setFtueStep: (step: FtueStep) => {
+        set({ ftueStep: step });
+      },
+
+      setHasUpgradedBase: (status: boolean) => {
+        set({ hasUpgradedBase: status });
+      },
+
+      resetGame: () => {
+        set((state) => {
+          Object.assign(state, {
+            ...initialState,
+            activeParty: [null, null, null], // Ensure reset uses correct type
+            ascensionTier: 0,
+            currentStoryNodeId: null,
+            currentStoryDialogueIndex: 0,
+            ftueStep: null,
+            hasUpgradedBase: false,
+            completedStoryNodes: [],
+            currentEncounterId: null,
+          });
+        });
+      },
+
+      // --- MainScreen Actions ---
+      updateQi: () => {
+        const state = get();
+        const buffs = state.getAscensionBuffs();
+        const base = state.qiUpgrades.baseProduction;
+        const multiplier = state.qiUpgrades.multiplier;
+        const ascensionMultiplier = buffs.qiMultiplier;
+        const battlesBonus = state.battlesWon * 0.01;
+        const perSecond =
+          (base * multiplier + battlesBonus) * ascensionMultiplier;
+        const now = Date.now();
+        const delta = (now - state.lastUpdate) / 1000;
+        const qiToAdd = perSecond * delta;
+
+        set((s) => {
+          s.qi += qiToAdd;
+          s.qiPerSecond = perSecond;
+          s.lastUpdate = now;
+        });
       },
 
       getBaseProductionUpgradeCost: () => {
-        const state = get();
-        const level = state.qiUpgrades.baseProductionLevel;
         return Math.floor(
-          BASE_PRODUCTION_UPGRADE_BASE_COST * Math.pow(1.1, level - 1),
+          BASE_PROD_COST_BASE *
+            Math.pow(1.15, get().qiUpgrades.baseProductionLevel),
         );
       },
 
       getMultiplierUpgradeCost: () => {
-        const state = get();
-        const level = state.qiUpgrades.multiplierLevel;
         return Math.floor(
-          MULTIPLIER_UPGRADE_BASE_COST * Math.pow(1.1, level - 1),
+          MULT_COST_BASE * Math.pow(1.2, get().qiUpgrades.multiplierLevel),
         );
       },
 
       getBattleRewardUpgradeCost: () => {
-        const state = get();
-        const upgradeLevel = Math.round(
-          (state.battleRewardMultiplier - 1.0) / 0.1,
+        return Math.floor(
+          BATTLE_REWARD_COST_BASE *
+            Math.pow(1.25, get().battleRewardMultiplier / 0.1),
         );
-        return BATTLE_REWARD_UPGRADE_BASE_COST * (upgradeLevel + 1);
-      },
-
-      // --- NEW FUNCTION ---
-      getAscensionCost: () => {
-        const state = get();
-        if (state.ascensionTier >= ASCENSION_COSTS.length) {
-          return Infinity; // Max tier reached
-        }
-        return ASCENSION_COSTS[state.ascensionTier];
-      },
-
-      // --- NEW FUNCTION ---
-      getAscensionBuffs: () => {
-        const state = get();
-        return (
-          ASCENSION_BUFFS[state.ascensionTier] ||
-          ASCENSION_BUFFS[ASCENSION_BUFFS.length - 1]
-        );
-      },
-      // --------------------
-
-      summonSpirit: () => {
-        // This logic is now correct, with the other function removed
-        const rarity = rollRarity();
-        const spiritsOfRarity = spiritsData[rarity];
-        const randomSpirit =
-          spiritsOfRarity[Math.floor(Math.random() * spiritsOfRarity.length)];
-        const isPrismatic = rollPrismatic();
-
-        const potentialFactors = {
-          attack: rollPotentialGrade(),
-          defense: rollPotentialGrade(),
-          health: rollPotentialGrade(),
-          elementalAffinity: rollPotentialGrade(),
-        };
-
-        const instanceId = `${randomSpirit.id}_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-
-        const newSpirit: PlayerSpirit = {
-          instanceId,
-          spiritId: randomSpirit.id,
-          level: 1,
-          experience: 0,
-          isPrismatic,
-          potentialFactors,
-        };
-
-        set((state) => ({
-          spirits: [...state.spirits, newSpirit],
-          summonCount: (state.summonCount || 0) + 1,
-        }));
-
-        return newSpirit;
-      }, // <-- This comma closes summonSpirit
-
-      // --- THIS IS THE CORRECT, SEPARATE PLACEMENT ---
-      summonMultipleSpirits: (count: number) => {
-        const newSpirits: PlayerSpirit[] = [];
-
-        for (let i = 0; i < count; i++) {
-          // This logic is copied from your existing summonSpirit function
-          const rarity = rollRarity();
-          const spiritsOfRarity = spiritsData[rarity];
-          const randomSpirit =
-            spiritsOfRarity[Math.floor(Math.random() * spiritsOfRarity.length)];
-          const isPrismatic = rollPrismatic();
-
-          const potentialFactors = {
-            attack: rollPotentialGrade(),
-            defense: rollPotentialGrade(),
-            health: rollPotentialGrade(),
-            elementalAffinity: rollPotentialGrade(),
-          };
-
-          const instanceId = `${randomSpirit.id}_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-
-          const newSpirit: PlayerSpirit = {
-            instanceId,
-            spiritId: randomSpirit.id,
-            level: 1,
-            experience: 0,
-            isPrismatic,
-            potentialFactors,
-          };
-
-          newSpirits.push(newSpirit);
-        }
-
-        // Set state ONCE for performance
-        set((state) => ({
-          spirits: [...state.spirits, ...newSpirits],
-          summonCount: (state.summonCount || 0) + newSpirits.length,
-        }));
-
-        return newSpirits;
-      },
-
-      addToParty: (instanceId: string) => {
-        // ... (unchanged)
-        set((state) => {
-          if (state.activeParty.length >= 4) {
-            return state;
-          }
-          if (state.activeParty.includes(instanceId)) {
-            return state;
-          }
-          return {
-            activeParty: [...state.activeParty, instanceId],
-          };
-        });
-      },
-
-      removeFromParty: (instanceId: string) => {
-        // ... (unchanged)
-        set((state) => ({
-          activeParty: state.activeParty.filter((id) => id !== instanceId),
-        }));
       },
 
       upgradeQiProduction: () => {
-        set((state) => {
-          const cost = get().getBaseProductionUpgradeCost();
-          if (state.qi >= cost) {
-            const newBaseProduction = state.qiUpgrades.baseProduction + 1;
-
-            // --- MODIFIED: Recalculate qiPerSecond ---
-            const { qiMultiplier, battleMultiplier } =
-              get().getAscensionBuffs();
-            const battleBonus = state.battlesWon * battleMultiplier;
-            const totalMultiplier =
-              (state.qiUpgrades.multiplier + battleBonus) * qiMultiplier;
-            const newQiPerSecond = newBaseProduction * totalMultiplier;
-            // ----------------------------------------
-
-            return {
-              qi: state.qi - cost,
-              qiUpgrades: {
-                ...state.qiUpgrades,
-                baseProduction: newBaseProduction,
-                baseProductionLevel: state.qiUpgrades.baseProductionLevel + 1,
-              },
-              qiPerSecond: newQiPerSecond,
-            };
-          }
-          return state;
-        });
-      },
-
-      upgradeQiMultiplier: () => {
-        set((state) => {
-          const cost = get().getMultiplierUpgradeCost();
-          if (state.qi >= cost) {
-            const newMultiplier = parseFloat(
-              (state.qiUpgrades.multiplier + 0.1).toFixed(1),
-            );
-
-            // --- MODIFIED: Recalculate qiPerSecond ---
-            const { qiMultiplier, battleMultiplier } =
-              get().getAscensionBuffs();
-            const battleBonus = state.battlesWon * battleMultiplier;
-            const totalMultiplier =
-              (newMultiplier + battleBonus) * qiMultiplier;
-            const newQiPerSecond =
-              state.qiUpgrades.baseProduction * totalMultiplier;
-            // ----------------------------------------
-
-            return {
-              qi: state.qi - cost,
-              qiUpgrades: {
-                ...state.qiUpgrades,
-                multiplier: newMultiplier,
-                multiplierLevel: state.qiUpgrades.multiplierLevel + 1,
-              },
-              qiPerSecond: newQiPerSecond,
-            };
-          }
-          return state;
-        });
-      },
-
-      upgradeBattleReward: () => {
-        set((state) => {
-          const cost = get().getBattleRewardUpgradeCost();
-          if (state.qi >= cost) {
-            return {
-              ...state,
-              qi: state.qi - cost,
-              battleRewardMultiplier: parseFloat(
-                (state.battleRewardMultiplier + 0.1).toFixed(1),
-              ),
-            };
-          }
-          return state;
-        });
-      },
-
-      winBattle: (qiReward: number) => {
-        set((state) => {
-          const newMultiplier = parseFloat(
-            (state.qiUpgrades.multiplier + 0.1).toFixed(1),
-          );
-          const newBattlesWon = state.battlesWon + 1;
-
-          // --- MODIFIED: Recalculate qiPerSecond ---
-          const { qiMultiplier, battleMultiplier } = get().getAscensionBuffs();
-          const battleBonus = newBattlesWon * battleMultiplier; // Use new battle count
-          const totalMultiplier = (newMultiplier + battleBonus) * qiMultiplier;
-          const newQiPerSecond =
-            state.qiUpgrades.baseProduction * totalMultiplier;
-          // ----------------------------------------
-
-          return {
-            battlesWon: newBattlesWon,
-            qi: state.qi + qiReward,
-            qiUpgrades: {
-              ...state.qiUpgrades,
-              multiplier: newMultiplier,
-            },
-            qiPerSecond: newQiPerSecond,
-          };
-        });
-      },
-
-      // --- NEW FUNCTION ---
-      ascend: () => {
-        set((state) => {
-          const cost = get().getAscensionCost();
-          // Check for cost and max tier
-          if (
-            state.qi < cost ||
-            state.ascensionTier >= ASCENSION_COSTS.length
-          ) {
-            return state;
-          }
-
-          const initialState = getInitialState();
-          const newTier = state.ascensionTier + 1;
-          const newBuffs = ASCENSION_BUFFS[newTier];
-
-          // Calculate new qiPerSecond based on *reset* stats and *new* buffs
-          const battleBonus =
-            initialState.battlesWon * newBuffs.battleMultiplier; // Will be 0
-          const totalMultiplier =
-            (initialState.qiUpgrades.multiplier + battleBonus) *
-            newBuffs.qiMultiplier;
-          const newQiPerSecond =
-            initialState.qiUpgrades.baseProduction * totalMultiplier;
-
-          return {
-            qi: state.qi - cost, // Deduct cost
-            ascensionTier: newTier, // Increment tier
-
-            // Reset progress
-            qiUpgrades: initialState.qiUpgrades,
-            battlesWon: initialState.battlesWon,
-            summonCount: initialState.summonCount,
-
-            // Set new Qi rate
-            qiPerSecond: newQiPerSecond,
-
-            // Keep spirits, essences, party, and battle mastery
-            // (they are not part of initialState spread)
-          };
-        });
-      },
-
-      updateSpiritHealth: (instanceId: string, health: number) => {
-        // ... (unchanged)
-        set((state) => ({
-          spirits: state.spirits.map((spirit) =>
-            spirit.instanceId === instanceId
-              ? { ...spirit, currentHealth: health }
-              : spirit,
-          ),
-        }));
-      },
-
-      levelUpSpirit: (instanceId: string) => {
-        // ... (unchanged)
-        const state = get();
-        const spirit = state.spirits.find((s) => s.instanceId === instanceId);
-        if (!spirit) return;
-
-        const cost = get().getLevelUpCost(spirit.level);
-        const essenceCount = state.essences[spirit.spiritId] || 0;
-
-        if (state.qi >= cost.qi && essenceCount >= cost.essence) {
-          set((state) => ({
-            qi: state.qi - cost.qi,
-            essences: {
-              ...state.essences,
-              [spirit.spiritId]:
-                (state.essences[spirit.spiritId] || 0) - cost.essence,
-            },
-            spirits: state.spirits.map((s) =>
-              s.instanceId === instanceId
-                ? { ...s, level: s.level + 1, experience: 0 }
-                : s,
-            ),
-          }));
+        const cost = get().getBaseProductionUpgradeCost();
+        if (get().qi >= cost) {
+          set((state) => {
+            state.qi -= cost;
+            state.qiUpgrades.baseProduction += 1;
+            state.qiUpgrades.baseProductionLevel += 1;
+            if (!state.hasUpgradedBase) {
+              state.hasUpgradedBase = true;
+            }
+            if (state.ftueStep === "highlightUpgradeBase") {
+              state.ftueStep = null; // Clears the highlight
+            }
+          });
         }
       },
 
-      addEssence: (spiritId: string, amount: number) => {
-        // ... (unchanged)
-        set((state) => ({
-          essences: {
-            ...state.essences,
-            [spiritId]: (state.essences[spiritId] || 0) + amount,
-          },
-        }));
+      upgradeQiMultiplier: () => {
+        const cost = get().getMultiplierUpgradeCost();
+        if (get().qi >= cost) {
+          set((state) => {
+            state.qi -= cost;
+            state.qiUpgrades.multiplier += 0.1;
+            state.qiUpgrades.multiplierLevel += 1;
+          });
+        }
       },
 
-      getEssenceCount: (spiritId: string) => {
-        // ... (unchanged)
-        const state = get();
-        return state.essences[spiritId] || 0;
+      upgradeBattleReward: () => {
+        const cost = get().getBattleRewardUpgradeCost();
+        if (get().qi >= cost) {
+          set((state) => {
+            state.qi -= cost;
+            state.battleRewardMultiplier += 0.1;
+          });
+        }
       },
 
-      harmonizeSpirit: (instanceId: string) => {
-        // ... (unchanged)
-        const state = get();
-        const spirit = state.spirits.find((s) => s.instanceId === instanceId);
-        if (!spirit) return;
-
-        const essenceGained = 5 + spirit.level * 2;
-
-        set((state) => ({
-          spirits: state.spirits.filter((s) => s.instanceId !== instanceId),
-          activeParty: state.activeParty.filter((id) => id !== instanceId),
-          essences: {
-            ...state.essences,
-            [spirit.spiritId]:
-              (state.essences[spirit.spiritId] || 0) + essenceGained,
-          },
-        }));
+      getAscensionCost: () => {
+        return TIER_DATA[get().ascensionTier]?.cost ?? Infinity;
       },
 
-      getLevelUpCost: (level: number) => {
-        // ... (unchanged)
+      getAscensionBuffs: (tier?: number) => {
+        const currentTier = tier ?? get().ascensionTier;
+        const data = TIER_DATA[currentTier];
         return {
-          qi: level * 50,
-          essence: level * 2,
+          qiMultiplier: data?.qiMult ?? 1,
+          battleMultiplier: data?.battleMult ?? 0,
         };
       },
 
-      healAllSpirits: () => {
-        // ... (unchanged)
-        set((state) => ({
-          spirits: state.spirits.map((spirit) => ({
-            ...spirit,
-            currentHealth: undefined,
-          })),
-        }));
+      ascend: () => {
+        const cost = get().getAscensionCost();
+        if (get().qi >= cost) {
+          set((state) => {
+            state.qi = 0;
+            state.battlesWon = 0;
+            state.qiUpgrades = { ...initialState.qiUpgrades };
+            state.battleRewardMultiplier = 1;
+            state.summonCount = 0;
+            state.lastUpdate = Date.now();
+            state.ascensionTier += 1;
+          });
+        }
       },
-      completeStoryNode: (nodeId: number) => {
-        set((state) => ({
-          completedStoryNodes: state.completedStoryNodes.includes(nodeId)
-            ? state.completedStoryNodes
-            : [...state.completedStoryNodes, nodeId],
-        }));
-      },
-      isStoryNodeCompleted: (nodeId: number) => {
-        const state = get();
-        return state.completedStoryNodes.includes(nodeId);
-      },
-      setCurrentEncounterId: (id) => set({ currentEncounterId: id }),
-      resetGame: () => {
-        set(getInitialState());
-      },
-      resetStory: () => {
-        set({ completedStoryNodes: [] });
-      },
-    }),
-    // --- THIS IS THE NEW, ENCRYPTED CONFIG ---
+    })),
+    // --- Encryption Config ---
     {
-      name: "ascension-game-state", // The name of the item in localStorage
+      name: "ascension-game-state",
       storage: createJSONStorage(() => ({
-        /**
-         * This function runs when SAVING the state.
-         * We encrypt the 'value' (your game state) before saving.
-         */
         setItem: (name, value) => {
           const encryptedState = encrypt(value);
           localStorage.setItem(name, encryptedState);
         },
-        /**
-         * This function runs when LOADING the state.
-         * We load the encrypted data and try to decrypt it.
-         */
         getItem: (name) => {
           const encryptedState = localStorage.getItem(name);
-          // If no save exists, return null
           if (!encryptedState) return null;
-
           try {
-            // Decrypt the state after loading
             const decryptedState = decrypt(encryptedState);
             return decryptedState;
           } catch (error) {
             console.warn("Failed to decrypt state, resetting save.", error);
-            // If decryption fails (e.g., bad key, corrupt data),
-            // remove the bad save file to start fresh.
             localStorage.removeItem(name);
             return null;
           }
         },
-        /**
-         * This function runs when DELETING the state.
-         */
         removeItem: (name) => localStorage.removeItem(name),
       })),
     },

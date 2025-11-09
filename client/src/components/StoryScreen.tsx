@@ -1,6 +1,6 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect } from "react"; // <-- Import useEffect
 import { Button } from "./ui/button";
-import { BookOpen, ArrowRight, ChevronRight } from "lucide-react";
+import { BookOpen, ArrowRight, ChevronRight, Lock } from "lucide-react";
 import { useGameState } from "../lib/stores/useGameState";
 import storyData from "@shared/data/story.json";
 import { motion, AnimatePresence } from "framer-motion";
@@ -36,36 +36,65 @@ interface StoryScreenProps {
 
 function getPortraitPath(characterId: string, expression: string): string {
   // Use 'neutral' as a fallback if the specific expression doesn't exist
-  // (You'd need to handle image preloading or 404s in a real app)
   return `/images/portraits/${characterId.toLowerCase()}/${expression}.png`;
 }
 
 export function StoryScreen({ onClose, onNavigate }: StoryScreenProps) {
-  const [storyLayer, setStoryLayer] = useState<"map" | "scene">("map");
-  const [currentNodeId, setCurrentNodeId] = useState<number | null>(null);
-  const [currentDialogueIndex, setCurrentDialogueIndex] = useState(0);
+  // --- FIX: This line is new/modified ---
+  const [storyLayer, setStoryLayer] = useState<"map" | "scene">(() => {
+    // This function now runs ONCE when the component loads
+    // We check the global state:
+    const initialNodeId = useGameState.getState().currentStoryNodeId;
+
+    // If a node ID is set (e.g., 0), we are in a scene.
+    // If it's null, we are on the map.
+    return initialNodeId !== null ? "scene" : "map";
+  });
+
+  // --- FIX: REMOVED LOCAL STATE ---
+  // const [currentNodeId, setCurrentNodeId] = useState<number | null>(null);
+  // const [currentDialogueIndex, setCurrentDialogueIndex] = useState(0);
 
   const {
     completedStoryNodes,
     completeStoryNode,
     isStoryNodeCompleted,
     setCurrentEncounterId,
+    // --- FIX: USING GLOBAL STATE AS THE ONLY SOURCE OF TRUTH ---
+    currentStoryNodeId,
+    currentStoryDialogueIndex,
+    hasUpgradedBase,
+    setStoryPosition, // <-- The action to update global state
+    setFtueStep,
+    ftueStep,
   } = useGameState();
 
   const storyNodes = storyData as StoryNode[];
-  const currentNode = storyNodes.find((n) => n.id === currentNodeId);
+  // --- FIX: Find node using global state ---
+  const currentNode = storyNodes.find((n) => n.id === currentStoryNodeId);
+
+  // --- FTUE EFFECT HOOK ---
+  // This effect watches the global state and works correctly
+  useEffect(() => {
+    if (currentStoryNodeId === 0 && currentStoryDialogueIndex === 2) {
+      setFtueStep("highlightCultivation");
+    } else if (currentStoryNodeId === 0 && currentStoryDialogueIndex === 3) {
+      setFtueStep("highlightSummon");
+    }
+  }, [currentStoryNodeId, currentStoryDialogueIndex, setFtueStep]);
 
   const handleNodeClick = (nodeId: number) => {
-    setCurrentNodeId(nodeId);
-    setCurrentDialogueIndex(0);
+    // --- FIX: Update global state ---
+    setStoryPosition(nodeId, 0);
     setStoryLayer("scene");
   };
 
   const handleContinueDialogue = () => {
-    if (!currentNode) return;
+    if (!currentNode || currentStoryNodeId === null) return;
 
-    if (currentDialogueIndex < currentNode.dialogues.length - 1) {
-      setCurrentDialogueIndex(currentDialogueIndex + 1);
+    if (currentStoryDialogueIndex < currentNode.dialogues.length - 1) {
+      // --- FIX: Update global state ---
+      setStoryPosition(currentStoryNodeId, currentStoryDialogueIndex + 1);
     } else {
       // Reached the end of dialogues
       handleNodeComplete();
@@ -73,32 +102,27 @@ export function StoryScreen({ onClose, onNavigate }: StoryScreenProps) {
   };
 
   const handleNodeComplete = () => {
-    if (currentNodeId === null || !currentNode) return;
+    if (currentStoryNodeId === null || !currentNode) return;
 
-    // Check if this is the first time completing this node
-    const isFirstCompletion = !isStoryNodeCompleted(currentNodeId);
+    const isFirstCompletion = !isStoryNodeCompleted(currentStoryNodeId);
+    completeStoryNode(currentStoryNodeId);
 
-    // Mark node as completed
-    completeStoryNode(currentNodeId);
-
-    // Only trigger encounter on first completion
     if (isFirstCompletion && currentNode.encounterId !== null) {
-      // Set the encounter ID in global state
       setCurrentEncounterId(currentNode.encounterId);
-
-      // Trigger battle encounter
       setStoryLayer("map");
+      setStoryPosition(null, 0); // Reset story position
       if (onNavigate) {
         onNavigate("battle");
       }
     } else {
-      // Just return to map (replay or no encounter)
       setStoryLayer("map");
+      setStoryPosition(null, 0); // Reset story position
     }
   };
 
   const handleSkipToMap = () => {
     setStoryLayer("map");
+    setStoryPosition(null, 0); // Reset story position
   };
 
   const getNextIncompleteNode = () => {
@@ -107,18 +131,30 @@ export function StoryScreen({ onClose, onNavigate }: StoryScreenProps) {
 
   const nextNode = getNextIncompleteNode();
 
-  if (storyLayer === "scene" && currentNode) {
-    const currentDialogue = currentNode.dialogues[currentDialogueIndex];
-    const isLastDialogue =
-      currentDialogueIndex === currentNode.dialogues.length - 1;
+  // --- RENDER LOGIC ---
 
+  // --- RENDER SCENE VIEW ---
+  if (storyLayer === "scene" && currentNode) {
+    // --- FIX: All these variables now use the same global state ---
+    const currentDialogue = currentNode.dialogues[currentStoryDialogueIndex];
+    const isLastDialogue =
+      currentStoryDialogueIndex === currentNode.dialogues.length - 1;
+
+    // --- FTUE GATING LOGIC ---
+    const isGated =
+      currentStoryNodeId === 0 &&
+      currentStoryDialogueIndex === 2 &&
+      !hasUpgradedBase;
+
+    // This 'return' was missing, causing a syntax error
     return (
       <div className="absolute inset-0 z-10 flex flex-col">
-        {/* 1. Background Image (MOVED HERE) */}
+        {/* 1. Background Image */}
         {(() => {
-          const currentDialogue = currentNode.dialogues[currentDialogueIndex];
-          const backgroundToShow =
-            currentDialogue.background ?? currentNode.background;
+          // This logic is now consistent
+          const dialogueBg =
+            currentNode.dialogues[currentStoryDialogueIndex].background;
+          const backgroundToShow = dialogueBg ?? currentNode.background;
 
           return (
             <AnimatePresence>
@@ -137,34 +173,26 @@ export function StoryScreen({ onClose, onNavigate }: StoryScreenProps) {
         })()}
         {/* Upper 2/3: Scene and Characters */}
         <div className="flex-[2] flex justify-center p-8 relative overflow-hidden z-10">
-          {/* 2. Character Sprites */}
           <div className="relative z-10 w-full h-full flex items-end justify-center">
             {currentNode.characters.map((character) => {
+              // This logic is now consistent
               const currentDialogue =
-                currentNode.dialogues[currentDialogueIndex];
+                currentNode.dialogues[currentStoryDialogueIndex];
 
-              // Find out if the current speaker *has* a character sprite
               const speakerHasSprite = currentNode.characters.some(
                 (c) => c.id === currentDialogue.speakerId,
               );
-
-              // Is this specific character the one speaking?
               const isSpeaking =
                 currentDialogue.speakerId.toLowerCase() ===
                 character.id.toLowerCase();
-
-              // Determine the correct expression
               const expression = isSpeaking
                 ? currentDialogue.expression
-                : "neutral"; // Default to neutral when not speaking
-
-              // Get the image path
+                : "neutral";
               const imagePath = getPortraitPath(character.id, expression);
 
-              // Determine opacity
-              let targetOpacity = 0; // Start hidden
+              let targetOpacity = 0;
               if (speakerHasSprite) {
-                targetOpacity = isSpeaking ? 1 : 0.6; // Highlight speaker, dim others
+                targetOpacity = isSpeaking ? 1 : 0.6;
               }
 
               return (
@@ -172,7 +200,6 @@ export function StoryScreen({ onClose, onNavigate }: StoryScreenProps) {
                   key={character.id}
                   className="absolute top-1/2 -translate-y-1/2"
                   style={{
-                    // Use custom properties for CSS-based positioning
                     // @ts-ignore
                     "--position-x":
                       character.position === "left"
@@ -182,7 +209,7 @@ export function StoryScreen({ onClose, onNavigate }: StoryScreenProps) {
                           : "0%",
                   }}
                   animate={{
-                    opacity: targetOpacity, // <-- NEW LOGIC
+                    opacity: targetOpacity,
                     scale: isSpeaking ? 1.05 : 1,
                     y: isSpeaking ? -10 : 0,
                   }}
@@ -206,7 +233,7 @@ export function StoryScreen({ onClose, onNavigate }: StoryScreenProps) {
         <div className="flex-[1] flex items-end p-6 relative z-10">
           <AnimatePresence mode="wait">
             <motion.div
-              key={currentDialogueIndex}
+              key={currentStoryDialogueIndex} // <-- Use global index
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
@@ -252,7 +279,9 @@ export function StoryScreen({ onClose, onNavigate }: StoryScreenProps) {
                         className="w-3 h-3 rounded-full border"
                         style={{
                           background:
-                            index <= currentDialogueIndex ? "#4C8477" : "#999",
+                            index <= currentStoryDialogueIndex // <-- Use global index
+                              ? "#4C8477"
+                              : "#999",
                           borderColor: "#5C4033",
                         }}
                       />
@@ -265,7 +294,7 @@ export function StoryScreen({ onClose, onNavigate }: StoryScreenProps) {
                       className="px-6 py-2"
                       variant="outline"
                       style={{
-                        borderColor: "#8B4513",
+                        borderColor: "#8B4G13",
                         color: "#8B4513",
                       }}
                     >
@@ -273,13 +302,16 @@ export function StoryScreen({ onClose, onNavigate }: StoryScreenProps) {
                     </Button>
                     <Button
                       onClick={handleContinueDialogue}
-                      className="px-6 py-2 flex items-center gap-2"
+                      disabled={isGated} // This logic is now consistent
+                      className={`px-6 py-2 flex items-center gap-2 ${
+                        isGated ? "opacity-50 cursor-not-allowed" : ""
+                      }`}
                       style={{
-                        background: "#4C8477",
+                        background: isGated ? "#999" : "#4C8477",
                         color: "#F5E6D3",
                       }}
                     >
-                      {isLastDialogue ? (
+                      {isLastDialogue ? ( // This logic is now consistent
                         currentNode.encounterId !== null ? (
                           <>
                             Begin Trial <ArrowRight className="w-4 h-4" />
@@ -305,6 +337,7 @@ export function StoryScreen({ onClose, onNavigate }: StoryScreenProps) {
     );
   }
 
+  // --- RENDER MAP VIEW ---
   return (
     <div
       className="w-full h-full overflow-y-auto"
@@ -346,8 +379,46 @@ export function StoryScreen({ onClose, onNavigate }: StoryScreenProps) {
                   .slice(0, index)
                   .every((n) => isStoryNodeCompleted(n.id));
 
+              // --- STYLING LOGIC ---
+              let bgStyle = {};
+              let borderStyle = {};
+              let textTitleColor = "#8B4513";
+              let textDescColor = "#5C4033";
+              let hoverClasses = "hover:shadow-lg";
+
+              if (!isAvailable) {
+                // Locked
+                bgStyle = { background: "#AAA", color: "#F5E6D3" };
+                borderStyle = { borderColor: "#888" };
+                textTitleColor = "#E8D4B8";
+                textDescColor = "#D4CBB8";
+                hoverClasses = ""; // No hover effect
+              } else if (isCompleted) {
+                // Completed
+                bgStyle = { background: "rgba(76, 132, 119, 0.1)" };
+                borderStyle = { borderColor: "#4C8477" };
+                hoverClasses += " hover:border-[#2C5347]";
+              } else {
+                // Available
+                bgStyle = { background: "rgba(212, 175, 55, 0.1)" };
+                borderStyle = { borderColor: "#D4AF37" };
+                hoverClasses += " hover:border-[#8B7500]";
+              }
+              // --- END STYLING LOGIC ---
+
               return (
-                <div key={node.id} className="flex items-center gap-4">
+                <button
+                  key={node.id}
+                  onClick={() => handleNodeClick(node.id)}
+                  disabled={!isAvailable}
+                  className={`flex items-center gap-4 w-full p-4 rounded-lg border-4 transition-all ${hoverClasses} ${
+                    !isAvailable
+                      ? "opacity-70 cursor-not-allowed"
+                      : "cursor-pointer"
+                  }`}
+                  style={{ ...bgStyle, ...borderStyle }}
+                >
+                  {/* Node Icon */}
                   <div
                     className="w-16 h-16 rounded-full flex items-center justify-center border-4 font-bold text-xl shrink-0"
                     style={{
@@ -364,65 +435,25 @@ export function StoryScreen({ onClose, onNavigate }: StoryScreenProps) {
                       color: "#F5E6D3",
                     }}
                   >
-                    {isCompleted ? "✓" : index + 1}
+                    {isCompleted ? "✓" : !isAvailable ? <Lock /> : index + 1}
                   </div>
-                  <div className="flex-1">
+                  {/* Node Text */}
+                  <div className="flex-1 text-left">
                     <h3
                       className="text-2xl font-bold mb-1"
-                      style={{ color: "#8B4513" }}
+                      style={{ color: textTitleColor }}
                     >
                       {node.title}
                     </h3>
-                    <p className="text-sm" style={{ color: "#5C4033" }}>
+                    <p className="text-sm" style={{ color: textDescColor }}>
                       {node.description}
                     </p>
                   </div>
-                  {isAvailable && (
-                    <Button
-                      onClick={() => handleNodeClick(node.id)}
-                      className="px-6 py-3"
-                      style={{
-                        background: isCompleted ? "#3A6EA5" : "#4C8477",
-                        color: "#F5E6D3",
-                      }}
-                    >
-                      {isCompleted ? "Replay" : "Continue Story"}
-                    </Button>
-                  )}
-                  {!isAvailable && (
-                    <div
-                      className="px-6 py-3 rounded opacity-50"
-                      style={{
-                        background: "#999",
-                        color: "#F5E6D3",
-                      }}
-                    >
-                      Locked
-                    </div>
-                  )}
-                </div>
+                </button>
               );
             })}
           </div>
         </div>
-
-        {nextNode && (
-          <div
-            className="text-center p-6 rounded-lg border-2 cursor-pointer hover:border-4 transition-all"
-            style={{
-              background: "rgba(76, 132, 119, 0.1)",
-              borderColor: "#4C8477",
-            }}
-            onClick={() => handleNodeClick(nextNode.id)}
-          >
-            <p className="text-lg font-bold mb-2" style={{ color: "#4C8477" }}>
-              Next: {nextNode.title}
-            </p>
-            <p className="text-sm" style={{ color: "#5C4033" }}>
-              Click to continue your journey
-            </p>
-          </div>
-        )}
 
         {!nextNode && completedStoryNodes.length > 0 && (
           <div

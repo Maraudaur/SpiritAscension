@@ -1,22 +1,54 @@
 import { BookOpen, Zap, Users, Sparkles, Swords } from "lucide-react";
+import { useGameState } from "../lib/stores/useGameState";
 
 type Screen = "story" | "cultivation" | "spirits" | "summon" | "battle";
 
+// --- FIX: This is the only interface needed ---
 interface SidebarProps {
   currentScreen: Screen;
   onNavigate: (screen: Screen) => void;
 }
 
+// --- FIX: This is the only Sidebar function, now with FTUE logic ---
 export function Sidebar({ currentScreen, onNavigate }: SidebarProps) {
+  // --- Logic merged from your first function ---
+  const ftueStep = useGameState((s) => s.ftueStep);
+  const setFtueStep = useGameState((s) => s.setFtueStep);
+
   const handleNavigate = (screen: Screen) => {
+    // 1. Always navigate
     onNavigate(screen);
+
+    // 2. Check and advance FTUE step
+    if (screen === "cultivation" && ftueStep === "highlightCultivation") {
+      setFtueStep("highlightUpgradeBase");
+    }
+    if (screen === "summon" && ftueStep === "highlightSummon") {
+      setFtueStep("highlightSummonButton");
+    }
   };
+  // --- End of merged logic ---
 
   const navItems = [
     { id: "story" as Screen, icon: BookOpen, label: "Story", color: "#D4AF37" },
-    { id: "cultivation" as Screen, icon: Zap, label: "Cultivation", color: "#4C8477" },
-    { id: "spirits" as Screen, icon: Users, label: "Spirits", color: "#3A6EA5" },
-    { id: "summon" as Screen, icon: Sparkles, label: "Summon", color: "#9B4DCA" },
+    {
+      id: "cultivation" as Screen,
+      icon: Zap,
+      label: "Cultivation",
+      color: "#4C8477",
+    },
+    {
+      id: "spirits" as Screen,
+      icon: Users,
+      label: "Spirits",
+      color: "#3A6EA5",
+    },
+    {
+      id: "summon" as Screen,
+      icon: Sparkles,
+      label: "Summon",
+      color: "#9B4DCA",
+    },
     { id: "battle" as Screen, icon: Swords, label: "Battle", color: "#C1272D" },
   ];
 
@@ -48,10 +80,7 @@ export function Sidebar({ currentScreen, onNavigate }: SidebarProps) {
       </div>
 
       {/* Divider */}
-      <div
-        className="w-16 h-1 rounded"
-        style={{ background: "#8B4513" }}
-      />
+      <div className="w-16 h-1 rounded" style={{ background: "#8B4513" }} />
 
       {/* Navigation Buttons */}
       <nav className="flex flex-col gap-4 w-full px-3">
@@ -59,15 +88,25 @@ export function Sidebar({ currentScreen, onNavigate }: SidebarProps) {
           const Icon = item.icon;
           const isActive = currentScreen === item.id;
 
+          // --- FIX: Apply FTUE class logic here ---
+          let ftueClass = "";
+          if (
+            item.id === "cultivation" &&
+            ftueStep === "highlightCultivation"
+          ) {
+            ftueClass = "animate-pulse-bright";
+          }
+          if (item.id === "summon" && ftueStep === "highlightSummon") {
+            ftueClass = "animate-pulse-bright";
+          }
+
           return (
             <button
               key={item.id}
-              onClick={() => handleNavigate(item.id)}
-              className="flex flex-col items-center gap-1 p-3 rounded-lg transition-all hover:-translate-y-1 hover:shadow-lg active:scale-95"
+              onClick={() => handleNavigate(item.id)} // <-- Use merged handler
+              className={`flex flex-col items-center gap-1 p-3 rounded-lg transition-all hover:-translate-y-1 hover:shadow-lg active:scale-95 ${ftueClass}`} // <-- Apply FTUE class
               style={{
-                background: isActive
-                  ? item.color
-                  : "rgba(245, 230, 211, 0.5)",
+                background: isActive ? item.color : "rgba(245, 230, 211, 0.5)",
                 color: isActive ? "#F5E6D3" : "#8B4513",
                 border: isActive
                   ? `2px solid ${item.color}`
