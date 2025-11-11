@@ -21,12 +21,12 @@
       {
         "speakerId": "Mysterious Voice",
         "expression": "neutral",
-        "text": "You're finally awake! I've been waiting for you. You need to rebuild your strength. Go to the cultivation page and upgrade you base cultivation rate. This will help you. in the next step. It will help you see me better too."
+        "text": "You're finally awake! I've been waiting for you. You need to rebuild your strength. Go to the cultivation tab and upgrade you base cultivation rate. This will help you. in the next step. It will help you see me better too."
       },
       {
         "speakerId": "Droplet",
         "expression": "happy",
-        "text": "well done! now you can see me better. Something went wrong on the peak. You need to find out what happened. before we head out you need a spirit to protect yourself. Go to the summon page and summon your first spirit and then go to spirit page to assign them to your active party!"
+        "text": "well done! now you can see me better. Something went wrong on the peak. You need to find out what happened. before we head out you need a spirit to protect yourself. Go to the summon tab and summon your first spirit and then go to spirit tab to assign them to your active party!"
       },
       {
         "speakerId": "Droplet",
@@ -45,7 +45,7 @@
       {
         "speakerId": "Droplet",
         "expression": "happy",
-        "text": "How was your first fight? lets level up our spirit. Go to the spirit page, click your spirit and level up! You can get more spirit essense later by summoning more spirits and harmonizing them."
+        "text": "How was your first fight? lets level up our spirit. Go to the spirit tab, click your spirit and level up! You can get more spirit essense later by summoning more spirits and harmonizing them."
       },
       {
         "speakerId": "Droplet",
@@ -55,7 +55,7 @@
       {
         "speakerId": "Droplet",
         "expression": "angry",
-        "text": "there seems to be a corrupted spirit up ahead. It's level 10 so get your spirits prepared and take it on!"
+        "text": "There's a small town up ahead, but there seems to be a corrupted spirit up ahead. It's level 10 so get your spirits prepared and take it on!"
       }
     ],
     "encounterId": "e_boss_01"
