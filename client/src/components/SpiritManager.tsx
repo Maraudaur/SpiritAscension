@@ -56,6 +56,8 @@ export function SpiritManager({ onClose }: SpiritManagerProps = {}) {
     harmonizeSpirit,
     getEssenceCount,
     getLevelUpCost,
+    ftueStep,
+    setFtueStep,
   } = useGameState();
   const [selectedSpirit, setSelectedSpirit] = useState<PlayerSpirit | null>(
     null,
@@ -84,6 +86,14 @@ export function SpiritManager({ onClose }: SpiritManagerProps = {}) {
       }
     };
   }, [audioElement]);
+  
+  // FTUE: Auto-select first spirit when highlightFirstSpirit is active
+  useEffect(() => {
+    if (ftueStep === "highlightFirstSpirit" && spirits.length > 0 && !selectedSpirit) {
+      setSelectedSpirit(spirits[0]);
+      setFtueStep("highlightLevelUpButton");
+    }
+  }, [ftueStep, spirits, selectedSpirit, setFtueStep]);
   
   // Apply filters and sorting
   const filteredAndSortedSpirits = useMemo(() => {
@@ -374,6 +384,10 @@ export function SpiritManager({ onClose }: SpiritManagerProps = {}) {
               const element = getElement(baseSpirit.element);
               const lineage = getLineage(baseSpirit.lineage);
               const isInParty = activeParty.includes(spirit.instanceId);
+              
+              // FTUE: Highlight first spirit
+              const isFirstSpirit = spirits[0]?.instanceId === spirit.instanceId;
+              const shouldHighlight = ftueStep === "highlightFirstSpirit" && isFirstSpirit;
 
               return (
                 <div
@@ -383,7 +397,7 @@ export function SpiritManager({ onClose }: SpiritManagerProps = {}) {
                     spirit.isPrismatic
                       ? "prismatic-border"
                       : ""
-                  }`}
+                  } ${shouldHighlight ? "animate-pulse-bright" : ""}`}
                   style={{ 
                     background: "#FFFFFF",
                     borderColor: spirit.isPrismatic ? undefined : "#8B4513"
@@ -684,7 +698,7 @@ export function SpiritManager({ onClose }: SpiritManagerProps = {}) {
                             canLevelUp
                               ? "bg-blue-600 text-white hover:bg-blue-700"
                               : "bg-gray-300 text-gray-500 cursor-not-allowed"
-                          }`}
+                          } ${ftueStep === "highlightLevelUpButton" ? "animate-pulse-bright" : ""}`}
                         >
                           <ArrowUp className="w-4 h-4" />
                           Level Up (Lv.{selectedSpirit.level} →{" "}

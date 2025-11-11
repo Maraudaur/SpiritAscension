@@ -533,6 +533,11 @@ export const useGameState = create<GameStateStore>()(
               state.essences[spirit.spiritId] =
                 (state.essences[spirit.spiritId] ?? 0) - cost.essence;
               spiritToLevel.level += 1;
+              
+              // FTUE logic: clear level up button highlight
+              if (state.ftueStep === "highlightLevelUpButton") {
+                state.ftueStep = null;
+              }
             }
           });
         }
@@ -565,6 +570,11 @@ export const useGameState = create<GameStateStore>()(
         set((state) => {
           state.qi += qiAmount;
           state.battlesWon += 1;
+          
+          // FTUE logic: clear battle highlight after winning
+          if (state.ftueStep === "highlightBattle") {
+            state.ftueStep = null;
+          }
         });
       },
 
