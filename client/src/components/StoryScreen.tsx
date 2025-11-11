@@ -39,6 +39,33 @@ function getPortraitPath(characterId: string, expression: string): string {
   return `/images/portraits/${characterId.toLowerCase()}/${expression}.png`;
 }
 
+// Character-specific style configuration
+interface CharacterStyleConfig {
+  maxHeight: string;
+  verticalPos: string;
+  transform: string;
+}
+
+const characterStyles: Record<string, CharacterStyleConfig> = {
+  droplet: {
+    maxHeight: "max-h-[30vh]",
+    verticalPos: "top-[45%]",
+    transform: "-translate-y-full",
+  },
+  oldman: {
+    maxHeight: "max-h-[70vh]",
+    verticalPos: "top-1/2",
+    transform: "-translate-y-1/2",
+  },
+};
+
+// Default styles for characters not in the configuration
+const defaultCharacterStyle: CharacterStyleConfig = {
+  maxHeight: "max-h-[70vh]",
+  verticalPos: "top-1/2",
+  transform: "-translate-y-1/2",
+};
+
 export function StoryScreen({ onClose, onNavigate }: StoryScreenProps) {
   // --- FIX: This line is new/modified ---
   const [storyLayer, setStoryLayer] = useState<"map" | "scene">(() => {
@@ -226,20 +253,14 @@ export function StoryScreen({ onClose, onNavigate }: StoryScreenProps) {
                 targetOpacity = isSpeaking ? 1 : 0.6;
               }
 
-              // Move Hero character higher than other characters  
-              // For Hero: anchor bottom edge at ~30vh using top-[45%] + -translate-y-full
-              // Hero sprite uses max-height 30vh: 45% of 67vh = 30vh, minus 30vh = 0vh (no clipping)
-              // This positions Hero's bottom at 30vh (higher than centered chars at ~34vh)
-              // For others: center vertically using top-1/2 and -translate-y-1/2
-              const isHero = character.id.toLowerCase() === "hero";
-              const verticalPosition = isHero ? "top-[45%]" : "top-1/2";
-              const translateClass = isHero ? "-translate-y-full" : "-translate-y-1/2";
-              const spriteMaxHeight = isHero ? "max-h-[30vh]" : "max-h-[70vh]";
+              // Get character-specific styles or fall back to defaults
+              const charId = character.id.toLowerCase();
+              const styles = characterStyles[charId] || defaultCharacterStyle;
 
               return (
                 <motion.div
                   key={character.id}
-                  className={`absolute ${verticalPosition} ${translateClass}`}
+                  className={`absolute ${styles.verticalPos} ${styles.transform}`}
                   style={{
                     // @ts-ignore
                     "--position-x":
@@ -259,7 +280,7 @@ export function StoryScreen({ onClose, onNavigate }: StoryScreenProps) {
                   <img
                     src={imagePath}
                     alt={character.id}
-                    className={`${spriteMaxHeight} object-contain`}
+                    className={`${styles.maxHeight} object-contain`}
                     style={{
                       transform: `translateX(var(--position-x))`,
                     }}
