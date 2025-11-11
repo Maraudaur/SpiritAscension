@@ -228,12 +228,13 @@ export function StoryScreen({ onClose, onNavigate }: StoryScreenProps) {
 
               // Move Hero character 50% higher than other characters
               const isHero = character.id.toLowerCase() === "hero";
-              const verticalPosition = isHero ? "top-[5%]" : "top-1/2";
+              const verticalPosition = isHero ? "top-[15%]" : "top-1/2";
+              const translateClass = isHero ? "" : "-translate-y-1/2";
 
               return (
                 <motion.div
                   key={character.id}
-                  className={`absolute ${verticalPosition} -translate-y-1/2`}
+                  className={`absolute ${verticalPosition} ${translateClass}`}
                   style={{
                     // @ts-ignore
                     "--position-x":
