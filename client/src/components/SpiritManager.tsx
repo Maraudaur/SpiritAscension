@@ -475,7 +475,7 @@ export function SpiritManager({ onClose }: SpiritManagerProps = {}) {
           setShowHarmonizeConfirm(false);
         }
       }}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto parchment-bg" style={{ background: "#F5E6D3" }}>
+        <DialogContent className="max-w-6xl max-h-[85vh] parchment-bg" style={{ background: "#F5E6D3" }}>
           {selectedSpirit && (() => {
             const baseSpirit = getBaseSpirit(selectedSpirit.spiritId);
             if (!baseSpirit) return null;
@@ -486,12 +486,13 @@ export function SpiritManager({ onClose }: SpiritManagerProps = {}) {
             const skills = getAvailableSkills(selectedSpirit);
 
             return (
-              <div className="space-y-4">
-                <div className="flex items-center gap-4">
+              <div className="flex flex-col gap-4" style={{ maxHeight: "80vh" }}>
+                {/* Header with Spirit Name and Image */}
+                <div className="flex items-center gap-4 pb-3 border-b-2" style={{ borderColor: "#8B4513" }}>
                   <img
                     src="/icons/placeholdericon.png"
                     alt={baseSpirit.name}
-                    className="w-24 h-24 object-contain flex-shrink-0"
+                    className="w-20 h-20 object-contain flex-shrink-0"
                   />
                   <div className="flex-1">
                     <h3 className="text-2xl font-bold parchment-text mb-1">
@@ -516,167 +517,178 @@ export function SpiritManager({ onClose }: SpiritManagerProps = {}) {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="p-3 rounded-lg border-2" style={{ background: "#FFFFFF", borderColor: "#8B4513" }}>
-                    <h4 className="font-bold parchment-text text-sm mb-2">
-                      Details
-                    </h4>
-                    <div className="text-sm parchment-text space-y-1">
-                      <div className="flex justify-between">
-                        <span>Level:</span>
-                        <span className="font-semibold">
-                          {selectedSpirit.level}
-                        </span>
+                {/* Three Column Layout */}
+                <div className="grid grid-cols-3 gap-4 flex-1 overflow-hidden">
+                  {/* LEFT COLUMN: Basic Info + Essence */}
+                  <div className="space-y-4 flex flex-col">
+                    <div className="p-3 rounded-lg border-2" style={{ background: "#FFFFFF", borderColor: "#8B4513" }}>
+                      <h4 className="font-bold parchment-text text-sm mb-2">
+                        Details
+                      </h4>
+                      <div className="text-sm parchment-text space-y-1">
+                        <div className="flex justify-between">
+                          <span>Level:</span>
+                          <span className="font-semibold">
+                            {selectedSpirit.level}
+                          </span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span>Element:</span>
+                          <span className={`element-${element.id} font-semibold`}>
+                            {element.name}
+                          </span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span>Lineage:</span>
+                          <span className="font-semibold">
+                            {lineage.name}
+                          </span>
+                        </div>
                       </div>
-                      <div className="flex justify-between">
-                        <span>Element:</span>
-                        <span className={`element-${element.id} font-semibold`}>
-                          {element.name}
-                        </span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span>Lineage:</span>
-                        <span className="font-semibold">
-                          {lineage.name}
-                        </span>
+                    </div>
+
+                    <div className="p-3 rounded-lg border-2" style={{ background: "#FFFFFF", borderColor: "#8B4513" }}>
+                      <h4 className="font-bold parchment-text text-sm mb-2">
+                        Essence
+                      </h4>
+                      <div className="text-sm parchment-text">
+                        <div className="flex justify-between items-center">
+                          <span>{baseSpirit.name}:</span>
+                          <span className="font-semibold text-purple-700">
+                            {getEssenceCount(baseSpirit.id)}
+                          </span>
+                        </div>
                       </div>
                     </div>
                   </div>
 
-                  <div className="p-3 rounded-lg border-2" style={{ background: "#FFFFFF", borderColor: "#8B4513" }}>
-                    <h4 className="font-bold parchment-text text-sm mb-2">
-                      Essence
-                    </h4>
-                    <div className="text-sm parchment-text">
-                      <div className="flex justify-between items-center">
-                        <span>{baseSpirit.name} Essence:</span>
-                        <span className="font-semibold text-purple-700">
-                          {getEssenceCount(baseSpirit.id)}
-                        </span>
+                  {/* MIDDLE COLUMN: Combat Stats */}
+                  <div className="space-y-4 flex flex-col">
+                    <div className="p-3 rounded-lg border-2 flex-1" style={{ background: "#FFFFFF", borderColor: "#8B4513" }}>
+                      <h4 className="font-bold parchment-text text-sm mb-3">
+                        Combat Stats
+                      </h4>
+                      <div className="space-y-2 text-sm parchment-text">
+                        <div className="flex justify-between">
+                          <span>Attack:</span>
+                          <span
+                            className="font-semibold"
+                            style={{
+                              color: getPotentialColor(
+                                selectedSpirit.potentialFactors.attack,
+                              ),
+                            }}
+                          >
+                            {stats.attack} [
+                            {selectedSpirit.potentialFactors.attack}]
+                          </span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span>Defense:</span>
+                          <span
+                            className="font-semibold"
+                            style={{
+                              color: getPotentialColor(
+                                selectedSpirit.potentialFactors.defense,
+                              ),
+                            }}
+                          >
+                            {stats.defense} [
+                            {selectedSpirit.potentialFactors.defense}]
+                          </span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span>Health:</span>
+                          <span
+                            className="font-semibold"
+                            style={{
+                              color: getPotentialColor(
+                                selectedSpirit.potentialFactors.health,
+                              ),
+                            }}
+                          >
+                            {stats.health} [
+                            {selectedSpirit.potentialFactors.health}]
+                          </span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span>Affinity:</span>
+                          <span
+                            className="font-semibold"
+                            style={{
+                              color: getPotentialColor(
+                                selectedSpirit.potentialFactors
+                                  .elementalAffinity,
+                              ),
+                            }}
+                          >
+                            {stats.elementalAffinity} [
+                            {
+                              selectedSpirit.potentialFactors
+                                .elementalAffinity
+                            }
+                            ]
+                          </span>
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
 
-                <div className="p-3 rounded-lg border-2" style={{ background: "#FFFFFF", borderColor: "#8B4513" }}>
-                  <h4 className="font-bold parchment-text text-sm mb-2">
-                    Combat Stats
-                  </h4>
-                  <div className="grid grid-cols-2 gap-2 text-sm parchment-text">
-                    <div className="flex justify-between">
-                      <span>Attack:</span>
-                      <span
-                        className="font-semibold"
-                        style={{
-                          color: getPotentialColor(
-                            selectedSpirit.potentialFactors.attack,
-                          ),
-                        }}
-                      >
-                        {stats.attack} [
-                        {selectedSpirit.potentialFactors.attack}]
-                      </span>
+                  {/* RIGHT COLUMN: Passive Abilities + Skills */}
+                  <div className="space-y-4 flex flex-col overflow-y-auto" style={{ maxHeight: "55vh" }}>
+                    <div className="p-3 rounded-lg border-2 flex-shrink-0" style={{ background: "#FFFFFF", borderColor: "#8B4513" }}>
+                      <h4 className="font-bold parchment-text text-sm mb-2">
+                        Passive Abilities
+                      </h4>
+                      <div className="text-sm parchment-text space-y-1">
+                        {baseSpirit.passiveAbilities &&
+                        baseSpirit.passiveAbilities.length > 0 ? (
+                          baseSpirit.passiveAbilities.map((passiveId) => {
+                            const passive = getPassiveAbility(passiveId);
+                            return (
+                              <div key={passiveId}>
+                                <p className="font-semibold">
+                                  {passive ? passive.name : "Unknown Passive"}
+                                </p>
+                                <p className="text-xs opacity-75">
+                                  {passive ? passive.description : ""}
+                                </p>
+                              </div>
+                            );
+                          })
+                        ) : (
+                          <p className="opacity-75">
+                            None
+                          </p>
+                        )}
+                      </div>
                     </div>
-                    <div className="flex justify-between">
-                      <span>Defense:</span>
-                      <span
-                        className="font-semibold"
-                        style={{
-                          color: getPotentialColor(
-                            selectedSpirit.potentialFactors.defense,
-                          ),
-                        }}
-                      >
-                        {stats.defense} [
-                        {selectedSpirit.potentialFactors.defense}]
-                      </span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span>Health:</span>
-                      <span
-                        className="font-semibold"
-                        style={{
-                          color: getPotentialColor(
-                            selectedSpirit.potentialFactors.health,
-                          ),
-                        }}
-                      >
-                        {stats.health} [
-                        {selectedSpirit.potentialFactors.health}]
-                      </span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span>Affinity:</span>
-                      <span
-                        className="font-semibold"
-                        style={{
-                          color: getPotentialColor(
-                            selectedSpirit.potentialFactors
-                              .elementalAffinity,
-                          ),
-                        }}
-                      >
-                        {stats.elementalAffinity} [
-                        {
-                          selectedSpirit.potentialFactors
-                            .elementalAffinity
-                        }
-                        ]
-                      </span>
-                    </div>
-                  </div>
-                </div>
 
-                <div className="p-3 rounded-lg border-2" style={{ background: "#FFFFFF", borderColor: "#8B4513" }}>
-                  <h4 className="font-bold parchment-text text-sm mb-2">
-                    Passive Abilities
-                  </h4>
-                  <div className="text-sm parchment-text space-y-1">
-                    {baseSpirit.passiveAbilities &&
-                    baseSpirit.passiveAbilities.length > 0 ? (
-                      baseSpirit.passiveAbilities.map((passiveId) => {
-                        const passive = getPassiveAbility(passiveId);
-                        return (
-                          <div key={passiveId}>
-                            <p className="font-semibold">
-                              {passive ? passive.name : "Unknown Passive"}
+                    <div className="p-3 rounded-lg border-2 flex-shrink-0" style={{ background: "#FFFFFF", borderColor: "#8B4513" }}>
+                      <h4 className="font-bold parchment-text text-sm mb-2">
+                        Skills
+                      </h4>
+                      <div className="space-y-2">
+                        {skills.map((skill) => (
+                          <div
+                            key={skill.id}
+                            className="p-2 bg-amber-50 rounded border border-amber-300"
+                          >
+                            <p className="font-semibold parchment-text text-xs">
+                              {skill.name}
                             </p>
-                            <p className="text-xs opacity-75">
-                              {passive ? passive.description : ""}
+                            <p className="text-xs parchment-text opacity-75">
+                              {skill.description}
                             </p>
                           </div>
-                        );
-                      })
-                    ) : (
-                      <p className="opacity-75">
-                        None
-                      </p>
-                    )}
-                  </div>
-                </div>
-
-                <div className="p-3 rounded-lg border-2" style={{ background: "#FFFFFF", borderColor: "#8B4513" }}>
-                  <h4 className="font-bold parchment-text text-sm mb-2">
-                    Skills
-                  </h4>
-                  <div className="space-y-2">
-                    {skills.map((skill) => (
-                      <div
-                        key={skill.id}
-                        className="p-2 bg-amber-50 rounded border border-amber-300"
-                      >
-                        <p className="font-semibold parchment-text text-xs">
-                          {skill.name}
-                        </p>
-                        <p className="text-xs parchment-text opacity-75">
-                          {skill.description}
-                        </p>
+                        ))}
                       </div>
-                    ))}
+                    </div>
                   </div>
                 </div>
 
-                <div className="space-y-3 pt-3 border-t-2" style={{ borderColor: "#8B4513" }}>
+                {/* Bottom Row: Action Buttons */}
+                <div className="pt-3 border-t-2 space-y-3" style={{ borderColor: "#8B4513" }}>
                   {(() => {
                     const levelUpCost = getLevelUpCost(
                       selectedSpirit.level,
@@ -689,60 +701,64 @@ export function SpiritManager({ onClose }: SpiritManagerProps = {}) {
 
                     return (
                       <>
-                        <button
-                          onClick={() =>
-                            handleLevelUp(selectedSpirit.instanceId)
-                          }
-                          disabled={!canLevelUp}
-                          className={`w-full p-3 rounded font-bold flex items-center justify-center gap-2 ${
-                            canLevelUp
-                              ? "bg-blue-600 text-white hover:bg-blue-700"
-                              : "bg-gray-300 text-gray-500 cursor-not-allowed"
-                          } ${ftueStep === "highlightLevelUpButton" ? "animate-pulse-bright" : ""}`}
-                        >
-                          <ArrowUp className="w-4 h-4" />
-                          Level Up (Lv.{selectedSpirit.level} →{" "}
-                          {selectedSpirit.level + 1})
-                        </button>
-                        <div className="text-xs parchment-text text-center space-y-0.5">
-                          <div
-                            className={
-                              qi >= levelUpCost.qi
-                                ? "text-green-700"
-                                : "text-red-600"
-                            }
-                          >
-                            Cost: {levelUpCost.qi} Qi{" "}
-                            {qi < levelUpCost.qi && "(Insufficient)"}
-                          </div>
-                          <div
-                            className={
-                              essenceCount >= levelUpCost.essence
-                                ? "text-green-700"
-                                : "text-red-600"
-                            }
-                          >
-                            Cost: {levelUpCost.essence} {baseSpirit.name}{" "}
-                            Essence{" "}
-                            {essenceCount < levelUpCost.essence &&
-                              "(Insufficient)"}
-                          </div>
-                        </div>
-
                         {!showHarmonizeConfirm ? (
-                          <>
-                            <button
-                              onClick={() => setShowHarmonizeConfirm(true)}
-                              className="w-full p-3 rounded font-bold flex items-center justify-center gap-2 bg-purple-600 text-white hover:bg-purple-700"
-                            >
-                              <Sparkles className="w-4 h-4" />
-                              Harmonize Spirit
-                            </button>
-                            <div className="text-xs parchment-text text-center text-purple-700">
-                              Gain +{harmonizeReward} {baseSpirit.name}{" "}
-                              Essence
+                          <div className="grid grid-cols-2 gap-3">
+                            <div className="space-y-2">
+                              <button
+                                onClick={() =>
+                                  handleLevelUp(selectedSpirit.instanceId)
+                                }
+                                disabled={!canLevelUp}
+                                className={`w-full p-3 rounded font-bold flex items-center justify-center gap-2 ${
+                                  canLevelUp
+                                    ? "bg-blue-600 text-white hover:bg-blue-700"
+                                    : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                                } ${ftueStep === "highlightLevelUpButton" ? "animate-pulse-bright" : ""}`}
+                              >
+                                <ArrowUp className="w-4 h-4" />
+                                Level Up (Lv.{selectedSpirit.level} →{" "}
+                                {selectedSpirit.level + 1})
+                              </button>
+                              <div className="text-xs parchment-text space-y-0.5">
+                                <div
+                                  className={
+                                    qi >= levelUpCost.qi
+                                      ? "text-green-700"
+                                      : "text-red-600"
+                                  }
+                                >
+                                  Cost: {levelUpCost.qi} Qi{" "}
+                                  {qi < levelUpCost.qi && "(Insufficient)"}
+                                </div>
+                                <div
+                                  className={
+                                    essenceCount >= levelUpCost.essence
+                                      ? "text-green-700"
+                                      : "text-red-600"
+                                  }
+                                >
+                                  Cost: {levelUpCost.essence} {baseSpirit.name}{" "}
+                                  Essence{" "}
+                                  {essenceCount < levelUpCost.essence &&
+                                    "(Insufficient)"}
+                                </div>
+                              </div>
                             </div>
-                          </>
+
+                            <div className="space-y-2">
+                              <button
+                                onClick={() => setShowHarmonizeConfirm(true)}
+                                className="w-full p-3 rounded font-bold flex items-center justify-center gap-2 bg-purple-600 text-white hover:bg-purple-700"
+                              >
+                                <Sparkles className="w-4 h-4" />
+                                Harmonize Spirit
+                              </button>
+                              <div className="text-xs parchment-text text-purple-700">
+                                Gain +{harmonizeReward} {baseSpirit.name}{" "}
+                                Essence
+                              </div>
+                            </div>
+                          </div>
                         ) : (
                           <div className="p-4 rounded-lg border-2 border-red-600 bg-red-50">
                             <p className="text-sm parchment-text mb-2 text-center">
