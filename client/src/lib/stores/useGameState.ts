@@ -304,12 +304,19 @@ export const useGameState = create<GameStateStore>()(
       resolveStoryBattle: (outcome: "victory" | "defeat") => {
         set((state) => {
           if (outcome === "victory") {
+            // Mark story node complete on victory ONLY
+            if (state.storyBattleCheckpoint) {
+              const nodeId = state.storyBattleCheckpoint.nodeId;
+              if (!state.completedStoryNodes.includes(nodeId)) {
+                state.completedStoryNodes.push(nodeId);
+              }
+            }
             // Clear checkpoint and story position on victory
             state.storyBattleCheckpoint = null;
             state.currentStoryNodeId = null;
             state.currentStoryDialogueIndex = 0;
           } else {
-            // On defeat, restore the checkpoint position
+            // On defeat, restore the checkpoint position (node stays incomplete)
             if (state.storyBattleCheckpoint) {
               state.currentStoryNodeId = state.storyBattleCheckpoint.nodeId;
               state.currentStoryDialogueIndex = state.storyBattleCheckpoint.dialogueIndex;

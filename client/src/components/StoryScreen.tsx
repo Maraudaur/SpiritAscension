@@ -112,10 +112,10 @@ export function StoryScreen({ onClose, onNavigate }: StoryScreenProps) {
   const handleNodeComplete = () => {
     if (currentStoryNodeId === null || !currentNode) return;
 
-    const isFirstCompletion = !isStoryNodeCompleted(currentStoryNodeId);
-    completeStoryNode(currentStoryNodeId);
+    const isNodeIncomplete = !isStoryNodeCompleted(currentStoryNodeId);
 
-    if (isFirstCompletion && currentNode.encounterId !== null) {
+    // If node is incomplete AND has an encounter, trigger the battle
+    if (isNodeIncomplete && currentNode.encounterId !== null) {
       // Set checkpoint for story battle retry flow
       setStoryBattleCheckpoint({
         nodeId: currentStoryNodeId,
@@ -128,6 +128,11 @@ export function StoryScreen({ onClose, onNavigate }: StoryScreenProps) {
         onNavigate("battle");
       }
     } else {
+      // Node is already complete OR has no encounter - just return to map
+      // Mark as complete if it wasn't already (for non-battle nodes)
+      if (isNodeIncomplete) {
+        completeStoryNode(currentStoryNodeId);
+      }
       setStoryLayer("map");
       setStoryPosition(null, 0); // Reset story position
     }
