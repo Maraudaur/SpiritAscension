@@ -226,10 +226,15 @@ export function StoryScreen({ onClose, onNavigate }: StoryScreenProps) {
                 targetOpacity = isSpeaking ? 1 : 0.6;
               }
 
-              // Move Hero character 50% higher than other characters
+              // Move Hero character higher than other characters  
+              // For Hero: anchor bottom edge at ~30vh using top-[45%] + -translate-y-full
+              // Hero sprite uses max-height 30vh: 45% of 67vh = 30vh, minus 30vh = 0vh (no clipping)
+              // This positions Hero's bottom at 30vh (higher than centered chars at ~34vh)
+              // For others: center vertically using top-1/2 and -translate-y-1/2
               const isHero = character.id.toLowerCase() === "hero";
-              const verticalPosition = isHero ? "top-[15%]" : "top-1/2";
-              const translateClass = isHero ? "" : "-translate-y-1/2";
+              const verticalPosition = isHero ? "top-[45%]" : "top-1/2";
+              const translateClass = isHero ? "-translate-y-full" : "-translate-y-1/2";
+              const spriteMaxHeight = isHero ? "max-h-[30vh]" : "max-h-[70vh]";
 
               return (
                 <motion.div
@@ -254,7 +259,7 @@ export function StoryScreen({ onClose, onNavigate }: StoryScreenProps) {
                   <img
                     src={imagePath}
                     alt={character.id}
-                    className="max-h-[70vh] object-contain"
+                    className={`${spriteMaxHeight} object-contain`}
                     style={{
                       transform: `translateX(var(--position-x))`,
                     }}
