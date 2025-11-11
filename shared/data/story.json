@@ -26,7 +26,7 @@
       {
         "speakerId": "Droplet",
         "expression": "happy",
-        "text": "well done! now you can see me better. Something went wrong on the peak. You need to find out what happened. before we head out you need a spirit to protect yourself. Go to the summon page and summon your first spirit and then go to spirit manager to assign them to your active party!"
+        "text": "well done! now you can see me better. Something went wrong on the peak. You need to find out what happened. before we head out you need a spirit to protect yourself. Go to the summon page and summon your first spirit and then go to spirit page to assign them to your active party!"
       },
       {
         "speakerId": "Droplet",
@@ -38,32 +38,27 @@
   },
   {
     "id": 1,
-    "title": "First Cultivation",
+    "title": "First Steps",
     "description": "Learn the basics of Qi cultivation",
-    "characters": [{ "id": "Elder Chen", "position": "center" }],
+    "characters": [{ "id": "Droplet", "position": "right" }],
     "dialogues": [
       {
-        "speakerId": "Elder Chen",
-        "expression": "neutral",
-        "text": "Close your eyes and feel the flow of Qi around you. It moves like water, yet burns like fire."
+        "speakerId": "Droplet",
+        "expression": "happy",
+        "text": "How was your first fight? lets level up our spirit. Go to the spirit page, click your spirit and level up! You can get more spirit essense later by summoning more spirits and harmonizing them."
       },
       {
-        "speakerId": "Narrator",
-        "expression": "neutral",
-        "text": "You follow the Elder's guidance, feeling a warm sensation building in your core."
+        "speakerId": "Droplet",
+        "expression": "happy",
+        "text": "The more battles you do the more Qi and Qi generation you will get! make sure to keep upgrading that Qi generation rate! Head on to the battle tab to start training"
       },
       {
-        "speakerId": "Elder Chen",
-        "expression": "neutral",
-        "text": "Good! You have a natural affinity. Now, direct that energy through your meridians."
-      },
-      {
-        "speakerId": "Narrator",
-        "expression": "neutral",
-        "text": "As you practice, the Qi flows more easily. You can feel yourself growing stronger with each breath."
+        "speakerId": "Droplet",
+        "expression": "angry",
+        "text": "there seems to be a corrupted spirit up ahead. It's level 10 so get your spirits prepared and take it on!"
       }
     ],
-    "encounterId": "e001"
+    "encounterId": "e_boss_01"
   },
   {
     "id": 2,
