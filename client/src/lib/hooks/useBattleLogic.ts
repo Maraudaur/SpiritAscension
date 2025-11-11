@@ -72,6 +72,7 @@ type TurnPhase =
 export function useBattleLogic({
   onClose,
   isBossBattle = false,
+  returnTo = "cultivation",
 }: BattleScreenProps) {
   // ========== Game State Hooks ==========
   const {
@@ -84,6 +85,7 @@ export function useBattleLogic({
     healAllSpirits,
     currentEncounterId,
     setCurrentEncounterId,
+    resolveStoryBattle,
   } = useGameState();
 
   const {
@@ -1965,6 +1967,16 @@ export function useBattleLogic({
         );
       });
     }
+    
+    // Resolve story battle checkpoint if this was a story battle
+    if (returnTo === "story") {
+      if (battleState === "victory") {
+        resolveStoryBattle("victory");
+      } else if (battleState === "defeat") {
+        resolveStoryBattle("defeat");
+      }
+    }
+    
     playExploreMusic();
     onClose();
   };

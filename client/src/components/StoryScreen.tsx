@@ -70,6 +70,7 @@ export function StoryScreen({ onClose, onNavigate }: StoryScreenProps) {
     setStoryPosition, // <-- The action to update global state
     setFtueStep,
     ftueStep,
+    setStoryBattleCheckpoint,
   } = useGameState();
 
   const storyNodes = storyData as StoryNode[];
@@ -115,9 +116,14 @@ export function StoryScreen({ onClose, onNavigate }: StoryScreenProps) {
     completeStoryNode(currentStoryNodeId);
 
     if (isFirstCompletion && currentNode.encounterId !== null) {
+      // Set checkpoint for story battle retry flow
+      setStoryBattleCheckpoint({
+        nodeId: currentStoryNodeId,
+        dialogueIndex: currentStoryDialogueIndex,
+      });
       setCurrentEncounterId(currentNode.encounterId);
       setStoryLayer("map");
-      setStoryPosition(null, 0); // Reset story position
+      // DON'T clear story position - preserve it for defeat retry
       if (onNavigate) {
         onNavigate("battle");
       }

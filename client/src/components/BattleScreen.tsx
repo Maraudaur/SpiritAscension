@@ -70,7 +70,7 @@ export function BattleScreen({
   returnTo = "cultivation",
   autoStart = false,
 }: BattleScreenProps) {
-  const logic = useBattleLogic({ onClose, isBossBattle: false });
+  const logic = useBattleLogic({ onClose, isBossBattle: false, returnTo });
   const logContainerRef = useRef<HTMLDivElement>(null);
   const hasStartedBattle = useRef(false);
 

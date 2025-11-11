@@ -33,6 +33,12 @@ interface AscensionBuffs {
   battleMultiplier: number;
 }
 
+// Story battle checkpoint for retry flow
+export interface StoryBattleCheckpoint {
+  nodeId: number;
+  dialogueIndex: number;
+}
+
 // --- Define the full store state ---
 export interface GameStateStore extends Omit<GameStateData, "activeParty"> {
   // FTUE State
@@ -48,6 +54,7 @@ export interface GameStateStore extends Omit<GameStateData, "activeParty"> {
   ascensionTier: number;
   completedStoryNodes: number[];
   currentEncounterId: string | null;
+  storyBattleCheckpoint: StoryBattleCheckpoint | null;
 
   // Actions
   addQi: (amount: number) => void;
@@ -60,6 +67,8 @@ export interface GameStateStore extends Omit<GameStateData, "activeParty"> {
   setStoryPosition: (nodeId: number | null, dialogueIndex: number) => void;
   setFtueStep: (step: FtueStep) => void;
   setHasUpgradedBase: (status: boolean) => void;
+  setStoryBattleCheckpoint: (checkpoint: StoryBattleCheckpoint | null) => void;
+  resolveStoryBattle: (outcome: "victory" | "defeat") => void;
 
   // MainScreen Actions
   updateQi: () => void;
@@ -210,6 +219,7 @@ export const useGameState = create<GameStateStore>()(
       hasUpgradedBase: false,
       completedStoryNodes: [],
       currentEncounterId: null,
+      storyBattleCheckpoint: null,
 
       // --- (Core Actions) ---
       addQi: (amount: number) => {
@@ -288,6 +298,25 @@ export const useGameState = create<GameStateStore>()(
       setHasUpgradedBase: (status: boolean) => {
         set({ hasUpgradedBase: status });
       },
+      setStoryBattleCheckpoint: (checkpoint: StoryBattleCheckpoint | null) => {
+        set({ storyBattleCheckpoint: checkpoint });
+      },
+      resolveStoryBattle: (outcome: "victory" | "defeat") => {
+        set((state) => {
+          if (outcome === "victory") {
+            // Clear checkpoint and story position on victory
+            state.storyBattleCheckpoint = null;
+            state.currentStoryNodeId = null;
+            state.currentStoryDialogueIndex = 0;
+          } else {
+            // On defeat, restore the checkpoint position
+            if (state.storyBattleCheckpoint) {
+              state.currentStoryNodeId = state.storyBattleCheckpoint.nodeId;
+              state.currentStoryDialogueIndex = state.storyBattleCheckpoint.dialogueIndex;
+            }
+          }
+        });
+      },
       resetGame: () => {
         set((state) => {
           Object.assign(state, {
@@ -300,6 +329,7 @@ export const useGameState = create<GameStateStore>()(
             hasUpgradedBase: false,
             completedStoryNodes: [],
             currentEncounterId: null,
+            storyBattleCheckpoint: null,
           });
         });
       },
