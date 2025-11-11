@@ -400,13 +400,22 @@ export const useGameState = create<GameStateStore>()(
       // --- SUMMONING LOGIC ---
       getSpiritCost: () => {
         const summonCount = get().summonCount ?? 0;
-        const increase = Math.floor(summonCount / 10) * 5;
-        // Uses BASE_SUMMON_COST from top level
-        return Math.min(BASE_SUMMON_COST + increase, 500);
+        // Exponential growth: 30% more expensive each summon
+        const cost = BASE_SUMMON_COST * Math.pow(1.3, summonCount);
+        // Clamp to safe integer range to prevent overflow
+        return Math.floor(Math.min(cost, Number.MAX_SAFE_INTEGER));
       },
 
       getMultiSummonCost: (count: number) => {
-        return Math.floor(get().getSpiritCost() * count * 0.9);
+        const summonCount = get().summonCount ?? 0;
+        let totalCost = 0;
+        // Calculate cost for each summon individually with exponential growth
+        for (let i = 0; i < count; i++) {
+          const cost = BASE_SUMMON_COST * Math.pow(1.3, summonCount + i);
+          totalCost += Math.min(cost, Number.MAX_SAFE_INTEGER);
+        }
+        // Apply 10% discount for bulk summons
+        return Math.floor(Math.min(totalCost * 0.9, Number.MAX_SAFE_INTEGER));
       },
 
       spendQi: (amount: number) => {
