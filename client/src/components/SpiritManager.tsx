@@ -33,6 +33,7 @@ import {
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import type { PlayerSpirit } from "@shared/types";
+import { SpiritSpriteAnimation } from "./SpiritSpriteAnimation";
 
 interface SpiritManagerProps {
   onClose?: () => void;
@@ -487,77 +488,63 @@ export function SpiritManager({ onClose }: SpiritManagerProps = {}) {
 
             return (
               <div className="flex flex-col gap-4" style={{ maxHeight: "80vh" }}>
-                {/* Header with Spirit Name and Image */}
-                <div className="flex items-center gap-4 pb-3 border-b-2" style={{ borderColor: "#8B4513" }}>
-                  <img
-                    src="/icons/placeholdericon.png"
-                    alt={baseSpirit.name}
-                    className="w-20 h-20 object-contain flex-shrink-0"
-                  />
-                  <div className="flex-1">
-                    <h3 className="text-2xl font-bold parchment-text mb-1">
-                      {baseSpirit.name}
-                    </h3>
-                    <div className="flex gap-2">
-                      <span
-                        className="text-xs font-bold px-2 py-1 rounded"
-                        style={{
-                          background: getRarityColor(baseSpirit.rarity),
-                          color: "white",
-                        }}
-                      >
-                        {baseSpirit.rarity.toUpperCase()}
+                {/* Header with Spirit Name */}
+                <div className="pb-3 border-b-2" style={{ borderColor: "#8B4513" }}>
+                  <h3 className="text-2xl font-bold parchment-text mb-2">
+                    {baseSpirit.name}
+                  </h3>
+                  <div className="flex gap-2 flex-wrap items-center text-sm">
+                    <span
+                      className="text-xs font-bold px-2 py-1 rounded border-2"
+                      style={{
+                        background: getRarityColor(baseSpirit.rarity),
+                        color: "white",
+                        borderColor: "#8B4513",
+                      }}
+                    >
+                      {baseSpirit.rarity.toUpperCase()}
+                    </span>
+                    {selectedSpirit.isPrismatic && (
+                      <span className="text-xs font-bold px-2 py-1 rounded border-2 prismatic-border" style={{ borderColor: "#8B4513" }}>
+                        PRISMATIC
                       </span>
-                      {selectedSpirit.isPrismatic && (
-                        <span className="text-xs font-bold px-2 py-1 rounded prismatic-border">
-                          PRISMATIC
-                        </span>
-                      )}
-                    </div>
+                    )}
+                    <span className="text-xs parchment-text bg-white px-2 py-1 rounded border-2" style={{ borderColor: "#8B4513" }}>
+                      Level {selectedSpirit.level}
+                    </span>
+                    <span className={`element-${element.id} text-xs font-semibold px-2 py-1 rounded bg-white border-2`} style={{ borderColor: "#8B4513" }}>
+                      {element.name}
+                    </span>
+                    <span className="text-xs parchment-text font-semibold px-2 py-1 rounded bg-white border-2" style={{ borderColor: "#8B4513" }}>
+                      {lineage.name}
+                    </span>
                   </div>
                 </div>
 
                 {/* Three Column Layout */}
                 <div className="grid grid-cols-3 gap-4 flex-1 overflow-hidden">
-                  {/* LEFT COLUMN: Basic Info + Essence */}
-                  <div className="space-y-4 flex flex-col">
-                    <div className="p-3 rounded-lg border-2" style={{ background: "#FFFFFF", borderColor: "#8B4513" }}>
-                      <h4 className="font-bold parchment-text text-sm mb-2">
-                        Details
-                      </h4>
-                      <div className="text-sm parchment-text space-y-1">
-                        <div className="flex justify-between">
-                          <span>Level:</span>
-                          <span className="font-semibold">
-                            {selectedSpirit.level}
-                          </span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span>Element:</span>
-                          <span className={`element-${element.id} font-semibold`}>
-                            {element.name}
-                          </span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span>Lineage:</span>
-                          <span className="font-semibold">
-                            {lineage.name}
-                          </span>
-                        </div>
-                      </div>
+                  {/* LEFT COLUMN: Spirit Sprite + Essence */}
+                  <div className="flex flex-col items-center justify-between gap-4 py-2">
+                    <div className="flex items-center justify-center flex-1 min-h-0">
+                      <SpiritSpriteAnimation
+                        spiritId={baseSpirit.id}
+                        position="left"
+                        size={200}
+                        isTakingDamage={false}
+                        isDefeated={false}
+                      />
                     </div>
-
-                    <div className="p-3 rounded-lg border-2" style={{ background: "#FFFFFF", borderColor: "#8B4513" }}>
-                      <h4 className="font-bold parchment-text text-sm mb-2">
+                    <div className="w-full p-3 rounded-lg border-2 flex-shrink-0" style={{ background: "#FFFFFF", borderColor: "#8B4513" }}>
+                      <h4 className="font-bold parchment-text text-sm mb-2 text-center">
                         Essence
                       </h4>
-                      <div className="text-sm parchment-text">
-                        <div className="flex justify-between items-center">
-                          <span>{baseSpirit.name}:</span>
-                          <span className="font-semibold text-purple-700">
-                            {getEssenceCount(baseSpirit.id)}
-                          </span>
-                        </div>
+                      <div className="text-center">
+                        <span className="font-bold text-purple-700 text-2xl">
+                          {getEssenceCount(baseSpirit.id)}
+                        </span>
+                        <p className="text-xs parchment-text mt-1">
+                          {baseSpirit.name} Essence
+                        </p>
                       </div>
                     </div>
                   </div>
