@@ -162,7 +162,7 @@ export function StoryScreen({ onClose, onNavigate }: StoryScreenProps) {
     const hasNoSpiritsInParty = activeParty.every((slot) => slot === null);
     const hasLevel2Spirit = spirits.some((spirit) => spirit.level >= 2);
     const hasWonBattle = battlesWon >= 1;
-    
+
     const isGated =
       (currentStoryNodeId === 0 &&
         currentStoryDialogueIndex === 2 &&
@@ -228,7 +228,7 @@ export function StoryScreen({ onClose, onNavigate }: StoryScreenProps) {
 
               // Move Hero character 50% higher than other characters
               const isHero = character.id.toLowerCase() === "hero";
-              const verticalPosition = isHero ? "top-1/4" : "top-1/2";
+              const verticalPosition = isHero ? "top-[5%]" : "top-1/2";
 
               return (
                 <motion.div
