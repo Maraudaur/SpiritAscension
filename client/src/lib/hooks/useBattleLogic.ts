@@ -1823,7 +1823,25 @@ export function useBattleLogic({
         );
       }
 
-      // TODO: Apply reflectedDamage to enemy
+      // Apply reflected damage to enemy
+      if (reflectedDamage > 0) {
+        setBattleEnemies((prev) =>
+          prev.map((enemy, i) => {
+            if (i !== activeEnemyIndex) return enemy;
+            const newHealth = Math.max(
+              0,
+              enemy.currentHealth - reflectedDamage,
+            );
+            return { ...enemy, currentHealth: newHealth };
+          }),
+        );
+        addLog(
+          `${activeEnemy.name} takes ${reflectedDamage} reflected damage!`,
+        );
+        playDamage();
+        setEnemyHealthBarShake(true);
+        setTimeout(() => setEnemyHealthBarShake(false), 500);
+      }
 
       return prevSpirits.map((sp, index) =>
         index === activePartySlot
