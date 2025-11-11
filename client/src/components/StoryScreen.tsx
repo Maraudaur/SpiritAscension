@@ -226,10 +226,14 @@ export function StoryScreen({ onClose, onNavigate }: StoryScreenProps) {
                 targetOpacity = isSpeaking ? 1 : 0.6;
               }
 
+              // Move Hero character 50% higher than other characters
+              const isHero = character.id.toLowerCase() === "hero";
+              const verticalPosition = isHero ? "top-1/4" : "top-1/2";
+
               return (
                 <motion.div
                   key={character.id}
-                  className="absolute top-1/2 -translate-y-1/2"
+                  className={`absolute ${verticalPosition} -translate-y-1/2`}
                   style={{
                     // @ts-ignore
                     "--position-x":
