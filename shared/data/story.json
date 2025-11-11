@@ -55,7 +55,7 @@
       {
         "speakerId": "Droplet",
         "expression": "angry",
-        "text": "There's a small town up ahead, but there seems to be a corrupted spirit up ahead. It's level 10 so get your spirits prepared and take it on!"
+        "text": "There's a small town up ahead, but there seems to be a corrupted spirit blocking the path. It's level 10 so get your spirits prepared and take it on!"
       }
     ],
     "encounterId": "e_boss_01"
