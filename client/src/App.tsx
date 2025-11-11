@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { Sidebar } from "./components/Sidebar";
+import { useGameState } from "./lib/stores/useGameState";
 import { QiHUD } from "./components/QiHUD";
 import { StoryScreen } from "./components/StoryScreen";
 import { MainScreen } from "./components/MainScreen";
@@ -13,7 +14,10 @@ type Screen = "story" | "cultivation" | "spirits" | "summon" | "battle";
 
 function App() {
   const [currentScreen, setCurrentScreen] = useState<Screen>("story");
-  const [battleSource, setBattleSource] = useState<"story" | "sidebar">("sidebar");
+  const [battleSource, setBattleSource] = useState<"story" | "sidebar">(
+    "sidebar",
+  );
+  const { updateQi } = useGameState();
 
   // Get all functions from the store
   const {
@@ -26,6 +30,14 @@ function App() {
     setBattleMusic,
     playExploreMusic,
   } = useAudio();
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      updateQi();
+    }, 100);
+
+    return () => clearInterval(interval);
+  }, [updateQi]);
 
   // Use a ref to ensure initialization runs only once
   const audioInitialized = useRef(false);
@@ -108,14 +120,14 @@ function App() {
         background: "linear-gradient(135deg, #1A0F0A 0%, #2C1810 100%)",
       }}
     >
-      <Sidebar 
-        currentScreen={currentScreen} 
+      <Sidebar
+        currentScreen={currentScreen}
         onNavigate={(screen) => {
           if (screen === "battle") {
             setBattleSource("sidebar");
           }
           setCurrentScreen(screen);
-        }} 
+        }}
       />
 
       <div
@@ -145,19 +157,19 @@ function App() {
           }}
         >
           <QiHUD currentScreen={currentScreen} />
-          
+
           <div style={{ flex: 1, overflow: "hidden", position: "relative" }}>
             {currentScreen === "story" && (
-              <StoryScreen 
+              <StoryScreen
                 onNavigate={(screen) => {
                   if (screen === "battle") {
                     setBattleSource("story");
                   }
                   setCurrentScreen(screen);
-                }} 
+                }}
               />
             )}
-            
+
             {currentScreen === "cultivation" && (
               <div className="w-full h-full overflow-y-auto">
                 <MainScreen onNavigate={setCurrentScreen} />
@@ -166,7 +178,9 @@ function App() {
 
             {currentScreen === "spirits" && (
               <div className="w-full h-full overflow-hidden">
-                <SpiritManager onClose={() => setCurrentScreen("cultivation")} />
+                <SpiritManager
+                  onClose={() => setCurrentScreen("cultivation")}
+                />
               </div>
             )}
 
@@ -178,7 +192,7 @@ function App() {
 
             {currentScreen === "battle" && battleSource === "sidebar" && (
               <div className="w-full h-full overflow-hidden">
-                <BattleScreen 
+                <BattleScreen
                   onClose={() => {
                     setBattleSource("sidebar");
                     setCurrentScreen("cultivation");
@@ -188,14 +202,14 @@ function App() {
                 />
               </div>
             )}
-            
+
             {currentScreen === "battle" && battleSource === "story" && (
-              <div 
+              <div
                 className="absolute inset-0 z-50 flex items-center justify-center"
                 style={{ background: "rgba(0, 0, 0, 0.8)" }}
               >
                 <div className="w-full h-full">
-                  <BattleScreen 
+                  <BattleScreen
                     onClose={() => {
                       setBattleSource("sidebar");
                       setCurrentScreen("story");

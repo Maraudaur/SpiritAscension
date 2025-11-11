@@ -67,14 +67,6 @@ export function MainScreen({ onNavigate }: MainScreenProps) {
   const [ascendConfirmStep, setAscendConfirmStep] = useState(0);
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      updateQi();
-    }, 100);
-
-    return () => clearInterval(interval);
-  }, [updateQi]);
-
-  useEffect(() => {
     setDisplayQi(qi);
   }, [qi]);
 
