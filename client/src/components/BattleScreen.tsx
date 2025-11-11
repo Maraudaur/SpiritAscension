@@ -72,6 +72,7 @@ export function BattleScreen({
 }: BattleScreenProps) {
   const logic = useBattleLogic({ onClose, isBossBattle: false });
   const logContainerRef = useRef<HTMLDivElement>(null);
+  const hasStartedBattle = useRef(false);
 
   const [isClient, setIsClient] = useState(false);
   useEffect(() => {
@@ -109,8 +110,10 @@ export function BattleScreen({
     confirmEnemyDefeat,
   } = logic;
 
+  // Auto-start guard: prevents double initialization in React StrictMode/double-render scenarios
   useEffect(() => {
-    if (autoStart && battleState === "setup") {
+    if (autoStart && battleState === "setup" && !hasStartedBattle.current) {
+      hasStartedBattle.current = true;
       startBattle();
     }
   }, [autoStart, battleState, startBattle]);
