@@ -77,6 +77,19 @@ export interface GameStateStore extends Omit<GameStateData, "activeParty"> {
   addEssence: (spiritId: string, amount: number) => void;
   summonSpirit: () => PlayerSpirit;
   summonMultipleSpirits: (count: number) => PlayerSpirit[];
+
+  // SpiritManager Actions
+  addToParty: (instanceId: string) => void;
+  removeFromParty: (instanceId: string) => void;
+  getEssenceCount: (spiritId: string) => number;
+  getLevelUpCost: (level: number) => { qi: number; essence: number };
+  levelUpSpirit: (instanceId: string) => void;
+  harmonizeSpirit: (instanceId: string) => void;
+
+  //Battle actions
+  winBattle: (qiAmount: number) => void;
+  updateSpiritHealth: (instanceId: string, health: number) => void;
+  healAllSpirits: () => void;
 }
 
 // --- FIX: ALL CONSTANTS MOVED TO TOP-LEVEL SCOPE ---
@@ -139,7 +152,8 @@ const spiritsData: Record<string, BaseSpirit[]> = spiritsDataJson as any;
 
 function _selectRandomRarity(): Rarity {
   let roll = Math.random() * TOTAL_WEIGHT; // <-- Now works
-  for (const rate of SUMMON_RATES) { // <-- Now works
+  for (const rate of SUMMON_RATES) {
+    // <-- Now works
     if (roll < rate.weight) {
       return rate.rarity;
     }
@@ -184,7 +198,7 @@ export const useGameState = create<GameStateStore>()(
     immer((set, get) => ({
       // --- (Initial State and FTUE State) ---
       ...initialState,
-      activeParty: [null, null, null],
+      activeParty: [null, null, null, null],
       ascensionTier: 0,
       currentStoryNodeId: null,
       currentStoryDialogueIndex: 0,
@@ -454,6 +468,111 @@ export const useGameState = create<GameStateStore>()(
           }
         });
         return newSpirits;
+      },
+      addToParty: (instanceId: string) => {
+        set((state) => {
+          // Find the first empty (null) slot
+          const emptySlotIndex = state.activeParty.indexOf(null);
+          if (emptySlotIndex !== -1) {
+            // Add the spirit to that slot
+            state.activeParty[emptySlotIndex] = instanceId;
+          }
+        });
+      },
+
+      removeFromParty: (instanceId: string) => {
+        set((state) => {
+          // Find the index of the spirit to remove
+          const spiritIndex = state.activeParty.indexOf(instanceId);
+          if (spiritIndex !== -1) {
+            // Set that slot back to null
+            state.activeParty[spiritIndex] = null;
+          }
+        });
+      },
+
+      getEssenceCount: (spiritId: string) => {
+        return get().essences[spiritId] ?? 0;
+      },
+
+      getLevelUpCost: (level: number) => {
+        const qiCost = Math.floor(10 * Math.pow(1.2, level));
+        const essenceCost = 1 + Math.floor(level / 10);
+        return { qi: qiCost, essence: essenceCost };
+      },
+
+      levelUpSpirit: (instanceId: string) => {
+        const spirit = get().spirits.find((s) => s.instanceId === instanceId);
+        if (!spirit) return;
+
+        const cost = get().getLevelUpCost(spirit.level);
+        const essenceCount = get().getEssenceCount(spirit.spiritId);
+        const currentQi = get().qi;
+
+        if (currentQi >= cost.qi && essenceCount >= cost.essence) {
+          set((state) => {
+            // Find the spirit in the draft state to modify it
+            const spiritToLevel = state.spirits.find(
+              (s) => s.instanceId === instanceId,
+            );
+            if (spiritToLevel) {
+              state.qi -= cost.qi;
+              state.essences[spirit.spiritId] =
+                (state.essences[spirit.spiritId] ?? 0) - cost.essence;
+              spiritToLevel.level += 1;
+            }
+          });
+        }
+      },
+
+      harmonizeSpirit: (instanceId: string) => {
+        const spirit = get().spirits.find((s) => s.instanceId === instanceId);
+        if (!spirit) return;
+
+        const reward = 5 + spirit.level * 2;
+
+        set((state) => {
+          // Add essence
+          state.essences[spirit.spiritId] =
+            (state.essences[spirit.spiritId] ?? 0) + reward;
+
+          // Remove from party if it's there
+          if (state.activeParty.includes(instanceId)) {
+            const index = state.activeParty.indexOf(instanceId);
+            state.activeParty[index] = null;
+          }
+
+          // Remove from spirit list
+          state.spirits = state.spirits.filter(
+            (s) => s.instanceId !== instanceId,
+          );
+        });
+      },
+      winBattle: (qiAmount: number) => {
+        set((state) => {
+          state.qi += qiAmount;
+          state.battlesWon += 1;
+        });
+      },
+
+      updateSpiritHealth: (instanceId: string, health: number) => {
+        set((state) => {
+          const spirit = state.spirits.find((s) => s.instanceId === instanceId);
+          if (spirit) {
+            spirit.currentHealth = health;
+          }
+        });
+      },
+
+      healAllSpirits: () => {
+        set((state) => {
+          state.spirits.forEach((spirit) => {
+            // Setting to undefined makes the battle logic
+            // default them to max health on next battle start.
+            spirit.currentHealth = undefined;
+            spirit.activeEffects = []; // Clear effects
+          });
+        });
       },
     })),
     // --- (Encryption Config) ---

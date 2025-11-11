@@ -234,6 +234,11 @@ export function useBattleLogic({
     let reflectedDamage = 0;
     const attackerEffects: ActiveEffect[] = [];
 
+    const calculateMinOneDamage = (rawAmount: number): number => {
+      if (rawAmount <= 0) return 0;
+      return Math.max(1, Math.floor(rawAmount));
+    };
+
     if (trigger === "on_get_hit" && target && damage && damage > 0) {
       // 1. Check Target's Active Effects (Thorns buff and damage_reflect_buff)
       if ("activeEffects" in target) {
@@ -244,7 +249,9 @@ export function useBattleLogic({
             effect.damageReturnRatio &&
             damage
           ) {
-            reflectedDamage += Math.floor(damage * effect.damageReturnRatio);
+            reflectedDamage += calculateMinOneDamage(
+              damage * effect.damageReturnRatio,
+            );
             addLog(
               `${getBaseSpirit(battleSpirit.playerSpirit.spiritId)?.name}'s Thorns reflects damage!`,
             );
@@ -254,7 +261,7 @@ export function useBattleLogic({
             effect.damageReflectRatio &&
             damage
           ) {
-            const reflectAmount = Math.floor(
+            const reflectAmount = calculateMinOneDamage(
               damage * effect.damageReflectRatio,
             );
             reflectedDamage += reflectAmount;
@@ -306,7 +313,9 @@ export function useBattleLogic({
               });
             }
             if (effect.type === "damage_reflect_passive") {
-              const reflectAmount = Math.floor(damage * effect.ratio);
+              const reflectAmount = calculateMinOneDamage(
+                damage * effect.ratio,
+              );
               reflectedDamage += reflectAmount;
               const targetDisplayName =
                 (target as Enemy).name ||
