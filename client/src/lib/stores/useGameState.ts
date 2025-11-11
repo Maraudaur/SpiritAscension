@@ -94,11 +94,11 @@ export interface GameStateStore extends Omit<GameStateData, "activeParty"> {
 
 // --- FIX: ALL CONSTANTS MOVED TO TOP-LEVEL SCOPE ---
 const TIER_DATA = [
-  { tier: 0, cost: 1000, qiMult: 1, battleMult: 0 },
-  { tier: 1, cost: 10000, qiMult: 1.5, battleMult: 1 },
-  { tier: 2, cost: 100000, qiMult: 2, battleMult: 2 },
-  { tier: 3, cost: 1000000, qiMult: 2.5, battleMult: 3 },
-  { tier: 4, cost: 10000000, qiMult: 3, battleMult: 4 },
+  { tier: 0, cost: 100000, qiMult: 1, battleMult: 0 },
+  { tier: 1, cost: 1000000, qiMult: 1.5, battleMult: 1 },
+  { tier: 2, cost: 10000000, qiMult: 2, battleMult: 2 },
+  { tier: 3, cost: 100000000, qiMult: 2.5, battleMult: 3 },
+  { tier: 4, cost: 1000000000, qiMult: 3, battleMult: 4 },
   { tier: 5, cost: Infinity, qiMult: 5, battleMult: 5 },
 ];
 const BASE_PROD_COST_BASE = 10;
@@ -505,7 +505,7 @@ export const useGameState = create<GameStateStore>()(
       },
 
       getLevelUpCost: (level: number) => {
-        const qiCost = Math.floor(10 * Math.pow(1.2, level));
+        const qiCost = Math.floor(10 * Math.pow(1.3, level));
         const essenceCost = 1 + Math.floor(level / 10);
         return { qi: qiCost, essence: essenceCost };
       },
