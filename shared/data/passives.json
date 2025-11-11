@@ -79,7 +79,7 @@
       {
         "type": "stat_boost",
         "stat": "health",
-        "value": 20
+        "value": 200
       }
     ]
   },

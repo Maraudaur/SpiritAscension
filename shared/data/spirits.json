@@ -1239,7 +1239,7 @@
       "element": "metal",
       "lineage": "dragon",
       "baseStats": {
-        "attack": 300,
+        "attack": 800,
         "defense": 150,
         "health": 1000,
         "elementalAffinity": 50
