@@ -26,6 +26,13 @@ export function Sidebar({ currentScreen, onNavigate }: SidebarProps) {
     if (screen === "summon" && ftueStep === "highlightSummon") {
       setFtueStep("highlightSummonButton");
     }
+    if (screen === "spirits" && ftueStep === "highlightSpirits") {
+      setFtueStep("highlightFirstSpirit");
+    }
+    if (screen === "battle" && ftueStep === "highlightBattle") {
+      // Don't clear yet - will clear after winning battle
+      // Keep highlightBattle active so player knows this is FTUE
+    }
   };
   // --- End of merged logic ---
 
@@ -97,6 +104,12 @@ export function Sidebar({ currentScreen, onNavigate }: SidebarProps) {
             ftueClass = "animate-pulse-bright";
           }
           if (item.id === "summon" && ftueStep === "highlightSummon") {
+            ftueClass = "animate-pulse-bright";
+          }
+          if (item.id === "spirits" && ftueStep === "highlightSpirits") {
+            ftueClass = "animate-pulse-bright";
+          }
+          if (item.id === "battle" && ftueStep === "highlightBattle") {
             ftueClass = "animate-pulse-bright";
           }
 

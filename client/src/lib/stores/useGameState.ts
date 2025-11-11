@@ -17,6 +17,10 @@ export type FtueStep =
   | "highlightUpgradeBase"
   | "highlightSummon"
   | "highlightSummonButton"
+  | "highlightSpirits"
+  | "highlightFirstSpirit"
+  | "highlightLevelUpButton"
+  | "highlightBattle"
   | null;
 
 export type Spirit = BaseSpirit & {
