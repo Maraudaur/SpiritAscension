@@ -65,6 +65,8 @@ export function StoryScreen({ onClose, onNavigate }: StoryScreenProps) {
     currentStoryDialogueIndex,
     hasUpgradedBase,
     activeParty,
+    spirits,
+    battlesWon,
     setStoryPosition, // <-- The action to update global state
     setFtueStep,
     ftueStep,
@@ -143,13 +145,22 @@ export function StoryScreen({ onClose, onNavigate }: StoryScreenProps) {
 
     // --- FTUE GATING LOGIC ---
     const hasNoSpiritsInParty = activeParty.every((slot) => slot === null);
+    const hasLevel2Spirit = spirits.some((spirit) => spirit.level >= 2);
+    const hasWonBattle = battlesWon >= 1;
+    
     const isGated =
       (currentStoryNodeId === 0 &&
         currentStoryDialogueIndex === 2 &&
         !hasUpgradedBase) ||
       (currentStoryNodeId === 0 &&
         currentStoryDialogueIndex === 3 &&
-        hasNoSpiritsInParty);
+        hasNoSpiritsInParty) ||
+      (currentStoryNodeId === 1 &&
+        currentStoryDialogueIndex === 0 &&
+        !hasLevel2Spirit) ||
+      (currentStoryNodeId === 1 &&
+        currentStoryDialogueIndex === 1 &&
+        !hasWonBattle);
 
     // This 'return' was missing, causing a syntax error
     return (
