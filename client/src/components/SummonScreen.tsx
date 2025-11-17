@@ -576,7 +576,7 @@ export function SummonScreen({ onNavigate }: SummonScreenProps) {
                     for this summon.
                   </div>
 
-                  <div className="grid grid-cols-2 gap-4 mt-6">
+                  <div className="grid grid-cols-3 gap-4 mt-6">
                     <Button
                       onClick={handleContinue}
                       className="w-full p-4 text-lg font-bold"
@@ -589,6 +589,16 @@ export function SummonScreen({ onNavigate }: SummonScreenProps) {
                       currentIndex < summonQueue.length - 1
                         ? `Next (${currentIndex + 2}/${summonQueue.length})`
                         : "Summon Again"}
+                    </Button>
+                    <Button
+                      onClick={() => onNavigate("spirits")}
+                      className="w-full p-4 text-lg font-bold"
+                      style={{
+                        background: "#4C8477",
+                        color: "var(--parchment)",
+                      }}
+                    >
+                      Manage Spirits
                     </Button>
                     <Button
                       onClick={() => onNavigate("cultivation")}
