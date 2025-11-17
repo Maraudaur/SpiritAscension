@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react"; // <-- Import useEffect
 import { Button } from "./ui/button";
-import { BookOpen, ArrowRight, ChevronRight, Lock } from "lucide-react";
+import { BookOpen, ArrowRight, ArrowLeft, ChevronRight, Lock } from "lucide-react";
 import { useGameState } from "../lib/stores/useGameState";
 import storyData from "@shared/data/story.json";
 import { motion, AnimatePresence } from "framer-motion";
@@ -68,7 +68,7 @@ const defaultCharacterStyle: CharacterStyleConfig = {
 
 export function StoryScreen({ onClose, onNavigate }: StoryScreenProps) {
   // --- FIX: This line is new/modified ---
-  const [storyLayer, setStoryLayer] = useState<"map" | "scene">(() => {
+  const [storyLayer, setStoryLayer] = useState<"map" | "scene" | "summary">(() => {
     // This function now runs ONCE when the component loads
     // We check the global state:
     const initialNodeId = useGameState.getState().currentStoryNodeId;
@@ -121,7 +121,12 @@ export function StoryScreen({ onClose, onNavigate }: StoryScreenProps) {
   const handleNodeClick = (nodeId: number) => {
     // --- FIX: Update global state ---
     setStoryPosition(nodeId, 0);
-    setStoryLayer("scene");
+    
+    // Check if this story node is already completed
+    const isCompleted = isStoryNodeCompleted(nodeId);
+    
+    // If completed, show summary; otherwise show scene
+    setStoryLayer(isCompleted ? "summary" : "scene");
   };
 
   const handleContinueDialogue = () => {
@@ -394,6 +399,106 @@ export function StoryScreen({ onClose, onNavigate }: StoryScreenProps) {
               </div>
             </motion.div>
           </AnimatePresence>
+        </div>
+      </div>
+    );
+  }
+
+  // --- RENDER SUMMARY VIEW ---
+  if (storyLayer === "summary" && currentNode) {
+    return (
+      <div
+        className="w-full h-full overflow-y-auto flex items-center justify-center"
+        style={{
+          background: "linear-gradient(135deg, #F5E6D3 0%, #E8D4B8 100%)",
+        }}
+      >
+        <div className="max-w-4xl mx-auto p-8">
+          <div
+            className="p-8 rounded-lg border-4"
+            style={{
+              background: "#FFFFFF",
+              borderColor: "#4C8477",
+              boxShadow: "0 4px 12px rgba(0, 0, 0, 0.15)",
+            }}
+          >
+            {/* Header with completion badge */}
+            <div className="flex items-start justify-between mb-6">
+              <div className="flex-1">
+                <h1
+                  className="text-4xl font-bold mb-2"
+                  style={{ color: "#8B4513", fontFamily: "serif" }}
+                >
+                  {currentNode.title}
+                </h1>
+              </div>
+              <div
+                className="px-4 py-2 rounded-lg text-sm font-bold flex items-center gap-2"
+                style={{
+                  background: "rgba(76, 132, 119, 0.2)",
+                  color: "#4C8477",
+                  border: "2px solid #4C8477",
+                }}
+              >
+                <span>✓</span>
+                <span>Story Complete</span>
+              </div>
+            </div>
+
+            {/* Description */}
+            <div className="mb-8">
+              <p
+                className="text-lg leading-relaxed"
+                style={{ color: "#5C4033" }}
+              >
+                {currentNode.description}
+              </p>
+            </div>
+
+            {/* Additional Info */}
+            {currentNode.encounterId && (
+              <div
+                className="mb-8 p-4 rounded-lg"
+                style={{
+                  background: "rgba(212, 175, 55, 0.1)",
+                  border: "2px solid #D4AF37",
+                }}
+              >
+                <p
+                  className="text-sm font-semibold"
+                  style={{ color: "#8B4513" }}
+                >
+                  ⚔️ This story unlocked a battle encounter
+                </p>
+              </div>
+            )}
+
+            {/* Action Buttons */}
+            <div className="flex gap-4">
+              <Button
+                onClick={() => setStoryLayer("scene")}
+                className="flex-1 px-6 py-3 flex items-center justify-center gap-2"
+                style={{
+                  background: "#4C8477",
+                  color: "#F5E6D3",
+                }}
+              >
+                <span>↻</span>
+                <span>Replay Story</span>
+              </Button>
+              <Button
+                onClick={handleSkipToMap}
+                className="flex-1 px-6 py-3 flex items-center justify-center gap-2"
+                style={{
+                  background: "#8B4513",
+                  color: "#F5E6D3",
+                }}
+              >
+                <ArrowLeft className="w-4 h-4" />
+                <span>Back to Map</span>
+              </Button>
+            </div>
+          </div>
         </div>
       </div>
     );

@@ -117,7 +117,7 @@ const TIER_DATA = [
 const BASE_PROD_COST_BASE = 10;
 const MULT_COST_BASE = 50;
 const BATTLE_REWARD_COST_BASE = 100;
-const BASE_SUMMON_COST = 100; // <-- Now accessible
+const BASE_SUMMON_COST = 50; // <-- Now accessible
 
 export const POTENTIAL_BONUSES: { [key in PotentialGrade]: number } = {
   SS: 1.25,
@@ -319,7 +319,8 @@ export const useGameState = create<GameStateStore>()(
             // On defeat, restore the checkpoint position (node stays incomplete)
             if (state.storyBattleCheckpoint) {
               state.currentStoryNodeId = state.storyBattleCheckpoint.nodeId;
-              state.currentStoryDialogueIndex = state.storyBattleCheckpoint.dialogueIndex;
+              state.currentStoryDialogueIndex =
+                state.storyBattleCheckpoint.dialogueIndex;
             }
           }
         });
@@ -570,7 +571,7 @@ export const useGameState = create<GameStateStore>()(
               state.essences[spirit.spiritId] =
                 (state.essences[spirit.spiritId] ?? 0) - cost.essence;
               spiritToLevel.level += 1;
-              
+
               // FTUE logic: clear level up button highlight
               if (state.ftueStep === "highlightLevelUpButton") {
                 state.ftueStep = null;
@@ -607,7 +608,7 @@ export const useGameState = create<GameStateStore>()(
         set((state) => {
           state.qi += qiAmount;
           state.battlesWon += 1;
-          
+
           // FTUE logic: clear battle highlight after winning
           if (state.ftueStep === "highlightBattle") {
             state.ftueStep = null;
