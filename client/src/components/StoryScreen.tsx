@@ -21,6 +21,7 @@ interface StoryNode {
   id: number;
   title: string;
   description: string;
+  summary?: string; // Plot summary for completed stories
   background: string; // Path to background image
   characters: StoryCharacter[]; // Characters in this scene
   dialogues: StoryDialogue[]; // Dialogues for this scene
@@ -445,13 +446,13 @@ export function StoryScreen({ onClose, onNavigate }: StoryScreenProps) {
               </div>
             </div>
 
-            {/* Description */}
+            {/* Story Summary */}
             <div className="mb-8">
               <p
                 className="text-lg leading-relaxed"
                 style={{ color: "#5C4033" }}
               >
-                {currentNode.description}
+                {currentNode.summary || currentNode.description}
               </p>
             </div>
 

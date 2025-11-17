@@ -3,6 +3,7 @@
     "id": 0,
     "title": "The Fall",
     "description": "What happened...?",
+    "summary": "After a catastrophic fall during ascension, you awaken weakened. Droplet, a water spirit, guides you to rebuild your cultivation and gather spirits before investigating what happened.",
     "background": "/images/backgrounds/mountainshackbg.png",
     "characters": [{ "id": "Droplet", "position": "right" }],
     "dialogues": [
@@ -40,6 +41,7 @@
     "id": 1,
     "title": "First Steps",
     "description": "Learn the basics of Qi cultivation",
+    "summary": "You train your first spirit and learn combat basics. A corrupted level 10 spirit blocks the path to a nearby town - you must prepare and defeat it.",
     "characters": [{ "id": "Droplet", "position": "right" }],
     "dialogues": [
       {
