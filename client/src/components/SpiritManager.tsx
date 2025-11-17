@@ -386,6 +386,9 @@ export function SpiritManager({ onClose }: SpiritManagerProps = {}) {
               const lineage = getLineage(baseSpirit.lineage);
               const isInParty = activeParty.includes(spirit.instanceId);
               
+              // Count filled party slots (non-null spirits)
+              const filledPartySlots = activeParty.filter(id => id !== null).length;
+              
               // FTUE: Highlight first spirit
               const isFirstSpirit = spirits[0]?.instanceId === spirit.instanceId;
               const shouldHighlight = ftueStep === "highlightFirstSpirit" && isFirstSpirit;
@@ -428,7 +431,7 @@ export function SpiritManager({ onClose }: SpiritManagerProps = {}) {
                     >
                       {baseSpirit.rarity.toUpperCase()}
                     </span>
-                    {!isInParty && activeParty.length < 4 && (
+                    {!isInParty && filledPartySlots < 4 && (
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
