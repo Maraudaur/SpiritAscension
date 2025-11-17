@@ -4,6 +4,7 @@ import {
   getElement,
   getLineage,
   getRarityColor,
+  getElementColor,
 } from "@/lib/spiritUtils";
 import { Button } from "@/components/ui/button";
 import {
@@ -440,22 +441,28 @@ export function BattleScreen({
                     </button>
                   </div>
                   <div className="flex flex-col gap-2 max-h-48 overflow-y-auto">
-                    {availableSkills.map((skill) => (
-                      <button
-                        key={skill.id}
-                        onClick={() => {
-                          playButtonClick();
-                          handleSkillSelect(skill.id);
-                        }}
-                        onMouseEnter={playButtonHover}
-                        className="p-3 bg-purple-600 hover:bg-purple-700 text-white rounded-lg text-left"
-                      >
-                        <p className="font-bold">{skill.name}</p>
-                        <p className="text-xs opacity-90">
-                          {skill.description}
-                        </p>
-                      </button>
-                    ))}
+                    {availableSkills.map((skill) => {
+                      const elementColor = getElementColor(skill.element);
+                      return (
+                        <button
+                          key={skill.id}
+                          onClick={() => {
+                            playButtonClick();
+                            handleSkillSelect(skill.id);
+                          }}
+                          onMouseEnter={playButtonHover}
+                          className="p-3 text-white rounded-lg text-left transition-all hover:brightness-125"
+                          style={{
+                            backgroundColor: elementColor,
+                          }}
+                        >
+                          <p className="font-bold">{skill.name}</p>
+                          <p className="text-xs opacity-90">
+                            {skill.description}
+                          </p>
+                        </button>
+                      );
+                    })}
                   </div>
                 </motion.div>
               )}

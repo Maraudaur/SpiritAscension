@@ -122,6 +122,18 @@ export function getElement(elementId: string): Element {
   return (elementsData as Record<string, Element>)[elementId];
 }
 
+export function getElementColor(elementId: ElementId): string {
+  const battlePalette: Record<ElementId, string> = {
+    wood: "#3a5c44",
+    earth: "#6b5437",
+    fire: "#9a342a",
+    water: "#2d5580",
+    metal: "#4a4a4a",
+    none: "#3d3d3d",
+  };
+  return battlePalette[elementId] || "#3d3d3d";
+}
+
 export function getLineage(lineageId: string): Lineage {
   return (lineagesData as Record<string, Lineage>)[lineageId];
 }
