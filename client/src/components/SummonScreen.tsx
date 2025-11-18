@@ -9,6 +9,7 @@ import {
   calculateAllStats,
   getPassiveAbility,
   getPrimaryElement,
+  getElementColor,
 } from "@/lib/spiritUtils";
 import { Button } from "@/components/ui/button";
 import { Sparkles, Info } from "lucide-react";
@@ -150,7 +151,6 @@ export function SummonScreen({ onNavigate }: SummonScreenProps) {
   const baseSpirit = summonedSpirit
     ? getBaseSpirit(summonedSpirit.spiritId)
     : null;
-  const element = baseSpirit ? getElement(getPrimaryElement(baseSpirit)) : null;
   const lineage = baseSpirit ? getLineage(baseSpirit.lineage) : null;
   const stats = summonedSpirit ? calculateAllStats(summonedSpirit) : null;
   const passiveId = baseSpirit?.passiveAbilities?.[0];
@@ -458,7 +458,7 @@ export function SummonScreen({ onNavigate }: SummonScreenProps) {
                         Level {summonedSpirit.level}
                       </p>
 
-                      <div className="flex gap-4 text-sm parchment-text">
+                      <div className="flex gap-2 text-sm parchment-text flex-wrap">
                         <span
                           className="font-semibold px-2 py-0.5 rounded"
                           style={{
@@ -469,15 +469,21 @@ export function SummonScreen({ onNavigate }: SummonScreenProps) {
                         >
                           {baseSpirit.rarity.toUpperCase()}
                         </span>
-                        <span
-                          className="font-semibold px-2 py-0.5 rounded"
-                          style={{
-                            backgroundColor: element.color,
-                            color: "#FFF",
-                          }}
-                        >
-                          {element.name.toUpperCase()}
-                        </span>
+                        {baseSpirit.elements.map((elemId) => {
+                          const elem = getElement(elemId);
+                          return (
+                            <span
+                              key={elemId}
+                              className="font-semibold px-2 py-0.5 rounded"
+                              style={{
+                                backgroundColor: getElementColor(elemId),
+                                color: "#FFF",
+                              }}
+                            >
+                              {elem?.name.toUpperCase()}
+                            </span>
+                          );
+                        })}
                       </div>
                       <p className="text-sm parchment-text opacity-80 italic">
                         {lineage.description}
