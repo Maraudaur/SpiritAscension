@@ -268,13 +268,14 @@ export function SpiritManager({ onClose }: SpiritManagerProps = {}) {
                         <div className="flex items-center gap-1 mt-1 flex-wrap">
                           {baseSpirit.elements.map((elemId) => {
                             const elem = getElement(elemId);
+                            const isNeutral = elemId === "none";
                             return (
                               <span
                                 key={elemId}
                                 className="text-xs font-bold px-1.5 py-0.5 rounded"
                                 style={{
                                   backgroundColor: getElementColor(elemId),
-                                  color: "white",
+                                  color: isNeutral ? "#000000" : "white",
                                 }}
                               >
                                 {elem?.name}
@@ -443,13 +444,14 @@ export function SpiritManager({ onClose }: SpiritManagerProps = {}) {
                     <div className="flex items-center gap-1 mb-2 flex-wrap justify-center">
                       {baseSpirit.elements.map((elemId) => {
                         const elem = getElement(elemId);
+                        const isNeutral = elemId === "none";
                         return (
                           <span
                             key={elemId}
                             className="text-xs font-bold px-1.5 py-0.5 rounded"
                             style={{
                               backgroundColor: getElementColor(elemId),
-                              color: "white",
+                              color: isNeutral ? "#000000" : "white",
                             }}
                           >
                             {elem?.name}
@@ -567,13 +569,14 @@ export function SpiritManager({ onClose }: SpiritManagerProps = {}) {
                     </span>
                     {baseSpirit.elements.map((elemId) => {
                       const elem = getElement(elemId);
+                      const isNeutral = elemId === "none";
                       return (
                         <span
                           key={elemId}
                           className="text-xs font-bold px-2 py-1 rounded"
                           style={{
                             backgroundColor: getElementColor(elemId),
-                            color: "white",
+                            color: isNeutral ? "#000000" : "white",
                           }}
                         >
                           {elem?.name}

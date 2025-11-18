@@ -244,13 +244,14 @@ export function BattleScreen({
               <div className="flex gap-1 mb-1 flex-wrap">
                 {activeBaseSpirit.elements.map((elemId) => {
                   const elem = getElement(elemId);
+                  const isNeutral = elemId === "none";
                   return (
                     <span
                       key={elemId}
                       className="text-xs font-bold px-1.5 py-0.5 rounded [text-shadow:0_1px_2px_rgba(0,0,0,0.8)]"
                       style={{
                         backgroundColor: getElementColor(elemId),
-                        color: "white",
+                        color: isNeutral ? "#000000" : "white",
                       }}
                     >
                       {elem?.name}
@@ -326,13 +327,14 @@ export function BattleScreen({
               <div className="flex gap-1 mb-1 flex-wrap justify-end">
                 {activeEnemy.elements.map((elemId) => {
                   const elem = getElement(elemId);
+                  const isNeutral = elemId === "none";
                   return (
                     <span
                       key={elemId}
                       className="text-xs font-bold px-1.5 py-0.5 rounded [text-shadow:0_1px_2px_rgba(0,0,0,0.8)]"
                       style={{
                         backgroundColor: getElementColor(elemId),
-                        color: "white",
+                        color: isNeutral ? "#000000" : "white",
                       }}
                     >
                       {elem?.name}

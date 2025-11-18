@@ -470,13 +470,14 @@ export function SummonScreen({ onNavigate }: SummonScreenProps) {
                         </span>
                         {baseSpirit.elements.map((elemId) => {
                           const elem = getElement(elemId);
+                          const isNeutral = elemId === "none";
                           return (
                             <span
                               key={elemId}
                               className="font-semibold px-2 py-0.5 rounded"
                               style={{
                                 backgroundColor: getElementColor(elemId),
-                                color: "#FFF",
+                                color: isNeutral ? "#000000" : "#FFF",
                               }}
                             >
                               {elem?.name.toUpperCase()}
