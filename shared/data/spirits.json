@@ -918,6 +918,100 @@
       "elements": [
         "metal"
       ]
+    },
+    {
+      "id": "spirit_u11",
+      "name": "Steam Phoenix",
+      "rarity": "uncommon",
+      "lineage": "dragon",
+      "baseStats": {
+        "attack": 180,
+        "defense": 140,
+        "health": 180,
+        "elementalAffinity": 120
+      },
+      "passiveAbilities": [
+        "attack_focus"
+      ],
+      "skills": [
+        "basic_attack",
+        "heavy_hit",
+        "crit_setup"
+      ],
+      "spriteConfig": {
+        "textureUrl": "/sprites/cinderpaw_idle.png",
+        "frameWidth": 128,
+        "frameHeight": 128,
+        "totalFrames": 8,
+        "animationSpeed": 0.1
+      },
+      "elements": [
+        "fire",
+        "water"
+      ]
+    },
+    {
+      "id": "spirit_u12",
+      "name": "Iron Mountain",
+      "rarity": "uncommon",
+      "lineage": "ox",
+      "baseStats": {
+        "attack": 140,
+        "defense": 210,
+        "health": 200,
+        "elementalAffinity": 80
+      },
+      "passiveAbilities": [
+        "defense_focus"
+      ],
+      "skills": [
+        "basic_attack",
+        "bubble_barrier",
+        "hit_and_heal"
+      ],
+      "spriteConfig": {
+        "textureUrl": "/sprites/cinderpaw_idle.png",
+        "frameWidth": 128,
+        "frameHeight": 128,
+        "totalFrames": 8,
+        "animationSpeed": 0.1
+      },
+      "elements": [
+        "earth",
+        "metal"
+      ]
+    },
+    {
+      "id": "spirit_u13",
+      "name": "Wildfire Stag",
+      "rarity": "uncommon",
+      "lineage": "horse",
+      "baseStats": {
+        "attack": 190,
+        "defense": 130,
+        "health": 170,
+        "elementalAffinity": 110
+      },
+      "passiveAbilities": [
+        "attack_focus",
+        "crit_mastery"
+      ],
+      "skills": [
+        "basic_attack",
+        "heavy_hit",
+        "lifesteal_buff"
+      ],
+      "spriteConfig": {
+        "textureUrl": "/sprites/cinderpaw_idle.png",
+        "frameWidth": 128,
+        "frameHeight": 128,
+        "totalFrames": 8,
+        "animationSpeed": 0.1
+      },
+      "elements": [
+        "wood",
+        "fire"
+      ]
     }
   ],
   "rare": [
