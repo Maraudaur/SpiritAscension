@@ -254,7 +254,7 @@ export interface BaseSpirit {
   id: string;
   name: string;
   rarity: Rarity;
-  element: ElementId;
+  elements: ElementId[];
   lineage: LineageId;
   baseStats: {
     attack: number;

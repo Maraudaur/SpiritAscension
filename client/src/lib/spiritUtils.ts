@@ -63,11 +63,29 @@ const ELEMENTAL_MATRIX: Record<ElementId, Record<ElementId, number>> = {
   none: { wood: 1.0, water: 1.0, metal: 1.0, earth: 1.0, fire: 1.0, none: 1.0 },
 } as const;
 
+export function getPrimaryElement(spirit: BaseSpirit): ElementId {
+  return spirit.elements[0] || "none";
+}
+
 export function getElementalDamageMultiplier(
-  attackerElement: ElementId,
-  defenderElement: ElementId,
+  attackerElements: ElementId | ElementId[],
+  defenderElements: ElementId | ElementId[],
 ): number {
-  return ELEMENTAL_MATRIX[attackerElement]?.[defenderElement] || 1.0;
+  const attackerArray = Array.isArray(attackerElements) ? attackerElements : [attackerElements];
+  const defenderArray = Array.isArray(defenderElements) ? defenderElements : [defenderElements];
+  
+  if (attackerArray.length === 0 || defenderArray.length === 0) {
+    return 1.0;
+  }
+  
+  const allMultipliers: number[] = [];
+  for (const atkElem of attackerArray) {
+    for (const defElem of defenderArray) {
+      allMultipliers.push(ELEMENTAL_MATRIX[atkElem]?.[defElem] || 1.0);
+    }
+  }
+  
+  return Math.max(...allMultipliers);
 }
 
 export function getBaseSpirit(spiritId: string): BaseSpirit | undefined {

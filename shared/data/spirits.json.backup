@@ -4,6 +4,7 @@
       "id": "spirit_c01",
       "name": "Jade Sparrow",
       "rarity": "common",
+      "element": "wood",
       "lineage": "tiger",
       "baseStats": {
         "attack": 120,
@@ -11,29 +12,21 @@
         "health": 180,
         "elementalAffinity": 60
       },
-      "passiveAbilities": [
-        "health_focus"
-      ],
-      "skills": [
-        "basic_attack",
-        "heavy_hit",
-        "hit_and_heal"
-      ],
+      "passiveAbilities": ["health_focus"],
+      "skills": ["basic_attack", "heavy_hit", "hit_and_heal"],
       "spriteConfig": {
         "textureUrl": "/sprites/cinderpaw_idle.png",
         "frameWidth": 128,
         "frameHeight": 128,
         "totalFrames": 8,
         "animationSpeed": 0.1
-      },
-      "elements": [
-        "wood"
-      ]
+      }
     },
     {
       "id": "spirit_c02",
       "name": "Stone Carp",
       "rarity": "common",
+      "element": "earth",
       "lineage": "ox",
       "baseStats": {
         "attack": 100,
@@ -41,29 +34,21 @@
         "health": 160,
         "elementalAffinity": 60
       },
-      "passiveAbilities": [
-        "defense_focus"
-      ],
-      "skills": [
-        "basic_attack",
-        "bubble_barrier",
-        "hit_and_heal"
-      ],
+      "passiveAbilities": ["defense_focus"],
+      "skills": ["basic_attack", "bubble_barrier", "hit_and_heal"],
       "spriteConfig": {
         "textureUrl": "/sprites/cinderpaw_idle.png",
         "frameWidth": 128,
         "frameHeight": 128,
         "totalFrames": 8,
         "animationSpeed": 0.1
-      },
-      "elements": [
-        "earth"
-      ]
+      }
     },
     {
       "id": "spirit_c03",
       "name": "Ember Fox",
       "rarity": "common",
+      "element": "fire",
       "lineage": "serpent",
       "baseStats": {
         "attack": 160,
@@ -71,30 +56,21 @@
         "health": 140,
         "elementalAffinity": 100
       },
-      "passiveAbilities": [
-        "attack_focus",
-        "crit_mastery"
-      ],
-      "skills": [
-        "basic_attack",
-        "heavy_hit",
-        "hit_and_heal"
-      ],
+      "passiveAbilities": ["attack_focus", "crit_mastery"],
+      "skills": ["basic_attack", "heavy_hit", "hit_and_heal"],
       "spriteConfig": {
         "textureUrl": "/sprites/cinderpaw_idle.png",
         "frameWidth": 128,
         "frameHeight": 128,
         "totalFrames": 8,
         "animationSpeed": 0.1
-      },
-      "elements": [
-        "fire"
-      ]
+      }
     },
     {
       "id": "spirit_c04",
       "name": "Mist Crane",
       "rarity": "common",
+      "element": "water",
       "lineage": "horse",
       "baseStats": {
         "attack": 130,
@@ -102,30 +78,21 @@
         "health": 150,
         "elementalAffinity": 100
       },
-      "passiveAbilities": [
-        "health_focus",
-        "healing_waters"
-      ],
-      "skills": [
-        "basic_attack",
-        "heavy_hit",
-        "water_charge"
-      ],
+      "passiveAbilities": ["health_focus", "healing_waters"],
+      "skills": ["basic_attack", "heavy_hit", "water_charge"],
       "spriteConfig": {
         "textureUrl": "/sprites/cinderpaw_idle.png",
         "frameWidth": 128,
         "frameHeight": 128,
         "totalFrames": 8,
         "animationSpeed": 0.1
-      },
-      "elements": [
-        "water"
-      ]
+      }
     },
     {
       "id": "spirit_c05",
       "name": "Iron Beetle",
       "rarity": "common",
+      "element": "metal",
       "lineage": "ox",
       "baseStats": {
         "attack": 80,
@@ -133,29 +100,21 @@
         "health": 140,
         "elementalAffinity": 100
       },
-      "passiveAbilities": [
-        "damage_reflect",
-        "defense_focus"
-      ],
-      "skills": [
-        "basic_attack",
-        "thorns_buff"
-      ],
+      "passiveAbilities": ["damage_reflect", "defense_focus"],
+      "skills": ["basic_attack", "thorns_buff"],
       "spriteConfig": {
         "textureUrl": "/sprites/cinderpaw_idle.png",
         "frameWidth": 128,
         "frameHeight": 128,
         "totalFrames": 8,
         "animationSpeed": 0.1
-      },
-      "elements": [
-        "metal"
-      ]
+      }
     },
     {
       "id": "spirit_c06",
       "name": "Bamboo Spirit",
       "rarity": "common",
+      "element": "wood",
       "lineage": "monkey",
       "baseStats": {
         "attack": 140,
@@ -163,29 +122,21 @@
         "health": 150,
         "elementalAffinity": 90
       },
-      "passiveAbilities": [
-        "attack_focus"
-      ],
-      "skills": [
-        "basic_attack",
-        "heavy_hit",
-        "hit_and_heal"
-      ],
+      "passiveAbilities": ["attack_focus"],
+      "skills": ["basic_attack", "heavy_hit", "hit_and_heal"],
       "spriteConfig": {
         "textureUrl": "/sprites/cinderpaw_idle.png",
         "frameWidth": 128,
         "frameHeight": 128,
         "totalFrames": 8,
         "animationSpeed": 0.1
-      },
-      "elements": [
-        "wood"
-      ]
+      }
     },
     {
       "id": "spirit_c07",
       "name": "Clay Guardian",
       "rarity": "common",
+      "element": "earth",
       "lineage": "tiger",
       "baseStats": {
         "attack": 110,
@@ -193,29 +144,21 @@
         "health": 170,
         "elementalAffinity": 60
       },
-      "passiveAbilities": [
-        "defense_focus"
-      ],
-      "skills": [
-        "basic_attack",
-        "heavy_hit",
-        "hit_and_heal"
-      ],
+      "passiveAbilities": ["defense_focus"],
+      "skills": ["basic_attack", "heavy_hit", "hit_and_heal"],
       "spriteConfig": {
         "textureUrl": "/sprites/cinderpaw_idle.png",
         "frameWidth": 128,
         "frameHeight": 128,
         "totalFrames": 8,
         "animationSpeed": 0.1
-      },
-      "elements": [
-        "earth"
-      ]
+      }
     },
     {
       "id": "spirit_c08",
       "name": "Flame Moth",
       "rarity": "common",
+      "element": "fire",
       "lineage": "monkey",
       "baseStats": {
         "attack": 150,
@@ -223,29 +166,21 @@
         "health": 130,
         "elementalAffinity": 110
       },
-      "passiveAbilities": [
-        "attack_focus"
-      ],
-      "skills": [
-        "basic_attack",
-        "heavy_hit",
-        "hit_and_heal"
-      ],
+      "passiveAbilities": ["attack_focus"],
+      "skills": ["basic_attack", "heavy_hit", "hit_and_heal"],
       "spriteConfig": {
         "textureUrl": "/sprites/cinderpaw_idle.png",
         "frameWidth": 128,
         "frameHeight": 128,
         "totalFrames": 8,
         "animationSpeed": 0.1
-      },
-      "elements": [
-        "fire"
-      ]
+      }
     },
     {
       "id": "spirit_c09",
       "name": "Brook Turtle",
       "rarity": "common",
+      "element": "water",
       "lineage": "ox",
       "baseStats": {
         "attack": 90,
@@ -253,14 +188,8 @@
         "health": 150,
         "elementalAffinity": 70
       },
-      "passiveAbilities": [
-        "defense_focus"
-      ],
-      "skills": [
-        "basic_attack",
-        "bubble_barrier",
-        "hit_and_heal"
-      ],
+      "passiveAbilities": ["defense_focus"],
+      "skills": ["basic_attack", "bubble_barrier", "hit_and_heal"],
       "triggeredAbilities": [
         {
           "trigger": "on_switch_in",
@@ -279,15 +208,13 @@
         "frameHeight": 128,
         "totalFrames": 8,
         "animationSpeed": 0.1
-      },
-      "elements": [
-        "water"
-      ]
+      }
     },
     {
       "id": "spirit_c10",
       "name": "Steel Mantis",
       "rarity": "common",
+      "element": "metal",
       "lineage": "serpent",
       "baseStats": {
         "attack": 170,
@@ -295,29 +222,21 @@
         "health": 130,
         "elementalAffinity": 110
       },
-      "passiveAbilities": [
-        "attack_focus"
-      ],
-      "skills": [
-        "basic_attack",
-        "swap_atk_trap",
-        "crit_setup"
-      ],
+      "passiveAbilities": ["attack_focus"],
+      "skills": ["basic_attack", "swap_atk_trap", "crit_setup"],
       "spriteConfig": {
         "textureUrl": "/sprites/cinderpaw_idle.png",
         "frameWidth": 128,
         "frameHeight": 128,
         "totalFrames": 8,
         "animationSpeed": 0.1
-      },
-      "elements": [
-        "metal"
-      ]
+      }
     },
     {
       "id": "spirit_c11",
       "name": "Willow Wisp",
       "rarity": "common",
+      "element": "wood",
       "lineage": "serpent",
       "baseStats": {
         "attack": 130,
@@ -325,29 +244,21 @@
         "health": 140,
         "elementalAffinity": 100
       },
-      "passiveAbilities": [
-        "dot_amplification"
-      ],
-      "skills": [
-        "basic_attack",
-        "def_shred_dot",
-        "hit_and_heal"
-      ],
+      "passiveAbilities": ["dot_amplification"],
+      "skills": ["basic_attack", "def_shred_dot", "hit_and_heal"],
       "spriteConfig": {
         "textureUrl": "/sprites/cinderpaw_idle.png",
         "frameWidth": 128,
         "frameHeight": 128,
         "totalFrames": 8,
         "animationSpeed": 0.1
-      },
-      "elements": [
-        "wood"
-      ]
+      }
     },
     {
       "id": "spirit_c12",
       "name": "Sand Scorpion",
       "rarity": "common",
+      "element": "earth",
       "lineage": "serpent",
       "baseStats": {
         "attack": 140,
@@ -355,29 +266,21 @@
         "health": 130,
         "elementalAffinity": 100
       },
-      "passiveAbilities": [
-        "poison_thorns"
-      ],
-      "skills": [
-        "basic_attack",
-        "def_shred_dot",
-        "heavy_hit"
-      ],
+      "passiveAbilities": ["poison_thorns"],
+      "skills": ["basic_attack", "def_shred_dot", "heavy_hit"],
       "spriteConfig": {
         "textureUrl": "/sprites/cinderpaw_idle.png",
         "frameWidth": 128,
         "frameHeight": 128,
         "totalFrames": 8,
         "animationSpeed": 0.1
-      },
-      "elements": [
-        "earth"
-      ]
+      }
     },
     {
       "id": "spirit_c13",
       "name": "Ash Hound",
       "rarity": "common",
+      "element": "fire",
       "lineage": "tiger",
       "baseStats": {
         "attack": 150,
@@ -385,29 +288,21 @@
         "health": 140,
         "elementalAffinity": 90
       },
-      "passiveAbilities": [
-        "attack_focus"
-      ],
-      "skills": [
-        "basic_attack",
-        "heavy_hit",
-        "hit_and_heal"
-      ],
+      "passiveAbilities": ["attack_focus"],
+      "skills": ["basic_attack", "heavy_hit", "hit_and_heal"],
       "spriteConfig": {
         "textureUrl": "/sprites/cinderpaw_idle.png",
         "frameWidth": 128,
         "frameHeight": 128,
         "totalFrames": 8,
         "animationSpeed": 0.1
-      },
-      "elements": [
-        "fire"
-      ]
+      }
     },
     {
       "id": "spirit_c14",
       "name": "Wave Serpent",
       "rarity": "common",
+      "element": "water",
       "lineage": "serpent",
       "baseStats": {
         "attack": 140,
@@ -415,29 +310,21 @@
         "health": 140,
         "elementalAffinity": 110
       },
-      "passiveAbilities": [
-        "health_focus"
-      ],
-      "skills": [
-        "basic_attack",
-        "heavy_hit",
-        "hit_and_heal"
-      ],
+      "passiveAbilities": ["health_focus"],
+      "skills": ["basic_attack", "heavy_hit", "hit_and_heal"],
       "spriteConfig": {
         "textureUrl": "/sprites/cinderpaw_idle.png",
         "frameWidth": 128,
         "frameHeight": 128,
         "totalFrames": 8,
         "animationSpeed": 0.1
-      },
-      "elements": [
-        "water"
-      ]
+      }
     },
     {
       "id": "spirit_c15",
       "name": "Bronze Hawk",
       "rarity": "common",
+      "element": "metal",
       "lineage": "horse",
       "baseStats": {
         "attack": 140,
@@ -445,29 +332,21 @@
         "health": 120,
         "elementalAffinity": 110
       },
-      "passiveAbilities": [
-        "attack_focus"
-      ],
-      "skills": [
-        "basic_attack",
-        "heavy_hit",
-        "hit_and_heal"
-      ],
+      "passiveAbilities": ["attack_focus"],
+      "skills": ["basic_attack", "heavy_hit", "hit_and_heal"],
       "spriteConfig": {
         "textureUrl": "/sprites/cinderpaw_idle.png",
         "frameWidth": 128,
         "frameHeight": 128,
         "totalFrames": 8,
         "animationSpeed": 0.1
-      },
-      "elements": [
-        "metal"
-      ]
+      }
     },
     {
       "id": "spirit_c16",
       "name": "Pine Spirit",
       "rarity": "common",
+      "element": "wood",
       "lineage": "ox",
       "baseStats": {
         "attack": 110,
@@ -475,29 +354,21 @@
         "health": 170,
         "elementalAffinity": 70
       },
-      "passiveAbilities": [
-        "health_focus"
-      ],
-      "skills": [
-        "basic_attack",
-        "heavy_hit",
-        "hit_and_heal"
-      ],
+      "passiveAbilities": ["health_focus"],
+      "skills": ["basic_attack", "heavy_hit", "hit_and_heal"],
       "spriteConfig": {
         "textureUrl": "/sprites/cinderpaw_idle.png",
         "frameWidth": 128,
         "frameHeight": 128,
         "totalFrames": 8,
         "animationSpeed": 0.1
-      },
-      "elements": [
-        "wood"
-      ]
+      }
     },
     {
       "id": "spirit_c17",
       "name": "Dust Devil",
       "rarity": "common",
+      "element": "earth",
       "lineage": "horse",
       "baseStats": {
         "attack": 130,
@@ -505,29 +376,21 @@
         "health": 140,
         "elementalAffinity": 110
       },
-      "passiveAbilities": [
-        "attack_focus"
-      ],
-      "skills": [
-        "basic_attack",
-        "heavy_hit",
-        "hit_and_heal"
-      ],
+      "passiveAbilities": ["attack_focus"],
+      "skills": ["basic_attack", "heavy_hit", "hit_and_heal"],
       "spriteConfig": {
         "textureUrl": "/sprites/cinderpaw_idle.png",
         "frameWidth": 128,
         "frameHeight": 128,
         "totalFrames": 8,
         "animationSpeed": 0.1
-      },
-      "elements": [
-        "earth"
-      ]
+      }
     },
     {
       "id": "spirit_c18",
       "name": "Cinder Cat",
       "rarity": "common",
+      "element": "fire",
       "lineage": "tiger",
       "baseStats": {
         "attack": 160,
@@ -535,29 +398,21 @@
         "health": 130,
         "elementalAffinity": 110
       },
-      "passiveAbilities": [
-        "attack_focus"
-      ],
-      "skills": [
-        "basic_attack",
-        "heavy_hit",
-        "hit_and_heal"
-      ],
+      "passiveAbilities": ["attack_focus"],
+      "skills": ["basic_attack", "heavy_hit", "hit_and_heal"],
       "spriteConfig": {
         "textureUrl": "/sprites/cinderpaw_idle.png",
         "frameWidth": 128,
         "frameHeight": 128,
         "totalFrames": 8,
         "animationSpeed": 0.1
-      },
-      "elements": [
-        "fire"
-      ]
+      }
     },
     {
       "id": "spirit_c19",
       "name": "Tide Frog",
       "rarity": "common",
+      "element": "water",
       "lineage": "monkey",
       "baseStats": {
         "attack": 120,
@@ -565,29 +420,21 @@
         "health": 140,
         "elementalAffinity": 100
       },
-      "passiveAbilities": [
-        "health_focus"
-      ],
-      "skills": [
-        "basic_attack",
-        "heavy_hit",
-        "hit_and_heal"
-      ],
+      "passiveAbilities": ["health_focus"],
+      "skills": ["basic_attack", "heavy_hit", "hit_and_heal"],
       "spriteConfig": {
         "textureUrl": "/sprites/cinderpaw_idle.png",
         "frameWidth": 128,
         "frameHeight": 128,
         "totalFrames": 8,
         "animationSpeed": 0.1
-      },
-      "elements": [
-        "water"
-      ]
+      }
     },
     {
       "id": "spirit_c20",
       "name": "Silver Spider",
       "rarity": "common",
+      "element": "metal",
       "lineage": "monkey",
       "baseStats": {
         "attack": 140,
@@ -595,24 +442,15 @@
         "health": 120,
         "elementalAffinity": 120
       },
-      "passiveAbilities": [
-        "attack_focus"
-      ],
-      "skills": [
-        "basic_attack",
-        "heavy_hit",
-        "hit_and_heal"
-      ],
+      "passiveAbilities": ["attack_focus"],
+      "skills": ["basic_attack", "heavy_hit", "hit_and_heal"],
       "spriteConfig": {
         "textureUrl": "/sprites/cinderpaw_idle.png",
         "frameWidth": 128,
         "frameHeight": 128,
         "totalFrames": 8,
         "animationSpeed": 0.1
-      },
-      "elements": [
-        "metal"
-      ]
+      }
     }
   ],
   "uncommon": [
@@ -620,6 +458,7 @@
       "id": "spirit_u01",
       "name": "Emerald Tiger",
       "rarity": "uncommon",
+      "element": "wood",
       "lineage": "tiger",
       "baseStats": {
         "attack": 160,
@@ -627,30 +466,21 @@
         "health": 200,
         "elementalAffinity": 90
       },
-      "passiveAbilities": [
-        "attack_focus",
-        "healing_flames"
-      ],
-      "skills": [
-        "basic_attack",
-        "heavy_hit",
-        "lifesteal_buff"
-      ],
+      "passiveAbilities": ["attack_focus", "healing_flames"],
+      "skills": ["basic_attack", "heavy_hit", "lifesteal_buff"],
       "spriteConfig": {
         "textureUrl": "/sprites/cinderpaw_idle.png",
         "frameWidth": 128,
         "frameHeight": 128,
         "totalFrames": 8,
         "animationSpeed": 0.1
-      },
-      "elements": [
-        "wood"
-      ]
+      }
     },
     {
       "id": "spirit_u02",
       "name": "Mountain Bear",
       "rarity": "uncommon",
+      "element": "earth",
       "lineage": "ox",
       "baseStats": {
         "attack": 140,
@@ -658,29 +488,21 @@
         "health": 190,
         "elementalAffinity": 70
       },
-      "passiveAbilities": [
-        "defense_focus"
-      ],
-      "skills": [
-        "basic_attack",
-        "heavy_hit",
-        "hit_and_heal"
-      ],
+      "passiveAbilities": ["defense_focus"],
+      "skills": ["basic_attack", "heavy_hit", "hit_and_heal"],
       "spriteConfig": {
         "textureUrl": "/sprites/cinderpaw_idle.png",
         "frameWidth": 128,
         "frameHeight": 128,
         "totalFrames": 8,
         "animationSpeed": 0.1
-      },
-      "elements": [
-        "earth"
-      ]
+      }
     },
     {
       "id": "spirit_u03",
       "name": "Inferno Wolf",
       "rarity": "uncommon",
+      "element": "fire",
       "lineage": "tiger",
       "baseStats": {
         "attack": 200,
@@ -688,30 +510,21 @@
         "health": 170,
         "elementalAffinity": 110
       },
-      "passiveAbilities": [
-        "attack_focus",
-        "crit_mastery"
-      ],
-      "skills": [
-        "basic_attack",
-        "heavy_hit",
-        "crit_setup"
-      ],
+      "passiveAbilities": ["attack_focus", "crit_mastery"],
+      "skills": ["basic_attack", "heavy_hit", "crit_setup"],
       "spriteConfig": {
         "textureUrl": "/sprites/cinderpaw_idle.png",
         "frameWidth": 128,
         "frameHeight": 128,
         "totalFrames": 8,
         "animationSpeed": 0.1
-      },
-      "elements": [
-        "fire"
-      ]
+      }
     },
     {
       "id": "spirit_u04",
       "name": "Frost Stag",
       "rarity": "uncommon",
+      "element": "water",
       "lineage": "horse",
       "baseStats": {
         "attack": 170,
@@ -719,29 +532,21 @@
         "health": 180,
         "elementalAffinity": 110
       },
-      "passiveAbilities": [
-        "health_focus"
-      ],
-      "skills": [
-        "basic_attack",
-        "heavy_hit",
-        "hit_and_heal"
-      ],
+      "passiveAbilities": ["health_focus"],
+      "skills": ["basic_attack", "heavy_hit", "hit_and_heal"],
       "spriteConfig": {
         "textureUrl": "/sprites/cinderpaw_idle.png",
         "frameWidth": 128,
         "frameHeight": 128,
         "totalFrames": 8,
         "animationSpeed": 0.1
-      },
-      "elements": [
-        "water"
-      ]
+      }
     },
     {
       "id": "spirit_u05",
       "name": "Platinum Eagle",
       "rarity": "uncommon",
+      "element": "metal",
       "lineage": "horse",
       "baseStats": {
         "attack": 180,
@@ -749,29 +554,21 @@
         "health": 160,
         "elementalAffinity": 110
       },
-      "passiveAbilities": [
-        "attack_focus"
-      ],
-      "skills": [
-        "basic_attack",
-        "heavy_hit",
-        "hit_and_heal"
-      ],
+      "passiveAbilities": ["attack_focus"],
+      "skills": ["basic_attack", "heavy_hit", "hit_and_heal"],
       "spriteConfig": {
         "textureUrl": "/sprites/cinderpaw_idle.png",
         "frameWidth": 128,
         "frameHeight": 128,
         "totalFrames": 8,
         "animationSpeed": 0.1
-      },
-      "elements": [
-        "metal"
-      ]
+      }
     },
     {
       "id": "spirit_u06",
       "name": "Jade Panther",
       "rarity": "uncommon",
+      "element": "wood",
       "lineage": "tiger",
       "baseStats": {
         "attack": 180,
@@ -779,29 +576,21 @@
         "health": 180,
         "elementalAffinity": 100
       },
-      "passiveAbilities": [
-        "attack_focus"
-      ],
-      "skills": [
-        "basic_attack",
-        "heavy_hit",
-        "hit_and_heal"
-      ],
+      "passiveAbilities": ["attack_focus"],
+      "skills": ["basic_attack", "heavy_hit", "hit_and_heal"],
       "spriteConfig": {
         "textureUrl": "/sprites/cinderpaw_idle.png",
         "frameWidth": 128,
         "frameHeight": 128,
         "totalFrames": 8,
         "animationSpeed": 0.1
-      },
-      "elements": [
-        "wood"
-      ]
+      }
     },
     {
       "id": "spirit_u07",
       "name": "Boulder Rhino",
       "rarity": "uncommon",
+      "element": "earth",
       "lineage": "ox",
       "baseStats": {
         "attack": 150,
@@ -809,30 +598,21 @@
         "health": 180,
         "elementalAffinity": 60
       },
-      "passiveAbilities": [
-        "defense_focus",
-        "damage_reflect"
-      ],
-      "skills": [
-        "basic_attack",
-        "thorns_buff",
-        "bubble_barrier"
-      ],
+      "passiveAbilities": ["defense_focus", "damage_reflect"],
+      "skills": ["basic_attack", "thorns_buff", "bubble_barrier"],
       "spriteConfig": {
         "textureUrl": "/sprites/cinderpaw_idle.png",
         "frameWidth": 128,
         "frameHeight": 128,
         "totalFrames": 8,
         "animationSpeed": 0.1
-      },
-      "elements": [
-        "earth"
-      ]
+      }
     },
     {
       "id": "spirit_u08",
       "name": "Crimson Serpent",
       "rarity": "uncommon",
+      "element": "fire",
       "lineage": "serpent",
       "baseStats": {
         "attack": 190,
@@ -840,29 +620,21 @@
         "health": 160,
         "elementalAffinity": 120
       },
-      "passiveAbilities": [
-        "attack_focus"
-      ],
-      "skills": [
-        "basic_attack",
-        "heavy_hit",
-        "hit_and_heal"
-      ],
+      "passiveAbilities": ["attack_focus"],
+      "skills": ["basic_attack", "heavy_hit", "hit_and_heal"],
       "spriteConfig": {
         "textureUrl": "/sprites/cinderpaw_idle.png",
         "frameWidth": 128,
         "frameHeight": 128,
         "totalFrames": 8,
         "animationSpeed": 0.1
-      },
-      "elements": [
-        "fire"
-      ]
+      }
     },
     {
       "id": "spirit_u09",
       "name": "Ocean Dolphin",
       "rarity": "uncommon",
+      "element": "water",
       "lineage": "horse",
       "baseStats": {
         "attack": 160,
@@ -870,29 +642,21 @@
         "health": 190,
         "elementalAffinity": 100
       },
-      "passiveAbilities": [
-        "health_focus"
-      ],
-      "skills": [
-        "basic_attack",
-        "heavy_hit",
-        "hit_and_heal"
-      ],
+      "passiveAbilities": ["health_focus"],
+      "skills": ["basic_attack", "heavy_hit", "hit_and_heal"],
       "spriteConfig": {
         "textureUrl": "/sprites/cinderpaw_idle.png",
         "frameWidth": 128,
         "frameHeight": 128,
         "totalFrames": 8,
         "animationSpeed": 0.1
-      },
-      "elements": [
-        "water"
-      ]
+      }
     },
     {
       "id": "spirit_u10",
       "name": "Steel Ox",
       "rarity": "uncommon",
+      "element": "metal",
       "lineage": "ox",
       "baseStats": {
         "attack": 150,
@@ -900,24 +664,15 @@
         "health": 170,
         "elementalAffinity": 90
       },
-      "passiveAbilities": [
-        "defense_focus"
-      ],
-      "skills": [
-        "basic_attack",
-        "heavy_hit",
-        "hit_and_heal"
-      ],
+      "passiveAbilities": ["defense_focus"],
+      "skills": ["basic_attack", "heavy_hit", "hit_and_heal"],
       "spriteConfig": {
         "textureUrl": "/sprites/cinderpaw_idle.png",
         "frameWidth": 128,
         "frameHeight": 128,
         "totalFrames": 8,
         "animationSpeed": 0.1
-      },
-      "elements": [
-        "metal"
-      ]
+      }
     }
   ],
   "rare": [
@@ -925,6 +680,7 @@
       "id": "spirit_r01",
       "name": "Verdant Dragon",
       "rarity": "rare",
+      "element": "wood",
       "lineage": "dragon",
       "baseStats": {
         "attack": 190,
@@ -932,29 +688,21 @@
         "health": 230,
         "elementalAffinity": 100
       },
-      "passiveAbilities": [
-        "health_focus"
-      ],
-      "skills": [
-        "basic_attack",
-        "heavy_hit",
-        "hit_and_heal"
-      ],
+      "passiveAbilities": ["health_focus"],
+      "skills": ["basic_attack", "heavy_hit", "hit_and_heal"],
       "spriteConfig": {
         "textureUrl": "/sprites/cinderpaw_idle.png",
         "frameWidth": 128,
         "frameHeight": 128,
         "totalFrames": 8,
         "animationSpeed": 0.1
-      },
-      "elements": [
-        "wood"
-      ]
+      }
     },
     {
       "id": "spirit_r02",
       "name": "Granite Golem",
       "rarity": "rare",
+      "element": "earth",
       "lineage": "ox",
       "baseStats": {
         "attack": 170,
@@ -962,29 +710,21 @@
         "health": 210,
         "elementalAffinity": 80
       },
-      "passiveAbilities": [
-        "defense_focus"
-      ],
-      "skills": [
-        "basic_attack",
-        "heavy_hit",
-        "hit_and_heal"
-      ],
+      "passiveAbilities": ["defense_focus"],
+      "skills": ["basic_attack", "heavy_hit", "hit_and_heal"],
       "spriteConfig": {
         "textureUrl": "/sprites/cinderpaw_idle.png",
         "frameWidth": 128,
         "frameHeight": 128,
         "totalFrames": 8,
         "animationSpeed": 0.1
-      },
-      "elements": [
-        "earth"
-      ]
+      }
     },
     {
       "id": "spirit_r03",
       "name": "Phoenix Flame",
       "rarity": "rare",
+      "element": "fire",
       "lineage": "dragon",
       "baseStats": {
         "attack": 240,
@@ -992,29 +732,21 @@
         "health": 200,
         "elementalAffinity": 110
       },
-      "passiveAbilities": [
-        "attack_focus"
-      ],
-      "skills": [
-        "basic_attack",
-        "heavy_hit",
-        "hit_and_heal"
-      ],
+      "passiveAbilities": ["attack_focus"],
+      "skills": ["basic_attack", "heavy_hit", "hit_and_heal"],
       "spriteConfig": {
         "textureUrl": "/sprites/cinderpaw_idle.png",
         "frameWidth": 128,
         "frameHeight": 128,
         "totalFrames": 8,
         "animationSpeed": 0.1
-      },
-      "elements": [
-        "fire"
-      ]
+      }
     },
     {
       "id": "spirit_r04",
       "name": "Glacier Wyrm",
       "rarity": "rare",
+      "element": "water",
       "lineage": "dragon",
       "baseStats": {
         "attack": 200,
@@ -1022,29 +754,21 @@
         "health": 220,
         "elementalAffinity": 110
       },
-      "passiveAbilities": [
-        "health_focus"
-      ],
-      "skills": [
-        "basic_attack",
-        "heavy_hit",
-        "hit_and_heal"
-      ],
+      "passiveAbilities": ["health_focus"],
+      "skills": ["basic_attack", "heavy_hit", "hit_and_heal"],
       "spriteConfig": {
         "textureUrl": "/sprites/cinderpaw_idle.png",
         "frameWidth": 128,
         "frameHeight": 128,
         "totalFrames": 8,
         "animationSpeed": 0.1
-      },
-      "elements": [
-        "water"
-      ]
+      }
     },
     {
       "id": "spirit_r05",
       "name": "Adamant Wyvern",
       "rarity": "rare",
+      "element": "metal",
       "lineage": "dragon",
       "baseStats": {
         "attack": 210,
@@ -1052,29 +776,21 @@
         "health": 190,
         "elementalAffinity": 110
       },
-      "passiveAbilities": [
-        "attack_focus"
-      ],
-      "skills": [
-        "basic_attack",
-        "heavy_hit",
-        "hit_and_heal"
-      ],
+      "passiveAbilities": ["attack_focus"],
+      "skills": ["basic_attack", "heavy_hit", "hit_and_heal"],
       "spriteConfig": {
         "textureUrl": "/sprites/cinderpaw_idle.png",
         "frameWidth": 128,
         "frameHeight": 128,
         "totalFrames": 8,
         "animationSpeed": 0.1
-      },
-      "elements": [
-        "metal"
-      ]
+      }
     },
     {
       "id": "spirit_r06",
       "name": "Forest Guardian",
       "rarity": "rare",
+      "element": "wood",
       "lineage": "ox",
       "baseStats": {
         "attack": 180,
@@ -1082,29 +798,21 @@
         "health": 230,
         "elementalAffinity": 90
       },
-      "passiveAbilities": [
-        "health_focus"
-      ],
-      "skills": [
-        "basic_attack",
-        "heavy_hit",
-        "hit_and_heal"
-      ],
+      "passiveAbilities": ["health_focus"],
+      "skills": ["basic_attack", "heavy_hit", "hit_and_heal"],
       "spriteConfig": {
         "textureUrl": "/sprites/cinderpaw_idle.png",
         "frameWidth": 128,
         "frameHeight": 128,
         "totalFrames": 8,
         "animationSpeed": 0.1
-      },
-      "elements": [
-        "wood"
-      ]
+      }
     },
     {
       "id": "spirit_r07",
       "name": "Terra Titan",
       "rarity": "rare",
+      "element": "earth",
       "lineage": "ox",
       "baseStats": {
         "attack": 160,
@@ -1112,29 +820,21 @@
         "health": 220,
         "elementalAffinity": 70
       },
-      "passiveAbilities": [
-        "defense_focus"
-      ],
-      "skills": [
-        "basic_attack",
-        "heavy_hit",
-        "hit_and_heal"
-      ],
+      "passiveAbilities": ["defense_focus"],
+      "skills": ["basic_attack", "heavy_hit", "hit_and_heal"],
       "spriteConfig": {
         "textureUrl": "/sprites/cinderpaw_idle.png",
         "frameWidth": 128,
         "frameHeight": 128,
         "totalFrames": 8,
         "animationSpeed": 0.1
-      },
-      "elements": [
-        "earth"
-      ]
+      }
     },
     {
       "id": "spirit_r08",
       "name": "Solar Lion",
       "rarity": "rare",
+      "element": "fire",
       "lineage": "tiger",
       "baseStats": {
         "attack": 230,
@@ -1142,29 +842,21 @@
         "health": 200,
         "elementalAffinity": 110
       },
-      "passiveAbilities": [
-        "attack_focus"
-      ],
-      "skills": [
-        "basic_attack",
-        "heavy_hit",
-        "hit_and_heal"
-      ],
+      "passiveAbilities": ["attack_focus"],
+      "skills": ["basic_attack", "heavy_hit", "hit_and_heal"],
       "spriteConfig": {
         "textureUrl": "/sprites/cinderpaw_idle.png",
         "frameWidth": 128,
         "frameHeight": 128,
         "totalFrames": 8,
         "animationSpeed": 0.1
-      },
-      "elements": [
-        "fire"
-      ]
+      }
     },
     {
       "id": "spirit_r09",
       "name": "Riptide",
       "rarity": "rare",
+      "element": "water",
       "lineage": "serpent",
       "baseStats": {
         "attack": 210,
@@ -1172,30 +864,21 @@
         "health": 210,
         "elementalAffinity": 120
       },
-      "passiveAbilities": [
-        "health_focus",
-        "dot_amplification"
-      ],
-      "skills": [
-        "bubble_barrier",
-        "tidal_surge",
-        "def_shred_dot"
-      ],
+      "passiveAbilities": ["health_focus", "dot_amplification"],
+      "skills": ["bubble_barrier", "tidal_surge", "def_shred_dot"],
       "spriteConfig": {
         "textureUrl": "/sprites/cinderpaw_idle.png",
         "frameWidth": 128,
         "frameHeight": 128,
         "totalFrames": 8,
         "animationSpeed": 0.1
-      },
-      "elements": [
-        "water"
-      ]
+      }
     },
     {
       "id": "spirit_r10",
       "name": "Thundersteel Pegasus",
       "rarity": "rare",
+      "element": "metal",
       "lineage": "horse",
       "baseStats": {
         "attack": 220,
@@ -1203,24 +886,15 @@
         "health": 200,
         "elementalAffinity": 110
       },
-      "passiveAbilities": [
-        "attack_focus"
-      ],
-      "skills": [
-        "basic_attack",
-        "heavy_hit",
-        "hit_and_heal"
-      ],
+      "passiveAbilities": ["attack_focus"],
+      "skills": ["basic_attack", "heavy_hit", "hit_and_heal"],
       "spriteConfig": {
         "textureUrl": "/sprites/cinderpaw_idle.png",
         "frameWidth": 128,
         "frameHeight": 128,
         "totalFrames": 8,
         "animationSpeed": 0.1
-      },
-      "elements": [
-        "metal"
-      ]
+      }
     }
   ],
   "epic": [
@@ -1228,6 +902,7 @@
       "id": "spirit_e01",
       "name": "Ancient Treant Lord",
       "rarity": "epic",
+      "element": "wood",
       "lineage": "dragon",
       "baseStats": {
         "attack": 220,
@@ -1235,29 +910,21 @@
         "health": 260,
         "elementalAffinity": 100
       },
-      "passiveAbilities": [
-        "health_focus"
-      ],
-      "skills": [
-        "basic_attack",
-        "heavy_hit",
-        "hit_and_heal"
-      ],
+      "passiveAbilities": ["health_focus"],
+      "skills": ["basic_attack", "heavy_hit", "hit_and_heal"],
       "spriteConfig": {
         "textureUrl": "/sprites/cinderpaw_idle.png",
         "frameWidth": 128,
         "frameHeight": 128,
         "totalFrames": 8,
         "animationSpeed": 0.1
-      },
-      "elements": [
-        "wood"
-      ]
+      }
     },
     {
       "id": "spirit_e02",
       "name": "Obsidian Colossus",
       "rarity": "epic",
+      "element": "earth",
       "lineage": "ox",
       "baseStats": {
         "attack": 200,
@@ -1265,29 +932,21 @@
         "health": 240,
         "elementalAffinity": 80
       },
-      "passiveAbilities": [
-        "defense_focus"
-      ],
-      "skills": [
-        "basic_attack",
-        "heavy_hit",
-        "hit_and_heal"
-      ],
+      "passiveAbilities": ["defense_focus"],
+      "skills": ["basic_attack", "heavy_hit", "hit_and_heal"],
       "spriteConfig": {
         "textureUrl": "/sprites/cinderpaw_idle.png",
         "frameWidth": 128,
         "frameHeight": 128,
         "totalFrames": 8,
         "animationSpeed": 0.1
-      },
-      "elements": [
-        "earth"
-      ]
+      }
     },
     {
       "id": "spirit_e03",
       "name": "Celestial Phoenix",
       "rarity": "epic",
+      "element": "fire",
       "lineage": "dragon",
       "baseStats": {
         "attack": 280,
@@ -1295,29 +954,21 @@
         "health": 240,
         "elementalAffinity": 100
       },
-      "passiveAbilities": [
-        "attack_focus"
-      ],
-      "skills": [
-        "basic_attack",
-        "heavy_hit",
-        "hit_and_heal"
-      ],
+      "passiveAbilities": ["attack_focus"],
+      "skills": ["basic_attack", "heavy_hit", "hit_and_heal"],
       "spriteConfig": {
         "textureUrl": "/sprites/cinderpaw_idle.png",
         "frameWidth": 128,
         "frameHeight": 128,
         "totalFrames": 8,
         "animationSpeed": 0.1
-      },
-      "elements": [
-        "fire"
-      ]
+      }
     },
     {
       "id": "spirit_e04",
       "name": "Primordial Kraken",
       "rarity": "epic",
+      "element": "water",
       "lineage": "dragon",
       "baseStats": {
         "attack": 240,
@@ -1325,29 +976,21 @@
         "health": 260,
         "elementalAffinity": 100
       },
-      "passiveAbilities": [
-        "health_focus"
-      ],
-      "skills": [
-        "basic_attack",
-        "heavy_hit",
-        "hit_and_heal"
-      ],
+      "passiveAbilities": ["health_focus"],
+      "skills": ["basic_attack", "heavy_hit", "hit_and_heal"],
       "spriteConfig": {
         "textureUrl": "/sprites/cinderpaw_idle.png",
         "frameWidth": 128,
         "frameHeight": 128,
         "totalFrames": 8,
         "animationSpeed": 0.1
-      },
-      "elements": [
-        "water"
-      ]
+      }
     },
     {
       "id": "spirit_e05",
       "name": "Mythril Sovereign",
       "rarity": "epic",
+      "element": "metal",
       "lineage": "dragon",
       "baseStats": {
         "attack": 260,
@@ -1355,29 +998,21 @@
         "health": 220,
         "elementalAffinity": 100
       },
-      "passiveAbilities": [
-        "attack_focus"
-      ],
-      "skills": [
-        "basic_attack",
-        "heavy_hit",
-        "hit_and_heal"
-      ],
+      "passiveAbilities": ["attack_focus"],
+      "skills": ["basic_attack", "heavy_hit", "hit_and_heal"],
       "spriteConfig": {
         "textureUrl": "/sprites/cinderpaw_idle.png",
         "frameWidth": 128,
         "frameHeight": 128,
         "totalFrames": 8,
         "animationSpeed": 0.1
-      },
-      "elements": [
-        "metal"
-      ]
+      }
     },
     {
       "id": "spirit_e06",
       "name": "Cosmic Wood Spirit",
       "rarity": "epic",
+      "element": "wood",
       "lineage": "dragon",
       "baseStats": {
         "attack": 230,
@@ -1385,29 +1020,21 @@
         "health": 260,
         "elementalAffinity": 100
       },
-      "passiveAbilities": [
-        "health_focus"
-      ],
-      "skills": [
-        "basic_attack",
-        "heavy_hit",
-        "hit_and_heal"
-      ],
+      "passiveAbilities": ["health_focus"],
+      "skills": ["basic_attack", "heavy_hit", "hit_and_heal"],
       "spriteConfig": {
         "textureUrl": "/sprites/cinderpaw_idle.png",
         "frameWidth": 128,
         "frameHeight": 128,
         "totalFrames": 8,
         "animationSpeed": 0.1
-      },
-      "elements": [
-        "wood"
-      ]
+      }
     },
     {
       "id": "spirit_e07",
       "name": "Diamond Behemoth",
       "rarity": "epic",
+      "element": "earth",
       "lineage": "ox",
       "baseStats": {
         "attack": 190,
@@ -1415,29 +1042,21 @@
         "health": 250,
         "elementalAffinity": 70
       },
-      "passiveAbilities": [
-        "defense_focus"
-      ],
-      "skills": [
-        "basic_attack",
-        "heavy_hit",
-        "hit_and_heal"
-      ],
+      "passiveAbilities": ["defense_focus"],
+      "skills": ["basic_attack", "heavy_hit", "hit_and_heal"],
       "spriteConfig": {
         "textureUrl": "/sprites/cinderpaw_idle.png",
         "frameWidth": 128,
         "frameHeight": 128,
         "totalFrames": 8,
         "animationSpeed": 0.1
-      },
-      "elements": [
-        "earth"
-      ]
+      }
     },
     {
       "id": "spirit_e08",
       "name": "Inferno Dragon King",
       "rarity": "epic",
+      "element": "fire",
       "lineage": "dragon",
       "baseStats": {
         "attack": 270,
@@ -1445,29 +1064,21 @@
         "health": 240,
         "elementalAffinity": 100
       },
-      "passiveAbilities": [
-        "attack_focus"
-      ],
-      "skills": [
-        "basic_attack",
-        "heavy_hit",
-        "hit_and_heal"
-      ],
+      "passiveAbilities": ["attack_focus"],
+      "skills": ["basic_attack", "heavy_hit", "hit_and_heal"],
       "spriteConfig": {
         "textureUrl": "/sprites/cinderpaw_idle.png",
         "frameWidth": 128,
         "frameHeight": 128,
         "totalFrames": 8,
         "animationSpeed": 0.1
-      },
-      "elements": [
-        "fire"
-      ]
+      }
     },
     {
       "id": "spirit_e09",
       "name": "Eternal Ocean Wyrm",
       "rarity": "epic",
+      "element": "water",
       "lineage": "dragon",
       "baseStats": {
         "attack": 250,
@@ -1475,29 +1086,21 @@
         "health": 260,
         "elementalAffinity": 100
       },
-      "passiveAbilities": [
-        "health_focus"
-      ],
-      "skills": [
-        "basic_attack",
-        "heavy_hit",
-        "hit_and_heal"
-      ],
+      "passiveAbilities": ["health_focus"],
+      "skills": ["basic_attack", "heavy_hit", "hit_and_heal"],
       "spriteConfig": {
         "textureUrl": "/sprites/cinderpaw_idle.png",
         "frameWidth": 128,
         "frameHeight": 128,
         "totalFrames": 8,
         "animationSpeed": 0.1
-      },
-      "elements": [
-        "water"
-      ]
+      }
     },
     {
       "id": "spirit_e10",
       "name": "Platinum War God",
       "rarity": "epic",
+      "element": "metal",
       "lineage": "tiger",
       "baseStats": {
         "attack": 270,
@@ -1505,24 +1108,15 @@
         "health": 230,
         "elementalAffinity": 100
       },
-      "passiveAbilities": [
-        "attack_focus"
-      ],
-      "skills": [
-        "basic_attack",
-        "heavy_hit",
-        "hit_and_heal"
-      ],
+      "passiveAbilities": ["attack_focus"],
+      "skills": ["basic_attack", "heavy_hit", "hit_and_heal"],
       "spriteConfig": {
         "textureUrl": "/sprites/cinderpaw_idle.png",
         "frameWidth": 128,
         "frameHeight": 128,
         "totalFrames": 8,
         "animationSpeed": 0.1
-      },
-      "elements": [
-        "metal"
-      ]
+      }
     }
   ],
   "legendary": [
@@ -1530,6 +1124,7 @@
       "id": "spirit_l01",
       "name": "Primordial Jade Emperor",
       "rarity": "legendary",
+      "element": "wood",
       "lineage": "dragon",
       "baseStats": {
         "attack": 250,
@@ -1537,29 +1132,21 @@
         "health": 300,
         "elementalAffinity": 100
       },
-      "passiveAbilities": [
-        "health_focus"
-      ],
-      "skills": [
-        "basic_attack",
-        "heavy_hit",
-        "hit_and_heal"
-      ],
+      "passiveAbilities": ["health_focus"],
+      "skills": ["basic_attack", "heavy_hit", "hit_and_heal"],
       "spriteConfig": {
         "textureUrl": "/sprites/cinderpaw_idle.png",
         "frameWidth": 128,
         "frameHeight": 128,
         "totalFrames": 8,
         "animationSpeed": 0.1
-      },
-      "elements": [
-        "wood"
-      ]
+      }
     },
     {
       "id": "spirit_l02",
       "name": "Eternal Mountain Sovereign",
       "rarity": "legendary",
+      "element": "earth",
       "lineage": "dragon",
       "baseStats": {
         "attack": 220,
@@ -1567,29 +1154,21 @@
         "health": 280,
         "elementalAffinity": 80
       },
-      "passiveAbilities": [
-        "defense_focus"
-      ],
-      "skills": [
-        "basic_attack",
-        "heavy_hit",
-        "hit_and_heal"
-      ],
+      "passiveAbilities": ["defense_focus"],
+      "skills": ["basic_attack", "heavy_hit", "hit_and_heal"],
       "spriteConfig": {
         "textureUrl": "/sprites/cinderpaw_idle.png",
         "frameWidth": 128,
         "frameHeight": 128,
         "totalFrames": 8,
         "animationSpeed": 0.1
-      },
-      "elements": [
-        "earth"
-      ]
+      }
     },
     {
       "id": "spirit_l03",
       "name": "Supreme Vermillion Phoenix",
       "rarity": "legendary",
+      "element": "fire",
       "lineage": "dragon",
       "baseStats": {
         "attack": 320,
@@ -1597,29 +1176,21 @@
         "health": 280,
         "elementalAffinity": 100
       },
-      "passiveAbilities": [
-        "attack_focus"
-      ],
-      "skills": [
-        "basic_attack",
-        "heavy_hit",
-        "hit_and_heal"
-      ],
+      "passiveAbilities": ["attack_focus"],
+      "skills": ["basic_attack", "heavy_hit", "hit_and_heal"],
       "spriteConfig": {
         "textureUrl": "/sprites/cinderpaw_idle.png",
         "frameWidth": 128,
         "frameHeight": 128,
         "totalFrames": 8,
         "animationSpeed": 0.1
-      },
-      "elements": [
-        "fire"
-      ]
+      }
     },
     {
       "id": "spirit_l04",
       "name": "Azure Dragon of the Depths",
       "rarity": "legendary",
+      "element": "water",
       "lineage": "dragon",
       "baseStats": {
         "attack": 270,
@@ -1627,29 +1198,21 @@
         "health": 300,
         "elementalAffinity": 100
       },
-      "passiveAbilities": [
-        "health_focus"
-      ],
-      "skills": [
-        "basic_attack",
-        "heavy_hit",
-        "hit_and_heal"
-      ],
+      "passiveAbilities": ["health_focus"],
+      "skills": ["basic_attack", "heavy_hit", "hit_and_heal"],
       "spriteConfig": {
         "textureUrl": "/sprites/cinderpaw_idle.png",
         "frameWidth": 128,
         "frameHeight": 128,
         "totalFrames": 8,
         "animationSpeed": 0.1
-      },
-      "elements": [
-        "water"
-      ]
+      }
     },
     {
       "id": "spirit_l05",
       "name": "White Tiger Divine General",
       "rarity": "legendary",
+      "element": "metal",
       "lineage": "tiger",
       "baseStats": {
         "attack": 300,
@@ -1657,24 +1220,15 @@
         "health": 260,
         "elementalAffinity": 100
       },
-      "passiveAbilities": [
-        "attack_focus"
-      ],
-      "skills": [
-        "basic_attack",
-        "heavy_hit",
-        "hit_and_heal"
-      ],
+      "passiveAbilities": ["attack_focus"],
+      "skills": ["basic_attack", "heavy_hit", "hit_and_heal"],
       "spriteConfig": {
         "textureUrl": "/sprites/cinderpaw_idle.png",
         "frameWidth": 128,
         "frameHeight": 128,
         "totalFrames": 8,
         "animationSpeed": 0.1
-      },
-      "elements": [
-        "metal"
-      ]
+      }
     }
   ],
   "boss": [
@@ -1682,6 +1236,7 @@
       "id": "boss_01",
       "name": "Heavenly Warlord",
       "rarity": "legendary",
+      "element": "metal",
       "lineage": "dragon",
       "baseStats": {
         "attack": 800,
@@ -1689,24 +1244,15 @@
         "health": 1000,
         "elementalAffinity": 50
       },
-      "passiveAbilities": [
-        "boss_massive_health"
-      ],
-      "skills": [
-        "basic_attack",
-        "atk_buff",
-        "charged_hit"
-      ],
+      "passiveAbilities": ["boss_massive_health"],
+      "skills": ["basic_attack", "atk_buff", "charged_hit"],
       "spriteConfig": {
         "textureUrl": "/sprites/cinderpaw_idle.png",
         "frameWidth": 128,
         "frameHeight": 128,
         "totalFrames": 8,
         "animationSpeed": 0.1
-      },
-      "elements": [
-        "metal"
-      ]
+      }
     }
   ]
 }

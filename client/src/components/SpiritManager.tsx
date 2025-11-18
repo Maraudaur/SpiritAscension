@@ -10,6 +10,7 @@ import {
   calculateAllStats,
   getAvailableSkills,
   getPassiveAbility,
+  getPrimaryElement,
 } from "@/lib/spiritUtils";
 import { Button } from "@/components/ui/button";
 import {
@@ -32,7 +33,7 @@ import {
   Filter,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import type { PlayerSpirit } from "@shared/types";
+import type { PlayerSpirit, ElementId } from "@shared/types";
 import { SpiritSpriteAnimation } from "./SpiritSpriteAnimation";
 
 interface SpiritManagerProps {
@@ -104,7 +105,7 @@ export function SpiritManager({ onClose }: SpiritManagerProps = {}) {
     if (elementFilter !== "all") {
       filtered = filtered.filter((spirit) => {
         const baseSpirit = getBaseSpirit(spirit.spiritId);
-        return baseSpirit?.element === elementFilter;
+        return baseSpirit?.elements.includes(elementFilter as ElementId);
       });
     }
     
@@ -234,7 +235,7 @@ export function SpiritManager({ onClose }: SpiritManagerProps = {}) {
             );
             const baseSpirit = spirit ? getBaseSpirit(spirit.spiritId) : null;
             const element =
-              spirit && baseSpirit ? getElement(baseSpirit.element) : null;
+              spirit && baseSpirit ? getElement(getPrimaryElement(baseSpirit)) : null;
             const lineage =
               spirit && baseSpirit ? getLineage(baseSpirit.lineage) : null;
 
@@ -382,7 +383,7 @@ export function SpiritManager({ onClose }: SpiritManagerProps = {}) {
               const baseSpirit = getBaseSpirit(spirit.spiritId);
               if (!baseSpirit) return null;
 
-              const element = getElement(baseSpirit.element);
+              const element = getElement(getPrimaryElement(baseSpirit));
               const lineage = getLineage(baseSpirit.lineage);
               const isInParty = activeParty.includes(spirit.instanceId);
               
@@ -484,7 +485,7 @@ export function SpiritManager({ onClose }: SpiritManagerProps = {}) {
             const baseSpirit = getBaseSpirit(selectedSpirit.spiritId);
             if (!baseSpirit) return null;
 
-            const element = getElement(baseSpirit.element);
+            const element = getElement(getPrimaryElement(baseSpirit));
             const lineage = getLineage(baseSpirit.lineage);
             const stats = calculateAllStats(selectedSpirit);
             const skills = getAvailableSkills(selectedSpirit);

@@ -7,6 +7,7 @@ import {
   getAvailableSkills,
   getSkill,
   getElementalDamageMultiplier,
+  getPrimaryElement,
 } from "@/lib/spiritUtils";
 import type {
   PlayerSpirit,
@@ -42,7 +43,7 @@ interface CombatantStats {
   attack: number;
   defense: number;
   elementalAffinity: number;
-  element: ElementId;
+  elements: ElementId[];
   currentHealth: number;
   maxHealth: number;
 }
@@ -554,7 +555,7 @@ export function useBattleLogic({
                   attack: attackerStats.attack,
                   defense: attackerStats.defense,
                   elementalAffinity: attackerStats.elementalAffinity,
-                  element: attackerBase.element,
+                  elements: attackerBase.elements,
                   currentHealth: attackerSpirit.currentHealth,
                   maxHealth: attackerSpirit.maxHealth,
                 };
@@ -566,7 +567,7 @@ export function useBattleLogic({
                   attack: targetEnemy.attack,
                   defense: targetEnemy.defense,
                   elementalAffinity: targetEnemy.elementalAffinity,
-                  element: targetEnemy.element,
+                  elements: targetEnemy.elements,
                   currentHealth: targetEnemy.currentHealth,
                   maxHealth: targetEnemy.maxHealth,
                 };
@@ -741,7 +742,7 @@ export function useBattleLogic({
                   attack: attackerEnemy.attack,
                   defense: attackerEnemy.defense,
                   elementalAffinity: attackerEnemy.elementalAffinity,
-                  element: attackerEnemy.element,
+                  elements: attackerEnemy.elements,
                   currentHealth: attackerEnemy.currentHealth,
                   maxHealth: attackerEnemy.maxHealth,
                 };
@@ -753,7 +754,7 @@ export function useBattleLogic({
                   attack: targetStats.attack,
                   defense: targetStats.defense,
                   elementalAffinity: targetStats.elementalAffinity,
-                  element: targetBase.element,
+                  elements: targetBase.elements,
                   currentHealth: targetSpirit.currentHealth,
                   maxHealth: targetSpirit.maxHealth,
                 };
@@ -909,7 +910,7 @@ export function useBattleLogic({
           defense: enemyDefense,
           maxHealth: enemyHealth,
           currentHealth: enemyHealth,
-          element: baseSpirit.element,
+          elements: baseSpirit.elements,
           elementalAffinity: enemyElementalAffinity,
           activeEffects: [] as ActiveEffect[],
         };
@@ -1272,7 +1273,7 @@ export function useBattleLogic({
     }
 
     // --- 1. Determine Elemental Properties
-    const spiritElement: ElementId = baseSpirit.element;
+    const spiritElement: ElementId = getPrimaryElement(baseSpirit);
     const affinityStat = attacker.elementalAffinity;
     const skillElement = skill.element;
     let affinityRatio =
@@ -1323,8 +1324,8 @@ export function useBattleLogic({
 
     // --- 4. Calculate Final Damage
     const elementalMultiplier = getElementalDamageMultiplier(
-      attackElement,
-      target.element,
+      [attackElement],
+      target.elements,
     );
     let totalDamage = 0;
     let elementalMessage = "";
@@ -1597,7 +1598,7 @@ export function useBattleLogic({
       attack: activeStats.attack,
       defense: activeStats.defense,
       elementalAffinity: activeStats.elementalAffinity,
-      element: activeBaseSpirit.element,
+      elements: activeBaseSpirit.elements,
       currentHealth: activeSpirit.currentHealth,
       maxHealth: activeSpirit.maxHealth,
     };
@@ -1609,7 +1610,7 @@ export function useBattleLogic({
       attack: activeEnemy.attack,
       defense: activeEnemy.defense,
       elementalAffinity: activeEnemy.elementalAffinity,
-      element: activeEnemy.element,
+      elements: activeEnemy.elements,
       currentHealth: activeEnemy.currentHealth,
       maxHealth: activeEnemy.maxHealth,
     };
@@ -1736,7 +1737,7 @@ export function useBattleLogic({
       attack: activeEnemy.attack,
       defense: activeEnemy.defense,
       elementalAffinity: activeEnemy.elementalAffinity,
-      element: activeEnemy.element,
+      elements: activeEnemy.elements,
       currentHealth: activeEnemy.currentHealth,
       maxHealth: activeEnemy.maxHealth,
     };
@@ -1748,7 +1749,7 @@ export function useBattleLogic({
       attack: activeStats.attack,
       defense: activeStats.defense,
       elementalAffinity: activeStats.elementalAffinity,
-      element: targetBase.element,
+      elements: targetBase.elements,
       currentHealth: activeSpirit.currentHealth,
       maxHealth: activeSpirit.maxHealth,
     };

@@ -8,6 +8,7 @@ import {
   getPotentialColor,
   calculateAllStats,
   getPassiveAbility,
+  getPrimaryElement,
 } from "@/lib/spiritUtils";
 import { Button } from "@/components/ui/button";
 import { Sparkles, Info } from "lucide-react";
@@ -149,7 +150,7 @@ export function SummonScreen({ onNavigate }: SummonScreenProps) {
   const baseSpirit = summonedSpirit
     ? getBaseSpirit(summonedSpirit.spiritId)
     : null;
-  const element = baseSpirit ? getElement(baseSpirit.element) : null;
+  const element = baseSpirit ? getElement(getPrimaryElement(baseSpirit)) : null;
   const lineage = baseSpirit ? getLineage(baseSpirit.lineage) : null;
   const stats = summonedSpirit ? calculateAllStats(summonedSpirit) : null;
   const passiveId = baseSpirit?.passiveAbilities?.[0];

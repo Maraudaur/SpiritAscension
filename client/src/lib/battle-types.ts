@@ -34,7 +34,7 @@ export interface Enemy {
   attack: number;
   defense: number;
   baseAttack?: number;
-  element: ElementId;
+  elements: ElementId[];
   elementalAffinity: number;
   activeEffects: ActiveEffect[];
 }

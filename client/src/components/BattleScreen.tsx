@@ -5,6 +5,7 @@ import {
   getLineage,
   getRarityColor,
   getElementColor,
+  getPrimaryElement,
 } from "@/lib/spiritUtils";
 import { Button } from "@/components/ui/button";
 import {
@@ -496,7 +497,7 @@ export function BattleScreen({
                         spirit.playerSpirit.spiritId,
                       );
                       const element = baseSpirit
-                        ? getElement(baseSpirit.element)
+                        ? getElement(getPrimaryElement(baseSpirit))
                         : null;
                       const isActive = index === activePartySlot;
                       const isDead = spirit.currentHealth <= 0;
