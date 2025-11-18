@@ -329,7 +329,7 @@ export const useGameState = create<GameStateStore>()(
         set((state) => {
           Object.assign(state, {
             ...initialState,
-            activeParty: [null, null, null],
+            activeParty: [null, null, null, null],
             ascensionTier: 0,
             currentStoryNodeId: null,
             currentStoryDialogueIndex: 0,
