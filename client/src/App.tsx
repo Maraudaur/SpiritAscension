@@ -197,6 +197,10 @@ function App() {
                     setBattleSource("sidebar");
                     setCurrentScreen("cultivation");
                   }}
+                  onNavigate={(screen) => {
+                    setBattleSource("sidebar");
+                    setCurrentScreen(screen);
+                  }}
                   returnTo="cultivation"
                   autoStart={false}
                 />
@@ -213,6 +217,10 @@ function App() {
                     onClose={() => {
                       setBattleSource("sidebar");
                       setCurrentScreen("story");
+                    }}
+                    onNavigate={(screen) => {
+                      setBattleSource("sidebar");
+                      setCurrentScreen(screen);
                     }}
                     returnTo="story"
                     autoStart={true}

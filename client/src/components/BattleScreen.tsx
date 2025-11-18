@@ -9,6 +9,14 @@ import {
 } from "@/lib/spiritUtils";
 import { Button } from "@/components/ui/button";
 import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
   Swords,
   ArrowLeftRight,
   Heart,
@@ -69,6 +77,7 @@ function BattleLoadingScreen() {
 
 export function BattleScreen({
   onClose,
+  onNavigate,
   returnTo = "cultivation",
   autoStart = false,
 }: BattleScreenProps) {
@@ -100,6 +109,8 @@ export function BattleScreen({
     activeStats,
     availableSkills,
     setActionMenu,
+    showEmptyPartyDialog,
+    setShowEmptyPartyDialog,
     playButtonClick,
     playButtonHover,
     isMuted,
@@ -729,6 +740,39 @@ export function BattleScreen({
           </ModalOverlay>
         )}
       </AnimatePresence>
+
+      {/* EMPTY PARTY DIALOG */}
+      <Dialog open={showEmptyPartyDialog} onOpenChange={setShowEmptyPartyDialog}>
+        <DialogContent className="parchment-bg chinese-border">
+          <DialogHeader>
+            <DialogTitle className="parchment-text text-2xl font-bold text-center">
+              Party is Empty
+            </DialogTitle>
+            <DialogDescription className="parchment-text text-center mt-2">
+              You need to add spirits to your active party before entering battle.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="mt-4">
+            <Button
+              onClick={() => {
+                setShowEmptyPartyDialog(false);
+                if (onNavigate) {
+                  onNavigate("spirits");
+                } else {
+                  onClose();
+                }
+              }}
+              className="w-full font-bold"
+              style={{
+                background: "var(--jade-green)",
+                color: "var(--parchment)",
+              }}
+            >
+              Go to Spirit Manager
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

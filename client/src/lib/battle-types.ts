@@ -11,6 +11,7 @@ export type BattleState =
 
 export interface BattleScreenProps {
   onClose: () => void;
+  onNavigate?: (screen: "story" | "cultivation" | "spirits" | "summon" | "battle") => void;
   isBossBattle?: boolean;
   returnTo?: "cultivation" | "story";
   autoStart?: boolean;

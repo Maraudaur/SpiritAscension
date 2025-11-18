@@ -121,6 +121,7 @@ export function useBattleLogic({
   );
   const [aiTurnStep, setAiTurnStep] = useState(0); // For enemy AI patterns
   const [isPaused, setIsPaused] = useState(false);
+  const [showEmptyPartyDialog, setShowEmptyPartyDialog] = useState(false);
 
   // ========== Health Bar FX State ==========
   const [playerHealthBarShake, setPlayerHealthBarShake] = useState(false);
@@ -842,6 +843,7 @@ export function useBattleLogic({
     // 1. Load Player Spirits
     if (activeParty.length === 0) {
       addLog("No spirits in active party!");
+      setShowEmptyPartyDialog(true);
       return;
     }
     const spiritsInBattle = activeParty
@@ -859,6 +861,14 @@ export function useBattleLogic({
           activeEffects: spirit.activeEffects || [],
         };
       });
+
+    // Check if spiritsInBattle is empty after filtering (corrupted save data or mismatched IDs)
+    if (spiritsInBattle.length === 0) {
+      addLog("No valid spirits found in active party!");
+      setShowEmptyPartyDialog(true);
+      return;
+    }
+
     setPlayerSpirits(spiritsInBattle);
     setActivePartySlot(0);
 
@@ -2070,6 +2080,7 @@ export function useBattleLogic({
     enemyHealthBarShake,
     playerHealthBarHeal,
     currentEncounter,
+    showEmptyPartyDialog,
 
     // Derived
     activeSpirit,
@@ -2080,6 +2091,7 @@ export function useBattleLogic({
 
     // Actions
     setActionMenu,
+    setShowEmptyPartyDialog,
 
     // Audio
     isMuted,
