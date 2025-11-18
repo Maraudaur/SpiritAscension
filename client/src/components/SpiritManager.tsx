@@ -62,6 +62,7 @@ export function SpiritManager({ onClose }: SpiritManagerProps = {}) {
     getLevelUpCost,
     ftueStep,
     setFtueStep,
+    freeLevelUp,
   } = useGameState();
   const [selectedSpirit, setSelectedSpirit] = useState<PlayerSpirit | null>(
     null,
@@ -781,8 +782,9 @@ export function SpiritManager({ onClose }: SpiritManagerProps = {}) {
                     );
                     const essenceCount = getEssenceCount(baseSpirit.id);
                     const canLevelUp =
-                      qi >= levelUpCost.qi &&
-                      essenceCount >= levelUpCost.essence;
+                      freeLevelUp ||
+                      (qi >= levelUpCost.qi &&
+                      essenceCount >= levelUpCost.essence);
                     const harmonizeReward = 5 + selectedSpirit.level * 2;
 
                     return (
