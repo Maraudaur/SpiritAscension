@@ -58,6 +58,7 @@ export interface GameStateStore extends Omit<GameStateData, "activeParty"> {
 
   // Debug State
   freeSummons: boolean;
+  freeLevelUp: boolean;
 
   // Actions
   addQi: (amount: number) => void;
@@ -109,6 +110,7 @@ export interface GameStateStore extends Omit<GameStateData, "activeParty"> {
 
   // Debug actions
   toggleFreeSummons: () => void;
+  toggleFreeLevelUp: () => void;
   spawnSpecificSpirit: (spiritId: string) => PlayerSpirit | null;
 }
 
@@ -264,6 +266,7 @@ export const useGameState = create<GameStateStore>()(
       currentEncounterId: null,
       storyBattleCheckpoint: null,
       freeSummons: false,
+      freeLevelUp: false,
 
       // --- (Core Actions) ---
       addQi: (amount: number) => {
@@ -616,17 +619,22 @@ export const useGameState = create<GameStateStore>()(
         const cost = get().getLevelUpCost(spirit.level);
         const essenceCount = get().getEssenceCount(spirit.spiritId);
         const currentQi = get().qi;
+        const freeLevelUp = get().freeLevelUp;
 
-        if (currentQi >= cost.qi && essenceCount >= cost.essence) {
+        // Check if we can afford it (or if free level up is enabled)
+        if (freeLevelUp || (currentQi >= cost.qi && essenceCount >= cost.essence)) {
           set((state) => {
             // Find the spirit in the draft state to modify it
             const spiritToLevel = state.spirits.find(
               (s) => s.instanceId === instanceId,
             );
             if (spiritToLevel) {
-              state.qi -= cost.qi;
-              state.essences[spirit.spiritId] =
-                (state.essences[spirit.spiritId] ?? 0) - cost.essence;
+              // Only deduct costs if not using free level up
+              if (!freeLevelUp) {
+                state.qi -= cost.qi;
+                state.essences[spirit.spiritId] =
+                  (state.essences[spirit.spiritId] ?? 0) - cost.essence;
+              }
               spiritToLevel.level += 1;
 
               // FTUE logic: clear level up button highlight
@@ -696,6 +704,12 @@ export const useGameState = create<GameStateStore>()(
       toggleFreeSummons: () => {
         set((state) => {
           state.freeSummons = !state.freeSummons;
+        });
+      },
+
+      toggleFreeLevelUp: () => {
+        set((state) => {
+          state.freeLevelUp = !state.freeLevelUp;
         });
       },
 

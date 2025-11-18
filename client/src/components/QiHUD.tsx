@@ -24,7 +24,7 @@ interface QiHUDProps {
 }
 
 export function QiHUD({ currentScreen }: QiHUDProps) {
-  const { qi, qiPerSecond, resetGame, freeSummons, toggleFreeSummons, spawnSpecificSpirit } = useGameState();
+  const { qi, qiPerSecond, resetGame, freeSummons, toggleFreeSummons, freeLevelUp, toggleFreeLevelUp, spawnSpecificSpirit } = useGameState();
   const { isMuted, toggleMute, volume, setVolume } = useAudio();
   const [showVolumeSlider, setShowVolumeSlider] = useState(false);
   const [showDebugMenu, setShowDebugMenu] = useState(false);
@@ -280,6 +280,23 @@ export function QiHUD({ currentScreen }: QiHUDProps) {
                       id="free-summons"
                       checked={freeSummons}
                       onCheckedChange={toggleFreeSummons}
+                    />
+                  </div>
+
+                  <div 
+                    className={`flex items-center justify-between px-2 py-2 rounded transition-colors ${
+                      freeLevelUp ? 'bg-green-100 border-green-400' : ''
+                    }`}
+                  >
+                    <label htmlFor="free-levelup" className={`text-xs font-medium cursor-pointer ${
+                      freeLevelUp ? 'text-green-700 font-bold' : 'text-orange-700'
+                    }`}>
+                      Free Level Up
+                    </label>
+                    <Switch
+                      id="free-levelup"
+                      checked={freeLevelUp}
+                      onCheckedChange={toggleFreeLevelUp}
                     />
                   </div>
 
