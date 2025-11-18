@@ -408,7 +408,6 @@ export function SummonScreen({ onNavigate }: SummonScreenProps) {
           {stage === "revealed" &&
             summonedSpirit &&
             baseSpirit &&
-            element &&
             lineage &&
             stats && (
               <motion.div
