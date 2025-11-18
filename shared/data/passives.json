@@ -115,5 +115,16 @@
         "ratio": 0.15
       }
     ]
+  },
+  "counter_strike": {
+    "id": "counter_strike",
+    "name": "Counter Strike",
+    "description": "50% chance to immediately counter-attack with a basic attack when hit.",
+    "effects": [
+      {
+        "type": "counter_attack_chance",
+        "chance": 0.5
+      }
+    ]
   }
 }

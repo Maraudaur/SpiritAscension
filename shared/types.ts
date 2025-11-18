@@ -150,6 +150,11 @@ export interface PassiveDamageReflect {
   ratio: number; // 0.15 for 15% reflection
 }
 
+export interface PassiveCounterAttack {
+  type: "counter_attack_chance";
+  chance: number; // 0.5 for 50% chance
+}
+
 export interface SpiritSpriteConfig {
   textureUrl: string;
   frameWidth: number;
@@ -164,7 +169,8 @@ export type PassiveEffect =
   | PassiveDOTAttacker
   | PassiveCritChanceBoost
   | PassiveDotDamageBoost
-  | PassiveDamageReflect;
+  | PassiveDamageReflect
+  | PassiveCounterAttack;
 
 export type CombatTrigger =
   | "on_hit"
