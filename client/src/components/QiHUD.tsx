@@ -206,6 +206,24 @@ export function QiHUD({ currentScreen }: QiHUDProps) {
             🎁 FREE SUMMONS
           </motion.div>
         )}
+
+        {/* FREE LEVEL UP INDICATOR */}
+        {freeLevelUp && (
+          <motion.div
+            initial={{ scale: 0.8, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            exit={{ scale: 0.8, opacity: 0 }}
+            className="px-3 py-1 rounded-full font-bold text-xs tracking-wider"
+            style={{
+              background: "linear-gradient(135deg, #10B981 0%, #059669 100%)",
+              color: "white",
+              boxShadow: "0 2px 8px rgba(16, 185, 129, 0.5), 0 0 20px rgba(16, 185, 129, 0.3)",
+              border: "2px solid #34D399",
+            }}
+          >
+            ⚡ FREE LEVEL UP
+          </motion.div>
+        )}
       </div>
 
       {/* RIGHT: Screen Title */}
