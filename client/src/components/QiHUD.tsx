@@ -4,6 +4,7 @@ import { useAudio } from "@/lib/stores/useAudio";
 import { Sparkles, Volume2, VolumeX, Bug } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
+import { Switch } from "@/components/ui/switch";
 import { motion, AnimatePresence } from "framer-motion";
 
 type Screen = "story" | "cultivation" | "spirits" | "summon" | "battle";
@@ -21,7 +22,7 @@ interface QiHUDProps {
 }
 
 export function QiHUD({ currentScreen }: QiHUDProps) {
-  const { qi, qiPerSecond, resetGame, resetStory } = useGameState();
+  const { qi, qiPerSecond, resetGame, freeSummons, toggleFreeSummons } = useGameState();
   const { isMuted, toggleMute, volume, setVolume } = useAudio();
   const [showVolumeSlider, setShowVolumeSlider] = useState(false);
   const [showDebugMenu, setShowDebugMenu] = useState(false);
@@ -216,25 +217,16 @@ export function QiHUD({ currentScreen }: QiHUDProps) {
                     Reset Game
                   </Button>
 
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => {
-                      if (
-                        window.confirm(
-                          "Reset story progress? You'll be able to replay all story nodes."
-                        )
-                      ) {
-                        console.log("--- RESETTING STORY ---");
-                        resetStory();
-                        setShowDebugMenu(false);
-                        console.log("Story progress reset.");
-                      }
-                    }}
-                    className="w-full text-xs border-orange-400 text-orange-700 hover:bg-orange-50"
-                  >
-                    Reset Story
-                  </Button>
+                  <div className="flex items-center justify-between pt-2 border-t border-orange-300 mt-2">
+                    <label htmlFor="free-summons" className="text-xs font-medium text-orange-700 cursor-pointer">
+                      Free Summons
+                    </label>
+                    <Switch
+                      id="free-summons"
+                      checked={freeSummons}
+                      onCheckedChange={toggleFreeSummons}
+                    />
+                  </div>
                 </div>
               </motion.div>
             )}

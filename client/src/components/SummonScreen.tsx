@@ -46,6 +46,7 @@ export function SummonScreen({ onNavigate }: SummonScreenProps) {
     addEssence,
     getMultiSummonCost,
     summonMultipleSpirits,
+    freeSummons,
   } = useGameState();
   
   const [summonedSpirit, setSummonedSpirit] = useState<PlayerSpirit | null>(
@@ -61,8 +62,8 @@ export function SummonScreen({ onNavigate }: SummonScreenProps) {
 
   const spiritCost = getSpiritCost();
   const multiSummonCost = getMultiSummonCost(10);
-  const canSummonOne = qi >= spiritCost;
-  const canSummonTen = qi >= multiSummonCost;
+  const canSummonOne = freeSummons || qi >= spiritCost;
+  const canSummonTen = freeSummons || qi >= multiSummonCost;
 
   const startReveal = (spirit: PlayerSpirit) => {
     setSummonedSpirit(spirit);
@@ -87,7 +88,8 @@ export function SummonScreen({ onNavigate }: SummonScreenProps) {
 
   const handleSingleSummon = () => {
     const cost = getSpiritCost();
-    if (spendQi(cost)) {
+    const canProceed = freeSummons || spendQi(cost);
+    if (canProceed) {
       const spirit = summonSpirit();
 
       const baseSpirit = getBaseSpirit(spirit.spiritId);
@@ -102,7 +104,8 @@ export function SummonScreen({ onNavigate }: SummonScreenProps) {
 
   const handleMultiSummon = (count: number) => {
     const cost = getMultiSummonCost(count);
-    if (spendQi(cost)) {
+    const canProceed = freeSummons || spendQi(cost);
+    if (canProceed) {
       const newSpirits = summonMultipleSpirits(count);
 
       newSpirits.forEach((spirit) => {

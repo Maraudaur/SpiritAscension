@@ -56,6 +56,9 @@ export interface GameStateStore extends Omit<GameStateData, "activeParty"> {
   currentEncounterId: string | null;
   storyBattleCheckpoint: StoryBattleCheckpoint | null;
 
+  // Debug State
+  freeSummons: boolean;
+
   // Actions
   addQi: (amount: number) => void;
   purchaseUpgrade: (cost: number, rateIncrease: number) => boolean;
@@ -103,6 +106,9 @@ export interface GameStateStore extends Omit<GameStateData, "activeParty"> {
   winBattle: (qiAmount: number) => void;
   updateSpiritHealth: (instanceId: string, health: number) => void;
   healAllSpirits: () => void;
+
+  // Debug actions
+  toggleFreeSummons: () => void;
 }
 
 // --- FIX: ALL CONSTANTS MOVED TO TOP-LEVEL SCOPE ---
@@ -221,6 +227,7 @@ export const useGameState = create<GameStateStore>()(
       completedStoryNodes: [],
       currentEncounterId: null,
       storyBattleCheckpoint: null,
+      freeSummons: false,
 
       // --- (Core Actions) ---
       addQi: (amount: number) => {
@@ -463,6 +470,11 @@ export const useGameState = create<GameStateStore>()(
       },
 
       spendQi: (amount: number) => {
+        // Free summons mode: always succeed without deducting Qi
+        if (get().freeSummons) {
+          return true;
+        }
+        
         if (get().qi >= amount) {
           set((state) => {
             state.qi -= amount;
@@ -642,6 +654,12 @@ export const useGameState = create<GameStateStore>()(
             spirit.currentHealth = undefined;
             spirit.activeEffects = []; // Clear effects
           });
+        });
+      },
+
+      toggleFreeSummons: () => {
+        set((state) => {
+          state.freeSummons = !state.freeSummons;
         });
       },
     })),
