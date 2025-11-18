@@ -481,7 +481,9 @@ export const useGameState = create<GameStateStore>()(
 
       summonSpirit: () => {
         // Uses helper functions from top level
-        const rarity = _selectRandomRarity();
+        const currentSummonCount = get().summonCount ?? 0;
+        // First summon is always common
+        const rarity = currentSummonCount === 0 ? "common" : _selectRandomRarity();
         const newSpirit = _createRandomSpirit(rarity);
 
         set((state) => {
@@ -499,17 +501,22 @@ export const useGameState = create<GameStateStore>()(
       summonMultipleSpirits: (count: number) => {
         const newSpirits: PlayerSpirit[] = [];
         let hasRare = false;
+        const currentSummonCount = get().summonCount ?? 0;
 
         for (let i = 0; i < count; i++) {
           // Uses helper functions from top level
-          const rarity = _selectRandomRarity();
+          // First summon ever is always common
+          const isFirstSummonEver = currentSummonCount === 0 && i === 0;
+          const rarity = isFirstSummonEver ? "common" : _selectRandomRarity();
           if (["rare", "epic", "legendary"].includes(rarity)) {
             hasRare = true;
           }
           newSpirits.push(_createRandomSpirit(rarity));
         }
 
+        // Guaranteed rare still applies even on first batch (just not in first slot if it's the first summon ever)
         if (!hasRare) {
+          // If this is the very first summon batch, put the rare in the last slot (not first)
           newSpirits[count - 1] = _createRandomSpirit("rare");
         }
 
