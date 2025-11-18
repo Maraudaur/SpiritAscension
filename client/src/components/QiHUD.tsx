@@ -157,6 +157,24 @@ export function QiHUD({ currentScreen }: QiHUDProps) {
             </div>
           </div>
         </div>
+
+        {/* FREE SUMMONS INDICATOR */}
+        {freeSummons && (
+          <motion.div
+            initial={{ scale: 0.8, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            exit={{ scale: 0.8, opacity: 0 }}
+            className="px-3 py-1 rounded-full font-bold text-xs tracking-wider"
+            style={{
+              background: "linear-gradient(135deg, #F59E0B 0%, #D97706 100%)",
+              color: "white",
+              boxShadow: "0 2px 8px rgba(245, 158, 11, 0.5), 0 0 20px rgba(245, 158, 11, 0.3)",
+              border: "2px solid #FBBF24",
+            }}
+          >
+            🎁 FREE SUMMONS
+          </motion.div>
+        )}
       </div>
 
       {/* RIGHT: Screen Title */}
@@ -217,8 +235,14 @@ export function QiHUD({ currentScreen }: QiHUDProps) {
                     Reset Game
                   </Button>
 
-                  <div className="flex items-center justify-between pt-2 border-t border-orange-300 mt-2">
-                    <label htmlFor="free-summons" className="text-xs font-medium text-orange-700 cursor-pointer">
+                  <div 
+                    className={`flex items-center justify-between pt-2 border-t border-orange-300 mt-2 px-2 py-2 rounded transition-colors ${
+                      freeSummons ? 'bg-amber-100 border-amber-400' : ''
+                    }`}
+                  >
+                    <label htmlFor="free-summons" className={`text-xs font-medium cursor-pointer ${
+                      freeSummons ? 'text-amber-700 font-bold' : 'text-orange-700'
+                    }`}>
                       Free Summons
                     </label>
                     <Switch
