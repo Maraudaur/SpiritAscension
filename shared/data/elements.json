@@ -28,5 +28,11 @@
     "name": "Metal",
     "color": "#a8a8a8",
     "description": "The element of precision and strength"
+  },
+  "none": {
+    "id": "none",
+    "name": "Neutral",
+    "color": "#e8e8e8",
+    "description": "Neutral element with no elemental affinity"
   }
 }
