@@ -951,17 +951,10 @@ export function useBattleLogic({
     const playerAgility = calculateAllStats(spiritsInBattle[0].playerSpirit).agility;
     const enemyAgility = allEnemies[0].agility;
     
-    if (playerAgility > enemyAgility) {
-      const spirit = getBaseSpirit(spiritsInBattle[0].playerSpirit.spiritId);
-      addLog(`${spirit?.name || "Your spirit"} is faster! (${playerAgility} AGI vs ${enemyAgility})`);
+    if (playerAgility >= enemyAgility) {
       setTurnPhase("player_start");
-    } else if (enemyAgility > playerAgility) {
-      addLog(`${allEnemies[0].name} is faster! (${enemyAgility} AGI vs ${playerAgility})`);
-      setTurnPhase("enemy_start");
     } else {
-      // Tied agility - player advantage
-      addLog(`Speed tied at ${playerAgility} AGI - you move first!`);
-      setTurnPhase("player_start");
+      setTurnPhase("enemy_start");
     }
   };
 

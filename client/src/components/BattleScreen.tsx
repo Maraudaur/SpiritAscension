@@ -270,9 +270,6 @@ export function BattleScreen({
                   );
                 })}
               </div>
-              <div className="text-xs text-white mb-1 [text-shadow:0_1px_2px_rgba(0,0,0,0.8)]">
-                ATK: {activeStats.attack} | DEF: {activeStats.defense} | AGI: {activeStats.agility}
-              </div>
               {/* HP Bar */}
               <motion.div
                 className="w-full bg-gray-900/70 rounded-full h-5 overflow-hidden relative border-2 border-white/50"
@@ -355,9 +352,6 @@ export function BattleScreen({
                     </span>
                   );
                 })}
-              </div>
-              <div className="text-xs text-white mb-1 text-right [text-shadow:0_1px_2px_rgba(0,0,0,0.8)]">
-                ATK: {activeEnemy.attack} | DEF: {activeEnemy.defense} | AGI: {activeEnemy.agility}
               </div>
               {/* HP Bar */}
               <motion.div
