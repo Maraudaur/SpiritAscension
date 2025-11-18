@@ -241,9 +241,10 @@ export function SpiritManager({ onClose }: SpiritManagerProps = {}) {
             return (
               <div
                 key={index}
+                onClick={() => spirit && setSelectedSpirit(spirit)}
                 className={`p-3 rounded-lg border-2 ${
                   spirit
-                    ? "bg-white shadow-md"
+                    ? "bg-white shadow-md cursor-pointer hover:shadow-lg transition-shadow"
                     : "border-dashed border-gray-400 bg-gray-100"
                 } min-h-[140px] flex flex-col justify-between`}
                 style={{ borderColor: spirit ? "#8B4513" : undefined }}
@@ -295,7 +296,10 @@ export function SpiritManager({ onClose }: SpiritManagerProps = {}) {
                       </div>
                     </div>
                     <button
-                      onClick={() => handleRemoveFromParty(spirit.instanceId)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleRemoveFromParty(spirit.instanceId);
+                      }}
                       className="w-full p-2 bg-red-600 text-white rounded text-xs font-semibold hover:bg-red-700 flex items-center justify-center gap-1"
                     >
                       <Trash2 className="w-3 h-3" />
