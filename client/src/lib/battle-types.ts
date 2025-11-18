@@ -50,6 +50,7 @@ export interface BossBattleState {
 export interface TriggerEffectResult {
   reflectedDamage: number;
   attackerEffects: ActiveEffect[];
+  counterAttackDamage: number;
 }
 
 export interface BattleRewards {

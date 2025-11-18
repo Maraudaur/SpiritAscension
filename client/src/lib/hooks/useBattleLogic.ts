@@ -236,6 +236,7 @@ export function useBattleLogic({
     damage?: number,
   ): TriggerEffectResult => {
     let reflectedDamage = 0;
+    let counterAttackDamage = 0;
     const attackerEffects: ActiveEffect[] = [];
 
     const calculateMinOneDamage = (rawAmount: number): number => {
@@ -243,7 +244,7 @@ export function useBattleLogic({
       return Math.max(1, Math.floor(rawAmount));
     };
 
-    if (trigger === "on_get_hit" && target && damage && damage > 0) {
+    if (trigger === "on_get_hit" && target && damage !== undefined) {
       // 1. Check Target's Active Effects (Thorns buff and damage_reflect_buff)
       if ("activeEffects" in target) {
         const battleSpirit = target as BattleSpirit;
@@ -333,8 +334,62 @@ export function useBattleLogic({
           }
         }
       }
+
+      // 3. Check for Counter Attack passive
+      if (targetBaseSpirit && targetBaseSpirit.passiveAbilities) {
+        for (const passiveId of targetBaseSpirit.passiveAbilities) {
+          const passive = (passivesData as Record<string, PassiveAbility>)[
+            passiveId
+          ];
+          if (!passive || !passive.effects) continue;
+
+          for (const effect of passive.effects) {
+            if (effect.type === "counter_attack_chance") {
+              // Roll for counter attack (50% chance)
+              if (Math.random() < effect.chance) {
+                // Get target's attack stat
+                let targetAttack = 0;
+                let targetLevel = 1;
+                let attackerDefense = 1;
+
+                if ("playerSpirit" in target) {
+                  const targetStats = calculateAllStats((target as BattleSpirit).playerSpirit);
+                  targetAttack = targetStats.attack;
+                  targetLevel = (target as BattleSpirit).playerSpirit.level;
+                } else {
+                  targetAttack = (target as Enemy).attack;
+                  targetLevel = (target as Enemy).level;
+                }
+
+                if ("playerSpirit" in attacker) {
+                  const attackerStats = calculateAllStats((attacker as BattleSpirit).playerSpirit);
+                  attackerDefense = Math.max(1, attackerStats.defense);
+                } else {
+                  attackerDefense = Math.max(1, (attacker as Enemy).defense);
+                }
+
+                // Calculate counter attack damage using simplified formula
+                const levelComponent = Math.floor((2 * targetLevel) / 5) + 2;
+                const attackDefenseRatio = targetAttack / attackerDefense;
+                const baseDamage = Math.floor(
+                  (levelComponent * 60 * attackDefenseRatio) / 50
+                ) + 2;
+                counterAttackDamage = Math.max(1, Math.floor(baseDamage));
+
+                const targetDisplayName =
+                  (target as Enemy).name ||
+                  getBaseSpirit((target as BattleSpirit).playerSpirit?.spiritId)?.name ||
+                  "Unknown";
+                addLog(
+                  `${targetDisplayName}'s "${passive.name}" triggers a counter attack dealing ${counterAttackDamage} damage!`
+                );
+              }
+            }
+          }
+        }
+      }
     }
-    return { reflectedDamage, attackerEffects };
+    return { reflectedDamage, attackerEffects, counterAttackDamage };
   };
   // --- END FIX ---
 
@@ -1702,7 +1757,7 @@ export function useBattleLogic({
       const targetEnemy = prevEnemies[activeEnemyIndex];
       let newHealth = Math.max(0, targetEnemy.currentHealth - damage);
 
-      const { reflectedDamage, attackerEffects } = executeTriggerEffects(
+      const { reflectedDamage, attackerEffects, counterAttackDamage } = executeTriggerEffects(
         "on_get_hit",
         activeSpirit, // Attacker
         targetEnemy, // Target
@@ -1747,6 +1802,23 @@ export function useBattleLogic({
         addLog(
           `${activeBaseSpirit.name} takes ${reflectedDamage} reflected damage!`,
         );
+      }
+
+      // Apply counter attack damage to player
+      if (counterAttackDamage > 0) {
+        setPlayerSpirits((prev) =>
+          prev.map((spirit, i) => {
+            if (i !== activePartySlot) return spirit;
+            const newHealth = Math.max(
+              0,
+              spirit.currentHealth - counterAttackDamage,
+            );
+            return { ...spirit, currentHealth: newHealth };
+          }),
+        );
+        playDamage();
+        setPlayerHealthBarShake(true);
+        setTimeout(() => setPlayerHealthBarShake(false), 500);
       }
 
       return prevEnemies.map((en, index) =>
@@ -1843,7 +1915,7 @@ export function useBattleLogic({
       const targetSpirit = prevSpirits[activePartySlot];
       const newHealth = Math.max(0, targetSpirit.currentHealth - damage);
 
-      const { reflectedDamage, attackerEffects } = executeTriggerEffects(
+      const { reflectedDamage, attackerEffects, counterAttackDamage } = executeTriggerEffects(
         "on_get_hit",
         activeEnemy, // Attacker
         targetSpirit, // Target
@@ -1880,6 +1952,23 @@ export function useBattleLogic({
         );
         addLog(
           `${activeEnemy.name} takes ${reflectedDamage} reflected damage!`,
+        );
+        playDamage();
+        setEnemyHealthBarShake(true);
+        setTimeout(() => setEnemyHealthBarShake(false), 500);
+      }
+
+      // Apply counter attack damage to enemy
+      if (counterAttackDamage > 0) {
+        setBattleEnemies((prev) =>
+          prev.map((enemy, i) => {
+            if (i !== activeEnemyIndex) return enemy;
+            const newHealth = Math.max(
+              0,
+              enemy.currentHealth - counterAttackDamage,
+            );
+            return { ...enemy, currentHealth: newHealth };
+          }),
         );
         playDamage();
         setEnemyHealthBarShake(true);

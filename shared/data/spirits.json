@@ -12,7 +12,7 @@
         "elementalAffinity": 60,
         "agility": 119
       },
-      "passiveAbilities": ["health_focus"],
+      "passiveAbilities": ["health_focus", "counter_strike"],
       "skills": ["basic_attack", "heavy_hit", "hit_and_heal"],
       "spriteConfig": {
         "textureUrl": "/sprites/cinderpaw_idle.png",
