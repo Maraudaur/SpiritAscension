@@ -32,7 +32,7 @@
   "none": {
     "id": "none",
     "name": "Neutral",
-    "color": "#e8e8e8",
+    "color": "#ffffff",
     "description": "Neutral element with no elemental affinity"
   }
 }

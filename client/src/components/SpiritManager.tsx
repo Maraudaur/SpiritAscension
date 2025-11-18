@@ -738,7 +738,7 @@ export function SpiritManager({ onClose }: SpiritManagerProps = {}) {
                                     className="text-xs font-bold px-2 py-0.5 rounded flex-shrink-0"
                                     style={{
                                       backgroundColor: getElementColor(skill.element),
-                                      color: isNeutral ? "#5D4037" : "white",
+                                      color: isNeutral ? "#000000" : "white",
                                     }}
                                   >
                                     {skillElement.name}
