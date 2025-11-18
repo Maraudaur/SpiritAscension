@@ -11,6 +11,7 @@ import {
   getAvailableSkills,
   getPassiveAbility,
   getPrimaryElement,
+  getElementColor,
 } from "@/lib/spiritUtils";
 import { Button } from "@/components/ui/button";
 import {
@@ -234,8 +235,6 @@ export function SpiritManager({ onClose }: SpiritManagerProps = {}) {
               (s) => s.instanceId === spiritInstanceId,
             );
             const baseSpirit = spirit ? getBaseSpirit(spirit.spiritId) : null;
-            const element =
-              spirit && baseSpirit ? getElement(getPrimaryElement(baseSpirit)) : null;
             const lineage =
               spirit && baseSpirit ? getLineage(baseSpirit.lineage) : null;
 
@@ -249,7 +248,7 @@ export function SpiritManager({ onClose }: SpiritManagerProps = {}) {
                 } min-h-[140px] flex flex-col justify-between`}
                 style={{ borderColor: spirit ? "#8B4513" : undefined }}
               >
-                {spirit && baseSpirit && element && lineage ? (
+                {spirit && baseSpirit && lineage ? (
                   <>
                     <div className="flex gap-3 mb-2">
                       <img
@@ -264,8 +263,25 @@ export function SpiritManager({ onClose }: SpiritManagerProps = {}) {
                         <div className="text-xs parchment-text opacity-75">
                           Lv. {spirit.level}
                         </div>
-                        <div className="text-xs mt-1" style={{ color: "#8B4513" }}>
-                          {element.name} | {lineage.name}
+                        <div className="flex items-center gap-1 mt-1 flex-wrap">
+                          {baseSpirit.elements.map((elemId) => {
+                            const elem = getElement(elemId);
+                            return (
+                              <span
+                                key={elemId}
+                                className="text-xs font-bold px-1.5 py-0.5 rounded"
+                                style={{
+                                  backgroundColor: getElementColor(elemId),
+                                  color: "white",
+                                }}
+                              >
+                                {elem?.name}
+                              </span>
+                            );
+                          })}
+                          <span className="text-xs" style={{ color: "#8B4513" }}>
+                            | {lineage.name}
+                          </span>
                         </div>
                         <span
                           className="inline-block text-xs font-bold px-2 py-0.5 rounded mt-1"
@@ -383,7 +399,6 @@ export function SpiritManager({ onClose }: SpiritManagerProps = {}) {
               const baseSpirit = getBaseSpirit(spirit.spiritId);
               if (!baseSpirit) return null;
 
-              const element = getElement(getPrimaryElement(baseSpirit));
               const lineage = getLineage(baseSpirit.lineage);
               const isInParty = activeParty.includes(spirit.instanceId);
               
@@ -420,8 +435,25 @@ export function SpiritManager({ onClose }: SpiritManagerProps = {}) {
                     <div className="text-xs parchment-text opacity-75 mb-1">
                       Lv. {spirit.level}
                     </div>
-                    <div className="text-xs mb-2" style={{ color: "#8B4513" }}>
-                      {element.name} | {lineage.name}
+                    <div className="flex items-center gap-1 mb-2 flex-wrap justify-center">
+                      {baseSpirit.elements.map((elemId) => {
+                        const elem = getElement(elemId);
+                        return (
+                          <span
+                            key={elemId}
+                            className="text-xs font-bold px-1.5 py-0.5 rounded"
+                            style={{
+                              backgroundColor: getElementColor(elemId),
+                              color: "white",
+                            }}
+                          >
+                            {elem?.name}
+                          </span>
+                        );
+                      })}
+                      <span className="text-xs" style={{ color: "#8B4513" }}>
+                        | {lineage.name}
+                      </span>
                     </div>
                     <span
                       className="text-xs font-bold px-2 py-1 rounded mb-2"
@@ -485,7 +517,6 @@ export function SpiritManager({ onClose }: SpiritManagerProps = {}) {
             const baseSpirit = getBaseSpirit(selectedSpirit.spiritId);
             if (!baseSpirit) return null;
 
-            const element = getElement(getPrimaryElement(baseSpirit));
             const lineage = getLineage(baseSpirit.lineage);
             const stats = calculateAllStats(selectedSpirit);
             const skills = getAvailableSkills(selectedSpirit);
@@ -516,9 +547,21 @@ export function SpiritManager({ onClose }: SpiritManagerProps = {}) {
                     <span className="text-xs parchment-text bg-white px-2 py-1 rounded border-2" style={{ borderColor: "#8B4513" }}>
                       Level {selectedSpirit.level}
                     </span>
-                    <span className={`element-${element.id} text-xs font-semibold px-2 py-1 rounded bg-white border-2`} style={{ borderColor: "#8B4513" }}>
-                      {element.name}
-                    </span>
+                    {baseSpirit.elements.map((elemId) => {
+                      const elem = getElement(elemId);
+                      return (
+                        <span
+                          key={elemId}
+                          className="text-xs font-bold px-2 py-1 rounded"
+                          style={{
+                            backgroundColor: getElementColor(elemId),
+                            color: "white",
+                          }}
+                        >
+                          {elem?.name}
+                        </span>
+                      );
+                    })}
                     <span className="text-xs parchment-text font-semibold px-2 py-1 rounded bg-white border-2" style={{ borderColor: "#8B4513" }}>
                       {lineage.name}
                     </span>
