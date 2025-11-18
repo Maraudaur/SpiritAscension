@@ -109,6 +109,7 @@ export interface GameStateStore extends Omit<GameStateData, "activeParty"> {
 
   // Debug actions
   toggleFreeSummons: () => void;
+  spawnSpecificSpirit: (spiritId: string) => PlayerSpirit | null;
 }
 
 // --- FIX: ALL CONSTANTS MOVED TO TOP-LEVEL SCOPE ---
@@ -194,6 +195,41 @@ function _createRandomSpirit(rarity: Rarity): PlayerSpirit {
     return POTENTIAL_GRADES[ // <-- Now works
       Math.floor(Math.random() * POTENTIAL_GRADES.length)
     ];
+  };
+
+  return {
+    instanceId: crypto.randomUUID(),
+    spiritId: baseSpirit.id,
+    level: 1,
+    experience: 0,
+    isPrismatic: isPrismatic,
+    potentialFactors: {
+      attack: getRandomPotential(),
+      defense: getRandomPotential(),
+      health: getRandomPotential(),
+      elementalAffinity: getRandomPotential(),
+      agility: getRandomPotential(),
+    },
+  };
+}
+
+function _createSpecificSpirit(spiritId: string): PlayerSpirit | null {
+  // Find the base spirit by ID across all rarities
+  let baseSpirit: BaseSpirit | undefined = undefined;
+  for (const raritySpirits of Object.values(spiritsData)) {
+    baseSpirit = (raritySpirits as BaseSpirit[]).find((s) => s.id === spiritId);
+    if (baseSpirit) break;
+  }
+
+  if (!baseSpirit) {
+    console.error(`Spirit with ID "${spiritId}" not found`);
+    return null;
+  }
+
+  const isPrismatic = Math.random() < 0.001; // 0.1% chance
+
+  const getRandomPotential = (): PotentialGrade => {
+    return POTENTIAL_GRADES[Math.floor(Math.random() * POTENTIAL_GRADES.length)];
   };
 
   return {
@@ -661,6 +697,17 @@ export const useGameState = create<GameStateStore>()(
         set((state) => {
           state.freeSummons = !state.freeSummons;
         });
+      },
+
+      spawnSpecificSpirit: (spiritId: string) => {
+        const newSpirit = _createSpecificSpirit(spiritId);
+        if (newSpirit) {
+          set((state) => {
+            state.spirits.push(newSpirit);
+          });
+          return newSpirit;
+        }
+        return null;
       },
     })),
     // --- (Encryption Config) ---

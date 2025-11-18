@@ -6,6 +6,8 @@ import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
 import { motion, AnimatePresence } from "framer-motion";
+import spiritsData from "@shared/data/spirits.json";
+import type { BaseSpirit } from "@shared/types";
 
 type Screen = "story" | "cultivation" | "spirits" | "summon" | "battle";
 
@@ -22,10 +24,12 @@ interface QiHUDProps {
 }
 
 export function QiHUD({ currentScreen }: QiHUDProps) {
-  const { qi, qiPerSecond, resetGame, freeSummons, toggleFreeSummons } = useGameState();
+  const { qi, qiPerSecond, resetGame, freeSummons, toggleFreeSummons, spawnSpecificSpirit } = useGameState();
   const { isMuted, toggleMute, volume, setVolume } = useAudio();
   const [showVolumeSlider, setShowVolumeSlider] = useState(false);
   const [showDebugMenu, setShowDebugMenu] = useState(false);
+  const [selectedSpiritId, setSelectedSpiritId] = useState<string>("");
+  const [spawnMessage, setSpawnMessage] = useState<string>("");
 
   const formatNumber = (num: number): string => {
     if (num >= 1_000_000_000) {
@@ -36,6 +40,33 @@ export function QiHUD({ currentScreen }: QiHUDProps) {
       return `${(num / 1_000).toFixed(2)}K`;
     }
     return Math.floor(num).toLocaleString();
+  };
+
+  const handleSpawnSpirit = () => {
+    if (!selectedSpiritId) {
+      setSpawnMessage("Please select a spirit first");
+      setTimeout(() => setSpawnMessage(""), 2000);
+      return;
+    }
+
+    const result = spawnSpecificSpirit(selectedSpiritId);
+    if (result) {
+      const spiritData = getAllSpirits().find((s) => s.id === selectedSpiritId);
+      setSpawnMessage(`✅ Spawned ${spiritData?.name}!`);
+      setTimeout(() => setSpawnMessage(""), 2000);
+    } else {
+      setSpawnMessage("❌ Failed to spawn spirit");
+      setTimeout(() => setSpawnMessage(""), 2000);
+    }
+  };
+
+  const getAllSpirits = (): BaseSpirit[] => {
+    const allSpirits: BaseSpirit[] = [];
+    const spiritsDataTyped = spiritsData as Record<string, BaseSpirit[]>;
+    for (const rarity of Object.keys(spiritsDataTyped)) {
+      allSpirits.push(...spiritsDataTyped[rarity]);
+    }
+    return allSpirits;
   };
 
   return (
@@ -250,6 +281,42 @@ export function QiHUD({ currentScreen }: QiHUDProps) {
                       checked={freeSummons}
                       onCheckedChange={toggleFreeSummons}
                     />
+                  </div>
+
+                  <div className="pt-2 border-t border-orange-300 mt-2 space-y-2">
+                    <div className="text-xs font-medium text-orange-700 mb-1">
+                      Get Specific Spirit
+                    </div>
+                    <select
+                      value={selectedSpiritId}
+                      onChange={(e) => setSelectedSpiritId(e.target.value)}
+                      className="w-full text-xs px-2 py-1.5 border border-orange-300 rounded bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-orange-400"
+                    >
+                      <option value="">-- Select Spirit --</option>
+                      {Object.entries(spiritsData as Record<string, BaseSpirit[]>).map(([rarity, spirits]) => (
+                        <optgroup key={rarity} label={rarity.toUpperCase()}>
+                          {spirits.map((spirit) => (
+                            <option key={spirit.id} value={spirit.id}>
+                              {spirit.name}
+                            </option>
+                          ))}
+                        </optgroup>
+                      ))}
+                    </select>
+                    <Button
+                      variant="default"
+                      size="sm"
+                      onClick={handleSpawnSpirit}
+                      disabled={!selectedSpiritId}
+                      className="w-full text-xs bg-orange-600 hover:bg-orange-700"
+                    >
+                      Spawn Spirit
+                    </Button>
+                    {spawnMessage && (
+                      <div className="text-xs text-center font-medium text-orange-700 py-1">
+                        {spawnMessage}
+                      </div>
+                    )}
                   </div>
                 </div>
               </motion.div>
