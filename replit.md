@@ -4,6 +4,25 @@ This is a cultivation/spirit-summoning idle game inspired by Asian mythology and
 
 **UI Design**: PC game interface with persistent left sidebar navigation (100px width) and 16:9 aspect ratio main content container. Persistent HUD at top displays volume control (left), Qi Energy counter with generation rate (center), and screen title (right). Five distinct game screens accessible via icon-driven sidebar buttons: Story (home), Cultivation (incremental loop), Spirit Manager, Summon (gacha), and Battle. Cultivation screen uses three-column layout: Ascension (left), Basic Generators (middle), Advanced Generators (right). Summon and Battle screens are full-page interfaces matching the 16:9 container aesthetic. Story screen features a two-layer system (Story Map + Visual Novel Scene). All screens maintain Xianxia/Chinese Imperial Fantasy aesthetic with parchment textures, vermillion, jade, and gold accents. Navigation between screens handled exclusively via sidebar, with no in-page navigation buttons.
 
+# Recent Changes (November 18, 2025)
+
+## Agility Stat System Implementation
+- **New Stat: Agility**: Added agility as a fifth core stat alongside attack, defense, health, and elemental affinity
+- **Data Updates**: All 58 spirits in `shared/data/spirits.json` now include base agility values (ranging from 10-30)
+- **Type System**: Updated `StatType` to include "agility", `BaseSpirit.baseStats` to include agility, and `PotentialFactors` interface to support agility potential grades
+- **Stat Calculation**: `calculateAllStats` in `spiritUtils.ts` now calculates agility with level and potential scaling, matching other stat formulas
+- **Turn Order System**: Battle logic in `useBattleLogic.ts` now determines turn order dynamically based on agility comparison:
+  - At battle start: Compares player vs enemy agility, faster spirit acts first
+  - End of each round: Re-evaluates agility to determine next round's turn order
+  - Supports agility changes from buffs, debuffs, or spirit swaps
+  - Battle log displays agility values when announcing who moves first
+- **Enemy Agility**: Enemy type in `battle-types.ts` now includes agility stat, calculated from base spirit data using same formula as other enemy stats
+- **UI Display**: 
+  - Spirit Manager inspection panel shows agility stat with potential grade color coding
+  - Battle Screen displays ATK/DEF/AGI stat line for both player and enemy spirits below element badges
+- **Legacy Save Compatibility**: `calculateAllStats` defaults to "C" potential grade for spirits from old saves missing agility data
+- **Summon System**: All new spirits summoned receive randomized agility potential grades (C/B/A/S/SS)
+
 # Recent Changes (November 7, 2025)
 
 ## Story Screen Enhancement

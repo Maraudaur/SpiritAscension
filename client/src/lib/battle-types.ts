@@ -33,6 +33,7 @@ export interface Enemy {
   maxHealth: number;
   attack: number;
   defense: number;
+  agility: number;
   baseAttack?: number;
   elements: ElementId[];
   elementalAffinity: number;

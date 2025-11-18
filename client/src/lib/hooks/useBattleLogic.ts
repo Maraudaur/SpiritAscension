@@ -900,6 +900,11 @@ export function useBattleLogic({
             (1 + enemyPotentialBonus) *
             levelMultiplier,
         );
+        const enemyAgility = Math.floor(
+          baseSpirit.baseStats.agility *
+            (1 + enemyPotentialBonus) *
+            levelMultiplier,
+        );
 
         return {
           id: `enemy_${Date.now()}_${index}`,
@@ -908,6 +913,7 @@ export function useBattleLogic({
           level: enemyData.level,
           attack: enemyAttack,
           defense: enemyDefense,
+          agility: enemyAgility,
           maxHealth: enemyHealth,
           currentHealth: enemyHealth,
           elements: baseSpirit.elements,
@@ -931,8 +937,22 @@ export function useBattleLogic({
     addLog("Battle begins!");
     playBattleMusic();
 
-    // 3. Kick off the turn state machine
-    setTurnPhase("player_start");
+    // 3. Determine initial turn order based on agility
+    const playerAgility = calculateAllStats(spiritsInBattle[0].playerSpirit).agility;
+    const enemyAgility = allEnemies[0].agility;
+    
+    if (playerAgility > enemyAgility) {
+      const spirit = getBaseSpirit(spiritsInBattle[0].playerSpirit.spiritId);
+      addLog(`${spirit?.name || "Your spirit"} is faster! (${playerAgility} AGI vs ${enemyAgility})`);
+      setTurnPhase("player_start");
+    } else if (enemyAgility > playerAgility) {
+      addLog(`${allEnemies[0].name} is faster! (${enemyAgility} AGI vs ${playerAgility})`);
+      setTurnPhase("enemy_start");
+    } else {
+      // Tied agility - player advantage
+      addLog(`Speed tied at ${playerAgility} AGI - you move first!`);
+      setTurnPhase("player_start");
+    }
   };
 
   /**
@@ -1183,7 +1203,7 @@ export function useBattleLogic({
 
         setIsPaused(true); // Pause the game
         setTimeout(() => {
-          setTurnPhase("enemy_start"); // Move to next turn
+          setTurnPhase("enemy_start"); // Move to enemy turn
           setIsPaused(false); // Unpause for enemy turn
         }, TURN_TRANSITION_DELAY);
         break;
@@ -1237,8 +1257,25 @@ export function useBattleLogic({
 
         setIsPaused(true); // Pause the game
         setTimeout(() => {
-          setTurnPhase("player_start"); // Loop back to player
-          setIsPaused(false); // Unpause for player turn
+          // Re-check agility for next round (in case of swaps/buffs)
+          const currentPlayerSpirit = playerSpirits[activePartySlot];
+          const currentEnemy = battleEnemies[activeEnemyIndex];
+          
+          if (currentPlayerSpirit && currentEnemy) {
+            const playerAgility = calculateAllStats(currentPlayerSpirit.playerSpirit).agility;
+            const enemyAgility = currentEnemy.agility;
+            
+            // Faster spirit goes first in next round
+            if (playerAgility >= enemyAgility) {
+              setTurnPhase("player_start");
+            } else {
+              setTurnPhase("enemy_start");
+            }
+          } else {
+            setTurnPhase("player_start"); // Fallback
+          }
+          
+          setIsPaused(false);
         }, TURN_TRANSITION_DELAY);
         break;
     }

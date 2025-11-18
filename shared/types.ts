@@ -28,7 +28,7 @@ export type PotentialGrade = "C" | "B" | "A" | "S" | "SS";
 export type SkillElementId = ElementId | "none";
 
 export type EffectTarget = "self" | "enemy" | "party_member";
-export type StatType = "attack" | "defense" | "health" | "elementalAffinity";
+export type StatType = "attack" | "defense" | "health" | "elementalAffinity" | "agility";
 /*** Defines the AI behavior for an enemy, e.g., a list of skill IDs to cycle through.*/
 export type EnemyAI = string[];
 
@@ -261,6 +261,7 @@ export interface BaseSpirit {
     defense: number;
     health: number;
     elementalAffinity: number;
+    agility: number;
   };
   passiveAbilities: string[];
   skills: string[];
@@ -273,6 +274,7 @@ export interface PotentialFactors {
   defense: PotentialGrade;
   health: PotentialGrade;
   elementalAffinity: PotentialGrade;
+  agility: PotentialGrade;
 }
 
 export interface PlayerSpirit {

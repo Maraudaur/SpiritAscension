@@ -201,6 +201,7 @@ function _createRandomSpirit(rarity: Rarity): PlayerSpirit {
       defense: getRandomPotential(),
       health: getRandomPotential(),
       elementalAffinity: getRandomPotential(),
+      agility: getRandomPotential(),
     },
   };
 }
@@ -260,6 +261,7 @@ export const useGameState = create<GameStateStore>()(
               defense: "C",
               health: "C",
               elementalAffinity: "C",
+              agility: "C",
             },
           };
           set((state) => {

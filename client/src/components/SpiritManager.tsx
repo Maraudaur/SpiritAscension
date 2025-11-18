@@ -667,6 +667,20 @@ export function SpiritManager({ onClose }: SpiritManagerProps = {}) {
                           </span>
                         </div>
                         <div className="flex justify-between">
+                          <span>Agility:</span>
+                          <span
+                            className="font-semibold"
+                            style={{
+                              color: getPotentialColor(
+                                selectedSpirit.potentialFactors.agility,
+                              ),
+                            }}
+                          >
+                            {stats.agility} [
+                            {selectedSpirit.potentialFactors.agility}]
+                          </span>
+                        </div>
+                        <div className="flex justify-between">
                           <span>Affinity:</span>
                           <span
                             className="font-semibold"

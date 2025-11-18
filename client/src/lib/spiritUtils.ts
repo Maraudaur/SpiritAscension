@@ -178,7 +178,7 @@ export function calculateStat(
 export function calculateAllStats(playerSpirit: PlayerSpirit) {
   const baseSpirit = getBaseSpirit(playerSpirit.spiritId);
   if (!baseSpirit) {
-    return { attack: 0, defense: 0, health: 0, elementalAffinity: 0 };
+    return { attack: 0, defense: 0, health: 0, elementalAffinity: 0, agility: 0 };
   }
 
   let attack = calculateStat(
@@ -206,6 +206,12 @@ export function calculateAllStats(playerSpirit: PlayerSpirit) {
     playerSpirit.potentialFactors.elementalAffinity,
   );
 
+  let agility = calculateStat(
+    baseSpirit.baseStats.agility,
+    playerSpirit.level,
+    playerSpirit.potentialFactors.agility || "C", // Default to C for legacy saves
+  );
+
   // Apply active effects (stat buffs/debuffs) - This logic is unchanged
   const activeEffects = playerSpirit.activeEffects || [];
   activeEffects.forEach((effect) => {
@@ -230,6 +236,9 @@ export function calculateAllStats(playerSpirit: PlayerSpirit) {
             elementalAffinity * effect.statMultiplier,
           );
           break;
+        case "agility":
+          agility = Math.floor(agility * effect.statMultiplier);
+          break;
       }
     }
   });
@@ -238,7 +247,7 @@ export function calculateAllStats(playerSpirit: PlayerSpirit) {
   // This block replaces the old switch statement
 
   // Create a mutable stats object from the values calculated so far
-  const stats = { attack, defense, health, elementalAffinity };
+  const stats = { attack, defense, health, elementalAffinity, agility };
 
   // Apply passive abilities
   if (baseSpirit.passiveAbilities && passivesData) {
@@ -272,6 +281,7 @@ export function calculateAllStats(playerSpirit: PlayerSpirit) {
     defense: Math.floor(stats.defense),
     health: Math.floor(stats.health),
     elementalAffinity: Math.floor(stats.elementalAffinity),
+    agility: Math.floor(stats.agility),
   };
 }
 
