@@ -12,7 +12,7 @@
         "elementalAffinity": 60,
         "agility": 119
       },
-      "passiveAbilities": ["health_focus", "counter_strike"],
+      "passiveAbilities": ["health_focus"],
       "skills": ["basic_attack", "heavy_hit", "hit_and_heal"],
       "spriteConfig": {
         "textureUrl": "/sprites/cinderpaw_idle.png",
@@ -58,7 +58,7 @@
         "elementalAffinity": 100,
         "agility": 140
       },
-      "passiveAbilities": ["attack_focus", "crit_mastery"],
+      "passiveAbilities": ["attack_focus"],
       "skills": ["basic_attack", "heavy_hit", "hit_and_heal"],
       "spriteConfig": {
         "textureUrl": "/sprites/cinderpaw_idle.png",
@@ -81,7 +81,7 @@
         "elementalAffinity": 100,
         "agility": 128
       },
-      "passiveAbilities": ["health_focus", "healing_waters"],
+      "passiveAbilities": ["health_focus"],
       "skills": ["basic_attack", "heavy_hit", "water_charge"],
       "spriteConfig": {
         "textureUrl": "/sprites/cinderpaw_idle.png",
@@ -104,7 +104,7 @@
         "elementalAffinity": 100,
         "agility": 104
       },
-      "passiveAbilities": ["damage_reflect", "defense_focus"],
+      "passiveAbilities": ["damage_reflect"],
       "skills": ["basic_attack", "thorns_buff"],
       "spriteConfig": {
         "textureUrl": "/sprites/cinderpaw_idle.png",
@@ -486,7 +486,7 @@
         "elementalAffinity": 90,
         "agility": 131
       },
-      "passiveAbilities": ["attack_focus", "healing_flames"],
+      "passiveAbilities": ["attack_focus"],
       "skills": ["basic_attack", "heavy_hit", "lifesteal_buff"],
       "spriteConfig": {
         "textureUrl": "/sprites/cinderpaw_idle.png",
@@ -532,7 +532,7 @@
         "elementalAffinity": 110,
         "agility": 147
       },
-      "passiveAbilities": ["attack_focus", "crit_mastery"],
+      "passiveAbilities": ["attack_focus"],
       "skills": ["basic_attack", "heavy_hit", "crit_setup"],
       "spriteConfig": {
         "textureUrl": "/sprites/cinderpaw_idle.png",
@@ -624,7 +624,7 @@
         "elementalAffinity": 60,
         "agility": 123
       },
-      "passiveAbilities": ["defense_focus", "damage_reflect"],
+      "passiveAbilities": ["defense_focus"],
       "skills": ["basic_attack", "thorns_buff", "bubble_barrier"],
       "spriteConfig": {
         "textureUrl": "/sprites/cinderpaw_idle.png",
@@ -762,7 +762,7 @@
         "elementalAffinity": 110,
         "agility": 143
       },
-      "passiveAbilities": ["attack_focus", "crit_mastery"],
+      "passiveAbilities": ["attack_focus"],
       "skills": ["basic_attack", "heavy_hit", "lifesteal_buff"],
       "spriteConfig": {
         "textureUrl": "/sprites/cinderpaw_idle.png",
