@@ -147,7 +147,7 @@ export function getElementColor(elementId: ElementId): string {
     fire: "#9a342a",
     water: "#2d5580",
     metal: "#4a4a4a",
-    none: "#ffffff",
+    none: "#e5e7eb",
   };
   return battlePalette[elementId] || "#3d3d3d";
 }
