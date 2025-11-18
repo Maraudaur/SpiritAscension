@@ -293,7 +293,7 @@ export function SpiritManager({ onClose }: SpiritManagerProps = {}) {
                             color: "white",
                           }}
                         >
-                          {baseSpirit.rarity.charAt(0).toUpperCase()}
+                          {baseSpirit.rarity.charAt(0).toUpperCase() + baseSpirit.rarity.slice(1)}
                         </span>
                       </div>
                     </div>

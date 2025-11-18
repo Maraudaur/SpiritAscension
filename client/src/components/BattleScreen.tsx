@@ -481,6 +481,7 @@ export function BattleScreen({
                     {availableSkills.map((skill) => {
                       const elementColor = getElementColor(skill.element);
                       const isNeutral = skill.element === "none";
+                      const element = getElement(skill.element);
                       return (
                         <button
                           key={skill.id}
@@ -494,7 +495,18 @@ export function BattleScreen({
                             backgroundColor: elementColor,
                           }}
                         >
-                          <p className="font-bold">{skill.name}</p>
+                          <div className="flex items-center justify-between mb-1">
+                            <p className="font-bold">{skill.name}</p>
+                            <span
+                              className="text-xs font-bold px-2 py-0.5 rounded ml-2"
+                              style={{
+                                backgroundColor: isNeutral ? "#ffffff" : "rgba(0, 0, 0, 0.3)",
+                                color: isNeutral ? "#000000" : "#ffffff",
+                              }}
+                            >
+                              {element?.name || "Unknown"}
+                            </span>
+                          </div>
                           <p className="text-xs opacity-90">
                             {skill.description}
                           </p>
