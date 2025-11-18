@@ -480,6 +480,7 @@ export function BattleScreen({
                   <div className="flex flex-col gap-2 max-h-48 overflow-y-auto">
                     {availableSkills.map((skill) => {
                       const elementColor = getElementColor(skill.element);
+                      const isNeutral = skill.element === "none";
                       return (
                         <button
                           key={skill.id}
@@ -488,7 +489,7 @@ export function BattleScreen({
                             handleSkillSelect(skill.id);
                           }}
                           onMouseEnter={playButtonHover}
-                          className="p-3 text-white rounded-lg text-left transition-all hover:brightness-125"
+                          className={`p-3 rounded-lg text-left transition-all hover:brightness-125 ${isNeutral ? "text-black border-2 border-gray-400" : "text-white"}`}
                           style={{
                             backgroundColor: elementColor,
                           }}
