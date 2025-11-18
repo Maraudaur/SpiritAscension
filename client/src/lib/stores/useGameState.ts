@@ -658,6 +658,15 @@ export const useGameState = create<GameStateStore>()(
         },
         removeItem: (name) => localStorage.removeItem(name),
       })),
+      onRehydrateStorage: () => (state) => {
+        // Migration: Fix activeParty if it has fewer than 4 slots
+        if (state && state.activeParty && state.activeParty.length < 4) {
+          console.log(`[Migration] Upgrading activeParty from ${state.activeParty.length} to 4 slots`);
+          while (state.activeParty.length < 4) {
+            state.activeParty.push(null);
+          }
+        }
+      },
     },
   ),
 );
