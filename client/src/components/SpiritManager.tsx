@@ -32,6 +32,7 @@ import {
   Sparkles,
   TrendingUp,
   Filter,
+  X,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import type { PlayerSpirit, ElementId } from "@shared/types";
@@ -527,6 +528,19 @@ export function SpiritManager({ onClose }: SpiritManagerProps = {}) {
 
             return (
               <div className="flex flex-col gap-4" style={{ maxHeight: "80vh" }}>
+                {/* Close Button */}
+                <button
+                  onClick={() => {
+                    setSelectedSpirit(null);
+                    setShowHarmonizeConfirm(false);
+                  }}
+                  className="absolute top-4 right-4 p-2 rounded-full hover:bg-gray-200 transition-colors"
+                  style={{ color: "#8B4513" }}
+                  aria-label="Close"
+                >
+                  <X className="w-6 h-6" />
+                </button>
+                
                 {/* Header with Spirit Name */}
                 <div className="pb-3 border-b-2" style={{ borderColor: "#8B4513" }}>
                   <h3 className="text-2xl font-bold parchment-text mb-2">
