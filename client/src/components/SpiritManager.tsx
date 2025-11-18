@@ -721,19 +721,35 @@ export function SpiritManager({ onClose }: SpiritManagerProps = {}) {
                         Skills
                       </h4>
                       <div className="space-y-2">
-                        {skills.map((skill) => (
-                          <div
-                            key={skill.id}
-                            className="p-2 bg-amber-50 rounded border border-amber-300"
-                          >
-                            <p className="font-semibold parchment-text text-xs">
-                              {skill.name}
-                            </p>
-                            <p className="text-xs parchment-text opacity-75">
-                              {skill.description}
-                            </p>
-                          </div>
-                        ))}
+                        {skills.map((skill) => {
+                          const skillElement = getElement(skill.element);
+                          return (
+                            <div
+                              key={skill.id}
+                              className="p-2 bg-amber-50 rounded border border-amber-300"
+                            >
+                              <div className="flex items-center justify-between gap-2 mb-1">
+                                <p className="font-semibold parchment-text text-xs">
+                                  {skill.name}
+                                </p>
+                                {skillElement && (
+                                  <span
+                                    className="text-xs font-bold px-2 py-0.5 rounded flex-shrink-0"
+                                    style={{
+                                      backgroundColor: getElementColor(skill.element),
+                                      color: "white",
+                                    }}
+                                  >
+                                    {skillElement.name}
+                                  </span>
+                                )}
+                              </div>
+                              <p className="text-xs parchment-text opacity-75">
+                                {skill.description}
+                              </p>
+                            </div>
+                          );
+                        })}
                       </div>
                     </div>
                   </div>
