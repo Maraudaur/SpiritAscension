@@ -469,7 +469,7 @@ export function SpiritManager({ onClose }: SpiritManagerProps = {}) {
                         color: "white",
                       }}
                     >
-                      {baseSpirit.rarity.toUpperCase()}
+                      {baseSpirit.rarity.charAt(0).toUpperCase() + baseSpirit.rarity.slice(1)}
                     </span>
                     {!isInParty && filledPartySlots < 4 && (
                       <button
@@ -557,7 +557,7 @@ export function SpiritManager({ onClose }: SpiritManagerProps = {}) {
                         borderColor: "#8B4513",
                       }}
                     >
-                      {baseSpirit.rarity.toUpperCase()}
+                      {baseSpirit.rarity.charAt(0).toUpperCase() + baseSpirit.rarity.slice(1)}
                     </span>
                     {selectedSpirit.isPrismatic && (
                       <span className="text-xs font-bold px-2 py-1 rounded border-2 prismatic-border" style={{ borderColor: "#8B4513" }}>
