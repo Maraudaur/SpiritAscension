@@ -2121,7 +2121,7 @@
       "passiveAbilities": ["counter_strike", "lucky"],
       "skills": [
         {
-          "skillId": "basic_attack",
+          "skillId": "taunt",
           "unlockLevel": 1
         },
         {

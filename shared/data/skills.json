@@ -28,7 +28,7 @@
   },
   "atk_buff": {
     "id": "atk_buff",
-    "name": "ATK Buff",
+    "name": "Empower",
     "description": "Increase Attack for 3 turns",
     "damage": 0,
     "healing": 0,
@@ -53,6 +53,38 @@
       {
         "type": "stat_buff",
         "stat": "defense",
+        "value": 0.5,
+        "duration": 3
+      }
+    ]
+  },
+  "agi_buff": {
+    "id": "agi_buff",
+    "name": "Speed",
+    "description": "Increase Agility for 3 turns",
+    "damage": 0,
+    "healing": 0,
+    "element": "none",
+    "effects": [
+      {
+        "type": "stat_buff",
+        "stat": "agility",
+        "value": 0.5,
+        "duration": 3
+      }
+    ]
+  },
+  "affinity_buff": {
+    "id": "affinity_buff",
+    "name": "Meditate",
+    "description": "Increase Affinity for 3 turns",
+    "damage": 0,
+    "healing": 0,
+    "element": "none",
+    "effects": [
+      {
+        "type": "stat_buff",
+        "stat": "elementalAffinity",
         "value": 0.5,
         "duration": 3
       }
