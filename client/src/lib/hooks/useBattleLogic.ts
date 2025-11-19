@@ -1591,68 +1591,77 @@ export function useBattleLogic({
           effectsToApplyToCaster.push(newActiveEffect);
           logMessages.push(`${attacker.name} activates a reflective barrier!`);
         } else if (skillEffect.type === "apply_dot_stack") {
-          // Calculate damage per turn based on target's max health
-          const damagePerTurn = Math.floor(
-            target.maxHealth * skillEffect.damageRatio,
-          );
-          const stacksToApply = skillEffect.stacks;
+          // Check chance to apply (defaults to 100% if not specified)
+          const applyChance = skillEffect.chance ?? 1.0;
+          const roll = Math.random();
+          
+          if (roll < applyChance) {
+            // Calculate damage per turn based on target's max health
+            const damagePerTurn = Math.floor(
+              target.maxHealth * skillEffect.damageRatio,
+            );
+            const stacksToApply = skillEffect.stacks;
 
-          // Check if caster has DoT amplification passive
-          let casterHasDotAmplification = false;
-          if (baseSpirit.passiveAbilities) {
-            for (const passiveId of baseSpirit.passiveAbilities) {
-              const passive = (passivesData as Record<string, PassiveAbility>)[
-                passiveId
-              ];
-              if (!passive || !passive.effects) continue;
-              for (const effect of passive.effects) {
-                if (effect.type === "dot_damage_boost") {
-                  casterHasDotAmplification = true;
-                  break;
+            // Check if caster has DoT amplification passive
+            let casterHasDotAmplification = false;
+            if (baseSpirit.passiveAbilities) {
+              for (const passiveId of baseSpirit.passiveAbilities) {
+                const passive = (passivesData as Record<string, PassiveAbility>)[
+                  passiveId
+                ];
+                if (!passive || !passive.effects) continue;
+                for (const effect of passive.effects) {
+                  if (effect.type === "dot_damage_boost") {
+                    casterHasDotAmplification = true;
+                    break;
+                  }
                 }
+                if (casterHasDotAmplification) break;
               }
-              if (casterHasDotAmplification) break;
             }
-          }
 
-          // Find existing DoT on target
-          const existingDot = effectsToApplyToTarget.find(
-            (e) => e.effectType === "damage_over_time",
-          );
+            // Find existing DoT on target
+            const existingDot = effectsToApplyToTarget.find(
+              (e) => e.effectType === "damage_over_time",
+            );
 
-          if (
-            existingDot &&
-            existingDot.dotStacks &&
-            existingDot.damagePerTurn
-          ) {
-            // Stack with existing
-            const newStacks = Math.min(
-              (existingDot.dotStacks || 0) + stacksToApply,
-              skillEffect.maxStacks,
-            );
-            existingDot.dotStacks = newStacks;
-            existingDot.damagePerTurn = damagePerTurn * newStacks;
-            existingDot.turnsRemaining = skillEffect.duration; // Refresh duration
-            existingDot.casterSpiritId = attacker.spiritId;
-            existingDot.casterHasDotAmplification = casterHasDotAmplification;
-            logMessages.push(
-              `${target.name} is poisoned! (${newStacks}/${skillEffect.maxStacks} stacks)`,
-            );
+            if (
+              existingDot &&
+              existingDot.dotStacks &&
+              existingDot.damagePerTurn
+            ) {
+              // Stack with existing
+              const newStacks = Math.min(
+                (existingDot.dotStacks || 0) + stacksToApply,
+                skillEffect.maxStacks,
+              );
+              existingDot.dotStacks = newStacks;
+              existingDot.damagePerTurn = damagePerTurn * newStacks;
+              existingDot.turnsRemaining = skillEffect.duration; // Refresh duration
+              existingDot.casterSpiritId = attacker.spiritId;
+              existingDot.casterHasDotAmplification = casterHasDotAmplification;
+              logMessages.push(
+                `${target.name} is poisoned! (${newStacks}/${skillEffect.maxStacks} stacks)`,
+              );
+            } else {
+              // Create new DoT
+              const newActiveEffect: ActiveEffect = {
+                id: `dot_stack_${Date.now()}`,
+                effectType: "damage_over_time",
+                turnsRemaining: skillEffect.duration,
+                damagePerTurn: damagePerTurn * stacksToApply,
+                dotStacks: stacksToApply,
+                casterSpiritId: attacker.spiritId,
+                casterHasDotAmplification,
+              };
+              effectsToApplyToTarget.push(newActiveEffect);
+              logMessages.push(
+                `${target.name} is poisoned! (${stacksToApply}/${skillEffect.maxStacks} stacks)`,
+              );
+            }
           } else {
-            // Create new DoT
-            const newActiveEffect: ActiveEffect = {
-              id: `dot_stack_${Date.now()}`,
-              effectType: "damage_over_time",
-              turnsRemaining: skillEffect.duration,
-              damagePerTurn: damagePerTurn * stacksToApply,
-              dotStacks: stacksToApply,
-              casterSpiritId: attacker.spiritId,
-              casterHasDotAmplification,
-            };
-            effectsToApplyToTarget.push(newActiveEffect);
-            logMessages.push(
-              `${target.name} is poisoned! (${stacksToApply}/${skillEffect.maxStacks} stacks)`,
-            );
+            // Poison failed to apply
+            logMessages.push(`${target.name} resisted the poison!`);
           }
         }
       }

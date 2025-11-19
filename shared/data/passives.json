@@ -71,18 +71,6 @@
       }
     ]
   },
-  "boss_massive_health": {
-    "id": "boss_massive_health",
-    "name": "Unbreakable Form",
-    "description": "The spirit's vital essence is massively amplified.",
-    "effects": [
-      {
-        "type": "stat_boost",
-        "stat": "health",
-        "value": 200
-      }
-    ]
-  },
   "crit_mastery": {
     "id": "crit_mastery",
     "name": "Crit Mastery",

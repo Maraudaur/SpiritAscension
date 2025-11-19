@@ -182,8 +182,8 @@
   },
   "def_shred_dot": {
     "id": "def_shred_dot",
-    "name": "Venomous Sap",
-    "description": "Deals light wood damage and applies 2 stacks of Poison (5% Max HP/turn) for 3 turns. Max 5 stacks.",
+    "name": "Venomous Bite",
+    "description": "Deals wood damage and has a 30% chance to poison the enemy.",
     "damage": 0.5,
     "healing": 0,
     "unlockLevel": 2,
@@ -192,9 +192,10 @@
       {
         "type": "apply_dot_stack",
         "damageRatio": 0.05,
-        "duration": 3,
-        "stacks": 2,
-        "maxStacks": 5
+        "duration": 5,
+        "stacks": 1,
+        "maxStacks": 5,
+        "chance": 0.3
       }
     ]
   },

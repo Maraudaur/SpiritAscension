@@ -101,6 +101,7 @@ export interface ApplyDotStackEffect {
   duration: number;
   stacks: number; // Number of stacks to apply
   maxStacks: number; // Maximum allowed stacks
+  chance?: number; // 0.3 for 30% chance to apply (optional, defaults to 100%)
 }
 
 export type CustomEffect =

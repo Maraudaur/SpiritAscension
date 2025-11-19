@@ -1368,7 +1368,7 @@
         "elementalAffinity": 50,
         "agility": 166
       },
-      "passiveAbilities": ["boss_massive_health"],
+      "passiveAbilities": ["counter_strike"],
       "skills": ["basic_attack", "atk_buff", "charged_hit"],
       "spriteConfig": {
         "textureUrl": "/sprites/cinderpaw_idle.png",
