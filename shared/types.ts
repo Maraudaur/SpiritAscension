@@ -258,9 +258,13 @@ export interface Skill {
   description: string;
   damage: number;
   healing: number;
-  unlockLevel: number;
   element: SkillElementId;
   effects?: CustomEffect[];
+}
+
+export interface SpiritSkill {
+  skillId: string;
+  unlockLevel: number;
 }
 
 export interface BaseSpirit {
@@ -277,7 +281,7 @@ export interface BaseSpirit {
     agility: number;
   };
   passiveAbilities: string[];
-  skills: string[];
+  skills: SpiritSkill[];
   triggeredAbilities?: TriggeredAbility[];
   spriteConfig?: SpiritSpriteConfig;
 }

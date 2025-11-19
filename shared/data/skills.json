@@ -5,7 +5,6 @@
     "description": "A simple attack dealing moderate damage",
     "damage": 1,
     "healing": 0,
-    "unlockLevel": 1,
     "element": "none",
     "effects": []
   },
@@ -15,7 +14,6 @@
     "description": "A powerful strike dealing heavy damage",
     "damage": 1.5,
     "healing": 0,
-    "unlockLevel": 2,
     "element": "none",
     "effects": []
   },
@@ -25,7 +23,6 @@
     "description": "Attack that heals the user for a portion of damage dealt",
     "damage": 1,
     "healing": 0.3,
-    "unlockLevel": 3,
     "element": "none",
     "effects": []
   },
@@ -35,7 +32,6 @@
     "description": "Increase Attack for 3 turns",
     "damage": 0,
     "healing": 0,
-    "unlockLevel": 1,
     "element": "none",
     "effects": [
       {
@@ -46,13 +42,12 @@
       }
     ]
   },
-  "atk_buff": {
+  "def_buff": {
     "id": "def_buff",
     "name": "Harden",
     "description": "Increase Defense for 3 turns",
     "damage": 0,
     "healing": 0,
-    "unlockLevel": 1,
     "element": "none",
     "effects": [
       {
@@ -69,7 +64,6 @@
     "description": "Charges for one turn, then unleashes a devastating strike with 2x damage",
     "damage": 0,
     "healing": 0,
-    "unlockLevel": 1,
     "element": "none",
     "effects": [
       {
@@ -86,7 +80,6 @@
     "description": "A powerful metal strike dealing heavy damage",
     "damage": 1.5,
     "healing": 0,
-    "unlockLevel": 2,
     "element": "metal",
     "effects": []
   },
@@ -96,7 +89,6 @@
     "description": "Increase Defense for 5 turns",
     "damage": 0,
     "healing": 0,
-    "unlockLevel": 1,
     "element": "none",
     "effects": [
       {
@@ -113,7 +105,6 @@
     "description": "Channels for one turn and crashes a powerful wave on the enemy.",
     "damage": 0,
     "healing": 0,
-    "unlockLevel": 1,
     "element": "water",
     "effects": [
       {
@@ -130,7 +121,6 @@
     "description": "Hits for moderate water damage, converts basic attacks to water, and increases attack by 20% for 3 turns",
     "damage": 0.8,
     "healing": 0,
-    "unlockLevel": 1,
     "element": "water",
     "effects": [
       {
@@ -152,7 +142,6 @@
     "description": "Gathers energy for one turn, then heals for 50 HP plus a bonus from Elemental Affinity.",
     "damage": 0,
     "healing": 0,
-    "unlockLevel": 2,
     "element": "wood",
     "effects": [
       {
@@ -169,7 +158,6 @@
     "description": "Sets a trap on the user. The next spirit to swap in for the user gains +50% ATK for 5 turns. The trap lasts for 4 turns.",
     "damage": 0,
     "healing": 0,
-    "unlockLevel": 1,
     "element": "none",
     "effects": [
       {
@@ -187,7 +175,6 @@
     "description": "Applies a Crit Chance Up buff (+50%) to the user for 3 turns.",
     "damage": 0,
     "healing": 0,
-    "unlockLevel": 1,
     "element": "metal",
     "effects": [
       {
@@ -203,7 +190,6 @@
     "description": "Deals Wood damage and may Poison the enemy.",
     "damage": 0.5,
     "healing": 0,
-    "unlockLevel": 2,
     "element": "wood",
     "effects": [
       {
@@ -222,7 +208,6 @@
     "description": "Grants the user 50% Lifesteal on all damage dealt for 4 turns.",
     "damage": 0,
     "healing": 0,
-    "unlockLevel": 3,
     "element": "fire",
     "effects": [
       {
@@ -238,7 +223,6 @@
     "description": "Applies a buff that reflects 30% of incoming damage for 5 turns.",
     "damage": 0,
     "healing": 0,
-    "unlockLevel": 2,
     "element": "earth",
     "effects": [
       {

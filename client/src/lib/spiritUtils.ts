@@ -290,8 +290,9 @@ export function getAvailableSkills(playerSpirit: PlayerSpirit): Skill[] {
   if (!baseSpirit) return [];
 
   return baseSpirit.skills
-    .map((skillId) => getSkill(skillId))
-    .filter((skill) => skill && skill.unlockLevel <= playerSpirit.level);
+    .filter((spiritSkill) => spiritSkill.unlockLevel <= playerSpirit.level)
+    .map((spiritSkill) => getSkill(spiritSkill.skillId))
+    .filter((skill) => skill !== undefined) as Skill[];
 }
 
 export function getRarityColor(rarity: string): string {
