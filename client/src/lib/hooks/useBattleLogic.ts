@@ -336,6 +336,23 @@ export function useBattleLogic({
       }
 
       // 3. Check for Counter Attack passive
+      // First, calculate Lucky bonus for the target (defender)
+      let targetLuckyBonus = 0;
+      if (targetBaseSpirit && targetBaseSpirit.passiveAbilities) {
+        for (const passiveId of targetBaseSpirit.passiveAbilities) {
+          const passive = (passivesData as Record<string, PassiveAbility>)[
+            passiveId
+          ];
+          if (!passive || !passive.effects) continue;
+          for (const effect of passive.effects) {
+            if (effect.type === "chance_boost") {
+              targetLuckyBonus += effect.value;
+            }
+          }
+        }
+      }
+
+      // Then check for counter attack chances
       if (targetBaseSpirit && targetBaseSpirit.passiveAbilities) {
         for (const passiveId of targetBaseSpirit.passiveAbilities) {
           const passive = (passivesData as Record<string, PassiveAbility>)[
@@ -345,8 +362,10 @@ export function useBattleLogic({
 
           for (const effect of passive.effects) {
             if (effect.type === "counter_attack_chance") {
-              // Roll for counter attack (50% chance)
-              if (Math.random() < effect.chance) {
+              // Calculate counter attack chance with Lucky passive boost
+              const counterChance = Math.min(1.0, effect.chance + targetLuckyBonus);
+              // Roll for counter attack
+              if (Math.random() < counterChance) {
                 // Get target's attack stat
                 let targetAttack = 0;
                 let targetLevel = 1;
@@ -1393,7 +1412,23 @@ export function useBattleLogic({
     const baseElementalDamage =
       skill.damage > 0 ? Math.floor(affinityStat * affinityRatio) : 0;
 
-    // --- 3. Calculate Critical Hit Chance
+    // --- 3. Calculate Lucky Passive Bonus (applies to all chance-based effects)
+    let luckyBonus = 0;
+    if (baseSpirit.passiveAbilities) {
+      for (const passiveId of baseSpirit.passiveAbilities) {
+        const passive = (passivesData as Record<string, PassiveAbility>)[
+          passiveId
+        ];
+        if (!passive || !passive.effects) continue;
+        for (const effect of passive.effects) {
+          if (effect.type === "chance_boost") {
+            luckyBonus += effect.value;
+          }
+        }
+      }
+    }
+
+    // --- 4. Calculate Critical Hit Chance
     let critChance = 0.05; // Base 5% crit chance
     if (baseSpirit.passiveAbilities) {
       for (const passiveId of baseSpirit.passiveAbilities) {
@@ -1416,6 +1451,8 @@ export function useBattleLogic({
         critChance += activeEffect.critChanceBoost;
       }
     }
+    // Apply Lucky passive bonus to crit chance
+    critChance = Math.min(1.0, critChance + luckyBonus);
 
     // --- 4. Calculate Final Damage
     const elementalMultiplier = getElementalDamageMultiplier(
@@ -1592,7 +1629,11 @@ export function useBattleLogic({
           logMessages.push(`${attacker.name} activates a reflective barrier!`);
         } else if (skillEffect.type === "apply_dot_stack") {
           // Check chance to apply (defaults to 100% if not specified)
-          const applyChance = skillEffect.chance ?? 1.0;
+          let applyChance = skillEffect.chance ?? 1.0;
+          
+          // Apply Lucky passive bonus to poison application chance
+          applyChance = Math.min(1.0, applyChance + luckyBonus);
+          
           const roll = Math.random();
           
           if (roll < applyChance) {
