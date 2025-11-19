@@ -32,7 +32,7 @@
   "atk_buff": {
     "id": "atk_buff",
     "name": "ATK Buff",
-    "description": "Increases attack power for 3 turns",
+    "description": "Increase Attack for 3 turns",
     "damage": 0,
     "healing": 0,
     "unlockLevel": 1,
@@ -41,6 +41,23 @@
       {
         "type": "stat_buff",
         "stat": "attack",
+        "value": 0.5,
+        "duration": 3
+      }
+    ]
+  },
+  "atk_buff": {
+    "id": "def_buff",
+    "name": "Harden",
+    "description": "Increase Defense for 3 turns",
+    "damage": 0,
+    "healing": 0,
+    "unlockLevel": 1,
+    "element": "none",
+    "effects": [
+      {
+        "type": "stat_buff",
+        "stat": "defense",
         "value": 0.5,
         "duration": 3
       }
@@ -76,7 +93,7 @@
   "bubble_barrier": {
     "id": "bubble_barrier",
     "name": "Bubble Barrier",
-    "description": "Raises defense by 50% for 5 turns",
+    "description": "Increase Defense for 5 turns",
     "damage": 0,
     "healing": 0,
     "unlockLevel": 1,
@@ -183,7 +200,7 @@
   "def_shred_dot": {
     "id": "def_shred_dot",
     "name": "Venomous Bite",
-    "description": "Deals wood damage and may poison the enemy.",
+    "description": "Deals Wood damage and may Poison the enemy.",
     "damage": 0.5,
     "healing": 0,
     "unlockLevel": 2,

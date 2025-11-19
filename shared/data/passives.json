@@ -2,7 +2,7 @@
   "attack_focus": {
     "id": "attack_focus",
     "name": "Attack Focus",
-    "description": "Increases base Attack stat by 10%.",
+    "description": "Increase Attack by 10%.",
     "effects": [
       {
         "type": "stat_boost",
@@ -14,7 +14,7 @@
   "defense_focus": {
     "id": "defense_focus",
     "name": "Defense Focus",
-    "description": "Increases base Defense stat by 10%.",
+    "description": "Increase Defense by 10%.",
     "effects": [
       {
         "type": "stat_boost",
@@ -26,7 +26,7 @@
   "health_focus": {
     "id": "health_focus",
     "name": "Health Focus",
-    "description": "Increases base Health stat by 10%.",
+    "description": "Increase Health by 10%.",
     "effects": [
       {
         "type": "stat_boost",
