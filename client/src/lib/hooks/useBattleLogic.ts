@@ -61,10 +61,12 @@ interface AttackResult {
 /** New state machine for managing turn flow */
 type TurnPhase =
   | "setup"
+  | "round_start" // Determine turn order for this round
   | "player_start"
   | "player_action" // Waiting for player input
   | "player_execute" // Processing player's move
   | "player_end"
+  | "player_forced_swap" // Player must swap after spirit death during enemy turn
   | "enemy_start"
   | "enemy_action" // Processing enemy's move
   | "enemy_end"
@@ -122,6 +124,7 @@ export function useBattleLogic({
   const [aiTurnStep, setAiTurnStep] = useState(0); // For enemy AI patterns
   const [isPaused, setIsPaused] = useState(false);
   const [showEmptyPartyDialog, setShowEmptyPartyDialog] = useState(false);
+  const [playerWentFirst, setPlayerWentFirst] = useState(false); // Track turn order for current round
 
   // ========== Health Bar FX State ==========
   const [playerHealthBarShake, setPlayerHealthBarShake] = useState(false);
@@ -1021,15 +1024,8 @@ export function useBattleLogic({
     addLog("Battle begins!");
     playBattleMusic();
 
-    // 3. Determine initial turn order based on agility
-    const playerAgility = calculateAllStats(spiritsInBattle[0].playerSpirit).agility;
-    const enemyAgility = allEnemies[0].agility;
-    
-    if (playerAgility >= enemyAgility) {
-      setTurnPhase("player_start");
-    } else {
-      setTurnPhase("enemy_start");
-    }
+    // 3. Start first round - agility will be checked in round_start phase
+    setTurnPhase("round_start");
   };
 
   /**
@@ -1232,6 +1228,31 @@ export function useBattleLogic({
 
     // This is the core state machine
     switch (turnPhase) {
+      case "round_start":
+        // Determine turn order for this round based on agility
+        const currentPlayerSpirit = playerSpirits[activePartySlot];
+        const currentEnemy = battleEnemies[activeEnemyIndex];
+        
+        if (!currentPlayerSpirit || !currentEnemy) {
+          setTurnPhase("player_start"); // Fallback
+          break;
+        }
+        
+        const playerAgility = calculateAllStats(currentPlayerSpirit.playerSpirit).agility;
+        const enemyAgility = currentEnemy.agility;
+        
+        addLog(`--- New Round: ${activeBaseSpirit?.name} (AGI: ${playerAgility}) vs ${activeEnemy.name} (AGI: ${enemyAgility}) ---`);
+        
+        // Track who goes first so we know who goes second
+        if (playerAgility >= enemyAgility) {
+          setPlayerWentFirst(true);
+          setTurnPhase("player_start");
+        } else {
+          setPlayerWentFirst(false);
+          setTurnPhase("enemy_start");
+        }
+        break;
+
       case "player_start":
         // Check for game-ending defeat first.
         if (checkGameEndCondition()) {
@@ -1280,8 +1301,13 @@ export function useBattleLogic({
 
         setIsPaused(true); // Pause the game
         setTimeout(() => {
-          setTurnPhase("enemy_start"); // Move to enemy turn
-          setIsPaused(false); // Unpause for enemy turn
+          // If player went first, enemy goes second. Otherwise, round is over.
+          if (playerWentFirst) {
+            setTurnPhase("enemy_start");
+          } else {
+            setTurnPhase("round_start");
+          }
+          setIsPaused(false);
         }, TURN_TRANSITION_DELAY);
         break;
 
@@ -1334,24 +1360,12 @@ export function useBattleLogic({
 
         setIsPaused(true); // Pause the game
         setTimeout(() => {
-          // Re-check agility for next round (in case of swaps/buffs)
-          const currentPlayerSpirit = playerSpirits[activePartySlot];
-          const currentEnemy = battleEnemies[activeEnemyIndex];
-          
-          if (currentPlayerSpirit && currentEnemy) {
-            const playerAgility = calculateAllStats(currentPlayerSpirit.playerSpirit).agility;
-            const enemyAgility = currentEnemy.agility;
-            
-            // Faster spirit goes first in next round
-            if (playerAgility >= enemyAgility) {
-              setTurnPhase("player_start");
-            } else {
-              setTurnPhase("enemy_start");
-            }
+          // If enemy went first, player goes second. Otherwise, round is over.
+          if (!playerWentFirst) {
+            setTurnPhase("player_start");
           } else {
-            setTurnPhase("player_start"); // Fallback
+            setTurnPhase("round_start");
           }
-          
           setIsPaused(false);
         }, TURN_TRANSITION_DELAY);
         break;
@@ -2025,7 +2039,7 @@ export function useBattleLogic({
         setTimeout(() => setEnemyHealthBarShake(false), 500);
       }
 
-      return prevSpirits.map((sp, index) =>
+      const updatedSpirits = prevSpirits.map((sp, index) =>
         index === activePartySlot
           ? {
               ...sp,
@@ -2038,6 +2052,24 @@ export function useBattleLogic({
             }
           : sp,
       );
+
+      // Check if active spirit died and force swap if needed
+      if (newHealth <= 0) {
+        const hasOtherAliveSpirits = updatedSpirits.some(
+          (s, i) => i !== activePartySlot && s.currentHealth > 0
+        );
+        
+        if (hasOtherAliveSpirits) {
+          // Spirit died but others are alive - force manual swap
+          setTimeout(() => {
+            addLog(`${activeBaseSpirit?.name} has been defeated! Choose a spirit to continue!`);
+            setTurnPhase("player_forced_swap");
+            setActionMenu("swap");
+          }, 100);
+        }
+      }
+
+      return updatedSpirits;
     });
     // The useEffect will catch the health change and trigger
     // the end-of-turn logic.
@@ -2059,7 +2091,11 @@ export function useBattleLogic({
   };
 
   const handleSwap = (index: number) => {
-    if (turnPhase !== "player_action" || index === activePartySlot) return;
+    const isForcedSwap = turnPhase === "player_forced_swap";
+    
+    // Allow swapping during normal player action or forced swap
+    if (turnPhase !== "player_action" && !isForcedSwap) return;
+    if (index === activePartySlot) return;
     if (playerSpirits[index].currentHealth <= 0) {
       addLog("Cannot swap to a defeated spirit!");
       return;
@@ -2134,7 +2170,14 @@ export function useBattleLogic({
     setActionMenu("none");
     setIsBlocking(false); // Swapping cancels block
     addLog(`Swapped ${oldSpirit?.name} for ${newSpiritBase.name}!`);
-    setTurnPhase("player_execute"); // Swapping counts as the action
+    
+    // If this was a forced swap during enemy turn, continue to enemy_end
+    // Otherwise, normal swap during player turn counts as the action
+    if (isForcedSwap) {
+      setTurnPhase("enemy_end");
+    } else {
+      setTurnPhase("player_execute");
+    }
   };
 
   const handleClose = () => {
