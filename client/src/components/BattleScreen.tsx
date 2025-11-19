@@ -777,6 +777,19 @@ export function BattleScreen({
                     </div>
                   )}
 
+                  {/* Passive Ability */}
+                  {passiveAbility && (
+                    <div className="mb-4 parchment-bg p-3 rounded">
+                      <h3 className="parchment-text font-bold mb-2">
+                        Passive Ability
+                      </h3>
+                      <div className="parchment-text text-sm">
+                        <p className="font-semibold">{passiveAbility.name}</p>
+                        <p className="opacity-80">{passiveAbility.description}</p>
+                      </div>
+                    </div>
+                  )}
+
                   {/* Skills */}
                   <div className="mb-4 parchment-bg p-3 rounded">
                     <h3 className="parchment-text font-bold mb-2">Skills</h3>
@@ -810,19 +823,6 @@ export function BattleScreen({
                       })}
                     </div>
                   </div>
-
-                  {/* Passive Ability */}
-                  {passiveAbility && (
-                    <div className="mb-4 parchment-bg p-3 rounded">
-                      <h3 className="parchment-text font-bold mb-2">
-                        Passive Ability
-                      </h3>
-                      <div className="parchment-text text-sm">
-                        <p className="font-semibold">{passiveAbility.name}</p>
-                        <p className="opacity-80">{passiveAbility.description}</p>
-                      </div>
-                    </div>
-                  )}
 
                   {/* Action Button */}
                   <Button
