@@ -183,7 +183,7 @@
   "def_shred_dot": {
     "id": "def_shred_dot",
     "name": "Venomous Bite",
-    "description": "Deals wood damage and has a 30% chance to poison the enemy.",
+    "description": "Deals wood damage and may poison the enemy.",
     "damage": 0.5,
     "healing": 0,
     "unlockLevel": 2,
@@ -194,7 +194,7 @@
         "damageRatio": 0.05,
         "duration": 5,
         "stacks": 1,
-        "maxStacks": 5,
+        "maxStacks": 1,
         "chance": 0.3
       }
     ]
