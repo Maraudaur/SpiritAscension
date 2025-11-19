@@ -1,8 +1,8 @@
 {
   "basic_attack": {
     "id": "basic_attack",
-    "name": "Basic Strike",
-    "description": "A simple attack dealing moderate damage",
+    "name": "Swipe",
+    "description": "A basic physical attack.",
     "damage": 1,
     "healing": 0,
     "element": "none",
