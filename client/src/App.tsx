@@ -14,7 +14,7 @@ type Screen = "story" | "cultivation" | "spirits" | "summon" | "battle";
 
 function App() {
   const [currentScreen, setCurrentScreen] = useState<Screen>("story");
-  const [battleSource, setBattleSource] = useState<"story" | "sidebar">(
+  const [battleSource, setBattleSource] = useState<"story" | "sidebar" | "debug">(
     "sidebar",
   );
   const { updateQi } = useGameState();
@@ -156,7 +156,15 @@ function App() {
             flexDirection: "column",
           }}
         >
-          <QiHUD currentScreen={currentScreen} />
+          <QiHUD 
+            currentScreen={currentScreen} 
+            onNavigate={(screen) => {
+              if (screen === "battle") {
+                setBattleSource("debug");
+              }
+              setCurrentScreen(screen);
+            }}
+          />
 
           <div style={{ flex: 1, overflow: "hidden", position: "relative" }}>
             {currentScreen === "story" && (
@@ -226,6 +234,23 @@ function App() {
                     autoStart={true}
                   />
                 </div>
+              </div>
+            )}
+
+            {currentScreen === "battle" && battleSource === "debug" && (
+              <div className="w-full h-full overflow-hidden">
+                <BattleScreen
+                  onClose={() => {
+                    setBattleSource("sidebar");
+                    setCurrentScreen("cultivation");
+                  }}
+                  onNavigate={(screen) => {
+                    setBattleSource("sidebar");
+                    setCurrentScreen(screen);
+                  }}
+                  returnTo="cultivation"
+                  autoStart={true}
+                />
               </div>
             )}
           </div>

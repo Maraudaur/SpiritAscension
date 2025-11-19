@@ -7,7 +7,8 @@ import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
 import { motion, AnimatePresence } from "framer-motion";
 import spiritsData from "@shared/data/spirits.json";
-import type { BaseSpirit } from "@shared/types";
+import encountersData from "@shared/data/encounters.json";
+import type { BaseSpirit, Encounter } from "@shared/types";
 
 type Screen = "story" | "cultivation" | "spirits" | "summon" | "battle";
 
@@ -21,14 +22,16 @@ const SCREEN_TITLES: Record<Screen, string> = {
 
 interface QiHUDProps {
   currentScreen: Screen;
+  onNavigate: (screen: Screen) => void;
 }
 
-export function QiHUD({ currentScreen }: QiHUDProps) {
-  const { qi, qiPerSecond, resetGame, freeSummons, toggleFreeSummons, freeLevelUp, toggleFreeLevelUp, spawnSpecificSpirit } = useGameState();
+export function QiHUD({ currentScreen, onNavigate }: QiHUDProps) {
+  const { qi, qiPerSecond, resetGame, freeSummons, toggleFreeSummons, freeLevelUp, toggleFreeLevelUp, spawnSpecificSpirit, setCurrentEncounterId } = useGameState();
   const { isMuted, toggleMute, volume, setVolume } = useAudio();
   const [showVolumeSlider, setShowVolumeSlider] = useState(false);
   const [showDebugMenu, setShowDebugMenu] = useState(false);
   const [selectedSpiritId, setSelectedSpiritId] = useState<string>("");
+  const [selectedEncounterId, setSelectedEncounterId] = useState<string>("");
   const [spawnMessage, setSpawnMessage] = useState<string>("");
 
   const formatNumber = (num: number): string => {
@@ -56,6 +59,26 @@ export function QiHUD({ currentScreen }: QiHUDProps) {
       setTimeout(() => setSpawnMessage(""), 2000);
     } else {
       setSpawnMessage("❌ Failed to spawn spirit");
+      setTimeout(() => setSpawnMessage(""), 2000);
+    }
+  };
+
+  const handleStartEncounter = () => {
+    if (!selectedEncounterId) {
+      setSpawnMessage("Please select an encounter first");
+      setTimeout(() => setSpawnMessage(""), 2000);
+      return;
+    }
+
+    const encounter = (encountersData as Encounter[]).find((e) => e.id === selectedEncounterId);
+    if (encounter) {
+      setCurrentEncounterId(selectedEncounterId);
+      onNavigate("battle");
+      setShowDebugMenu(false);
+      setSpawnMessage(`⚔️ Starting ${encounter.name}!`);
+      setTimeout(() => setSpawnMessage(""), 2000);
+    } else {
+      setSpawnMessage("❌ Encounter not found");
       setTimeout(() => setSpawnMessage(""), 2000);
     }
   };
@@ -352,6 +375,33 @@ export function QiHUD({ currentScreen }: QiHUDProps) {
                         {spawnMessage}
                       </div>
                     )}
+                  </div>
+
+                  <div className="pt-2 border-t border-orange-300 mt-2 space-y-2">
+                    <div className="text-xs font-medium text-orange-700 mb-1">
+                      Fight Encounter
+                    </div>
+                    <select
+                      value={selectedEncounterId}
+                      onChange={(e) => setSelectedEncounterId(e.target.value)}
+                      className="w-full text-xs px-2 py-1.5 border border-orange-300 rounded bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-orange-400"
+                    >
+                      <option value="">-- Select Encounter --</option>
+                      {(encountersData as Encounter[]).map((encounter) => (
+                        <option key={encounter.id} value={encounter.id}>
+                          {encounter.id} - {encounter.name} (Lv{encounter.averageLevel})
+                        </option>
+                      ))}
+                    </select>
+                    <Button
+                      variant="default"
+                      size="sm"
+                      onClick={handleStartEncounter}
+                      disabled={!selectedEncounterId}
+                      className="w-full text-xs bg-red-600 hover:bg-red-700"
+                    >
+                      Start Battle
+                    </Button>
                   </div>
                 </div>
               </motion.div>
