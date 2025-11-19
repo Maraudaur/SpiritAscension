@@ -1189,6 +1189,20 @@ export function useBattleLogic({
     }
     // --- END FIX ---
 
+    // Check for rage effect - may override skill selection
+    if (activeEnemy && activeEnemy.activeEffects) {
+      const rageEffect = activeEnemy.activeEffects.find(
+        (e) => e.effectType === "rage"
+      );
+      if (rageEffect && rageEffect.rageChance) {
+        const roll = Math.random();
+        if (roll < rageEffect.rageChance) {
+          skillId = "basic_attack";
+          addLog(`${activeEnemy.name} is overcome by rage and attacks wildly!`);
+        }
+      }
+    }
+
     // Handle the chosen action
     if (skillId === "block") {
       // Handle block as a special action
@@ -1666,6 +1680,15 @@ export function useBattleLogic({
           };
           effectsToApplyToCaster.push(newActiveEffect);
           logMessages.push(`${attacker.name} activates a reflective barrier!`);
+        } else if (skillEffect.type === "rage") {
+          const newActiveEffect: ActiveEffect = {
+            id: `rage_${Date.now()}`,
+            effectType: "rage",
+            turnsRemaining: skillEffect.duration,
+            rageChance: skillEffect.chance,
+          };
+          effectsToApplyToTarget.push(newActiveEffect);
+          logMessages.push(`${target.name} is enraged!`);
         } else if (skillEffect.type === "apply_dot_stack") {
           // Check chance to apply (defaults to 100% if not specified)
           let applyChance = skillEffect.chance ?? 1.0;
@@ -1763,7 +1786,23 @@ export function useBattleLogic({
   const handleAttack = (skillId: string) => {
     if (turnPhase !== "player_action") return;
 
-    const skill = getSkill(skillId);
+    let finalSkillId = skillId;
+
+    // Check for rage effect - may override skill selection
+    if (activeSpirit && activeSpirit.activeEffects) {
+      const rageEffect = activeSpirit.activeEffects.find(
+        (e) => e.effectType === "rage"
+      );
+      if (rageEffect && rageEffect.rageChance) {
+        const roll = Math.random();
+        if (roll < rageEffect.rageChance) {
+          finalSkillId = "basic_attack";
+          addLog(`${activeBaseSpirit?.name} is overcome by rage and attacks wildly!`);
+        }
+      }
+    }
+
+    const skill = getSkill(finalSkillId);
     if (
       !activeSpirit ||
       !activeStats ||

@@ -139,7 +139,7 @@
         "spiritId": "boss_01",
         "level": 10,
         "ai": [
-          "basic_attack",
+          "taunt",
           "atk_buff",
           "charged_hit"
         ]

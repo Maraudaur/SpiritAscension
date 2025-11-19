@@ -231,5 +231,20 @@
         "duration": 5
       }
     ]
+  },
+  "taunt": {
+    "id": "taunt",
+    "name": "Taunt",
+    "description": "Enrages the enemy, giving them a 50% chance to lose control and attack randomly for 3 turns.",
+    "damage": 0,
+    "healing": 0,
+    "element": "none",
+    "effects": [
+      {
+        "type": "rage",
+        "chance": 0.5,
+        "duration": 3
+      }
+    ]
   }
 }

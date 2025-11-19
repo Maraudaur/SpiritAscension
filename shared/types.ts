@@ -104,6 +104,12 @@ export interface ApplyDotStackEffect {
   chance?: number; // 0.3 for 30% chance to apply (optional, defaults to 100%)
 }
 
+export interface RageEffect {
+  type: "rage";
+  chance: number; // 0.5 for 50% chance to trigger and force basic_attack
+  duration: number;
+}
+
 export type CustomEffect =
   | StatBuffEffect
   | DOTEffect
@@ -116,7 +122,8 @@ export type CustomEffect =
   | CritChanceBuffEffect
   | LifestealBuffEffect
   | DamageReflectBuffEffect
-  | ApplyDotStackEffect;
+  | ApplyDotStackEffect
+  | RageEffect;
 
 export interface PassiveStatBoost {
   type: "stat_boost";
@@ -228,6 +235,7 @@ export interface ActiveEffect {
   dotStacks?: number; // For tracking DoT stacks
   casterSpiritId?: string; // For DoT amplification - the spirit that cast this effect
   casterHasDotAmplification?: boolean; // Whether the caster has dot_amplification passive
+  rageChance?: number; // For rage - chance to force basic_attack
 }
 
 export interface ChargeEffect {
