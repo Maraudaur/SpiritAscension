@@ -92,6 +92,7 @@ export function BattleScreen({
 
   const {
     battleState,
+    turnPhase,
     activePartySlot,
     activeParty,
     battleLog,
@@ -406,7 +407,7 @@ export function BattleScreen({
       {/* Action Buttons and Submenus (Bottom-Left, next to Player UI) */}
       {battleState === "fighting" &&
         activeSpirit &&
-        activeSpirit.currentHealth > 0 && (
+        (activeSpirit.currentHealth > 0 || turnPhase === "player_forced_swap") && (
           <div
             className="absolute z-30 bottom-10"
             style={{ left: "320px" }} // Positioned to the right of Player UI
