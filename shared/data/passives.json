@@ -114,5 +114,16 @@
         "chance": 0.5
       }
     ]
+  },
+  "lucky": {
+    "id": "lucky",
+    "name": "Lucky",
+    "description": "Increases critical hit chance and status effect application by 10%.",
+    "effects": [
+      {
+        "type": "chance_boost",
+        "value": 0.1
+      }
+    ]
   }
 }
