@@ -1174,7 +1174,7 @@ export function useBattleLogic({
     // --- FIX: Handle "r000" for random AI ---
     if (skillId === "r000") {
       const enemyBaseSpirit = getBaseSpirit(activeEnemy.spiritId);
-      let possibleSkillIds = ["basic_attack", "block"]; // Start with basic actions
+      let possibleSkillIds = ["basic_attack"]; // Start with basic actions
 
       // --- FIX 2: Added safety checks ---
       // Safely check if the spirit and its skills exist before adding them
