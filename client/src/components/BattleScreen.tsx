@@ -6,6 +6,10 @@ import {
   getRarityColor,
   getElementColor,
   getPrimaryElement,
+  getPotentialColor,
+  calculateAllStats,
+  getAvailableSkills as getSpiritAvailableSkills,
+  getPassiveAbility,
 } from "@/lib/spiritUtils";
 import { Button } from "@/components/ui/button";
 import {
@@ -86,6 +90,8 @@ export function BattleScreen({
   const hasStartedBattle = useRef(false);
 
   const [isClient, setIsClient] = useState(false);
+  const [inspectedSpiritIndex, setInspectedSpiritIndex] = useState<number | null>(null);
+  
   useEffect(() => {
     setIsClient(true);
   }, []);
@@ -531,7 +537,7 @@ export function BattleScreen({
                 </motion.div>
               )}
 
-              {actionMenu === "swap" && (
+              {actionMenu === "swap" && inspectedSpiritIndex === null && (
                 <motion.div
                   key="swap-menu"
                   initial={{ opacity: 0, x: 20 }}
@@ -566,8 +572,10 @@ export function BattleScreen({
                         <button
                           key={spirit.playerSpirit.instanceId}
                           onClick={() => {
-                            if (!isDead && !isActive) playButtonClick();
-                            handleSwap(index);
+                            if (!isDead && !isActive) {
+                              playButtonClick();
+                              setInspectedSpiritIndex(index);
+                            }
                           }}
                           onMouseEnter={() => {
                             if (!isDead && !isActive) playButtonHover();
@@ -578,7 +586,7 @@ export function BattleScreen({
                               ? "border-blue-400 bg-blue-900/50 cursor-not-allowed"
                               : isDead
                                 ? "border-gray-600 bg-gray-800/50 opacity-50 cursor-not-allowed"
-                                : "border-green-600 bg-black/50 hover:bg-green-900/50"
+                                : "border-green-600 bg-black/50 hover:bg-green-900/50 cursor-pointer"
                           }`}
                         >
                           {/* Note: Using placeholder, update as needed */}
@@ -612,6 +620,244 @@ export function BattleScreen({
             </AnimatePresence>
           </div>
         )}
+
+      {/* SPIRIT INSPECTION OVERLAY */}
+      {inspectedSpiritIndex !== null && playerSpirits[inspectedSpiritIndex] && (
+        <div className="absolute inset-0 z-40 flex items-center justify-center bg-black/60 p-6">
+          <motion.div
+            className="parchment-bg chinese-border max-w-2xl w-full p-6 rounded-lg max-h-[90vh] overflow-y-auto"
+            initial={{ scale: 0.9, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            exit={{ scale: 0.9, opacity: 0 }}
+          >
+            {(() => {
+              const spirit = playerSpirits[inspectedSpiritIndex];
+              const baseSpirit = getBaseSpirit(spirit.playerSpirit.spiritId);
+              if (!baseSpirit) return null;
+
+              const stats = calculateAllStats(spirit.playerSpirit);
+              const lineage = getLineage(baseSpirit.lineage);
+              const primaryElement = getPrimaryElement(baseSpirit);
+              const spiritSkills = getSpiritAvailableSkills(spirit.playerSpirit);
+              const passiveAbility = baseSpirit.passiveAbilities.length > 0
+                ? getPassiveAbility(baseSpirit.passiveAbilities[0])
+                : null;
+
+              return (
+                <>
+                  {/* Header */}
+                  <div className="flex items-center justify-between mb-4">
+                    <div>
+                      <h2 className="parchment-text text-2xl font-bold">
+                        {baseSpirit.name}
+                      </h2>
+                      <p className="parchment-text text-sm">
+                        {lineage?.name} • Level {spirit.playerSpirit.level}
+                      </p>
+                    </div>
+                    <button
+                      onClick={() => {
+                        playButtonClick();
+                        setInspectedSpiritIndex(null);
+                      }}
+                      onMouseEnter={playButtonHover}
+                      className="px-4 py-2 bg-gray-600 hover:bg-gray-500 rounded text-white font-semibold"
+                    >
+                      Back
+                    </button>
+                  </div>
+
+                  {/* Health Bar */}
+                  <div className="mb-4">
+                    <div className="flex justify-between text-sm parchment-text mb-1">
+                      <span>Health</span>
+                      <span className="font-semibold">
+                        {spirit.currentHealth} / {spirit.maxHealth}
+                      </span>
+                    </div>
+                    <div className="w-full bg-gray-500 rounded-full h-4">
+                      <div
+                        className="h-4 rounded-full bg-green-600"
+                        style={{
+                          width: `${(spirit.currentHealth / spirit.maxHealth) * 100}%`,
+                        }}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Stats */}
+                  <div className="mb-4 parchment-bg p-3 rounded">
+                    <h3 className="parchment-text font-bold mb-2">Stats</h3>
+                    <div className="grid grid-cols-2 gap-2 text-sm">
+                      <div className="flex justify-between">
+                        <span className="parchment-text">Attack:</span>
+                        <span
+                          className="font-semibold"
+                          style={{
+                            color: getPotentialColor(
+                              spirit.playerSpirit.potentialFactors.attack,
+                            ),
+                          }}
+                        >
+                          {stats.attack} [{spirit.playerSpirit.potentialFactors.attack}]
+                        </span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="parchment-text">Defense:</span>
+                        <span
+                          className="font-semibold"
+                          style={{
+                            color: getPotentialColor(
+                              spirit.playerSpirit.potentialFactors.defense,
+                            ),
+                          }}
+                        >
+                          {stats.defense} [{spirit.playerSpirit.potentialFactors.defense}]
+                        </span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="parchment-text">Health:</span>
+                        <span
+                          className="font-semibold"
+                          style={{
+                            color: getPotentialColor(
+                              spirit.playerSpirit.potentialFactors.health,
+                            ),
+                          }}
+                        >
+                          {stats.health} [{spirit.playerSpirit.potentialFactors.health}]
+                        </span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="parchment-text">Agility:</span>
+                        <span
+                          className="font-semibold"
+                          style={{
+                            color: getPotentialColor(
+                              spirit.playerSpirit.potentialFactors.agility,
+                            ),
+                          }}
+                        >
+                          {stats.agility} [{spirit.playerSpirit.potentialFactors.agility}]
+                        </span>
+                      </div>
+                      <div className="flex justify-between col-span-2">
+                        <span className="parchment-text">Elemental Affinity:</span>
+                        <span
+                          className="font-semibold"
+                          style={{
+                            color: getPotentialColor(
+                              spirit.playerSpirit.potentialFactors.elementalAffinity,
+                            ),
+                          }}
+                        >
+                          {stats.elementalAffinity} [
+                          {spirit.playerSpirit.potentialFactors.elementalAffinity}]
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Active Effects */}
+                  {spirit.activeEffects && spirit.activeEffects.length > 0 && (
+                    <div className="mb-4 parchment-bg p-3 rounded">
+                      <h3 className="parchment-text font-bold mb-2">Active Effects</h3>
+                      <div className="space-y-1 text-sm">
+                        {spirit.activeEffects.map((effect, idx) => (
+                          <div key={idx} className="parchment-text">
+                            • {effect.effectType}
+                            {effect.turnsRemaining !== undefined &&
+                              ` (${effect.turnsRemaining} turns)`}
+                            {effect.stat && ` - ${effect.stat}`}
+                            {effect.statMultiplier &&
+                              ` ${Math.round((effect.statMultiplier - 1) * 100)}%`}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Skills */}
+                  <div className="mb-4 parchment-bg p-3 rounded">
+                    <h3 className="parchment-text font-bold mb-2">Skills</h3>
+                    <div className="space-y-2">
+                      {spiritSkills.map((skill) => {
+                        const elementColor = getElementColor(skill.element);
+                        const isNeutral = skill.element === "none";
+                        const element = getElement(skill.element);
+                        return (
+                          <div
+                            key={skill.id}
+                            className="p-2 rounded"
+                            style={{
+                              backgroundColor: elementColor,
+                              color: isNeutral ? "#000000" : "#ffffff",
+                            }}
+                          >
+                            <div className="flex items-center justify-between">
+                              <span className="font-semibold text-sm">
+                                {skill.name}
+                              </span>
+                              <span className="text-xs px-2 py-0.5 rounded bg-black/20">
+                                {element?.name || "Unknown"}
+                              </span>
+                            </div>
+                            <p className="text-xs opacity-90 mt-1">
+                              {skill.description}
+                            </p>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* Passive Ability */}
+                  {passiveAbility && (
+                    <div className="mb-4 parchment-bg p-3 rounded">
+                      <h3 className="parchment-text font-bold mb-2">
+                        Passive Ability
+                      </h3>
+                      <div className="parchment-text text-sm">
+                        <p className="font-semibold">{passiveAbility.name}</p>
+                        <p className="opacity-80">{passiveAbility.description}</p>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Action Button */}
+                  <Button
+                    onClick={() => {
+                      playButtonClick();
+                      setInspectedSpiritIndex(null);
+                      setActionMenu("none");
+                      handleSwap(inspectedSpiritIndex);
+                    }}
+                    disabled={
+                      inspectedSpiritIndex === activePartySlot ||
+                      spirit.currentHealth <= 0
+                    }
+                    className="w-full p-4 text-lg font-bold"
+                    style={{
+                      background:
+                        inspectedSpiritIndex === activePartySlot ||
+                        spirit.currentHealth <= 0
+                          ? "var(--gray)"
+                          : "var(--vermillion)",
+                      color: "var(--parchment)",
+                    }}
+                  >
+                    {inspectedSpiritIndex === activePartySlot
+                      ? "Currently Active"
+                      : spirit.currentHealth <= 0
+                        ? "Spirit Defeated"
+                        : "Swap to This Spirit"}
+                  </Button>
+                </>
+              );
+            })()}
+          </motion.div>
+        </div>
+      )}
 
       {/* --- 4. MODALS (Setup, Victory, Defeat) --- */}
       <AnimatePresence>
