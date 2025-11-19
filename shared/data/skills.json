@@ -235,7 +235,7 @@
   "taunt": {
     "id": "taunt",
     "name": "Taunt",
-    "description": "Enrages the enemy, giving them a 50% chance to lose control and attack randomly for 3 turns.",
+    "description": "Chance to inflict Rage.",
     "damage": 0,
     "healing": 0,
     "element": "none",
