@@ -111,6 +111,8 @@ export function BattleScreen({
     setActionMenu,
     showEmptyPartyDialog,
     setShowEmptyPartyDialog,
+    showSpiritDefeatedDialog,
+    setShowSpiritDefeatedDialog,
     playButtonClick,
     playButtonHover,
     isMuted,
@@ -763,6 +765,41 @@ export function BattleScreen({
               }}
             >
               Go to Spirit Manager
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* SPIRIT DEFEATED DIALOG */}
+      <Dialog open={showSpiritDefeatedDialog}>
+        <DialogContent 
+          className="parchment-bg chinese-border"
+          onEscapeKeyDown={(e) => e.preventDefault()}
+          onPointerDownOutside={(e) => e.preventDefault()}
+          onInteractOutside={(e) => e.preventDefault()}
+        >
+          <DialogHeader>
+            <DialogTitle className="parchment-text text-2xl font-bold text-center text-red-700">
+              Spirit Defeated!
+            </DialogTitle>
+            <DialogDescription className="parchment-text text-center mt-2">
+              {activeBaseSpirit?.name} has been defeated! Choose a replacement spirit to continue the battle.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="mt-4">
+            <Button
+              onClick={() => {
+                playButtonClick();
+                setShowSpiritDefeatedDialog(false);
+                setActionMenu("swap");
+              }}
+              className="w-full font-bold"
+              style={{
+                background: "var(--vermillion)",
+                color: "var(--parchment)",
+              }}
+            >
+              Choose Replacement Spirit
             </Button>
           </DialogFooter>
         </DialogContent>

@@ -124,6 +124,7 @@ export function useBattleLogic({
   const [aiTurnStep, setAiTurnStep] = useState(0); // For enemy AI patterns
   const [isPaused, setIsPaused] = useState(false);
   const [showEmptyPartyDialog, setShowEmptyPartyDialog] = useState(false);
+  const [showSpiritDefeatedDialog, setShowSpiritDefeatedDialog] = useState(false);
   const [playerWentFirst, setPlayerWentFirst] = useState(false); // Track turn order for current round
 
   // ========== Health Bar FX State ==========
@@ -1369,8 +1370,14 @@ export function useBattleLogic({
           setIsPaused(false);
         }, TURN_TRANSITION_DELAY);
         break;
+
+      case "player_forced_swap":
+        // Wait for player to manually select a new spirit
+        // Dialog is shown, when they click button it will open swap menu
+        // Nothing to do here - just waiting
+        break;
     }
-    // 'player_action', 'setup', and 'game_over' are "waiting" states
+    // 'player_action', 'setup', 'player_forced_swap', and 'game_over' are "waiting" states
     // and don't trigger further actions.
   }, [turnPhase, battleState, isPaused]);
 
@@ -2060,12 +2067,12 @@ export function useBattleLogic({
         );
         
         if (hasOtherAliveSpirits) {
-          // Spirit died but others are alive - force manual swap
+          // Spirit died but others are alive - show dialog first
           setTimeout(() => {
-            addLog(`${activeBaseSpirit?.name} has been defeated! Choose a spirit to continue!`);
+            addLog(`${activeBaseSpirit?.name} has been defeated!`);
             setTurnPhase("player_forced_swap");
-            setActionMenu("swap");
-          }, 100);
+            setShowSpiritDefeatedDialog(true);
+          }, 500);
         }
       }
 
@@ -2256,6 +2263,7 @@ export function useBattleLogic({
     playerHealthBarHeal,
     currentEncounter,
     showEmptyPartyDialog,
+    showSpiritDefeatedDialog,
 
     // Derived
     activeSpirit,
@@ -2267,6 +2275,7 @@ export function useBattleLogic({
     // Actions
     setActionMenu,
     setShowEmptyPartyDialog,
+    setShowSpiritDefeatedDialog,
 
     // Audio
     isMuted,
