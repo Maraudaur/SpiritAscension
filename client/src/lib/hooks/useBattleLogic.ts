@@ -1359,6 +1359,24 @@ export function useBattleLogic({
         }
         // --- END DEFEAT CHECK ---
 
+        // --- PLAYER SPIRIT DEFEAT CHECK ---
+        // Check if player spirit died from enemy attack or DoT during enemy turn
+        if (activeSpirit.currentHealth <= 0) {
+          const hasAliveSpirits = playerSpirits.some((s) => s.currentHealth > 0);
+          if (hasAliveSpirits) {
+            // Player has spirits left - force manual swap
+            addLog(`${activeBaseSpirit?.name} has been defeated!`);
+            setShowSpiritDefeatedDialog(true);
+            setTurnPhase("player_forced_swap");
+            return;
+          }
+          // No spirits left - check for game over
+          if (checkGameEndCondition()) {
+            return;
+          }
+        }
+        // --- END PLAYER SPIRIT DEFEAT CHECK ---
+
         setIsPaused(true); // Pause the game
         setTimeout(() => {
           // If enemy went first, player goes second. Otherwise, round is over.
