@@ -12,9 +12,7 @@
         "elementalAffinity": 60,
         "agility": 119
       },
-      "passiveAbilities": [
-        "health_focus"
-      ],
+      "passiveAbilities": ["health_focus"],
       "skills": [
         {
           "skillId": "basic_attack",
@@ -25,8 +23,8 @@
           "unlockLevel": 3
         },
         {
-          "skillId": "hit_and_heal",
-          "unlockLevel": 3
+          "skillId": "def_shred_dot",
+          "unlockLevel": 6
         }
       ],
       "spriteConfig": {
@@ -36,9 +34,7 @@
         "totalFrames": 8,
         "animationSpeed": 0.1
       },
-      "elements": [
-        "wood"
-      ]
+      "elements": ["wood"]
     },
     {
       "id": "spirit_c02",
@@ -52,9 +48,7 @@
         "elementalAffinity": 60,
         "agility": 110
       },
-      "passiveAbilities": [
-        "defense_focus"
-      ],
+      "passiveAbilities": ["defense_focus", "regenerative"],
       "skills": [
         {
           "skillId": "basic_attack",
@@ -76,9 +70,7 @@
         "totalFrames": 8,
         "animationSpeed": 0.1
       },
-      "elements": [
-        "earth"
-      ]
+      "elements": ["earth"]
     },
     {
       "id": "spirit_c03",
@@ -92,9 +84,7 @@
         "elementalAffinity": 100,
         "agility": 140
       },
-      "passiveAbilities": [
-        "attack_focus"
-      ],
+      "passiveAbilities": ["attack_focus"],
       "skills": [
         {
           "skillId": "basic_attack",
@@ -116,9 +106,7 @@
         "totalFrames": 8,
         "animationSpeed": 0.1
       },
-      "elements": [
-        "fire"
-      ]
+      "elements": ["fire"]
     },
     {
       "id": "spirit_c04",
@@ -132,9 +120,7 @@
         "elementalAffinity": 100,
         "agility": 128
       },
-      "passiveAbilities": [
-        "health_focus"
-      ],
+      "passiveAbilities": ["health_focus"],
       "skills": [
         {
           "skillId": "basic_attack",
@@ -156,9 +142,7 @@
         "totalFrames": 8,
         "animationSpeed": 0.1
       },
-      "elements": [
-        "water"
-      ]
+      "elements": ["water"]
     },
     {
       "id": "spirit_c05",
@@ -172,9 +156,7 @@
         "elementalAffinity": 100,
         "agility": 104
       },
-      "passiveAbilities": [
-        "damage_reflect"
-      ],
+      "passiveAbilities": ["damage_reflect"],
       "skills": [
         {
           "skillId": "basic_attack",
@@ -192,9 +174,7 @@
         "totalFrames": 8,
         "animationSpeed": 0.1
       },
-      "elements": [
-        "metal"
-      ]
+      "elements": ["metal"]
     },
     {
       "id": "spirit_c06",
@@ -208,9 +188,7 @@
         "elementalAffinity": 90,
         "agility": 130
       },
-      "passiveAbilities": [
-        "attack_focus"
-      ],
+      "passiveAbilities": ["attack_focus"],
       "skills": [
         {
           "skillId": "basic_attack",
@@ -232,9 +210,7 @@
         "totalFrames": 8,
         "animationSpeed": 0.1
       },
-      "elements": [
-        "wood"
-      ]
+      "elements": ["wood"]
     },
     {
       "id": "spirit_c07",
@@ -248,9 +224,7 @@
         "elementalAffinity": 60,
         "agility": 114
       },
-      "passiveAbilities": [
-        "defense_focus"
-      ],
+      "passiveAbilities": ["defense_focus"],
       "skills": [
         {
           "skillId": "basic_attack",
@@ -272,9 +246,7 @@
         "totalFrames": 8,
         "animationSpeed": 0.1
       },
-      "elements": [
-        "earth"
-      ]
+      "elements": ["earth"]
     },
     {
       "id": "spirit_c08",
@@ -288,9 +260,7 @@
         "elementalAffinity": 110,
         "agility": 137
       },
-      "passiveAbilities": [
-        "attack_focus"
-      ],
+      "passiveAbilities": ["attack_focus"],
       "skills": [
         {
           "skillId": "basic_attack",
@@ -312,9 +282,7 @@
         "totalFrames": 8,
         "animationSpeed": 0.1
       },
-      "elements": [
-        "fire"
-      ]
+      "elements": ["fire"]
     },
     {
       "id": "spirit_c09",
@@ -328,9 +296,7 @@
         "elementalAffinity": 70,
         "agility": 106
       },
-      "passiveAbilities": [
-        "defense_focus"
-      ],
+      "passiveAbilities": ["defense_focus"],
       "skills": [
         {
           "skillId": "basic_attack",
@@ -364,9 +330,7 @@
         "totalFrames": 8,
         "animationSpeed": 0.1
       },
-      "elements": [
-        "water"
-      ]
+      "elements": ["water"]
     },
     {
       "id": "spirit_c10",
@@ -380,9 +344,7 @@
         "elementalAffinity": 110,
         "agility": 146
       },
-      "passiveAbilities": [
-        "attack_focus"
-      ],
+      "passiveAbilities": ["attack_focus"],
       "skills": [
         {
           "skillId": "basic_attack",
@@ -404,9 +366,7 @@
         "totalFrames": 8,
         "animationSpeed": 0.1
       },
-      "elements": [
-        "metal"
-      ]
+      "elements": ["metal"]
     },
     {
       "id": "spirit_c11",
@@ -420,9 +380,7 @@
         "elementalAffinity": 100,
         "agility": 127
       },
-      "passiveAbilities": [
-        "dot_amplification"
-      ],
+      "passiveAbilities": ["dot_amplification"],
       "skills": [
         {
           "skillId": "basic_attack",
@@ -444,9 +402,7 @@
         "totalFrames": 8,
         "animationSpeed": 0.1
       },
-      "elements": [
-        "wood"
-      ]
+      "elements": ["wood"]
     },
     {
       "id": "spirit_c12",
@@ -460,9 +416,7 @@
         "elementalAffinity": 100,
         "agility": 131
       },
-      "passiveAbilities": [
-        "poison_thorns"
-      ],
+      "passiveAbilities": ["poison_thorns"],
       "skills": [
         {
           "skillId": "basic_attack",
@@ -484,9 +438,7 @@
         "totalFrames": 8,
         "animationSpeed": 0.1
       },
-      "elements": [
-        "earth"
-      ]
+      "elements": ["earth"]
     },
     {
       "id": "spirit_c13",
@@ -500,9 +452,7 @@
         "elementalAffinity": 90,
         "agility": 134
       },
-      "passiveAbilities": [
-        "attack_focus"
-      ],
+      "passiveAbilities": ["attack_focus"],
       "skills": [
         {
           "skillId": "basic_attack",
@@ -524,9 +474,7 @@
         "totalFrames": 8,
         "animationSpeed": 0.1
       },
-      "elements": [
-        "fire"
-      ]
+      "elements": ["fire"]
     },
     {
       "id": "spirit_c14",
@@ -540,9 +488,7 @@
         "elementalAffinity": 110,
         "agility": 133
       },
-      "passiveAbilities": [
-        "health_focus"
-      ],
+      "passiveAbilities": ["health_focus"],
       "skills": [
         {
           "skillId": "basic_attack",
@@ -564,9 +510,7 @@
         "totalFrames": 8,
         "animationSpeed": 0.1
       },
-      "elements": [
-        "water"
-      ]
+      "elements": ["water"]
     },
     {
       "id": "spirit_c15",
@@ -580,9 +524,7 @@
         "elementalAffinity": 110,
         "agility": 132
       },
-      "passiveAbilities": [
-        "attack_focus"
-      ],
+      "passiveAbilities": ["attack_focus"],
       "skills": [
         {
           "skillId": "basic_attack",
@@ -604,9 +546,7 @@
         "totalFrames": 8,
         "animationSpeed": 0.1
       },
-      "elements": [
-        "metal"
-      ]
+      "elements": ["metal"]
     },
     {
       "id": "spirit_c16",
@@ -620,9 +560,7 @@
         "elementalAffinity": 70,
         "agility": 116
       },
-      "passiveAbilities": [
-        "health_focus"
-      ],
+      "passiveAbilities": ["health_focus"],
       "skills": [
         {
           "skillId": "basic_attack",
@@ -644,9 +582,7 @@
         "totalFrames": 8,
         "animationSpeed": 0.1
       },
-      "elements": [
-        "wood"
-      ]
+      "elements": ["wood"]
     },
     {
       "id": "spirit_c17",
@@ -660,9 +596,7 @@
         "elementalAffinity": 110,
         "agility": 129
       },
-      "passiveAbilities": [
-        "attack_focus"
-      ],
+      "passiveAbilities": ["attack_focus"],
       "skills": [
         {
           "skillId": "basic_attack",
@@ -684,9 +618,7 @@
         "totalFrames": 8,
         "animationSpeed": 0.1
       },
-      "elements": [
-        "earth"
-      ]
+      "elements": ["earth"]
     },
     {
       "id": "spirit_c18",
@@ -700,9 +632,7 @@
         "elementalAffinity": 110,
         "agility": 142
       },
-      "passiveAbilities": [
-        "attack_focus"
-      ],
+      "passiveAbilities": ["attack_focus"],
       "skills": [
         {
           "skillId": "basic_attack",
@@ -724,9 +654,7 @@
         "totalFrames": 8,
         "animationSpeed": 0.1
       },
-      "elements": [
-        "fire"
-      ]
+      "elements": ["fire"]
     },
     {
       "id": "spirit_c19",
@@ -740,9 +668,7 @@
         "elementalAffinity": 100,
         "agility": 122
       },
-      "passiveAbilities": [
-        "health_focus"
-      ],
+      "passiveAbilities": ["health_focus"],
       "skills": [
         {
           "skillId": "basic_attack",
@@ -764,9 +690,7 @@
         "totalFrames": 8,
         "animationSpeed": 0.1
       },
-      "elements": [
-        "water"
-      ]
+      "elements": ["water"]
     },
     {
       "id": "spirit_c20",
@@ -780,9 +704,7 @@
         "elementalAffinity": 120,
         "agility": 134
       },
-      "passiveAbilities": [
-        "attack_focus"
-      ],
+      "passiveAbilities": ["attack_focus"],
       "skills": [
         {
           "skillId": "basic_attack",
@@ -804,9 +726,7 @@
         "totalFrames": 8,
         "animationSpeed": 0.1
       },
-      "elements": [
-        "metal"
-      ]
+      "elements": ["metal"]
     }
   ],
   "uncommon": [
@@ -822,9 +742,7 @@
         "elementalAffinity": 90,
         "agility": 131
       },
-      "passiveAbilities": [
-        "attack_focus"
-      ],
+      "passiveAbilities": ["attack_focus"],
       "skills": [
         {
           "skillId": "basic_attack",
@@ -846,9 +764,7 @@
         "totalFrames": 8,
         "animationSpeed": 0.1
       },
-      "elements": [
-        "wood"
-      ]
+      "elements": ["wood"]
     },
     {
       "id": "spirit_u02",
@@ -862,9 +778,7 @@
         "elementalAffinity": 70,
         "agility": 121
       },
-      "passiveAbilities": [
-        "defense_focus"
-      ],
+      "passiveAbilities": ["defense_focus"],
       "skills": [
         {
           "skillId": "basic_attack",
@@ -886,9 +800,7 @@
         "totalFrames": 8,
         "animationSpeed": 0.1
       },
-      "elements": [
-        "earth"
-      ]
+      "elements": ["earth"]
     },
     {
       "id": "spirit_u03",
@@ -902,9 +814,7 @@
         "elementalAffinity": 110,
         "agility": 147
       },
-      "passiveAbilities": [
-        "attack_focus"
-      ],
+      "passiveAbilities": ["attack_focus"],
       "skills": [
         {
           "skillId": "basic_attack",
@@ -926,9 +836,7 @@
         "totalFrames": 8,
         "animationSpeed": 0.1
       },
-      "elements": [
-        "fire"
-      ]
+      "elements": ["fire"]
     },
     {
       "id": "spirit_u04",
@@ -942,9 +850,7 @@
         "elementalAffinity": 110,
         "agility": 136
       },
-      "passiveAbilities": [
-        "health_focus"
-      ],
+      "passiveAbilities": ["health_focus"],
       "skills": [
         {
           "skillId": "basic_attack",
@@ -966,9 +872,7 @@
         "totalFrames": 8,
         "animationSpeed": 0.1
       },
-      "elements": [
-        "water"
-      ]
+      "elements": ["water"]
     },
     {
       "id": "spirit_u05",
@@ -982,9 +886,7 @@
         "elementalAffinity": 110,
         "agility": 139
       },
-      "passiveAbilities": [
-        "attack_focus"
-      ],
+      "passiveAbilities": ["attack_focus"],
       "skills": [
         {
           "skillId": "basic_attack",
@@ -1006,9 +908,7 @@
         "totalFrames": 8,
         "animationSpeed": 0.1
       },
-      "elements": [
-        "metal"
-      ]
+      "elements": ["metal"]
     },
     {
       "id": "spirit_u06",
@@ -1022,9 +922,7 @@
         "elementalAffinity": 100,
         "agility": 138
       },
-      "passiveAbilities": [
-        "attack_focus"
-      ],
+      "passiveAbilities": ["attack_focus"],
       "skills": [
         {
           "skillId": "basic_attack",
@@ -1046,9 +944,7 @@
         "totalFrames": 8,
         "animationSpeed": 0.1
       },
-      "elements": [
-        "wood"
-      ]
+      "elements": ["wood"]
     },
     {
       "id": "spirit_u07",
@@ -1062,9 +958,7 @@
         "elementalAffinity": 60,
         "agility": 123
       },
-      "passiveAbilities": [
-        "defense_focus"
-      ],
+      "passiveAbilities": ["defense_focus"],
       "skills": [
         {
           "skillId": "basic_attack",
@@ -1086,9 +980,7 @@
         "totalFrames": 8,
         "animationSpeed": 0.1
       },
-      "elements": [
-        "earth"
-      ]
+      "elements": ["earth"]
     },
     {
       "id": "spirit_u08",
@@ -1102,9 +994,7 @@
         "elementalAffinity": 120,
         "agility": 144
       },
-      "passiveAbilities": [
-        "attack_focus"
-      ],
+      "passiveAbilities": ["attack_focus"],
       "skills": [
         {
           "skillId": "basic_attack",
@@ -1126,9 +1016,7 @@
         "totalFrames": 8,
         "animationSpeed": 0.1
       },
-      "elements": [
-        "fire"
-      ]
+      "elements": ["fire"]
     },
     {
       "id": "spirit_u09",
@@ -1142,9 +1030,7 @@
         "elementalAffinity": 100,
         "agility": 132
       },
-      "passiveAbilities": [
-        "health_focus"
-      ],
+      "passiveAbilities": ["health_focus"],
       "skills": [
         {
           "skillId": "basic_attack",
@@ -1166,9 +1052,7 @@
         "totalFrames": 8,
         "animationSpeed": 0.1
       },
-      "elements": [
-        "water"
-      ]
+      "elements": ["water"]
     },
     {
       "id": "spirit_u10",
@@ -1182,9 +1066,7 @@
         "elementalAffinity": 90,
         "agility": 126
       },
-      "passiveAbilities": [
-        "defense_focus"
-      ],
+      "passiveAbilities": ["defense_focus"],
       "skills": [
         {
           "skillId": "basic_attack",
@@ -1206,9 +1088,7 @@
         "totalFrames": 8,
         "animationSpeed": 0.1
       },
-      "elements": [
-        "metal"
-      ]
+      "elements": ["metal"]
     },
     {
       "id": "spirit_u11",
@@ -1222,9 +1102,7 @@
         "elementalAffinity": 120,
         "agility": 138
       },
-      "passiveAbilities": [
-        "attack_focus"
-      ],
+      "passiveAbilities": ["attack_focus"],
       "skills": [
         {
           "skillId": "basic_attack",
@@ -1246,10 +1124,7 @@
         "totalFrames": 8,
         "animationSpeed": 0.1
       },
-      "elements": [
-        "fire",
-        "water"
-      ]
+      "elements": ["fire", "water"]
     },
     {
       "id": "spirit_u12",
@@ -1263,9 +1138,7 @@
         "elementalAffinity": 80,
         "agility": 120
       },
-      "passiveAbilities": [
-        "defense_focus"
-      ],
+      "passiveAbilities": ["defense_focus"],
       "skills": [
         {
           "skillId": "basic_attack",
@@ -1287,10 +1160,7 @@
         "totalFrames": 8,
         "animationSpeed": 0.1
       },
-      "elements": [
-        "earth",
-        "metal"
-      ]
+      "elements": ["earth", "metal"]
     },
     {
       "id": "spirit_u13",
@@ -1304,9 +1174,7 @@
         "elementalAffinity": 110,
         "agility": 143
       },
-      "passiveAbilities": [
-        "attack_focus"
-      ],
+      "passiveAbilities": ["attack_focus"],
       "skills": [
         {
           "skillId": "basic_attack",
@@ -1328,10 +1196,7 @@
         "totalFrames": 8,
         "animationSpeed": 0.1
       },
-      "elements": [
-        "wood",
-        "fire"
-      ]
+      "elements": ["wood", "fire"]
     }
   ],
   "rare": [
@@ -1347,9 +1212,7 @@
         "elementalAffinity": 100,
         "agility": 136
       },
-      "passiveAbilities": [
-        "health_focus"
-      ],
+      "passiveAbilities": ["health_focus"],
       "skills": [
         {
           "skillId": "basic_attack",
@@ -1371,9 +1234,7 @@
         "totalFrames": 8,
         "animationSpeed": 0.1
       },
-      "elements": [
-        "wood"
-      ]
+      "elements": ["wood"]
     },
     {
       "id": "spirit_r02",
@@ -1387,9 +1248,7 @@
         "elementalAffinity": 80,
         "agility": 127
       },
-      "passiveAbilities": [
-        "defense_focus"
-      ],
+      "passiveAbilities": ["defense_focus"],
       "skills": [
         {
           "skillId": "basic_attack",
@@ -1411,9 +1270,7 @@
         "totalFrames": 8,
         "animationSpeed": 0.1
       },
-      "elements": [
-        "earth"
-      ]
+      "elements": ["earth"]
     },
     {
       "id": "spirit_r03",
@@ -1427,9 +1284,7 @@
         "elementalAffinity": 110,
         "agility": 151
       },
-      "passiveAbilities": [
-        "attack_focus"
-      ],
+      "passiveAbilities": ["attack_focus"],
       "skills": [
         {
           "skillId": "basic_attack",
@@ -1451,9 +1306,7 @@
         "totalFrames": 8,
         "animationSpeed": 0.1
       },
-      "elements": [
-        "fire"
-      ]
+      "elements": ["fire"]
     },
     {
       "id": "spirit_r04",
@@ -1467,9 +1320,7 @@
         "elementalAffinity": 110,
         "agility": 140
       },
-      "passiveAbilities": [
-        "health_focus"
-      ],
+      "passiveAbilities": ["health_focus"],
       "skills": [
         {
           "skillId": "basic_attack",
@@ -1491,9 +1342,7 @@
         "totalFrames": 8,
         "animationSpeed": 0.1
       },
-      "elements": [
-        "water"
-      ]
+      "elements": ["water"]
     },
     {
       "id": "spirit_r05",
@@ -1507,9 +1356,7 @@
         "elementalAffinity": 110,
         "agility": 142
       },
-      "passiveAbilities": [
-        "attack_focus"
-      ],
+      "passiveAbilities": ["attack_focus"],
       "skills": [
         {
           "skillId": "basic_attack",
@@ -1531,9 +1378,7 @@
         "totalFrames": 8,
         "animationSpeed": 0.1
       },
-      "elements": [
-        "metal"
-      ]
+      "elements": ["metal"]
     },
     {
       "id": "spirit_r06",
@@ -1547,9 +1392,7 @@
         "elementalAffinity": 90,
         "agility": 132
       },
-      "passiveAbilities": [
-        "health_focus"
-      ],
+      "passiveAbilities": ["health_focus"],
       "skills": [
         {
           "skillId": "basic_attack",
@@ -1571,9 +1414,7 @@
         "totalFrames": 8,
         "animationSpeed": 0.1
       },
-      "elements": [
-        "wood"
-      ]
+      "elements": ["wood"]
     },
     {
       "id": "spirit_r07",
@@ -1587,9 +1428,7 @@
         "elementalAffinity": 70,
         "agility": 124
       },
-      "passiveAbilities": [
-        "defense_focus"
-      ],
+      "passiveAbilities": ["defense_focus"],
       "skills": [
         {
           "skillId": "basic_attack",
@@ -1611,9 +1450,7 @@
         "totalFrames": 8,
         "animationSpeed": 0.1
       },
-      "elements": [
-        "earth"
-      ]
+      "elements": ["earth"]
     },
     {
       "id": "spirit_r08",
@@ -1627,9 +1464,7 @@
         "elementalAffinity": 110,
         "agility": 148
       },
-      "passiveAbilities": [
-        "attack_focus"
-      ],
+      "passiveAbilities": ["attack_focus"],
       "skills": [
         {
           "skillId": "basic_attack",
@@ -1651,9 +1486,7 @@
         "totalFrames": 8,
         "animationSpeed": 0.1
       },
-      "elements": [
-        "fire"
-      ]
+      "elements": ["fire"]
     },
     {
       "id": "spirit_r09",
@@ -1667,10 +1500,7 @@
         "elementalAffinity": 120,
         "agility": 144
       },
-      "passiveAbilities": [
-        "health_focus",
-        "dot_amplification"
-      ],
+      "passiveAbilities": ["health_focus", "dot_amplification"],
       "skills": [
         {
           "skillId": "bubble_barrier",
@@ -1692,9 +1522,7 @@
         "totalFrames": 8,
         "animationSpeed": 0.1
       },
-      "elements": [
-        "water"
-      ]
+      "elements": ["water"]
     },
     {
       "id": "spirit_r10",
@@ -1708,9 +1536,7 @@
         "elementalAffinity": 110,
         "agility": 145
       },
-      "passiveAbilities": [
-        "attack_focus"
-      ],
+      "passiveAbilities": ["attack_focus"],
       "skills": [
         {
           "skillId": "basic_attack",
@@ -1732,9 +1558,7 @@
         "totalFrames": 8,
         "animationSpeed": 0.1
       },
-      "elements": [
-        "metal"
-      ]
+      "elements": ["metal"]
     }
   ],
   "epic": [
@@ -1750,9 +1574,7 @@
         "elementalAffinity": 100,
         "agility": 140
       },
-      "passiveAbilities": [
-        "health_focus"
-      ],
+      "passiveAbilities": ["health_focus"],
       "skills": [
         {
           "skillId": "basic_attack",
@@ -1774,9 +1596,7 @@
         "totalFrames": 8,
         "animationSpeed": 0.1
       },
-      "elements": [
-        "wood"
-      ]
+      "elements": ["wood"]
     },
     {
       "id": "spirit_e02",
@@ -1790,9 +1610,7 @@
         "elementalAffinity": 80,
         "agility": 133
       },
-      "passiveAbilities": [
-        "defense_focus"
-      ],
+      "passiveAbilities": ["defense_focus"],
       "skills": [
         {
           "skillId": "basic_attack",
@@ -1814,9 +1632,7 @@
         "totalFrames": 8,
         "animationSpeed": 0.1
       },
-      "elements": [
-        "earth"
-      ]
+      "elements": ["earth"]
     },
     {
       "id": "spirit_e03",
@@ -1830,9 +1646,7 @@
         "elementalAffinity": 100,
         "agility": 155
       },
-      "passiveAbilities": [
-        "attack_focus"
-      ],
+      "passiveAbilities": ["attack_focus"],
       "skills": [
         {
           "skillId": "basic_attack",
@@ -1854,9 +1668,7 @@
         "totalFrames": 8,
         "animationSpeed": 0.1
       },
-      "elements": [
-        "fire"
-      ]
+      "elements": ["fire"]
     },
     {
       "id": "spirit_e04",
@@ -1870,9 +1682,7 @@
         "elementalAffinity": 100,
         "agility": 146
       },
-      "passiveAbilities": [
-        "health_focus"
-      ],
+      "passiveAbilities": ["health_focus"],
       "skills": [
         {
           "skillId": "basic_attack",
@@ -1894,9 +1704,7 @@
         "totalFrames": 8,
         "animationSpeed": 0.1
       },
-      "elements": [
-        "water"
-      ]
+      "elements": ["water"]
     },
     {
       "id": "spirit_e05",
@@ -1910,9 +1718,7 @@
         "elementalAffinity": 100,
         "agility": 149
       },
-      "passiveAbilities": [
-        "attack_focus"
-      ],
+      "passiveAbilities": ["attack_focus"],
       "skills": [
         {
           "skillId": "basic_attack",
@@ -1934,9 +1740,7 @@
         "totalFrames": 8,
         "animationSpeed": 0.1
       },
-      "elements": [
-        "metal"
-      ]
+      "elements": ["metal"]
     },
     {
       "id": "spirit_e06",
@@ -1950,9 +1754,7 @@
         "elementalAffinity": 100,
         "agility": 143
       },
-      "passiveAbilities": [
-        "health_focus"
-      ],
+      "passiveAbilities": ["health_focus"],
       "skills": [
         {
           "skillId": "basic_attack",
@@ -1974,9 +1776,7 @@
         "totalFrames": 8,
         "animationSpeed": 0.1
       },
-      "elements": [
-        "wood"
-      ]
+      "elements": ["wood"]
     },
     {
       "id": "spirit_e07",
@@ -1990,9 +1790,7 @@
         "elementalAffinity": 70,
         "agility": 130
       },
-      "passiveAbilities": [
-        "defense_focus"
-      ],
+      "passiveAbilities": ["defense_focus"],
       "skills": [
         {
           "skillId": "basic_attack",
@@ -2014,9 +1812,7 @@
         "totalFrames": 8,
         "animationSpeed": 0.1
       },
-      "elements": [
-        "earth"
-      ]
+      "elements": ["earth"]
     },
     {
       "id": "spirit_e08",
@@ -2030,9 +1826,7 @@
         "elementalAffinity": 100,
         "agility": 153
       },
-      "passiveAbilities": [
-        "attack_focus"
-      ],
+      "passiveAbilities": ["attack_focus"],
       "skills": [
         {
           "skillId": "basic_attack",
@@ -2054,9 +1848,7 @@
         "totalFrames": 8,
         "animationSpeed": 0.1
       },
-      "elements": [
-        "fire"
-      ]
+      "elements": ["fire"]
     },
     {
       "id": "spirit_e09",
@@ -2070,9 +1862,7 @@
         "elementalAffinity": 100,
         "agility": 148
       },
-      "passiveAbilities": [
-        "health_focus"
-      ],
+      "passiveAbilities": ["health_focus"],
       "skills": [
         {
           "skillId": "basic_attack",
@@ -2094,9 +1884,7 @@
         "totalFrames": 8,
         "animationSpeed": 0.1
       },
-      "elements": [
-        "water"
-      ]
+      "elements": ["water"]
     },
     {
       "id": "spirit_e10",
@@ -2110,9 +1898,7 @@
         "elementalAffinity": 100,
         "agility": 152
       },
-      "passiveAbilities": [
-        "attack_focus"
-      ],
+      "passiveAbilities": ["attack_focus"],
       "skills": [
         {
           "skillId": "basic_attack",
@@ -2134,9 +1920,7 @@
         "totalFrames": 8,
         "animationSpeed": 0.1
       },
-      "elements": [
-        "metal"
-      ]
+      "elements": ["metal"]
     }
   ],
   "legendary": [
@@ -2152,9 +1936,7 @@
         "elementalAffinity": 100,
         "agility": 145
       },
-      "passiveAbilities": [
-        "health_focus"
-      ],
+      "passiveAbilities": ["health_focus"],
       "skills": [
         {
           "skillId": "basic_attack",
@@ -2176,9 +1958,7 @@
         "totalFrames": 8,
         "animationSpeed": 0.1
       },
-      "elements": [
-        "wood"
-      ]
+      "elements": ["wood"]
     },
     {
       "id": "spirit_l02",
@@ -2192,9 +1972,7 @@
         "elementalAffinity": 80,
         "agility": 136
       },
-      "passiveAbilities": [
-        "defense_focus"
-      ],
+      "passiveAbilities": ["defense_focus"],
       "skills": [
         {
           "skillId": "basic_attack",
@@ -2216,9 +1994,7 @@
         "totalFrames": 8,
         "animationSpeed": 0.1
       },
-      "elements": [
-        "earth"
-      ]
+      "elements": ["earth"]
     },
     {
       "id": "spirit_l03",
@@ -2232,9 +2008,7 @@
         "elementalAffinity": 100,
         "agility": 160
       },
-      "passiveAbilities": [
-        "attack_focus"
-      ],
+      "passiveAbilities": ["attack_focus"],
       "skills": [
         {
           "skillId": "basic_attack",
@@ -2256,9 +2030,7 @@
         "totalFrames": 8,
         "animationSpeed": 0.1
       },
-      "elements": [
-        "fire"
-      ]
+      "elements": ["fire"]
     },
     {
       "id": "spirit_l04",
@@ -2272,9 +2044,7 @@
         "elementalAffinity": 100,
         "agility": 150
       },
-      "passiveAbilities": [
-        "health_focus"
-      ],
+      "passiveAbilities": ["health_focus"],
       "skills": [
         {
           "skillId": "basic_attack",
@@ -2296,9 +2066,7 @@
         "totalFrames": 8,
         "animationSpeed": 0.1
       },
-      "elements": [
-        "water"
-      ]
+      "elements": ["water"]
     },
     {
       "id": "spirit_l05",
@@ -2312,9 +2080,7 @@
         "elementalAffinity": 100,
         "agility": 155
       },
-      "passiveAbilities": [
-        "attack_focus"
-      ],
+      "passiveAbilities": ["attack_focus"],
       "skills": [
         {
           "skillId": "basic_attack",
@@ -2336,9 +2102,7 @@
         "totalFrames": 8,
         "animationSpeed": 0.1
       },
-      "elements": [
-        "metal"
-      ]
+      "elements": ["metal"]
     }
   ],
   "boss": [
@@ -2354,10 +2118,7 @@
         "elementalAffinity": 50,
         "agility": 166
       },
-      "passiveAbilities": [
-        "counter_strike",
-        "lucky"
-      ],
+      "passiveAbilities": ["counter_strike", "lucky"],
       "skills": [
         {
           "skillId": "basic_attack",
@@ -2379,10 +2140,7 @@
         "totalFrames": 8,
         "animationSpeed": 0.1
       },
-      "elements": [
-        "fire",
-        "metal"
-      ]
+      "elements": ["fire", "metal"]
     }
   ]
 }

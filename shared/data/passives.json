@@ -125,5 +125,16 @@
         "value": 0.1
       }
     ]
+  },
+  "regenerative": {
+    "id": "regenerative",
+    "name": "Regenerative",
+    "description": "Recovers 25% of max health when swapped out of battle.",
+    "effects": [
+      {
+        "type": "swap_out_heal",
+        "healPercentage": 0.25
+      }
+    ]
   }
 }

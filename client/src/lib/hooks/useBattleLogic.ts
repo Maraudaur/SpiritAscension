@@ -658,8 +658,8 @@ export function useBattleLogic({
                   description: "A powerful charged attack",
                   damage: effect.damageMultiplier, // Use the multiplier as the skill's damage
                   healing: 0,
-                  unlockLevel: 1,
                   element: effect.element || "none",
+                  effects: [],
                 };
 
                 // 3. Get results
@@ -845,8 +845,8 @@ export function useBattleLogic({
                   description: "A powerful charged attack",
                   damage: effect.damageMultiplier, // Use the multiplier as the skill's damage
                   healing: 0,
-                  unlockLevel: 1,
                   element: effect.element || "none",
+                  effects: [],
                 };
 
                 // 3. Get results
@@ -1179,7 +1179,7 @@ export function useBattleLogic({
       // --- FIX 2: Added safety checks ---
       // Safely check if the spirit and its skills exist before adding them
       if (enemyBaseSpirit && enemyBaseSpirit.skills) {
-        possibleSkillIds.push(...enemyBaseSpirit.skills);
+        possibleSkillIds.push(...enemyBaseSpirit.skills.map(s => s.skillId));
       }
       // --- END FIX 2 ---
 
@@ -2179,6 +2179,45 @@ export function useBattleLogic({
             return spirit;
           }),
         );
+      }
+    }
+
+    // Check for swap-out heal passive
+    if (oldSpirit && oldSpirit.passiveAbilities) {
+      for (const passiveId of oldSpirit.passiveAbilities) {
+        const passive = (passivesData as Record<string, PassiveAbility>)[passiveId];
+        if (passive && passive.effects) {
+          for (const effect of passive.effects) {
+            if (effect.type === "swap_out_heal") {
+              const outgoingSpirit = playerSpirits[activePartySlot];
+              const spiritStats = calculateAllStats(outgoingSpirit.playerSpirit);
+              const maxHealth = spiritStats.health;
+              const healAmount = Math.floor(maxHealth * effect.healPercentage);
+              
+              // Apply heal to the outgoing spirit
+              setPlayerSpirits((prevSpirits) =>
+                prevSpirits.map((spirit, i) => {
+                  if (i === activePartySlot) {
+                    const newHealth = Math.min(
+                      spirit.currentHealth + healAmount,
+                      maxHealth
+                    );
+                    return {
+                      ...spirit,
+                      currentHealth: newHealth,
+                    };
+                  }
+                  return spirit;
+                })
+              );
+              
+              const healPercentage = Math.round(effect.healPercentage * 100);
+              addLog(
+                `${oldSpirit.name} recovers ${healAmount} HP (${healPercentage}%) from ${passive.name}!`
+              );
+            }
+          }
+        }
       }
     }
 

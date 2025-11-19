@@ -161,6 +161,11 @@ export interface PassiveChanceBoost {
   value: number; // 0.1 for 10% boost to all chance-based effects
 }
 
+export interface PassiveSwapOutHeal {
+  type: "swap_out_heal";
+  healPercentage: number; // 0.2 for 20% max HP heal on swap out
+}
+
 export interface SpiritSpriteConfig {
   textureUrl: string;
   frameWidth: number;
@@ -177,7 +182,8 @@ export type PassiveEffect =
   | PassiveDotDamageBoost
   | PassiveDamageReflect
   | PassiveCounterAttack
-  | PassiveChanceBoost;
+  | PassiveChanceBoost
+  | PassiveSwapOutHeal;
 
 export type CombatTrigger =
   | "on_hit"
