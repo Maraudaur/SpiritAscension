@@ -46,7 +46,8 @@ interface StatComparison {
   attack: { old: number; new: number };
   defense: { old: number; new: number };
   health: { old: number; new: number };
-  elementalAffinity: { old: number; new: number };
+  affinity: { old: number; new: number };
+  agility: { old: number; new: number };
 }
 
 export function SpiritManager({ onClose }: SpiritManagerProps = {}) {
@@ -165,10 +166,8 @@ export function SpiritManager({ onClose }: SpiritManagerProps = {}) {
       attack: { old: oldStats.attack, new: newStats.attack },
       defense: { old: oldStats.defense, new: newStats.defense },
       health: { old: oldStats.health, new: newStats.health },
-      elementalAffinity: {
-        old: oldStats.elementalAffinity,
-        new: newStats.elementalAffinity,
-      },
+      affinity: { old: oldStats.affinity, new: newStats.affinity },
+      agility: { old: oldStats.agility, new: newStats.agility },
     };
 
     setLevelUpAnimation({
@@ -688,14 +687,14 @@ export function SpiritManager({ onClose }: SpiritManagerProps = {}) {
                             style={{
                               color: getPotentialColor(
                                 selectedSpirit.potentialFactors
-                                  .elementalAffinity,
+                                  .affinity,
                               ),
                             }}
                           >
-                            {stats.elementalAffinity} [
+                            {stats.affinity} [
                             {
                               selectedSpirit.potentialFactors
-                                .elementalAffinity
+                                .affinity
                             }
                             ]
                           </span>
@@ -988,7 +987,7 @@ export function SpiritManager({ onClose }: SpiritManagerProps = {}) {
                             className="flex justify-between items-center"
                           >
                             <span className="font-semibold parchment-text capitalize">
-                              {stat === "elementalAffinity"
+                              {stat === "affinity"
                                 ? "Affinity"
                                 : stat}
                               :

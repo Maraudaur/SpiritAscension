@@ -562,16 +562,16 @@ export function SummonScreen({ onNavigate }: SummonScreenProps) {
                       <div className="flex justify-between text-base">
                         <span>AFFINITY:</span>
                         <span className="font-medium">
-                          {stats.elementalAffinity}{" "}
+                          {stats.affinity}{" "}
                           <span
                             className="font-bold"
                             style={{
                               color: getPotentialColor(
-                                summonedSpirit.potentialFactors.elementalAffinity,
+                                summonedSpirit.potentialFactors.affinity,
                               ),
                             }}
                           >
-                            ({summonedSpirit.potentialFactors.elementalAffinity})
+                            ({summonedSpirit.potentialFactors.affinity})
                           </span>
                         </span>
                       </div>

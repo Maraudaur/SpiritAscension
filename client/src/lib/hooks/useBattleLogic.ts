@@ -42,7 +42,7 @@ interface CombatantStats {
   level: number;
   attack: number;
   defense: number;
-  elementalAffinity: number;
+  affinity: number;
   elements: ElementId[];
   currentHealth: number;
   maxHealth: number;
@@ -480,7 +480,7 @@ export function useBattleLogic({
         if (effect.type === "heal") {
           const maxHeal = spiritStats.health * effect.healthRatio;
           const affinityHeal =
-            spiritStats.elementalAffinity * effect.affinityRatio;
+            spiritStats.affinity * effect.affinityRatio;
           const totalHeal = Math.floor(maxHeal + affinityHeal);
 
           if (totalHeal > 0) {
@@ -633,7 +633,7 @@ export function useBattleLogic({
                   level: attackerSpirit.playerSpirit.level,
                   attack: attackerStats.attack,
                   defense: attackerStats.defense,
-                  elementalAffinity: attackerStats.elementalAffinity,
+                  affinity: attackerStats.affinity,
                   elements: attackerBase.elements,
                   currentHealth: attackerSpirit.currentHealth,
                   maxHealth: attackerSpirit.maxHealth,
@@ -645,7 +645,7 @@ export function useBattleLogic({
                   level: targetEnemy.level,
                   attack: targetEnemy.attack,
                   defense: targetEnemy.defense,
-                  elementalAffinity: targetEnemy.elementalAffinity,
+                  affinity: targetEnemy.affinity,
                   elements: targetEnemy.elements,
                   currentHealth: targetEnemy.currentHealth,
                   maxHealth: targetEnemy.maxHealth,
@@ -820,7 +820,7 @@ export function useBattleLogic({
                   level: attackerEnemy.level,
                   attack: attackerEnemy.attack,
                   defense: attackerEnemy.defense,
-                  elementalAffinity: attackerEnemy.elementalAffinity,
+                  affinity: attackerEnemy.affinity,
                   elements: attackerEnemy.elements,
                   currentHealth: attackerEnemy.currentHealth,
                   maxHealth: attackerEnemy.maxHealth,
@@ -832,7 +832,7 @@ export function useBattleLogic({
                   level: targetSpirit.playerSpirit.level,
                   attack: targetStats.attack,
                   defense: targetStats.defense,
-                  elementalAffinity: targetStats.elementalAffinity,
+                  affinity: targetStats.affinity,
                   elements: targetBase.elements,
                   currentHealth: targetSpirit.currentHealth,
                   maxHealth: targetSpirit.maxHealth,
@@ -984,7 +984,7 @@ export function useBattleLogic({
               levelMultiplier,
           ) + 10;
         const enemyElementalAffinity = Math.floor(
-          baseSpirit.baseStats.elementalAffinity *
+          baseSpirit.baseStats.affinity *
             (1 + enemyPotentialBonus) *
             levelMultiplier,
         );
@@ -1005,7 +1005,7 @@ export function useBattleLogic({
           maxHealth: enemyHealth,
           currentHealth: enemyHealth,
           elements: baseSpirit.elements,
-          elementalAffinity: enemyElementalAffinity,
+          affinity: enemyElementalAffinity,
           activeEffects: [] as ActiveEffect[],
         };
       })
@@ -1441,7 +1441,7 @@ export function useBattleLogic({
 
     // --- 1. Determine Elemental Properties
     const spiritElement: ElementId = getPrimaryElement(baseSpirit);
-    const affinityStat = attacker.elementalAffinity;
+    const affinityStat = attacker.affinity;
     const skillElement = skill.element;
     let affinityRatio =
       skillElement === "none" || skillElement === spiritElement ? 0.25 : 0.15;
@@ -1633,7 +1633,7 @@ export function useBattleLogic({
             element: skillEffect.element,
             casterStats: {
               attack: attacker.attack,
-              affinity: attacker.elementalAffinity,
+              affinity: attacker.affinity,
               level: attacker.level,
             },
             targetIndex: 0, // This will be set correctly by the handler
@@ -1820,7 +1820,7 @@ export function useBattleLogic({
       level: activeSpirit.playerSpirit.level,
       attack: activeStats.attack,
       defense: activeStats.defense,
-      elementalAffinity: activeStats.elementalAffinity,
+      affinity: activeStats.affinity,
       elements: activeBaseSpirit.elements,
       currentHealth: activeSpirit.currentHealth,
       maxHealth: activeSpirit.maxHealth,
@@ -1832,7 +1832,7 @@ export function useBattleLogic({
       level: activeEnemy.level,
       attack: activeEnemy.attack,
       defense: activeEnemy.defense,
-      elementalAffinity: activeEnemy.elementalAffinity,
+      affinity: activeEnemy.affinity,
       elements: activeEnemy.elements,
       currentHealth: activeEnemy.currentHealth,
       maxHealth: activeEnemy.maxHealth,
@@ -1976,7 +1976,7 @@ export function useBattleLogic({
       level: activeEnemy.level,
       attack: activeEnemy.attack,
       defense: activeEnemy.defense,
-      elementalAffinity: activeEnemy.elementalAffinity,
+      affinity: activeEnemy.affinity,
       elements: activeEnemy.elements,
       currentHealth: activeEnemy.currentHealth,
       maxHealth: activeEnemy.maxHealth,
@@ -1988,7 +1988,7 @@ export function useBattleLogic({
       level: activeSpirit.playerSpirit.level,
       attack: activeStats.attack,
       defense: activeStats.defense,
-      elementalAffinity: activeStats.elementalAffinity,
+      affinity: activeStats.affinity,
       elements: targetBase.elements,
       currentHealth: activeSpirit.currentHealth,
       maxHealth: activeSpirit.maxHealth,

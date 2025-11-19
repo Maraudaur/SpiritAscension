@@ -178,7 +178,7 @@ export function calculateStat(
 export function calculateAllStats(playerSpirit: PlayerSpirit) {
   const baseSpirit = getBaseSpirit(playerSpirit.spiritId);
   if (!baseSpirit) {
-    return { attack: 0, defense: 0, health: 0, elementalAffinity: 0, agility: 0 };
+    return { attack: 0, defense: 0, health: 0, affinity: 0, agility: 0 };
   }
 
   let attack = calculateStat(
@@ -200,10 +200,10 @@ export function calculateAllStats(playerSpirit: PlayerSpirit) {
       playerSpirit.potentialFactors.health,
     ) + 10; // Base health addition is kept
 
-  let elementalAffinity = calculateStat(
-    baseSpirit.baseStats.elementalAffinity,
+  let affinity = calculateStat(
+    baseSpirit.baseStats.affinity,
     playerSpirit.level,
-    playerSpirit.potentialFactors.elementalAffinity,
+    playerSpirit.potentialFactors.affinity,
   );
 
   let agility = calculateStat(
@@ -231,9 +231,9 @@ export function calculateAllStats(playerSpirit: PlayerSpirit) {
         case "health":
           health = Math.floor(health * effect.statMultiplier);
           break;
-        case "elementalAffinity":
-          elementalAffinity = Math.floor(
-            elementalAffinity * effect.statMultiplier,
+        case "affinity":
+          affinity = Math.floor(
+            affinity * effect.statMultiplier,
           );
           break;
         case "agility":
@@ -247,7 +247,7 @@ export function calculateAllStats(playerSpirit: PlayerSpirit) {
   // This block replaces the old switch statement
 
   // Create a mutable stats object from the values calculated so far
-  const stats = { attack, defense, health, elementalAffinity, agility };
+  const stats = { attack, defense, health, affinity, agility };
 
   // Apply passive abilities
   if (baseSpirit.passiveAbilities && passivesData) {
@@ -280,7 +280,7 @@ export function calculateAllStats(playerSpirit: PlayerSpirit) {
     attack: Math.floor(stats.attack),
     defense: Math.floor(stats.defense),
     health: Math.floor(stats.health),
-    elementalAffinity: Math.floor(stats.elementalAffinity),
+    affinity: Math.floor(stats.affinity),
     agility: Math.floor(stats.agility),
   };
 }

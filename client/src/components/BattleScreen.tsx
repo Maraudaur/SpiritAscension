@@ -747,12 +747,12 @@ export function BattleScreen({
                           className="font-semibold"
                           style={{
                             color: getPotentialColor(
-                              spirit.playerSpirit.potentialFactors.elementalAffinity,
+                              spirit.playerSpirit.potentialFactors.affinity,
                             ),
                           }}
                         >
-                          {stats.elementalAffinity} [
-                          {spirit.playerSpirit.potentialFactors.elementalAffinity}]
+                          {stats.affinity} [
+                          {spirit.playerSpirit.potentialFactors.affinity}]
                         </span>
                       </div>
                     </div>

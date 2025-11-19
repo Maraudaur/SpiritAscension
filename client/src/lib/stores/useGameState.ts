@@ -209,7 +209,7 @@ function _createRandomSpirit(rarity: Rarity): PlayerSpirit {
       attack: getRandomPotential(),
       defense: getRandomPotential(),
       health: getRandomPotential(),
-      elementalAffinity: getRandomPotential(),
+      affinity: getRandomPotential(),
       agility: getRandomPotential(),
     },
   };
@@ -244,7 +244,7 @@ function _createSpecificSpirit(spiritId: string): PlayerSpirit | null {
       attack: getRandomPotential(),
       defense: getRandomPotential(),
       health: getRandomPotential(),
-      elementalAffinity: getRandomPotential(),
+      affinity: getRandomPotential(),
       agility: getRandomPotential(),
     },
   };
@@ -306,7 +306,7 @@ export const useGameState = create<GameStateStore>()(
               attack: "C",
               defense: "C",
               health: "C",
-              elementalAffinity: "C",
+              affinity: "C",
               agility: "C",
             },
           };
@@ -753,6 +753,17 @@ export const useGameState = create<GameStateStore>()(
           while (state.activeParty.length < 4) {
             state.activeParty.push(null);
           }
+        }
+
+        // Migration: Rename elementalAffinity to affinity
+        if (state && state.spirits) {
+          state.spirits.forEach((spirit: any) => {
+            if (spirit.potentialFactors && 'elementalAffinity' in spirit.potentialFactors) {
+              console.log(`[Migration] Renaming elementalAffinity to affinity for spirit ${spirit.instanceId}`);
+              spirit.potentialFactors.affinity = spirit.potentialFactors.elementalAffinity;
+              delete spirit.potentialFactors.elementalAffinity;
+            }
+          });
         }
       },
     },

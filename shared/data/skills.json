@@ -84,7 +84,7 @@
     "effects": [
       {
         "type": "stat_buff",
-        "stat": "elementalAffinity",
+        "stat": "affinity",
         "value": 0.5,
         "duration": 3
       }
