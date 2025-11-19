@@ -48,7 +48,7 @@
         "elementalAffinity": 60,
         "agility": 110
       },
-      "passiveAbilities": ["defense_focus", "regenerative"],
+      "passiveAbilities": ["defense_focus"],
       "skills": [
         {
           "skillId": "basic_attack",
