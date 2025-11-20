@@ -7,6 +7,7 @@ import type {
   GameState as GameStateData,
   PlayerSpirit,
   Rarity,
+  Encounter,
 } from "@shared/types";
 import spiritsDataJson from "@shared/data/spirits.json";
 import { encrypt, decrypt } from "../encryption";
@@ -59,6 +60,7 @@ export interface GameStateStore extends Omit<GameStateData, "activeParty"> {
   // Debug State
   freeSummons: boolean;
   freeLevelUp: boolean;
+  debugEncounter: Encounter | null;
 
   // Actions
   addQi: (amount: number) => void;
@@ -112,6 +114,7 @@ export interface GameStateStore extends Omit<GameStateData, "activeParty"> {
   toggleFreeSummons: () => void;
   toggleFreeLevelUp: () => void;
   spawnSpecificSpirit: (spiritId: string) => PlayerSpirit | null;
+  setDebugEncounter: (encounter: Encounter | null) => void;
 }
 
 // --- FIX: ALL CONSTANTS MOVED TO TOP-LEVEL SCOPE ---
@@ -267,6 +270,7 @@ export const useGameState = create<GameStateStore>()(
       storyBattleCheckpoint: null,
       freeSummons: false,
       freeLevelUp: false,
+      debugEncounter: null,
 
       // --- (Core Actions) ---
       addQi: (amount: number) => {
@@ -386,6 +390,7 @@ export const useGameState = create<GameStateStore>()(
             completedStoryNodes: [],
             currentEncounterId: null,
             storyBattleCheckpoint: null,
+            debugEncounter: null,
           });
         });
       },
@@ -722,6 +727,12 @@ export const useGameState = create<GameStateStore>()(
           return newSpirit;
         }
         return null;
+      },
+
+      setDebugEncounter: (encounter: Encounter | null) => {
+        set((state) => {
+          state.debugEncounter = encounter;
+        });
       },
     })),
     // --- (Encryption Config) ---

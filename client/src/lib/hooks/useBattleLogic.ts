@@ -89,6 +89,8 @@ export function useBattleLogic({
     currentEncounterId,
     setCurrentEncounterId,
     resolveStoryBattle,
+    debugEncounter,
+    setDebugEncounter,
   } = useGameState();
 
   const {
@@ -173,6 +175,14 @@ export function useBattleLogic({
     if (!encounterData) {
       console.error("CRITICAL: encounters.json data is not loaded.");
       return null;
+    }
+
+    // Priority 0: Check for debug encounter (takes precedence over everything)
+    if (debugEncounter) {
+      console.log("[Debug] Using debug encounter:", debugEncounter.id);
+      // Clear the debug encounter after using it
+      setDebugEncounter(null);
+      return debugEncounter;
     }
 
     // --- 👇 ADD THIS ENTIRE BLOCK ---

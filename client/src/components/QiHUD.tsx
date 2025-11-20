@@ -26,13 +26,14 @@ interface QiHUDProps {
 }
 
 export function QiHUD({ currentScreen, onNavigate }: QiHUDProps) {
-  const { qi, qiPerSecond, resetGame, freeSummons, toggleFreeSummons, freeLevelUp, toggleFreeLevelUp, spawnSpecificSpirit, setCurrentEncounterId } = useGameState();
+  const { qi, qiPerSecond, resetGame, freeSummons, toggleFreeSummons, freeLevelUp, toggleFreeLevelUp, spawnSpecificSpirit, setCurrentEncounterId, setDebugEncounter } = useGameState();
   const { isMuted, toggleMute, volume, setVolume } = useAudio();
   const [showVolumeSlider, setShowVolumeSlider] = useState(false);
   const [showDebugMenu, setShowDebugMenu] = useState(false);
   const [selectedSpiritId, setSelectedSpiritId] = useState<string>("");
   const [selectedEncounterId, setSelectedEncounterId] = useState<string>("");
   const [spawnMessage, setSpawnMessage] = useState<string>("");
+  const [debugSpiritLevel, setDebugSpiritLevel] = useState<number>(5);
 
   const formatNumber = (num: number): string => {
     if (num >= 1_000_000_000) {
@@ -79,6 +80,47 @@ export function QiHUD({ currentScreen, onNavigate }: QiHUDProps) {
       setTimeout(() => setSpawnMessage(""), 2000);
     } else {
       setSpawnMessage("❌ Encounter not found");
+      setTimeout(() => setSpawnMessage(""), 2000);
+    }
+  };
+
+  const handleFightSpirit = () => {
+    if (!selectedSpiritId) {
+      setSpawnMessage("Please select a spirit first");
+      setTimeout(() => setSpawnMessage(""), 2000);
+      return;
+    }
+
+    const spiritData = getAllSpirits().find((s) => s.id === selectedSpiritId);
+    if (spiritData) {
+      // Create a debug encounter with the selected spirit
+      const debugEncounter: Encounter = {
+        id: "debug_fight",
+        name: `Debug: ${spiritData.name}`,
+        averageLevel: debugSpiritLevel,
+        enemies: [
+          {
+            spiritId: selectedSpiritId,
+            level: debugSpiritLevel,
+            ai: ["r000"] // Random AI
+          }
+        ],
+        rewards: {
+          qi: 0
+        },
+        penalties: {
+          qiLoss: 0
+        }
+      };
+      
+      // Set this as a debug encounter and navigate to battle
+      setDebugEncounter(debugEncounter);
+      onNavigate("battle");
+      setShowDebugMenu(false);
+      setSpawnMessage(`⚔️ Fighting ${spiritData.name} Lv${debugSpiritLevel}!`);
+      setTimeout(() => setSpawnMessage(""), 2000);
+    } else {
+      setSpawnMessage("❌ Spirit not found");
       setTimeout(() => setSpawnMessage(""), 2000);
     }
   };
@@ -343,7 +385,7 @@ export function QiHUD({ currentScreen, onNavigate }: QiHUDProps) {
 
                   <div className="pt-2 border-t border-orange-300 mt-2 space-y-2">
                     <div className="text-xs font-medium text-orange-700 mb-1">
-                      Get Specific Spirit
+                      Choose Spirit
                     </div>
                     <select
                       value={selectedSpiritId}
@@ -361,15 +403,37 @@ export function QiHUD({ currentScreen, onNavigate }: QiHUDProps) {
                         </optgroup>
                       ))}
                     </select>
-                    <Button
-                      variant="default"
-                      size="sm"
-                      onClick={handleSpawnSpirit}
-                      disabled={!selectedSpiritId}
-                      className="w-full text-xs bg-orange-600 hover:bg-orange-700"
-                    >
-                      Spawn Spirit
-                    </Button>
+                    <div className="flex items-center gap-2">
+                      <label className="text-xs text-orange-700 whitespace-nowrap">Level:</label>
+                      <input
+                        type="number"
+                        min="1"
+                        max="20"
+                        value={debugSpiritLevel}
+                        onChange={(e) => setDebugSpiritLevel(Math.min(20, Math.max(1, parseInt(e.target.value) || 1)))}
+                        className="flex-1 text-xs px-2 py-1.5 border border-orange-300 rounded bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-orange-400"
+                      />
+                    </div>
+                    <div className="grid grid-cols-2 gap-2">
+                      <Button
+                        variant="default"
+                        size="sm"
+                        onClick={handleSpawnSpirit}
+                        disabled={!selectedSpiritId}
+                        className="text-xs bg-orange-600 hover:bg-orange-700"
+                      >
+                        Spawn
+                      </Button>
+                      <Button
+                        variant="default"
+                        size="sm"
+                        onClick={handleFightSpirit}
+                        disabled={!selectedSpiritId}
+                        className="text-xs bg-red-600 hover:bg-red-700"
+                      >
+                        Fight
+                      </Button>
+                    </div>
                     {spawnMessage && (
                       <div className="text-xs text-center font-medium text-orange-700 py-1">
                         {spawnMessage}
