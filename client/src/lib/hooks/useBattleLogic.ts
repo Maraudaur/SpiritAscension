@@ -1565,10 +1565,17 @@ export function useBattleLogic({
       }
     }
 
-    if (skill.damage > 0 && !targetHasCritImmunity && Math.random() < critChance) {
-      totalDamage = Math.floor(totalDamage * 1.5);
-      wasCritical = true;
-      elementalMessage += " CRITICAL HIT!";
+    // Roll for crit first, then check immunity
+    if (skill.damage > 0 && Math.random() < critChance) {
+      if (targetHasCritImmunity) {
+        // Crit was rolled but blocked by Stalwart
+        elementalMessage += " Critical hit blocked by Stalwart!";
+      } else {
+        // Crit succeeds
+        totalDamage = Math.floor(totalDamage * 1.5);
+        wasCritical = true;
+        elementalMessage += " CRITICAL HIT!";
+      }
     }
 
     // --- 6. Log attack message
