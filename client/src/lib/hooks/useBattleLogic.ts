@@ -438,11 +438,6 @@ export function useBattleLogic({
       targetName = (target as Enemy).name;
     }
     const newEffect = { ...effect, id: `${effect.effectType}_${Date.now()}` };
-    
-    console.log(`[APPLY STATUS] Called for ${targetName}`);
-    console.log(`[APPLY STATUS] Effect to add:`, newEffect);
-    console.log(`[APPLY STATUS] Current effects before add:`, target.activeEffects);
-    
     addLog(`${targetName} is afflicted with ${effect.effectType}!`);
 
     // --- FIX: Use a safe, initialized array ---
@@ -456,14 +451,10 @@ export function useBattleLogic({
       const otherEffects = currentEffects.filter(
         (e) => e.effectType !== newEffect.effectType,
       );
-      const result = { ...target, activeEffects: [...otherEffects, newEffect] };
-      console.log(`[APPLY STATUS] Result (charge/buff no-stack):`, result.activeEffects);
-      return result;
+      return { ...target, activeEffects: [...otherEffects, newEffect] };
     }
 
-    const result = { ...target, activeEffects: [...currentEffects, newEffect] };
-    console.log(`[APPLY STATUS] Result (normal):`, result.activeEffects);
-    return result;
+    return { ...target, activeEffects: [...currentEffects, newEffect] };
   };
 
   /**
@@ -568,10 +559,6 @@ export function useBattleLogic({
       ) {
         return spirit;
       }
-
-      const spiritName = getBaseSpirit(spirit.playerSpirit.spiritId)?.name || "Player Spirit";
-      console.log(`[TICK DEBUG] tickPlayerEffects called for ${spiritName} at phase: ${phase}`);
-      console.log(`[TICK DEBUG] Spirit has ${spirit.activeEffects.length} active effects:`, spirit.activeEffects);
 
       let currentHealth = spirit.currentHealth;
       const newActiveEffects: ActiveEffect[] = [];
@@ -749,8 +736,6 @@ export function useBattleLogic({
           newActiveEffects.push(effect);
         }
       });
-
-      console.log(`[TICK DEBUG] After processing, ${spiritName} has ${newActiveEffects.length} effects remaining:`, newActiveEffects);
 
       return { ...spirit, currentHealth, activeEffects: newActiveEffects };
     });
@@ -1447,21 +1432,6 @@ export function useBattleLogic({
     skill: Skill,
     attackerActiveEffects: ActiveEffect[] = [],
   ): AttackResult => {
-    // DEBUG: Log what active effects are being passed in
-    console.log(`[EFFECTS DEBUG] === ${attacker.name} using ${skill.name} ===`);
-    console.log(`[EFFECTS DEBUG] attackerActiveEffects array:`, attackerActiveEffects);
-    console.log(`[EFFECTS DEBUG] Number of effects: ${attackerActiveEffects.length}`);
-    if (attackerActiveEffects.length > 0) {
-      attackerActiveEffects.forEach((eff, idx) => {
-        console.log(`[EFFECTS DEBUG] Effect ${idx}:`, {
-          id: eff.id,
-          effectType: eff.effectType,
-          turnsRemaining: eff.turnsRemaining,
-          critChanceBoost: eff.critChanceBoost,
-        });
-      });
-    }
-    
     const logMessages: string[] = [];
     let totalHealing = 0;
     const effectsToApplyToCaster: ActiveEffect[] = [];
@@ -1595,35 +1565,19 @@ export function useBattleLogic({
       }
     }
 
-    // DEBUG: Log crit calculation details
-    console.log(`[CRIT DEBUG] ${attacker.name} attacking ${target.name}`);
-    console.log(`[CRIT DEBUG] Crit chance: ${critChance * 100}%`);
-    console.log(`[CRIT DEBUG] Target has crit immunity: ${targetHasCritImmunity}`);
-    console.log(`[CRIT DEBUG] Skill damage: ${skill.damage}`);
-
     // Roll for crit first, then check immunity
     const critRoll = Math.random();
-    console.log(`[CRIT DEBUG] Crit roll: ${critRoll} (needed < ${critChance})`);
-    
     if (skill.damage > 0 && critRoll < critChance) {
-      console.log(`[CRIT DEBUG] ✅ Crit roll succeeded!`);
       if (targetHasCritImmunity) {
         // Crit was rolled but blocked by Stalwart
-        console.log(`[CRIT DEBUG] 🛡️ Crit blocked by Stalwart!`);
         elementalMessage += " Critical hit blocked by Stalwart!";
       } else {
         // Crit succeeds
-        console.log(`[CRIT DEBUG] 💥 Crit applied (1.5x damage)!`);
         totalDamage = Math.floor(totalDamage * 1.5);
         wasCritical = true;
         elementalMessage += " CRITICAL HIT!";
       }
-    } else {
-      console.log(`[CRIT DEBUG] ❌ Crit roll failed`);
     }
-    
-    console.log(`[CRIT DEBUG] Final elementalMessage: "${elementalMessage}"`);
-    console.log(`[CRIT DEBUG] ---`);
 
     // --- 6. Log attack message
     if (skillElement === "none") {
@@ -1865,16 +1819,7 @@ export function useBattleLogic({
    * (Step 4) Player's chosen attack.
    */
   const handleAttack = (skillId: string) => {
-    console.log(`[HANDLE ATTACK ENTRY] Called with skillId: ${skillId}`);
-    console.log(`[HANDLE ATTACK ENTRY] Current turnPhase: ${turnPhase}`);
-    console.log(`[HANDLE ATTACK ENTRY] Expected: "player_action"`);
-    
-    if (turnPhase !== "player_action") {
-      console.log(`[HANDLE ATTACK ENTRY] ❌ EARLY RETURN - turnPhase is not "player_action"!`);
-      return;
-    }
-    
-    console.log(`[HANDLE ATTACK ENTRY] ✅ Passed turnPhase check, proceeding...`);
+    if (turnPhase !== "player_action") return;
 
     let finalSkillId = skillId;
 
@@ -1937,10 +1882,6 @@ export function useBattleLogic({
     );
     result.logMessages.forEach(addLog);
 
-    console.log(`[HANDLE ATTACK] ${activeBaseSpirit.name} used ${skill.name}`);
-    console.log(`[HANDLE ATTACK] effectsToApplyToCaster:`, result.effectsToApplyToCaster);
-    console.log(`[HANDLE ATTACK] Number of effects to apply: ${result.effectsToApplyToCaster.length}`);
-
     let damage = result.totalDamage;
     if (isEnemyBlocking) {
       damage = Math.floor(damage * 0.5);
@@ -1957,9 +1898,6 @@ export function useBattleLogic({
     setPlayerSpirits((prev) =>
       prev.map((s, i) => {
         if (i !== activePartySlot) return s;
-        
-        console.log(`[SET SPIRITS] Before applying effects, spirit has ${s.activeEffects.length} effects:`, s.activeEffects);
-        
         let newSpirit = { ...s };
         if (result.totalHealing > 0) {
           newSpirit.currentHealth = Math.min(
@@ -1971,13 +1909,9 @@ export function useBattleLogic({
           setTimeout(() => setPlayerHealthBarHeal(false), 600);
         }
         result.effectsToApplyToCaster.forEach((eff) => {
-          console.log(`[SET SPIRITS] Applying effect:`, eff);
           eff.targetIndex = activeEnemyIndex; // Set correct target
           newSpirit = applyStatusEffect(newSpirit, eff) as BattleSpirit;
         });
-        
-        console.log(`[SET SPIRITS] After applying effects, spirit has ${newSpirit.activeEffects.length} effects:`, newSpirit.activeEffects);
-        
         return newSpirit;
       }),
     );
