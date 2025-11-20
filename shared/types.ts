@@ -110,6 +110,12 @@ export interface RageEffect {
   duration: number;
 }
 
+export interface BlindEffect {
+  type: "blind";
+  missChance: number; // 0.4 for 40% chance to miss offensive attacks
+  duration: number;
+}
+
 export type CustomEffect =
   | StatBuffEffect
   | DOTEffect
@@ -123,7 +129,8 @@ export type CustomEffect =
   | LifestealBuffEffect
   | DamageReflectBuffEffect
   | ApplyDotStackEffect
-  | RageEffect;
+  | RageEffect
+  | BlindEffect;
 
 export interface PassiveStatBoost {
   type: "stat_boost";
@@ -241,6 +248,7 @@ export interface ActiveEffect {
   casterSpiritId?: string; // For DoT amplification - the spirit that cast this effect
   casterHasDotAmplification?: boolean; // Whether the caster has dot_amplification passive
   rageChance?: number; // For rage - chance to force basic_attack
+  blindMissChance?: number; // For blind - chance to miss offensive attacks
 }
 
 export interface ChargeEffect {
