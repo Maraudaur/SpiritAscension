@@ -1432,6 +1432,21 @@ export function useBattleLogic({
     skill: Skill,
     attackerActiveEffects: ActiveEffect[] = [],
   ): AttackResult => {
+    // DEBUG: Log what active effects are being passed in
+    console.log(`[EFFECTS DEBUG] === ${attacker.name} using ${skill.name} ===`);
+    console.log(`[EFFECTS DEBUG] attackerActiveEffects array:`, attackerActiveEffects);
+    console.log(`[EFFECTS DEBUG] Number of effects: ${attackerActiveEffects.length}`);
+    if (attackerActiveEffects.length > 0) {
+      attackerActiveEffects.forEach((eff, idx) => {
+        console.log(`[EFFECTS DEBUG] Effect ${idx}:`, {
+          id: eff.id,
+          effectType: eff.effectType,
+          turnsRemaining: eff.turnsRemaining,
+          critChanceBoost: eff.critChanceBoost,
+        });
+      });
+    }
+    
     const logMessages: string[] = [];
     let totalHealing = 0;
     const effectsToApplyToCaster: ActiveEffect[] = [];
