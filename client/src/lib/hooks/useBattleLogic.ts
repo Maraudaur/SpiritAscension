@@ -2096,7 +2096,12 @@ export function useBattleLogic({
     };
 
     // 2. Get results
-    const result = calculateAttackResult(attackerData, targetData, skill);
+    const result = calculateAttackResult(
+      attackerData,
+      targetData,
+      skill,
+      activeEnemy.activeEffects || []
+    );
     result.logMessages.forEach(addLog);
 
     // 3. Apply block/shield modifications
