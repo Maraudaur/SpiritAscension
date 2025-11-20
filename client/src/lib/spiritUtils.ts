@@ -175,7 +175,10 @@ export function calculateStat(
   return Math.floor(baseWithPotential * (level * 0.02));
 }
 
-export function calculateAllStats(playerSpirit: PlayerSpirit) {
+export function calculateAllStats(
+  playerSpirit: PlayerSpirit,
+  battleActiveEffects?: ActiveEffect[]
+) {
   const baseSpirit = getBaseSpirit(playerSpirit.spiritId);
   if (!baseSpirit) {
     return { attack: 0, defense: 0, health: 0, affinity: 0, agility: 0 };
@@ -212,8 +215,11 @@ export function calculateAllStats(playerSpirit: PlayerSpirit) {
     playerSpirit.potentialFactors.agility || "C", // Default to C for legacy saves
   );
 
-  // Apply active effects (stat buffs/debuffs) - This logic is unchanged
-  const activeEffects = playerSpirit.activeEffects || [];
+  // Apply active effects (stat buffs/debuffs)
+  // Use battleActiveEffects if provided (during battle), otherwise use playerSpirit.activeEffects
+  const activeEffects = battleActiveEffects !== undefined 
+    ? battleActiveEffects 
+    : (playerSpirit.activeEffects || []);
   activeEffects.forEach((effect) => {
     if (
       (effect.effectType === "stat_buff" ||
