@@ -1184,6 +1184,8 @@ export function useBattleLogic({
       const enemyAgility = currentEnemy.agility;
 
       if (enemyAgility < playerAgility) {
+        console.log(`🎯 STRATEGIC [ENEMY]: ${currentEnemy.name} base ATK: ${currentEnemy.attack}`);
+        
         // Enemy is going second, apply 1-turn Strategic buff to updatedEnemies array
         const strategicBuff: ActiveEffect = {
           id: `strategic_${Date.now()}`,
@@ -1196,6 +1198,8 @@ export function useBattleLogic({
         updatedEnemies = updatedEnemies.map((e, i) => {
           if (i !== activeEnemyIndex) return e;
           const buffedEnemy = applyStatusEffect(e, strategicBuff) as Enemy;
+          const buffedStats = applyEnemyActiveEffects(buffedEnemy);
+          console.log(`🎯 STRATEGIC [ENEMY]: ${currentEnemy.name} buffed ATK: ${buffedStats.attack} (+${buffedStats.attack - currentEnemy.attack})`);
           return buffedEnemy;
         });
         
@@ -1326,6 +1330,9 @@ export function useBattleLogic({
         // Grants +30% ATK for this round only when going second
         const playerBaseSpirit = getBaseSpirit(currentPlayerSpirit.playerSpirit.spiritId);
         if (playerBaseSpirit?.passiveAbilities?.includes("strategic") && playerAgility < enemyAgility) {
+          const baseStats = calculateAllStats(currentPlayerSpirit.playerSpirit);
+          console.log(`🎯 STRATEGIC [PLAYER]: ${playerBaseSpirit.name} base ATK: ${baseStats.attack}`);
+          
           // Player is going second, apply 1-turn Strategic buff
           // Note: applyStatusEffect prevents stacking by removing existing stat_buff before applying
           const strategicBuff: ActiveEffect = {
@@ -1340,6 +1347,8 @@ export function useBattleLogic({
             prev.map((s, i) => {
               if (i !== activePartySlot) return s;
               const buffedSpirit = applyStatusEffect(s, strategicBuff) as BattleSpirit;
+              const buffedStats = calculateAllStats(buffedSpirit.playerSpirit);
+              console.log(`🎯 STRATEGIC [PLAYER]: ${playerBaseSpirit.name} buffed ATK: ${buffedStats.attack} (+${buffedStats.attack - baseStats.attack})`);
               return buffedSpirit;
             })
           );
@@ -1541,6 +1550,14 @@ export function useBattleLogic({
     const level = attacker.level;
     const attack = attacker.attack;
     const defense = Math.max(1, target.defense);
+    
+    // Debug: Log attack stat when Strategic buff is active
+    const hasStrategicBuff = attackerActiveEffects.some(
+      e => e.effectType === "stat_buff" && e.stat === "attack" && e.statMultiplier === 1.3
+    );
+    if (hasStrategicBuff) {
+      console.log(`⚔️ DAMAGE CALC: ${attacker.name} attacking with ATK: ${attack} (Strategic buff active)`);
+    }
     
     const STATIC_BASE_POWER = 60;
     const GAME_SCALING_FACTOR = 50;
