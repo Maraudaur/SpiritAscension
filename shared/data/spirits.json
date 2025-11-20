@@ -91,12 +91,12 @@
           "unlockLevel": 1
         },
         {
-          "skillId": "heavy_hit",
+          "skillId": "basic_attack_fire",
           "unlockLevel": 3
         },
         {
-          "skillId": "hit_and_heal",
-          "unlockLevel": 3
+          "skillId": "def_debuff",
+          "unlockLevel": 6
         }
       ],
       "spriteConfig": {
@@ -127,12 +127,12 @@
           "unlockLevel": 1
         },
         {
-          "skillId": "heavy_hit",
+          "skillId": "basic_attack_water",
           "unlockLevel": 3
         },
         {
           "skillId": "water_charge",
-          "unlockLevel": 3
+          "unlockLevel": 6
         }
       ],
       "spriteConfig": {

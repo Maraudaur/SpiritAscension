@@ -118,6 +118,23 @@
       }
     ]
   },
+
+  "def_buff": {
+    "id": "def_debuff",
+    "name": "Burn",
+    "description": "Weak Fire-type attack and decreases Defense for 3 turns",
+    "damage": 0.2,
+    "healing": 0,
+    "element": "fire",
+    "effects": [
+      {
+        "type": "stat_debuff",
+        "stat": "defense",
+        "value": 0.5,
+        "duration": 3
+      }
+    ]
+  },
   "agi_buff": {
     "id": "agi_buff",
     "name": "Speed",
