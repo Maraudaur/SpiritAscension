@@ -380,7 +380,7 @@ export function useBattleLogic({
               const counterChance = Math.min(1.0, effect.chance + targetLuckyBonus);
               // Roll for counter attack
               if (Math.random() < counterChance) {
-                // Get target's attack stat
+                // Get target's attack stat (with activeEffects applied)
                 let targetAttack = 0;
                 let targetLevel = 1;
                 let attackerDefense = 1;
@@ -390,7 +390,9 @@ export function useBattleLogic({
                   targetAttack = targetStats.attack;
                   targetLevel = (target as BattleSpirit).playerSpirit.level;
                 } else {
-                  targetAttack = (target as Enemy).attack;
+                  // Apply activeEffects to enemy counter-attack stats
+                  const enemyStats = applyEnemyActiveEffects(target as Enemy);
+                  targetAttack = enemyStats.attack;
                   targetLevel = (target as Enemy).level;
                 }
 
@@ -398,7 +400,9 @@ export function useBattleLogic({
                   const attackerStats = calculateAllStats((attacker as BattleSpirit).playerSpirit);
                   attackerDefense = Math.max(1, attackerStats.defense);
                 } else {
-                  attackerDefense = Math.max(1, (attacker as Enemy).defense);
+                  // Apply activeEffects to enemy defense for counter-attack damage calculation
+                  const enemyStats = applyEnemyActiveEffects(attacker as Enemy);
+                  attackerDefense = Math.max(1, enemyStats.defense);
                 }
 
                 // Calculate counter attack damage using simplified formula
@@ -648,14 +652,16 @@ export function useBattleLogic({
                   currentHealth: attackerSpirit.currentHealth,
                   maxHealth: attackerSpirit.maxHealth,
                 };
+                // Apply activeEffects to enemy stats for charge resolution
+                const targetEnemyStats = applyEnemyActiveEffects(targetEnemy);
                 const targetData: CombatantStats = {
                   id: targetEnemy.id,
                   name: targetEnemy.name,
                   spiritId: targetEnemy.spiritId,
                   level: targetEnemy.level,
-                  attack: targetEnemy.attack,
-                  defense: targetEnemy.defense,
-                  affinity: targetEnemy.affinity,
+                  attack: targetEnemyStats.attack,
+                  defense: targetEnemyStats.defense,
+                  affinity: targetEnemyStats.affinity,
                   elements: targetEnemy.elements,
                   currentHealth: targetEnemy.currentHealth,
                   maxHealth: targetEnemy.maxHealth,
@@ -822,15 +828,18 @@ export function useBattleLogic({
               const targetStats = calculateAllStats(targetSpirit.playerSpirit);
 
               if (targetBase && targetStats) {
+                // Apply activeEffects to enemy stats for charge resolution
+                const attackerEnemyStats = applyEnemyActiveEffects(attackerEnemy);
+                
                 // 1. Prepare data
                 const attackerData: CombatantStats = {
                   id: attackerEnemy.id,
                   name: attackerEnemy.name,
                   spiritId: attackerEnemy.spiritId,
                   level: attackerEnemy.level,
-                  attack: attackerEnemy.attack,
-                  defense: attackerEnemy.defense,
-                  affinity: attackerEnemy.affinity,
+                  attack: attackerEnemyStats.attack,
+                  defense: attackerEnemyStats.defense,
+                  affinity: attackerEnemyStats.affinity,
                   elements: attackerEnemy.elements,
                   currentHealth: attackerEnemy.currentHealth,
                   maxHealth: attackerEnemy.maxHealth,
@@ -1175,6 +1184,9 @@ export function useBattleLogic({
       const enemyAgility = currentEnemy.agility;
 
       if (enemyAgility < playerAgility) {
+        // DEBUG: Log base attack before buff
+        console.log(`[DEBUG STRATEGIC ENEMY] Base ATK before buff: ${currentEnemy.attack}`);
+        
         // Enemy is going second, apply 1-turn Strategic buff to updatedEnemies array
         const strategicBuff: ActiveEffect = {
           id: `strategic_${Date.now()}`,
@@ -1186,7 +1198,12 @@ export function useBattleLogic({
         
         updatedEnemies = updatedEnemies.map((e, i) => {
           if (i !== activeEnemyIndex) return e;
-          return applyStatusEffect(e, strategicBuff) as Enemy;
+          const buffedEnemy = applyStatusEffect(e, strategicBuff) as Enemy;
+          // DEBUG: Calculate what the buffed attack will be
+          const buffedStats = applyEnemyActiveEffects(buffedEnemy);
+          console.log(`[DEBUG STRATEGIC ENEMY] ATK after buff applied: ${buffedStats.attack} (${Math.floor(currentEnemy.attack * 1.3)} expected)`);
+          console.log(`[DEBUG STRATEGIC ENEMY] Active effects:`, buffedEnemy.activeEffects);
+          return buffedEnemy;
         });
         
         addLog(`${currentEnemy.name}'s Strategic passive activates! (+30% ATK this round)`);
@@ -1316,6 +1333,10 @@ export function useBattleLogic({
         // Grants +30% ATK for this round only when going second
         const playerBaseSpirit = getBaseSpirit(currentPlayerSpirit.playerSpirit.spiritId);
         if (playerBaseSpirit?.passiveAbilities?.includes("strategic") && playerAgility < enemyAgility) {
+          // DEBUG: Log base attack before buff
+          const baseStats = calculateAllStats(currentPlayerSpirit.playerSpirit);
+          console.log(`[DEBUG STRATEGIC PLAYER] Base ATK before buff: ${baseStats.attack}`);
+          
           // Player is going second, apply 1-turn Strategic buff
           // Note: applyStatusEffect prevents stacking by removing existing stat_buff before applying
           const strategicBuff: ActiveEffect = {
@@ -1329,7 +1350,12 @@ export function useBattleLogic({
           setPlayerSpirits((prev) =>
             prev.map((s, i) => {
               if (i !== activePartySlot) return s;
-              return applyStatusEffect(s, strategicBuff) as BattleSpirit;
+              const buffedSpirit = applyStatusEffect(s, strategicBuff) as BattleSpirit;
+              // DEBUG: Calculate what the buffed attack will be (simulate calculateAllStats with the new effect)
+              const buffedStats = calculateAllStats(buffedSpirit.playerSpirit);
+              console.log(`[DEBUG STRATEGIC PLAYER] ATK after buff applied: ${buffedStats.attack} (${Math.floor(baseStats.attack * 1.3)} expected)`);
+              console.log(`[DEBUG STRATEGIC PLAYER] Active effects:`, buffedSpirit.activeEffects);
+              return buffedSpirit;
             })
           );
           
@@ -1530,6 +1556,15 @@ export function useBattleLogic({
     const level = attacker.level;
     const attack = attacker.attack;
     const defense = Math.max(1, target.defense);
+    
+    // DEBUG: Log actual attack stat being used and check for Strategic buff
+    const hasStrategicBuff = attackerActiveEffects.some(
+      e => e.effectType === "stat_buff" && e.stat === "attack" && e.statMultiplier === 1.3
+    );
+    if (hasStrategicBuff || baseSpirit.passiveAbilities?.includes("strategic")) {
+      console.log(`[DEBUG DAMAGE CALC] ${attacker.name} using ATK: ${attack} (Strategic buff active: ${hasStrategicBuff})`);
+    }
+    
     const STATIC_BASE_POWER = 60;
     const GAME_SCALING_FACTOR = 50;
     const levelComponent = Math.floor((2 * level) / 5) + 2;
@@ -1915,6 +1950,9 @@ export function useBattleLogic({
     )
       return;
 
+    // Apply activeEffects to enemy stats (for defense/counter-attacks)
+    const enemyStats = applyEnemyActiveEffects(activeEnemy);
+
     // 1. Prepare data
     const attackerData: CombatantStats = {
       id: activeSpirit.playerSpirit.instanceId,
@@ -1933,9 +1971,9 @@ export function useBattleLogic({
       name: activeEnemy.name,
       spiritId: activeEnemy.spiritId,
       level: activeEnemy.level,
-      attack: activeEnemy.attack,
-      defense: activeEnemy.defense,
-      affinity: activeEnemy.affinity,
+      attack: enemyStats.attack,
+      defense: enemyStats.defense,
+      affinity: enemyStats.affinity,
       elements: activeEnemy.elements,
       currentHealth: activeEnemy.currentHealth,
       maxHealth: activeEnemy.maxHealth,
@@ -2062,6 +2100,43 @@ export function useBattleLogic({
   };
 
   /**
+   * Helper function to apply activeEffects to enemy stats (similar to calculateAllStats for players)
+   */
+  const applyEnemyActiveEffects = (enemy: Enemy): { attack: number; defense: number; affinity: number; agility: number } => {
+    let attack = enemy.attack;
+    let defense = enemy.defense;
+    let affinity = enemy.affinity;
+    let agility = enemy.agility;
+
+    const activeEffects = enemy.activeEffects || [];
+    activeEffects.forEach((effect) => {
+      if (
+        (effect.effectType === "stat_buff" ||
+          effect.effectType === "stat_debuff") &&
+        effect.stat &&
+        effect.statMultiplier
+      ) {
+        switch (effect.stat) {
+          case "attack":
+            attack = Math.floor(attack * effect.statMultiplier);
+            break;
+          case "defense":
+            defense = Math.floor(defense * effect.statMultiplier);
+            break;
+          case "affinity":
+            affinity = Math.floor(affinity * effect.statMultiplier);
+            break;
+          case "agility":
+            agility = Math.floor(agility * effect.statMultiplier);
+            break;
+        }
+      }
+    });
+
+    return { attack, defense, affinity, agility };
+  };
+
+  /**
    * (Step 6) Enemy's action execution.
    */
   const handleEnemyAction = (skill: Skill) => {
@@ -2071,15 +2146,18 @@ export function useBattleLogic({
     const targetBase = getBaseSpirit(activeSpirit.playerSpirit.spiritId);
     if (!targetBase) return;
 
+    // Apply activeEffects to enemy stats
+    const enemyStats = applyEnemyActiveEffects(activeEnemy);
+
     // 1. Prepare data
     const attackerData: CombatantStats = {
       id: activeEnemy.id,
       name: activeEnemy.name,
       spiritId: activeEnemy.spiritId,
       level: activeEnemy.level,
-      attack: activeEnemy.attack,
-      defense: activeEnemy.defense,
-      affinity: activeEnemy.affinity,
+      attack: enemyStats.attack,
+      defense: enemyStats.defense,
+      affinity: enemyStats.affinity,
       elements: activeEnemy.elements,
       currentHealth: activeEnemy.currentHealth,
       maxHealth: activeEnemy.maxHealth,
