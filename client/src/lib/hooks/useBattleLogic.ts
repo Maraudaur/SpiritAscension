@@ -1084,25 +1084,6 @@ export function useBattleLogic({
     addLog("Battle begins!");
     playBattleMusic();
 
-    // Debug: Log spirits with Strategic passive
-    console.log("🔍 ===== BATTLE INITIALIZATION =====");
-    spiritsInBattle.forEach((spirit, index) => {
-      const baseSpirit = getBaseSpirit(spirit.playerSpirit.spiritId);
-      if (baseSpirit?.passiveAbilities?.includes("strategic")) {
-        const stats = calculateAllStats(spirit.playerSpirit, spirit.activeEffects);
-        console.log(`✨ [PLAYER ${index + 1}] ${baseSpirit.name} has Strategic passive (AGI: ${stats.agility}, ATK: ${stats.attack})`);
-        console.log(`   → Strategic activates when going SECOND (+30% ATK for 1 round)`);
-      }
-    });
-    allEnemies.forEach((enemy, index) => {
-      const baseSpirit = getBaseSpirit(enemy.spiritId);
-      if (baseSpirit?.passiveAbilities?.includes("strategic")) {
-        console.log(`✨ [ENEMY ${index + 1}] ${enemy.name} has Strategic passive (AGI: ${enemy.agility}, ATK: ${enemy.attack})`);
-        console.log(`   → Strategic activates when going SECOND (+30% ATK for 1 round)`);
-      }
-    });
-    console.log("🔍 =================================");
-
     // 3. Start first round - agility will be checked in round_start phase
     setTurnPhase("round_start");
   };
@@ -1243,8 +1224,6 @@ export function useBattleLogic({
       const enemyAgility = currentEnemy.agility;
 
       if (enemyAgility < playerAgility) {
-        console.log(`🎯 STRATEGIC [ENEMY]: ${currentEnemy.name} base ATK: ${currentEnemy.attack}`);
-        
         // Enemy is going second, apply 1-turn Strategic buff to updatedEnemies array
         const strategicBuff: ActiveEffect = {
           id: `strategic_${Date.now()}`,
@@ -1257,8 +1236,6 @@ export function useBattleLogic({
         updatedEnemies = updatedEnemies.map((e, i) => {
           if (i !== activeEnemyIndex) return e;
           const buffedEnemy = applyStatusEffect(e, strategicBuff) as Enemy;
-          const buffedStats = applyEnemyActiveEffects(buffedEnemy);
-          console.log(`🎯 STRATEGIC [ENEMY]: ${currentEnemy.name} buffed ATK: ${buffedStats.attack} (+${buffedStats.attack - currentEnemy.attack})`);
           return buffedEnemy;
         });
         
@@ -1383,20 +1360,12 @@ export function useBattleLogic({
         const playerAgility = calculateAllStats(currentPlayerSpirit.playerSpirit, currentPlayerSpirit.activeEffects).agility;
         const enemyAgility = currentEnemy.agility;
         
-        console.log(`🔄 TURN ORDER: Player AGI: ${playerAgility} vs Enemy AGI: ${enemyAgility}`);
-        
         addLog(`--- New Round: ${activeBaseSpirit?.name} (AGI: ${playerAgility}) vs ${activeEnemy.name} (AGI: ${enemyAgility}) ---`);
         
         // Check for Strategic passive on player spirit (player-only passive)
         // Grants +30% ATK for this round only when going second
         const playerBaseSpirit = getBaseSpirit(currentPlayerSpirit.playerSpirit.spiritId);
         if (playerBaseSpirit?.passiveAbilities?.includes("strategic") && playerAgility < enemyAgility) {
-          console.log(`🔄 Player has LOWER agility (${playerAgility} < ${enemyAgility}), so player goes SECOND → Strategic activates`);
-        }
-        if (playerBaseSpirit?.passiveAbilities?.includes("strategic") && playerAgility < enemyAgility) {
-          const baseStats = calculateAllStats(currentPlayerSpirit.playerSpirit, currentPlayerSpirit.activeEffects);
-          console.log(`🎯 STRATEGIC [PLAYER]: ${playerBaseSpirit.name} base ATK: ${baseStats.attack}`);
-          
           // Player is going second, apply 1-turn Strategic buff
           // Note: applyStatusEffect prevents stacking by removing existing stat_buff before applying
           const strategicBuff: ActiveEffect = {
@@ -1411,8 +1380,6 @@ export function useBattleLogic({
             prev.map((s, i) => {
               if (i !== activePartySlot) return s;
               const buffedSpirit = applyStatusEffect(s, strategicBuff) as BattleSpirit;
-              const buffedStats = calculateAllStats(buffedSpirit.playerSpirit, buffedSpirit.activeEffects);
-              console.log(`🎯 STRATEGIC [PLAYER]: ${playerBaseSpirit.name} buffed ATK: ${buffedStats.attack} (+${buffedStats.attack - baseStats.attack})`);
               return buffedSpirit;
             })
           );
@@ -1422,11 +1389,9 @@ export function useBattleLogic({
         
         // Track who goes first so we know who goes second
         if (playerAgility >= enemyAgility) {
-          console.log(`🔄 Player AGI >= Enemy AGI (${playerAgility} >= ${enemyAgility}) → Player goes FIRST`);
           setPlayerWentFirst(true);
           setTurnPhase("player_start");
         } else {
-          console.log(`🔄 Player AGI < Enemy AGI (${playerAgility} < ${enemyAgility}) → Enemy goes FIRST`);
           setPlayerWentFirst(false);
           setTurnPhase("enemy_start");
         }
@@ -1616,14 +1581,6 @@ export function useBattleLogic({
     const level = attacker.level;
     const attack = attacker.attack;
     const defense = Math.max(1, target.defense);
-    
-    // Debug: Log attack stat when Strategic buff is active
-    const hasStrategicBuff = attackerActiveEffects.some(
-      e => e.effectType === "stat_buff" && e.stat === "attack" && e.statMultiplier === 1.3
-    );
-    if (hasStrategicBuff) {
-      console.log(`⚔️ DAMAGE CALC: ${attacker.name} attacking with ATK: ${attack} (Strategic buff active)`);
-    }
     
     const STATIC_BASE_POWER = 60;
     const GAME_SCALING_FACTOR = 50;
