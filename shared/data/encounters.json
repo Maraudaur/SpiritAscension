@@ -5,9 +5,9 @@
     "averageLevel": 1,
     "enemies": [
       {
-        "spiritId": "spirit_c01",
+        "spiritId": "spirit_c10",
         "level": 1,
-        "ai": ["r000"]
+        "ai": ["crit_setup", "basic_attack"]
       },
       {
         "spiritId": "spirit_c02",
