@@ -1565,18 +1565,35 @@ export function useBattleLogic({
       }
     }
 
+    // DEBUG: Log crit calculation details
+    console.log(`[CRIT DEBUG] ${attacker.name} attacking ${target.name}`);
+    console.log(`[CRIT DEBUG] Crit chance: ${critChance * 100}%`);
+    console.log(`[CRIT DEBUG] Target has crit immunity: ${targetHasCritImmunity}`);
+    console.log(`[CRIT DEBUG] Skill damage: ${skill.damage}`);
+
     // Roll for crit first, then check immunity
-    if (skill.damage > 0 && Math.random() < critChance) {
+    const critRoll = Math.random();
+    console.log(`[CRIT DEBUG] Crit roll: ${critRoll} (needed < ${critChance})`);
+    
+    if (skill.damage > 0 && critRoll < critChance) {
+      console.log(`[CRIT DEBUG] ✅ Crit roll succeeded!`);
       if (targetHasCritImmunity) {
         // Crit was rolled but blocked by Stalwart
+        console.log(`[CRIT DEBUG] 🛡️ Crit blocked by Stalwart!`);
         elementalMessage += " Critical hit blocked by Stalwart!";
       } else {
         // Crit succeeds
+        console.log(`[CRIT DEBUG] 💥 Crit applied (1.5x damage)!`);
         totalDamage = Math.floor(totalDamage * 1.5);
         wasCritical = true;
         elementalMessage += " CRITICAL HIT!";
       }
+    } else {
+      console.log(`[CRIT DEBUG] ❌ Crit roll failed`);
     }
+    
+    console.log(`[CRIT DEBUG] Final elementalMessage: "${elementalMessage}"`);
+    console.log(`[CRIT DEBUG] ---`);
 
     // --- 6. Log attack message
     if (skillElement === "none") {
