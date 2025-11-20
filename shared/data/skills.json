@@ -71,6 +71,21 @@
     "element": "none",
     "effects": []
   },
+  "sand_toss": {
+    "id": "sand_toss",
+    "name": "Sand Toss",
+    "description": "Throws sand at the enemy, dealing light damage and blinding them for 3 turns",
+    "damage": 0.7,
+    "healing": 0,
+    "element": "earth",
+    "effects": [
+      {
+        "type": "blind",
+        "missChance": 0.4,
+        "duration": 3
+      }
+    ]
+  },
   "atk_buff": {
     "id": "atk_buff",
     "name": "Empower",

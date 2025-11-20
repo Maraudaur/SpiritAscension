@@ -757,8 +757,9 @@ export function useBattleLogic({
                 getBaseSpirit(spirit.playerSpirit.spiritId)?.name ||
                 "Player Spirit";
               if (effect.effectType !== "charge") {
+                const effectName = effect.effectType === "blind" ? "Blind" : effect.effectType;
                 addLog(
-                  `${spiritName}'s ${effect.effectType} effect has worn off.`,
+                  `${spiritName}'s ${effectName} effect has worn off.`,
                 );
               } else {
                 // It's a charge with 1 turn left, keep it for start_of_turn
@@ -950,8 +951,9 @@ export function useBattleLogic({
               // Effect expires (if turnsRemaining was 1)
               // We DON'T want charges to expire here.
               if (effect.effectType !== "charge") {
+                const effectName = effect.effectType === "blind" ? "Blind" : effect.effectType;
                 addLog(
-                  `${enemy.name}'s ${effect.effectType} effect has worn off.`,
+                  `${enemy.name}'s ${effectName} effect has worn off.`,
                 );
               } else {
                 // It's a charge with 1 turn left, keep it for start_of_turn
@@ -1611,6 +1613,36 @@ export function useBattleLogic({
       }
     }
 
+    // --- 3.5. Check for Blind Effect (causes offensive attacks to miss)
+    // Only check for offensive skills (damage > 0)
+    if (skill.damage > 0) {
+      const blindEffect = attackerActiveEffects.find(
+        (effect) => effect.effectType === "blind" && effect.blindMissChance
+      );
+      
+      if (blindEffect && blindEffect.blindMissChance) {
+        // Lucky passive reduces miss chance
+        const finalMissChance = Math.max(
+          0,
+          blindEffect.blindMissChance - luckyBonus
+        );
+        const missRoll = Math.random();
+        
+        if (missRoll < finalMissChance) {
+          // Attack missed!
+          logMessages.push(`${attacker.name}'s attack missed due to Blind!`);
+          return {
+            totalDamage: 0,
+            totalHealing: 0,
+            logMessages,
+            effectsToApplyToCaster: [],
+            effectsToApplyToTarget: [],
+            wasCritical: false,
+          };
+        }
+      }
+    }
+
     // --- 4. Calculate Critical Hit Chance
     let critChance = 0.05; // Base 5% crit chance
     if (baseSpirit.passiveAbilities) {
@@ -1844,6 +1876,15 @@ export function useBattleLogic({
           };
           effectsToApplyToTarget.push(newActiveEffect);
           logMessages.push(`${target.name} is enraged!`);
+        } else if (skillEffect.type === "blind") {
+          const newActiveEffect: ActiveEffect = {
+            id: `blind_${Date.now()}`,
+            effectType: "blind",
+            turnsRemaining: skillEffect.duration,
+            blindMissChance: skillEffect.missChance,
+          };
+          effectsToApplyToTarget.push(newActiveEffect);
+          logMessages.push(`${target.name} is blinded!`);
         } else if (skillEffect.type === "apply_dot_stack") {
           // Check chance to apply (defaults to 100% if not specified)
           let applyChance = skillEffect.chance ?? 1.0;
