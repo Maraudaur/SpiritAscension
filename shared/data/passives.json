@@ -156,7 +156,7 @@
   "fortitude": {
     "id": "fortitude",
     "name": "Fortitude",
-    "description": "Increases Attack by 30% while afflicted by a status effect.",
+    "description": "Increases Attack while inflicted by a status effect.",
     "effects": [
       {
         "type": "conditional_stat_boost",
