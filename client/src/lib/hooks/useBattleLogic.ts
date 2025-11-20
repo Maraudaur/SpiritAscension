@@ -145,7 +145,7 @@ export function useBattleLogic({
   );
 
   const activeStats = useMemo(
-    () => (activeSpirit ? calculateAllStats(activeSpirit.playerSpirit) : null),
+    () => (activeSpirit ? calculateAllStats(activeSpirit.playerSpirit, activeSpirit.activeEffects) : null),
     [activeSpirit],
   );
 
@@ -386,9 +386,10 @@ export function useBattleLogic({
                 let attackerDefense = 1;
 
                 if ("playerSpirit" in target) {
-                  const targetStats = calculateAllStats((target as BattleSpirit).playerSpirit);
+                  const battleTarget = target as BattleSpirit;
+                  const targetStats = calculateAllStats(battleTarget.playerSpirit, battleTarget.activeEffects);
                   targetAttack = targetStats.attack;
-                  targetLevel = (target as BattleSpirit).playerSpirit.level;
+                  targetLevel = battleTarget.playerSpirit.level;
                 } else {
                   // Apply activeEffects to enemy counter-attack stats
                   const enemyStats = applyEnemyActiveEffects(target as Enemy);
@@ -397,7 +398,8 @@ export function useBattleLogic({
                 }
 
                 if ("playerSpirit" in attacker) {
-                  const attackerStats = calculateAllStats((attacker as BattleSpirit).playerSpirit);
+                  const battleAttacker = attacker as BattleSpirit;
+                  const attackerStats = calculateAllStats(battleAttacker.playerSpirit, battleAttacker.activeEffects);
                   attackerDefense = Math.max(1, attackerStats.defense);
                 } else {
                   // Apply activeEffects to enemy defense for counter-attack damage calculation
@@ -455,10 +457,38 @@ export function useBattleLogic({
       const otherEffects = currentEffects.filter(
         (e) => e.effectType !== newEffect.effectType,
       );
-      return { ...target, activeEffects: [...otherEffects, newEffect] };
+      const updatedEffects = [...otherEffects, newEffect];
+      
+      // If target is a BattleSpirit, synchronize both activeEffects arrays
+      if ("playerSpirit" in target) {
+        return {
+          ...target,
+          activeEffects: updatedEffects,
+          playerSpirit: {
+            ...target.playerSpirit,
+            activeEffects: updatedEffects,
+          },
+        };
+      }
+      
+      return { ...target, activeEffects: updatedEffects };
     }
 
-    return { ...target, activeEffects: [...currentEffects, newEffect] };
+    const updatedEffects = [...currentEffects, newEffect];
+    
+    // If target is a BattleSpirit, synchronize both activeEffects arrays
+    if ("playerSpirit" in target) {
+      return {
+        ...target,
+        activeEffects: updatedEffects,
+        playerSpirit: {
+          ...target.playerSpirit,
+          activeEffects: updatedEffects,
+        },
+      };
+    }
+    
+    return { ...target, activeEffects: updatedEffects };
   };
 
   /**
@@ -486,7 +516,7 @@ export function useBattleLogic({
       return;
     }
 
-    const spiritStats = calculateAllStats(spirit.playerSpirit);
+    const spiritStats = calculateAllStats(spirit.playerSpirit, spirit.activeEffects);
 
     abilities.forEach((ability) => {
       ability.effects.forEach((effect) => {
@@ -636,6 +666,7 @@ export function useBattleLogic({
               );
               const attackerStats = calculateAllStats(
                 attackerSpirit.playerSpirit,
+                attackerSpirit.activeEffects,
               );
 
               if (attackerBase && attackerStats) {
@@ -743,7 +774,16 @@ export function useBattleLogic({
         }
       });
 
-      return { ...spirit, currentHealth, activeEffects: newActiveEffects };
+      // Synchronize both activeEffects arrays
+      return { 
+        ...spirit, 
+        currentHealth, 
+        activeEffects: newActiveEffects,
+        playerSpirit: {
+          ...spirit.playerSpirit,
+          activeEffects: newActiveEffects,
+        },
+      };
     });
     return { updatedSpirits, updatedEnemies, chargeUnleashed };
   };
@@ -825,7 +865,7 @@ export function useBattleLogic({
               const targetBase = getBaseSpirit(
                 targetSpirit.playerSpirit.spiritId,
               );
-              const targetStats = calculateAllStats(targetSpirit.playerSpirit);
+              const targetStats = calculateAllStats(targetSpirit.playerSpirit, targetSpirit.activeEffects);
 
               if (targetBase && targetStats) {
                 // Apply activeEffects to enemy stats for charge resolution
@@ -1180,7 +1220,7 @@ export function useBattleLogic({
     if (enemyBaseSpirit?.passiveAbilities?.includes("strategic")) {
       // Get agility values to determine turn order
       const currentPlayerSpirit = playerSpirits[activePartySlot];
-      const playerAgility = currentPlayerSpirit ? calculateAllStats(currentPlayerSpirit.playerSpirit).agility : 0;
+      const playerAgility = currentPlayerSpirit ? calculateAllStats(currentPlayerSpirit.playerSpirit, currentPlayerSpirit.activeEffects).agility : 0;
       const enemyAgility = currentEnemy.agility;
 
       if (enemyAgility < playerAgility) {
@@ -1321,7 +1361,7 @@ export function useBattleLogic({
           break;
         }
         
-        const playerAgility = calculateAllStats(currentPlayerSpirit.playerSpirit).agility;
+        const playerAgility = calculateAllStats(currentPlayerSpirit.playerSpirit, currentPlayerSpirit.activeEffects).agility;
         const enemyAgility = currentEnemy.agility;
         
         addLog(`--- New Round: ${activeBaseSpirit?.name} (AGI: ${playerAgility}) vs ${activeEnemy.name} (AGI: ${enemyAgility}) ---`);
@@ -1330,7 +1370,7 @@ export function useBattleLogic({
         // Grants +30% ATK for this round only when going second
         const playerBaseSpirit = getBaseSpirit(currentPlayerSpirit.playerSpirit.spiritId);
         if (playerBaseSpirit?.passiveAbilities?.includes("strategic") && playerAgility < enemyAgility) {
-          const baseStats = calculateAllStats(currentPlayerSpirit.playerSpirit);
+          const baseStats = calculateAllStats(currentPlayerSpirit.playerSpirit, currentPlayerSpirit.activeEffects);
           console.log(`🎯 STRATEGIC [PLAYER]: ${playerBaseSpirit.name} base ATK: ${baseStats.attack}`);
           
           // Player is going second, apply 1-turn Strategic buff
@@ -1347,7 +1387,7 @@ export function useBattleLogic({
             prev.map((s, i) => {
               if (i !== activePartySlot) return s;
               const buffedSpirit = applyStatusEffect(s, strategicBuff) as BattleSpirit;
-              const buffedStats = calculateAllStats(buffedSpirit.playerSpirit);
+              const buffedStats = calculateAllStats(buffedSpirit.playerSpirit, buffedSpirit.activeEffects);
               console.log(`🎯 STRATEGIC [PLAYER]: ${playerBaseSpirit.name} buffed ATK: ${buffedStats.attack} (+${buffedStats.attack - baseStats.attack})`);
               return buffedSpirit;
             })
@@ -2409,7 +2449,7 @@ export function useBattleLogic({
           for (const effect of passive.effects) {
             if (effect.type === "swap_out_heal") {
               const outgoingSpirit = playerSpirits[activePartySlot];
-              const spiritStats = calculateAllStats(outgoingSpirit.playerSpirit);
+              const spiritStats = calculateAllStats(outgoingSpirit.playerSpirit, outgoingSpirit.activeEffects);
               const maxHealth = spiritStats.health;
               const healAmount = Math.floor(maxHealth * effect.healPercentage);
               
@@ -2514,7 +2554,7 @@ export function useBattleLogic({
       })),
     );
     playerSpirits.forEach((spirit) => {
-      const stats = calculateAllStats(spirit.playerSpirit);
+      const stats = calculateAllStats(spirit.playerSpirit, spirit.activeEffects);
       updateSpiritHealth(spirit.playerSpirit.instanceId, stats.health);
     });
   };
