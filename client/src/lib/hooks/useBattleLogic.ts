@@ -757,35 +757,9 @@ export function useBattleLogic({
           // --- END NEW CHARGE DAMAGE LOGIC ---
         } // <-- This closes the `else if (phase === "start_of_turn" ...)` block
 
-        // Tick down timer
-        if (phase === "end_of_turn") {
-          if (!effectIsDone) {
-            if (effect.turnsRemaining > 1) {
-              newActiveEffects.push({
-                ...effect,
-                turnsRemaining: effect.turnsRemaining - 1,
-              });
-            } else {
-              // Effect expires (if turnsRemaining was 1)
-              // We DON'T want charges to expire here.
-              const spiritName =
-                getBaseSpirit(spirit.playerSpirit.spiritId)?.name ||
-                "Player Spirit";
-              if (effect.effectType !== "charge") {
-                const effectName = effect.effectType === "blind" ? "Blind" : effect.effectType;
-                addLog(
-                  `${spiritName}'s ${effectName} effect has worn off.`,
-                );
-              } else {
-                // It's a charge with 1 turn left, keep it for start_of_turn
-                newActiveEffects.push(effect);
-              }
-            }
-          }
-        }
-        // If it's not end_of_turn (i.e., it's start_of_turn),
-        // just keep the effect unless it was just consumed.
-        else if (!effectIsDone) {
+        // At end_of_turn, keep all effects that aren't consumed
+        // Duration decrement now happens at round end, not turn end
+        if (!effectIsDone) {
           newActiveEffects.push(effect);
         }
       });
@@ -954,38 +928,100 @@ export function useBattleLogic({
           }
         }
 
-        // Tick down timer
-        if (phase === "end_of_turn") {
-          if (!effectIsDone) {
-            if (effect.turnsRemaining > 1) {
-              newActiveEffects.push({
-                ...effect,
-                turnsRemaining: effect.turnsRemaining - 1,
-              });
-            } else {
-              // Effect expires (if turnsRemaining was 1)
-              // We DON'T want charges to expire here.
-              if (effect.effectType !== "charge") {
-                const effectName = effect.effectType === "blind" ? "Blind" : effect.effectType;
-                addLog(
-                  `${enemy.name}'s ${effectName} effect has worn off.`,
-                );
-              } else {
-                // It's a charge with 1 turn left, keep it for start_of_turn
-                newActiveEffects.push(effect);
-              }
-            }
-          }
-        }
-        // If it's not end_of_turn (i.e., it's start_of_turn),
-        // just keep the effect unless it was just consumed.
-        else if (!effectIsDone) {
+        // At end_of_turn, keep all effects that aren't consumed
+        // Duration decrement now happens at round end, not turn end
+        if (!effectIsDone) {
           newActiveEffects.push(effect);
         }
       });
       return { ...enemy, currentHealth, activeEffects: newActiveEffects };
     });
     return { updatedEnemies, updatedSpirits, chargeUnleashed };
+  };
+
+  /**
+   * Ticks down effect durations at the end of each complete round.
+   * This is called after both player and enemy have acted.
+   */
+  const tickRoundEndEffects = (
+    spirits: BattleSpirit[],
+    enemies: Enemy[],
+  ): {
+    updatedSpirits: BattleSpirit[];
+    updatedEnemies: Enemy[];
+  } => {
+    // Process player spirits
+    const updatedSpirits = spirits.map((spirit) => {
+      const newActiveEffects: ActiveEffect[] = [];
+      
+      spirit.activeEffects.forEach((effect) => {
+        if (effect.turnsRemaining > 1) {
+          // Decrement duration
+          newActiveEffects.push({
+            ...effect,
+            turnsRemaining: effect.turnsRemaining - 1,
+          });
+        } else if (effect.turnsRemaining === 1) {
+          // Effect expires - don't push it
+          // Log expiry message (except for charges which shouldn't expire via duration)
+          if (effect.effectType !== "charge") {
+            const spiritName =
+              getBaseSpirit(spirit.playerSpirit.spiritId)?.name ||
+              "Player Spirit";
+            const effectName = effect.effectType === "blind" ? "Blind" : effect.effectType;
+            addLog(`${spiritName}'s ${effectName} effect has worn off.`);
+          } else {
+            // Charge with 1 turn shouldn't expire here, keep it
+            newActiveEffects.push(effect);
+          }
+        } else {
+          // turnsRemaining <= 0, shouldn't happen but keep for safety
+          newActiveEffects.push(effect);
+        }
+      });
+      
+      // Synchronize both activeEffects arrays
+      return {
+        ...spirit,
+        activeEffects: newActiveEffects,
+        playerSpirit: {
+          ...spirit.playerSpirit,
+          activeEffects: newActiveEffects,
+        },
+      };
+    });
+    
+    // Process enemies
+    const updatedEnemies = enemies.map((enemy) => {
+      const newActiveEffects: ActiveEffect[] = [];
+      
+      enemy.activeEffects.forEach((effect) => {
+        if (effect.turnsRemaining > 1) {
+          // Decrement duration
+          newActiveEffects.push({
+            ...effect,
+            turnsRemaining: effect.turnsRemaining - 1,
+          });
+        } else if (effect.turnsRemaining === 1) {
+          // Effect expires - don't push it
+          // Log expiry message (except for charges which shouldn't expire via duration)
+          if (effect.effectType !== "charge") {
+            const effectName = effect.effectType === "blind" ? "Blind" : effect.effectType;
+            addLog(`${enemy.name}'s ${effectName} effect has worn off.`);
+          } else {
+            // Charge with 1 turn shouldn't expire here, keep it
+            newActiveEffects.push(effect);
+          }
+        } else {
+          // turnsRemaining <= 0, shouldn't happen but keep for safety
+          newActiveEffects.push(effect);
+        }
+      });
+      
+      return { ...enemy, activeEffects: newActiveEffects };
+    });
+    
+    return { updatedSpirits, updatedEnemies };
   };
 
   // ========== Battle Flow Functions ==========
@@ -1456,6 +1492,16 @@ export function useBattleLogic({
         // This check is for DOTs
         if (checkAndHandleSpiritDefeat("player")) {
           // Spirit was defeated by poison.
+          // If this was the end of a complete round (enemy went first), 
+          // tick down effect durations before returning
+          if (!playerWentFirst) {
+            const { updatedSpirits, updatedEnemies } = tickRoundEndEffects(
+              playerSpirits,
+              battleEnemies
+            );
+            setPlayerSpirits(updatedSpirits);
+            setBattleEnemies(updatedEnemies);
+          }
           return;
         }
         // --- END DEFEAT CHECK ---
@@ -1466,6 +1512,13 @@ export function useBattleLogic({
           if (playerWentFirst) {
             setTurnPhase("enemy_start");
           } else {
+            // Round is over - tick down effect durations before starting new round
+            const { updatedSpirits, updatedEnemies } = tickRoundEndEffects(
+              playerSpirits,
+              battleEnemies
+            );
+            setPlayerSpirits(updatedSpirits);
+            setBattleEnemies(updatedEnemies);
             setTurnPhase("round_start");
           }
           setIsPaused(false);
@@ -1515,6 +1568,16 @@ export function useBattleLogic({
         // This check is for DOTs
         if (checkAndHandleSpiritDefeat("enemy")) {
           // Enemy was defeated by poison.
+          // If this was the end of a complete round (player went first), 
+          // tick down effect durations before returning
+          if (playerWentFirst) {
+            const { updatedSpirits, updatedEnemies } = tickRoundEndEffects(
+              playerSpirits,
+              battleEnemies
+            );
+            setPlayerSpirits(updatedSpirits);
+            setBattleEnemies(updatedEnemies);
+          }
           return;
         }
         // --- END DEFEAT CHECK ---
@@ -1526,6 +1589,18 @@ export function useBattleLogic({
           if (hasAliveSpirits) {
             // Player has spirits left - force manual swap
             addLog(`${activeBaseSpirit?.name} has been defeated!`);
+            
+            // If this was the end of a complete round (player went first), 
+            // tick down effect durations before forcing the swap
+            if (playerWentFirst) {
+              const { updatedSpirits, updatedEnemies } = tickRoundEndEffects(
+                playerSpirits,
+                battleEnemies
+              );
+              setPlayerSpirits(updatedSpirits);
+              setBattleEnemies(updatedEnemies);
+            }
+            
             setShowSpiritDefeatedDialog(true);
             setTurnPhase("player_forced_swap");
             return;
@@ -1543,6 +1618,13 @@ export function useBattleLogic({
           if (!playerWentFirst) {
             setTurnPhase("player_start");
           } else {
+            // Round is over - tick down effect durations before starting new round
+            const { updatedSpirits, updatedEnemies } = tickRoundEndEffects(
+              playerSpirits,
+              battleEnemies
+            );
+            setPlayerSpirits(updatedSpirits);
+            setBattleEnemies(updatedEnemies);
             setTurnPhase("round_start");
           }
           setIsPaused(false);
