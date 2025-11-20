@@ -1268,6 +1268,30 @@ export function useBattleLogic({
         
         addLog(`--- New Round: ${activeBaseSpirit?.name} (AGI: ${playerAgility}) vs ${activeEnemy.name} (AGI: ${enemyAgility}) ---`);
         
+        // Check for Strategic passive on player spirit (player-only passive)
+        // Grants +30% ATK for this round only when going second
+        const playerBaseSpirit = getBaseSpirit(currentPlayerSpirit.playerSpirit.spiritId);
+        if (playerBaseSpirit?.passiveAbilities?.includes("strategic") && playerAgility < enemyAgility) {
+          // Player is going second, apply 1-turn Strategic buff
+          // Note: applyStatusEffect prevents stacking by removing existing stat_buff before applying
+          const strategicBuff: ActiveEffect = {
+            id: `strategic_${Date.now()}`,
+            effectType: "stat_buff",
+            turnsRemaining: 1,
+            stat: "attack",
+            statMultiplier: 1.3,
+          };
+          
+          setPlayerSpirits((prev) =>
+            prev.map((s, i) => {
+              if (i !== activePartySlot) return s;
+              return applyStatusEffect(s, strategicBuff) as BattleSpirit;
+            })
+          );
+          
+          addLog(`${playerBaseSpirit.name}'s Strategic passive activates! (+30% ATK this round)`);
+        }
+        
         // Track who goes first so we know who goes second
         if (playerAgility >= enemyAgility) {
           setPlayerWentFirst(true);

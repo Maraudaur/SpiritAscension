@@ -15,7 +15,7 @@
       "passiveAbilities": ["stalwart"],
       "skills": [
         {
-          "skillId": "def_buff",
+          "skillId": "basic_attack",
           "unlockLevel": 1
         },
         {
@@ -48,7 +48,7 @@
         "affinity": 60,
         "agility": 110
       },
-      "passiveAbilities": ["defense_focus"],
+      "passiveAbilities": ["strategic"],
       "skills": [
         {
           "skillId": "basic_attack",

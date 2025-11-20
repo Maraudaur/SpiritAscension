@@ -146,5 +146,11 @@
         "type": "crit_immunity"
       }
     ]
+  },
+  "strategic": {
+    "id": "strategic",
+    "name": "Strategic",
+    "description": "When going second in a round, gains +30% Attack for that round only.",
+    "effects": []
   }
 }
