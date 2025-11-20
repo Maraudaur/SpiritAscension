@@ -1383,11 +1383,16 @@ export function useBattleLogic({
         const playerAgility = calculateAllStats(currentPlayerSpirit.playerSpirit, currentPlayerSpirit.activeEffects).agility;
         const enemyAgility = currentEnemy.agility;
         
+        console.log(`🔄 TURN ORDER: Player AGI: ${playerAgility} vs Enemy AGI: ${enemyAgility}`);
+        
         addLog(`--- New Round: ${activeBaseSpirit?.name} (AGI: ${playerAgility}) vs ${activeEnemy.name} (AGI: ${enemyAgility}) ---`);
         
         // Check for Strategic passive on player spirit (player-only passive)
         // Grants +30% ATK for this round only when going second
         const playerBaseSpirit = getBaseSpirit(currentPlayerSpirit.playerSpirit.spiritId);
+        if (playerBaseSpirit?.passiveAbilities?.includes("strategic") && playerAgility < enemyAgility) {
+          console.log(`🔄 Player has LOWER agility (${playerAgility} < ${enemyAgility}), so player goes SECOND → Strategic activates`);
+        }
         if (playerBaseSpirit?.passiveAbilities?.includes("strategic") && playerAgility < enemyAgility) {
           const baseStats = calculateAllStats(currentPlayerSpirit.playerSpirit, currentPlayerSpirit.activeEffects);
           console.log(`🎯 STRATEGIC [PLAYER]: ${playerBaseSpirit.name} base ATK: ${baseStats.attack}`);
@@ -1417,9 +1422,11 @@ export function useBattleLogic({
         
         // Track who goes first so we know who goes second
         if (playerAgility >= enemyAgility) {
+          console.log(`🔄 Player AGI >= Enemy AGI (${playerAgility} >= ${enemyAgility}) → Player goes FIRST`);
           setPlayerWentFirst(true);
           setTurnPhase("player_start");
         } else {
+          console.log(`🔄 Player AGI < Enemy AGI (${playerAgility} < ${enemyAgility}) → Enemy goes FIRST`);
           setPlayerWentFirst(false);
           setTurnPhase("enemy_start");
         }
