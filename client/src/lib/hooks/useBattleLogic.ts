@@ -560,6 +560,10 @@ export function useBattleLogic({
         return spirit;
       }
 
+      const spiritName = getBaseSpirit(spirit.playerSpirit.spiritId)?.name || "Player Spirit";
+      console.log(`[TICK DEBUG] tickPlayerEffects called for ${spiritName} at phase: ${phase}`);
+      console.log(`[TICK DEBUG] Spirit has ${spirit.activeEffects.length} active effects:`, spirit.activeEffects);
+
       let currentHealth = spirit.currentHealth;
       const newActiveEffects: ActiveEffect[] = [];
 
@@ -736,6 +740,8 @@ export function useBattleLogic({
           newActiveEffects.push(effect);
         }
       });
+
+      console.log(`[TICK DEBUG] After processing, ${spiritName} has ${newActiveEffects.length} effects remaining:`, newActiveEffects);
 
       return { ...spirit, currentHealth, activeEffects: newActiveEffects };
     });
