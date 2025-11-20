@@ -249,14 +249,14 @@
   "crit_setup": {
     "id": "crit_setup",
     "name": "Aura of Precision",
-    "description": "Applies a Crit Chance Up buff (+50%) to the user for 3 turns.",
+    "description": "Applies a Crit Chance Up buff (+100%) to the user for 3 turns.",
     "damage": 0,
     "healing": 0,
     "element": "metal",
     "effects": [
       {
         "type": "crit_chance_buff",
-        "value": 0.5,
+        "value": 1.0,
         "duration": 3
       }
     ]
