@@ -1084,6 +1084,25 @@ export function useBattleLogic({
     addLog("Battle begins!");
     playBattleMusic();
 
+    // Debug: Log spirits with Strategic passive
+    console.log("🔍 ===== BATTLE INITIALIZATION =====");
+    spiritsInBattle.forEach((spirit, index) => {
+      const baseSpirit = getBaseSpirit(spirit.playerSpirit.spiritId);
+      if (baseSpirit?.passiveAbilities?.includes("strategic")) {
+        const stats = calculateAllStats(spirit.playerSpirit, spirit.activeEffects);
+        console.log(`✨ [PLAYER ${index + 1}] ${baseSpirit.name} has Strategic passive (AGI: ${stats.agility}, ATK: ${stats.attack})`);
+        console.log(`   → Strategic activates when going SECOND (+30% ATK for 1 round)`);
+      }
+    });
+    allEnemies.forEach((enemy, index) => {
+      const baseSpirit = getBaseSpirit(enemy.spiritId);
+      if (baseSpirit?.passiveAbilities?.includes("strategic")) {
+        console.log(`✨ [ENEMY ${index + 1}] ${enemy.name} has Strategic passive (AGI: ${enemy.agility}, ATK: ${enemy.attack})`);
+        console.log(`   → Strategic activates when going SECOND (+30% ATK for 1 round)`);
+      }
+    });
+    console.log("🔍 =================================");
+
     // 3. Start first round - agility will be checked in round_start phase
     setTurnPhase("round_start");
   };
