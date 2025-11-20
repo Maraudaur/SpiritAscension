@@ -457,11 +457,15 @@ export function useBattleLogic({
     let updatedEffects: ActiveEffect[];
     let logMessage: string;
 
+    console.log(`🔮 Applying ${newEffect.effectType} to ${targetName}`);
+    console.log(`   Current effects (${currentEffects.length}):`, currentEffects.map(e => e.effectType));
+
     // Check if this is a stackable effect
     if (stackableEffects.includes(newEffect.effectType)) {
       // Stackable effects - always add as a new instance
       updatedEffects = [...currentEffects, newEffect];
       logMessage = `${targetName} is afflicted with ${effect.effectType}!`;
+      console.log(`   ✅ STACKED (stackable effect type)`);
     } else {
       // Non-stackable effects - check if already present and replace
       const existingEffectIndex = currentEffects.findIndex(
@@ -474,12 +478,16 @@ export function useBattleLogic({
           i === existingEffectIndex ? newEffect : e
         );
         logMessage = `${targetName}'s ${effect.effectType} duration was reset!`;
+        console.log(`   🔄 DURATION RESET (effect already exists)`);
       } else {
         // New effect - add it to the list
         updatedEffects = [...currentEffects, newEffect];
         logMessage = `${targetName} is afflicted with ${effect.effectType}!`;
+        console.log(`   ✅ NEW EFFECT APPLIED`);
       }
     }
+
+    console.log(`   Updated effects (${updatedEffects.length}):`, updatedEffects.map(e => `${e.effectType}(${e.turnsRemaining})`));
 
     addLog(logMessage);
     
@@ -1550,6 +1558,37 @@ export function useBattleLogic({
     // 'player_action', 'setup', 'player_forced_swap', and 'game_over' are "waiting" states
     // and don't trigger further actions.
   }, [turnPhase, battleState, isPaused]);
+
+  // Debug: Log status effects after actions complete
+  useEffect(() => {
+    if (battleState !== "fighting") return;
+    
+    // Log status effects when transitioning to these phases (after actions complete)
+    if (turnPhase === "player_end" || turnPhase === "enemy_end") {
+      const currentPlayer = playerSpirits[activePartySlot];
+      const currentEnemy = battleEnemies[activeEnemyIndex];
+      
+      if (!currentPlayer || !currentEnemy) return;
+      
+      const playerBaseSpirit = getBaseSpirit(currentPlayer.playerSpirit.spiritId);
+      
+      console.log(`📊 === STATUS EFFECTS (after ${turnPhase === "player_end" ? "PLAYER" : "ENEMY"} action) ===`);
+      
+      const playerEffects = currentPlayer.activeEffects || [];
+      console.log(`   Player (${playerBaseSpirit?.name || "Unknown"}):`, 
+        playerEffects.length > 0 
+          ? playerEffects.map(e => `${e.effectType}(${e.turnsRemaining})`)
+          : ["No effects"]
+      );
+      
+      const enemyEffects = currentEnemy.activeEffects || [];
+      console.log(`   Enemy (${currentEnemy.name}):`, 
+        enemyEffects.length > 0 
+          ? enemyEffects.map(e => `${e.effectType}(${e.turnsRemaining})`)
+          : ["No effects"]
+      );
+    }
+  }, [turnPhase, playerSpirits, battleEnemies, battleState, activePartySlot, activeEnemyIndex]);
 
   /**
    * (Step 4 & 6) The single, central function for all skill logic.
