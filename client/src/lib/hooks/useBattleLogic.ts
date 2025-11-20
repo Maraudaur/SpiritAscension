@@ -1186,16 +1186,31 @@ export function useBattleLogic({
       const enemyBaseSpirit = getBaseSpirit(activeEnemy.spiritId);
       let possibleSkillIds = ["basic_attack"]; // Start with basic actions
 
-      // --- FIX 2: Added safety checks ---
-      // Safely check if the spirit and its skills exist before adding them
+      // Filter skills by unlock level (same as player spirits)
       if (enemyBaseSpirit && enemyBaseSpirit.skills) {
-        possibleSkillIds.push(...enemyBaseSpirit.skills.map(s => s.skillId));
+        const availableSkills = enemyBaseSpirit.skills
+          .filter(s => s.unlockLevel <= activeEnemy.level)
+          .map(s => s.skillId);
+        possibleSkillIds.push(...availableSkills);
       }
-      // --- END FIX 2 ---
 
       const randomIndex = Math.floor(Math.random() * possibleSkillIds.length);
       skillId = possibleSkillIds[randomIndex];
       addLog(`${activeEnemy.name} acts randomly... and chooses ${skillId}!`);
+    }
+    // Validate explicitly assigned skills against unlock level
+    else if (skillId !== "block") {
+      const enemyBaseSpirit = getBaseSpirit(activeEnemy.spiritId);
+      if (enemyBaseSpirit && enemyBaseSpirit.skills) {
+        const skillData = enemyBaseSpirit.skills.find(s => s.skillId === skillId);
+        // Check if skill exists in spirit and if level requirement is met
+        if (skillData && skillData.unlockLevel > activeEnemy.level) {
+          addLog(`${activeEnemy.name} tries to use ${skillId} but it's locked! Using basic attack instead.`);
+          skillId = "basic_attack";
+        }
+        // If skill doesn't exist in spirit's skill list, allow it anyway (encounter override)
+        // This lets encounter designers give enemies special skills
+      }
     }
     // --- END FIX ---
 
