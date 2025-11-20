@@ -195,16 +195,13 @@
   "bubble_barrier": {
     "id": "bubble_barrier",
     "name": "Bubble Barrier",
-    "description": "Increase Defense for 5 turns",
+    "description": "Creates a protective shield that blocks the next attack completely",
     "damage": 0,
     "healing": 0,
     "element": "none",
     "effects": [
       {
-        "type": "stat_buff",
-        "stat": "defense",
-        "value": 0.5,
-        "duration": 5
+        "type": "one_time_shield"
       }
     ]
   },

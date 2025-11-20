@@ -2108,6 +2108,15 @@ export function useBattleLogic({
             // Poison failed to apply
             logMessages.push(`${target.name} resisted the poison!`);
           }
+        } else if (skillEffect.type === "one_time_shield") {
+          const newActiveEffect: ActiveEffect = {
+            id: `shield_${Date.now()}`,
+            effectType: "one_time_shield",
+            turnsRemaining: 1,
+            blocksFullHit: true,
+          };
+          effectsToApplyToCaster.push(newActiveEffect);
+          logMessages.push(`${attacker.name} creates a protective shield!`);
         }
       }
     }
