@@ -1581,8 +1581,27 @@ export function useBattleLogic({
 
     // --- 2. Calculate Base Damage
     const level = attacker.level;
-    const attack = attacker.attack;
+    let attack = attacker.attack;
     const defense = Math.max(1, target.defense);
+    
+    // --- 2.5. Apply Fortitude Passive (conditional attack boost when afflicted)
+    if (baseSpirit.passiveAbilities && attackerActiveEffects.length > 0) {
+      for (const passiveId of baseSpirit.passiveAbilities) {
+        const passive = (passivesData as Record<string, PassiveAbility>)[
+          passiveId
+        ];
+        if (!passive || !passive.effects) continue;
+        for (const effect of passive.effects) {
+          if (effect.type === "conditional_stat_boost" && 
+              effect.condition === "has_status_effect" && 
+              effect.stat === "attack") {
+            // Apply attack bonus since spirit has active status effects
+            attack = Math.floor(attack * (1 + effect.value));
+            break;
+          }
+        }
+      }
+    }
     
     const STATIC_BASE_POWER = 60;
     const GAME_SCALING_FACTOR = 50;

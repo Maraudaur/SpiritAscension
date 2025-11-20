@@ -55,12 +55,12 @@
           "unlockLevel": 1
         },
         {
-          "skillId": "bubble_barrier",
+          "skillId": "basic_attack_earth",
           "unlockLevel": 3
         },
         {
           "skillId": "sand_toss",
-          "unlockLevel": 3
+          "unlockLevel": 6
         }
       ],
       "spriteConfig": {
@@ -84,7 +84,7 @@
         "affinity": 100,
         "agility": 140
       },
-      "passiveAbilities": ["attack_focus"],
+      "passiveAbilities": ["fortitude"],
       "skills": [
         {
           "skillId": "basic_attack",

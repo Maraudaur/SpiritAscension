@@ -184,6 +184,13 @@ export interface PassiveCritImmunity {
   type: "crit_immunity";
 }
 
+export interface PassiveConditionalStatBoost {
+  type: "conditional_stat_boost";
+  condition: "has_status_effect";
+  stat: StatType;
+  value: number; // 0.3 for 30% boost
+}
+
 export interface SpiritSpriteConfig {
   textureUrl: string;
   frameWidth: number;
@@ -202,7 +209,8 @@ export type PassiveEffect =
   | PassiveCounterAttack
   | PassiveChanceBoost
   | PassiveSwapOutHeal
-  | PassiveCritImmunity;
+  | PassiveCritImmunity
+  | PassiveConditionalStatBoost;
 
 export type CombatTrigger =
   | "on_hit"

@@ -152,5 +152,18 @@
     "name": "Strategic",
     "description": "Increase Attack when going second.",
     "effects": []
+  },
+  "fortitude": {
+    "id": "fortitude",
+    "name": "Fortitude",
+    "description": "Increases Attack by 30% while afflicted by a status effect.",
+    "effects": [
+      {
+        "type": "conditional_stat_boost",
+        "condition": "has_status_effect",
+        "stat": "attack",
+        "value": 0.3
+      }
+    ]
   }
 }
