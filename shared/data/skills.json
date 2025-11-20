@@ -2,7 +2,7 @@
   "basic_attack": {
     "id": "basic_attack",
     "name": "Swipe",
-    "description": "A basic physical attack.",
+    "description": "A Neutral-type attack",
     "damage": 1,
     "healing": 0,
     "element": "none",
@@ -15,6 +15,51 @@
     "damage": 1.5,
     "healing": 0,
     "element": "none",
+    "effects": []
+  },
+  "basic_attack_wood": {
+    "id": "basic_attack_wood",
+    "name": "Throw Bark",
+    "description": "A Wood-type attack",
+    "damage": 1,
+    "healing": 0,
+    "element": "wood",
+    "effects": []
+  },
+  "basic_attack_fire": {
+    "id": "basic_attack_fire",
+    "name": "Ember",
+    "description": "A Fire-type attack",
+    "damage": 1,
+    "healing": 0,
+    "element": "fire",
+    "effects": []
+  },
+  "basic_attack_fire": {
+    "id": "basic_attack_earth",
+    "name": "Rock Throw",
+    "description": "A Earth-type attack",
+    "damage": 1,
+    "healing": 0,
+    "element": "earth",
+    "effects": []
+  },
+  "basic_attack_metal": {
+    "id": "basic_attack_metal",
+    "name": "Steel Ball",
+    "description": "A Metal-type attack",
+    "damage": 1,
+    "healing": 0,
+    "element": "metal",
+    "effects": []
+  },
+  "basic_attack_water": {
+    "id": "basic_attack_water",
+    "name": "Water Gun",
+    "description": "A Water-type attack",
+    "damage": 1,
+    "healing": 0,
+    "element": "water",
     "effects": []
   },
   "hit_and_heal": {
