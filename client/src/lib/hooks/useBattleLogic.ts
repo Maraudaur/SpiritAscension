@@ -1586,43 +1586,19 @@ export function useBattleLogic({
     
     // --- 2.5. Apply Fortitude Passive (conditional attack boost when afflicted)
     if (baseSpirit.passiveAbilities && attackerActiveEffects.length > 0) {
-      console.log(`[Fortitude Debug] ${attacker.name} has ${attackerActiveEffects.length} active status effect(s)`);
-      
       for (const passiveId of baseSpirit.passiveAbilities) {
         const passive = (passivesData as Record<string, PassiveAbility>)[
           passiveId
         ];
         if (!passive || !passive.effects) continue;
-        
-        console.log(`[Fortitude Debug] Checking passive: ${passive.name} (${passiveId})`);
-        
         for (const effect of passive.effects) {
           if (effect.type === "conditional_stat_boost" && 
               effect.condition === "has_status_effect" && 
               effect.stat === "attack") {
-            const originalAttack = attack;
-            const boostPercentage = (effect.value * 100).toFixed(0);
-            // Apply attack bonus since spirit has active status effects
             attack = Math.floor(attack * (1 + effect.value));
-            console.log(`[Fortitude Debug] ✓ FORTITUDE ACTIVATED!`);
-            console.log(`[Fortitude Debug]   - Original Attack: ${originalAttack}`);
-            console.log(`[Fortitude Debug]   - Boost: +${boostPercentage}%`);
-            console.log(`[Fortitude Debug]   - Boosted Attack: ${attack}`);
             break;
           }
         }
-      }
-    } else if (baseSpirit.passiveAbilities) {
-      const hasFortitude = baseSpirit.passiveAbilities.some(passiveId => {
-        const passive = (passivesData as Record<string, PassiveAbility>)[passiveId];
-        return passive?.effects?.some(e => 
-          e.type === "conditional_stat_boost" && 
-          e.condition === "has_status_effect"
-        );
-      });
-      
-      if (hasFortitude) {
-        console.log(`[Fortitude Debug] ${attacker.name} has Fortitude passive but NO active status effects (${attackerActiveEffects.length})`);
       }
     }
     
