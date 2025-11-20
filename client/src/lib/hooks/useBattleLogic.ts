@@ -447,10 +447,11 @@ export function useBattleLogic({
 
     const currentEffects = target.activeEffects || [];
 
-    // Define which effect types CAN stack (always append, never replace)
-    // Currently only damage_over_time can stack (multiple DoT sources)
+    // Define which effect types CAN stack (allow multiple instances)
+    // Only stat_buff and stat_debuff can stack
     const stackableEffects: ActiveEffect["effectType"][] = [
-      "damage_over_time",
+      "stat_buff",
+      "stat_debuff",
     ];
 
     let updatedEffects: ActiveEffect[];
