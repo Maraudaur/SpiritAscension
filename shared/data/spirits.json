@@ -9,7 +9,7 @@
         "attack": 120,
         "defense": 140,
         "health": 180,
-        "elementalAffinity": 60,
+        "affinity": 60,
         "agility": 119
       },
       "passiveAbilities": ["stalwart"],
@@ -45,7 +45,7 @@
         "attack": 100,
         "defense": 180,
         "health": 160,
-        "elementalAffinity": 60,
+        "affinity": 60,
         "agility": 110
       },
       "passiveAbilities": ["defense_focus"],
@@ -81,7 +81,7 @@
         "attack": 160,
         "defense": 100,
         "health": 140,
-        "elementalAffinity": 100,
+        "affinity": 100,
         "agility": 140
       },
       "passiveAbilities": ["attack_focus"],
@@ -117,7 +117,7 @@
         "attack": 130,
         "defense": 120,
         "health": 150,
-        "elementalAffinity": 100,
+        "affinity": 100,
         "agility": 128
       },
       "passiveAbilities": ["health_focus"],
@@ -153,7 +153,7 @@
         "attack": 80,
         "defense": 180,
         "health": 140,
-        "elementalAffinity": 100,
+        "affinity": 100,
         "agility": 104
       },
       "passiveAbilities": ["damage_reflect"],
@@ -185,7 +185,7 @@
         "attack": 140,
         "defense": 120,
         "health": 150,
-        "elementalAffinity": 90,
+        "affinity": 90,
         "agility": 130
       },
       "passiveAbilities": ["attack_focus"],
@@ -221,7 +221,7 @@
         "attack": 110,
         "defense": 160,
         "health": 170,
-        "elementalAffinity": 60,
+        "affinity": 60,
         "agility": 114
       },
       "passiveAbilities": ["defense_focus"],
@@ -257,7 +257,7 @@
         "attack": 150,
         "defense": 110,
         "health": 130,
-        "elementalAffinity": 110,
+        "affinity": 110,
         "agility": 137
       },
       "passiveAbilities": ["attack_focus"],
@@ -293,7 +293,7 @@
         "attack": 90,
         "defense": 190,
         "health": 150,
-        "elementalAffinity": 70,
+        "affinity": 70,
         "agility": 106
       },
       "passiveAbilities": ["defense_focus"],
@@ -341,7 +341,7 @@
         "attack": 170,
         "defense": 90,
         "health": 130,
-        "elementalAffinity": 110,
+        "affinity": 110,
         "agility": 146
       },
       "passiveAbilities": ["attack_focus"],
@@ -377,7 +377,7 @@
         "attack": 130,
         "defense": 130,
         "health": 140,
-        "elementalAffinity": 100,
+        "affinity": 100,
         "agility": 127
       },
       "passiveAbilities": ["dot_amplification"],
@@ -413,7 +413,7 @@
         "attack": 140,
         "defense": 130,
         "health": 130,
-        "elementalAffinity": 100,
+        "affinity": 100,
         "agility": 131
       },
       "passiveAbilities": ["poison_thorns"],
@@ -449,7 +449,7 @@
         "attack": 150,
         "defense": 120,
         "health": 140,
-        "elementalAffinity": 90,
+        "affinity": 90,
         "agility": 134
       },
       "passiveAbilities": ["attack_focus"],
@@ -485,7 +485,7 @@
         "attack": 140,
         "defense": 110,
         "health": 140,
-        "elementalAffinity": 110,
+        "affinity": 110,
         "agility": 133
       },
       "passiveAbilities": ["health_focus"],
@@ -521,7 +521,7 @@
         "attack": 140,
         "defense": 130,
         "health": 120,
-        "elementalAffinity": 110,
+        "affinity": 110,
         "agility": 132
       },
       "passiveAbilities": ["attack_focus"],
@@ -557,7 +557,7 @@
         "attack": 110,
         "defense": 150,
         "health": 170,
-        "elementalAffinity": 70,
+        "affinity": 70,
         "agility": 116
       },
       "passiveAbilities": ["health_focus"],
@@ -593,7 +593,7 @@
         "attack": 130,
         "defense": 120,
         "health": 140,
-        "elementalAffinity": 110,
+        "affinity": 110,
         "agility": 129
       },
       "passiveAbilities": ["attack_focus"],
@@ -629,7 +629,7 @@
         "attack": 160,
         "defense": 100,
         "health": 130,
-        "elementalAffinity": 110,
+        "affinity": 110,
         "agility": 142
       },
       "passiveAbilities": ["attack_focus"],
@@ -665,7 +665,7 @@
         "attack": 120,
         "defense": 140,
         "health": 140,
-        "elementalAffinity": 100,
+        "affinity": 100,
         "agility": 122
       },
       "passiveAbilities": ["health_focus"],
@@ -701,7 +701,7 @@
         "attack": 140,
         "defense": 120,
         "health": 120,
-        "elementalAffinity": 120,
+        "affinity": 120,
         "agility": 134
       },
       "passiveAbilities": ["attack_focus"],
@@ -739,7 +739,7 @@
         "attack": 160,
         "defense": 150,
         "health": 200,
-        "elementalAffinity": 90,
+        "affinity": 90,
         "agility": 131
       },
       "passiveAbilities": ["attack_focus"],
@@ -775,7 +775,7 @@
         "attack": 140,
         "defense": 200,
         "health": 190,
-        "elementalAffinity": 70,
+        "affinity": 70,
         "agility": 121
       },
       "passiveAbilities": ["defense_focus"],
@@ -811,7 +811,7 @@
         "attack": 200,
         "defense": 120,
         "health": 170,
-        "elementalAffinity": 110,
+        "affinity": 110,
         "agility": 147
       },
       "passiveAbilities": ["attack_focus"],
@@ -847,7 +847,7 @@
         "attack": 170,
         "defense": 140,
         "health": 180,
-        "elementalAffinity": 110,
+        "affinity": 110,
         "agility": 136
       },
       "passiveAbilities": ["health_focus"],
@@ -883,7 +883,7 @@
         "attack": 180,
         "defense": 150,
         "health": 160,
-        "elementalAffinity": 110,
+        "affinity": 110,
         "agility": 139
       },
       "passiveAbilities": ["attack_focus"],
@@ -919,7 +919,7 @@
         "attack": 180,
         "defense": 140,
         "health": 180,
-        "elementalAffinity": 100,
+        "affinity": 100,
         "agility": 138
       },
       "passiveAbilities": ["attack_focus"],
@@ -955,7 +955,7 @@
         "attack": 150,
         "defense": 210,
         "health": 180,
-        "elementalAffinity": 60,
+        "affinity": 60,
         "agility": 123
       },
       "passiveAbilities": ["defense_focus"],
@@ -991,7 +991,7 @@
         "attack": 190,
         "defense": 130,
         "health": 160,
-        "elementalAffinity": 120,
+        "affinity": 120,
         "agility": 144
       },
       "passiveAbilities": ["attack_focus"],
@@ -1027,7 +1027,7 @@
         "attack": 160,
         "defense": 150,
         "health": 190,
-        "elementalAffinity": 100,
+        "affinity": 100,
         "agility": 132
       },
       "passiveAbilities": ["health_focus"],
@@ -1063,7 +1063,7 @@
         "attack": 150,
         "defense": 190,
         "health": 170,
-        "elementalAffinity": 90,
+        "affinity": 90,
         "agility": 126
       },
       "passiveAbilities": ["defense_focus"],
@@ -1099,7 +1099,7 @@
         "attack": 180,
         "defense": 140,
         "health": 180,
-        "elementalAffinity": 120,
+        "affinity": 120,
         "agility": 138
       },
       "passiveAbilities": ["attack_focus"],
@@ -1135,7 +1135,7 @@
         "attack": 140,
         "defense": 210,
         "health": 200,
-        "elementalAffinity": 80,
+        "affinity": 80,
         "agility": 120
       },
       "passiveAbilities": ["defense_focus"],
@@ -1171,7 +1171,7 @@
         "attack": 190,
         "defense": 130,
         "health": 170,
-        "elementalAffinity": 110,
+        "affinity": 110,
         "agility": 143
       },
       "passiveAbilities": ["attack_focus"],
@@ -1209,7 +1209,7 @@
         "attack": 190,
         "defense": 180,
         "health": 230,
-        "elementalAffinity": 100,
+        "affinity": 100,
         "agility": 136
       },
       "passiveAbilities": ["health_focus"],
@@ -1245,7 +1245,7 @@
         "attack": 170,
         "defense": 240,
         "health": 210,
-        "elementalAffinity": 80,
+        "affinity": 80,
         "agility": 127
       },
       "passiveAbilities": ["defense_focus"],
@@ -1281,7 +1281,7 @@
         "attack": 240,
         "defense": 150,
         "health": 200,
-        "elementalAffinity": 110,
+        "affinity": 110,
         "agility": 151
       },
       "passiveAbilities": ["attack_focus"],
@@ -1317,7 +1317,7 @@
         "attack": 200,
         "defense": 170,
         "health": 220,
-        "elementalAffinity": 110,
+        "affinity": 110,
         "agility": 140
       },
       "passiveAbilities": ["health_focus"],
@@ -1353,7 +1353,7 @@
         "attack": 210,
         "defense": 190,
         "health": 190,
-        "elementalAffinity": 110,
+        "affinity": 110,
         "agility": 142
       },
       "passiveAbilities": ["attack_focus"],
@@ -1389,7 +1389,7 @@
         "attack": 180,
         "defense": 200,
         "health": 230,
-        "elementalAffinity": 90,
+        "affinity": 90,
         "agility": 132
       },
       "passiveAbilities": ["health_focus"],
@@ -1425,7 +1425,7 @@
         "attack": 160,
         "defense": 250,
         "health": 220,
-        "elementalAffinity": 70,
+        "affinity": 70,
         "agility": 124
       },
       "passiveAbilities": ["defense_focus"],
@@ -1461,7 +1461,7 @@
         "attack": 230,
         "defense": 160,
         "health": 200,
-        "elementalAffinity": 110,
+        "affinity": 110,
         "agility": 148
       },
       "passiveAbilities": ["attack_focus"],
@@ -1497,7 +1497,7 @@
         "attack": 210,
         "defense": 160,
         "health": 210,
-        "elementalAffinity": 120,
+        "affinity": 120,
         "agility": 144
       },
       "passiveAbilities": ["health_focus", "dot_amplification"],
@@ -1533,7 +1533,7 @@
         "attack": 220,
         "defense": 170,
         "health": 200,
-        "elementalAffinity": 110,
+        "affinity": 110,
         "agility": 145
       },
       "passiveAbilities": ["attack_focus"],
@@ -1571,7 +1571,7 @@
         "attack": 220,
         "defense": 220,
         "health": 260,
-        "elementalAffinity": 100,
+        "affinity": 100,
         "agility": 140
       },
       "passiveAbilities": ["health_focus"],
@@ -1607,7 +1607,7 @@
         "attack": 200,
         "defense": 280,
         "health": 240,
-        "elementalAffinity": 80,
+        "affinity": 80,
         "agility": 133
       },
       "passiveAbilities": ["defense_focus"],
@@ -1643,7 +1643,7 @@
         "attack": 280,
         "defense": 180,
         "health": 240,
-        "elementalAffinity": 100,
+        "affinity": 100,
         "agility": 155
       },
       "passiveAbilities": ["attack_focus"],
@@ -1679,7 +1679,7 @@
         "attack": 240,
         "defense": 200,
         "health": 260,
-        "elementalAffinity": 100,
+        "affinity": 100,
         "agility": 146
       },
       "passiveAbilities": ["health_focus"],
@@ -1715,7 +1715,7 @@
         "attack": 260,
         "defense": 220,
         "health": 220,
-        "elementalAffinity": 100,
+        "affinity": 100,
         "agility": 149
       },
       "passiveAbilities": ["attack_focus"],
@@ -1751,7 +1751,7 @@
         "attack": 230,
         "defense": 210,
         "health": 260,
-        "elementalAffinity": 100,
+        "affinity": 100,
         "agility": 143
       },
       "passiveAbilities": ["health_focus"],
@@ -1787,7 +1787,7 @@
         "attack": 190,
         "defense": 290,
         "health": 250,
-        "elementalAffinity": 70,
+        "affinity": 70,
         "agility": 130
       },
       "passiveAbilities": ["defense_focus"],
@@ -1823,7 +1823,7 @@
         "attack": 270,
         "defense": 190,
         "health": 240,
-        "elementalAffinity": 100,
+        "affinity": 100,
         "agility": 153
       },
       "passiveAbilities": ["attack_focus"],
@@ -1859,7 +1859,7 @@
         "attack": 250,
         "defense": 190,
         "health": 260,
-        "elementalAffinity": 100,
+        "affinity": 100,
         "agility": 148
       },
       "passiveAbilities": ["health_focus"],
@@ -1895,7 +1895,7 @@
         "attack": 270,
         "defense": 200,
         "health": 230,
-        "elementalAffinity": 100,
+        "affinity": 100,
         "agility": 152
       },
       "passiveAbilities": ["attack_focus"],
@@ -1933,7 +1933,7 @@
         "attack": 250,
         "defense": 250,
         "health": 300,
-        "elementalAffinity": 100,
+        "affinity": 100,
         "agility": 145
       },
       "passiveAbilities": ["health_focus"],
@@ -1969,7 +1969,7 @@
         "attack": 220,
         "defense": 320,
         "health": 280,
-        "elementalAffinity": 80,
+        "affinity": 80,
         "agility": 136
       },
       "passiveAbilities": ["defense_focus"],
@@ -2005,7 +2005,7 @@
         "attack": 320,
         "defense": 200,
         "health": 280,
-        "elementalAffinity": 100,
+        "affinity": 100,
         "agility": 160
       },
       "passiveAbilities": ["attack_focus"],
@@ -2041,7 +2041,7 @@
         "attack": 270,
         "defense": 230,
         "health": 300,
-        "elementalAffinity": 100,
+        "affinity": 100,
         "agility": 150
       },
       "passiveAbilities": ["health_focus"],
@@ -2077,7 +2077,7 @@
         "attack": 300,
         "defense": 240,
         "health": 260,
-        "elementalAffinity": 100,
+        "affinity": 100,
         "agility": 155
       },
       "passiveAbilities": ["attack_focus"],
@@ -2115,7 +2115,7 @@
         "attack": 800,
         "defense": 150,
         "health": 1000,
-        "elementalAffinity": 50,
+        "affinity": 50,
         "agility": 166
       },
       "passiveAbilities": ["counter_strike", "lucky"],

@@ -1465,23 +1465,6 @@ export function useBattleLogic({
     const baseElementalDamage =
       skill.damage > 0 ? Math.floor(affinityStat * affinityRatio) : 0;
 
-    // Debug: Log calculation values
-    console.log("🔍 Damage Calculation Debug:", {
-      attacker: attacker.name,
-      target: target.name,
-      skill: skill.name,
-      level,
-      attack,
-      defense,
-      affinityStat,
-      affinityRatio,
-      levelComponent,
-      attackDefenseRatio,
-      baseCalculation,
-      physicalDamage,
-      baseElementalDamage,
-    });
-
     // --- 3. Calculate Lucky Passive Bonus (applies to all chance-based effects)
     let luckyBonus = 0;
     if (baseSpirit.passiveAbilities) {
@@ -1577,14 +1560,6 @@ export function useBattleLogic({
       wasCritical = true;
       elementalMessage += " CRITICAL HIT!";
     }
-
-    // Debug: Log final damage values
-    console.log("🔍 Final Damage Debug:", {
-      targetHasCritImmunity,
-      totalDamage,
-      wasCritical,
-      elementalMultiplier,
-    });
 
     // --- 6. Log attack message
     if (skillElement === "none") {
