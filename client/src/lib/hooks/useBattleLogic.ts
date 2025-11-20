@@ -1537,8 +1537,25 @@ export function useBattleLogic({
         elementalMessage = " It was resisted...";
     }
 
-    // --- 5. Apply Critical Hit
-    if (skill.damage > 0 && Math.random() < critChance) {
+    // --- 5. Apply Critical Hit (check for crit immunity)
+    let targetHasCritImmunity = false;
+    const targetBaseSpirit = getBaseSpirit(target.spiritId);
+    if (targetBaseSpirit?.passiveAbilities) {
+      for (const passiveId of targetBaseSpirit.passiveAbilities) {
+        const passive = (passivesData as Record<string, PassiveAbility>)[passiveId];
+        if (passive?.effects) {
+          for (const effect of passive.effects) {
+            if (effect.type === "crit_immunity") {
+              targetHasCritImmunity = true;
+              break;
+            }
+          }
+        }
+        if (targetHasCritImmunity) break;
+      }
+    }
+
+    if (skill.damage > 0 && !targetHasCritImmunity && Math.random() < critChance) {
       totalDamage = Math.floor(totalDamage * 1.5);
       wasCritical = true;
       elementalMessage += " CRITICAL HIT!";

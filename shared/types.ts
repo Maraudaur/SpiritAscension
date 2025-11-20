@@ -173,6 +173,10 @@ export interface PassiveSwapOutHeal {
   healPercentage: number; // 0.2 for 20% max HP heal on swap out
 }
 
+export interface PassiveCritImmunity {
+  type: "crit_immunity";
+}
+
 export interface SpiritSpriteConfig {
   textureUrl: string;
   frameWidth: number;
@@ -190,7 +194,8 @@ export type PassiveEffect =
   | PassiveDamageReflect
   | PassiveCounterAttack
   | PassiveChanceBoost
-  | PassiveSwapOutHeal;
+  | PassiveSwapOutHeal
+  | PassiveCritImmunity;
 
 export type CombatTrigger =
   | "on_hit"

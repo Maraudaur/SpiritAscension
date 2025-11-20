@@ -136,5 +136,15 @@
         "healPercentage": 0.25
       }
     ]
+  },
+  "stalwart": {
+    "id": "stalwart",
+    "name": "Stalwart",
+    "description": "This spirit cannot receive critical hits.",
+    "effects": [
+      {
+        "type": "crit_immunity"
+      }
+    ]
   }
 }
