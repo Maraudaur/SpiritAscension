@@ -438,6 +438,11 @@ export function useBattleLogic({
       targetName = (target as Enemy).name;
     }
     const newEffect = { ...effect, id: `${effect.effectType}_${Date.now()}` };
+    
+    console.log(`[APPLY STATUS] Called for ${targetName}`);
+    console.log(`[APPLY STATUS] Effect to add:`, newEffect);
+    console.log(`[APPLY STATUS] Current effects before add:`, target.activeEffects);
+    
     addLog(`${targetName} is afflicted with ${effect.effectType}!`);
 
     // --- FIX: Use a safe, initialized array ---
@@ -451,10 +456,14 @@ export function useBattleLogic({
       const otherEffects = currentEffects.filter(
         (e) => e.effectType !== newEffect.effectType,
       );
-      return { ...target, activeEffects: [...otherEffects, newEffect] };
+      const result = { ...target, activeEffects: [...otherEffects, newEffect] };
+      console.log(`[APPLY STATUS] Result (charge/buff no-stack):`, result.activeEffects);
+      return result;
     }
 
-    return { ...target, activeEffects: [...currentEffects, newEffect] };
+    const result = { ...target, activeEffects: [...currentEffects, newEffect] };
+    console.log(`[APPLY STATUS] Result (normal):`, result.activeEffects);
+    return result;
   };
 
   /**
