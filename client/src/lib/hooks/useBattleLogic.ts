@@ -1865,7 +1865,16 @@ export function useBattleLogic({
    * (Step 4) Player's chosen attack.
    */
   const handleAttack = (skillId: string) => {
-    if (turnPhase !== "player_action") return;
+    console.log(`[HANDLE ATTACK ENTRY] Called with skillId: ${skillId}`);
+    console.log(`[HANDLE ATTACK ENTRY] Current turnPhase: ${turnPhase}`);
+    console.log(`[HANDLE ATTACK ENTRY] Expected: "player_action"`);
+    
+    if (turnPhase !== "player_action") {
+      console.log(`[HANDLE ATTACK ENTRY] ❌ EARLY RETURN - turnPhase is not "player_action"!`);
+      return;
+    }
+    
+    console.log(`[HANDLE ATTACK ENTRY] ✅ Passed turnPhase check, proceeding...`);
 
     let finalSkillId = skillId;
 
