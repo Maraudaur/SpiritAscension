@@ -1157,12 +1157,41 @@ export function useBattleLogic({
     addLog(`--- ${activeEnemy.name}'s Turn ---`);
     setIsEnemyBlocking(false);
 
-    const { updatedEnemies, updatedSpirits, chargeUnleashed } =
+    let { updatedEnemies, updatedSpirits, chargeUnleashed } =
       tickEnemyEffects(
         battleEnemies,
         playerSpirits, // <-- Pass spirits
         "start_of_turn",
       );
+
+    // Check for Strategic passive on enemy spirit BEFORE setting state
+    // Grants +30% ATK for this round only when going second
+    const currentEnemy = updatedEnemies[activeEnemyIndex];
+    const enemyBaseSpirit = getBaseSpirit(currentEnemy.spiritId);
+    if (enemyBaseSpirit?.passiveAbilities?.includes("strategic")) {
+      // Get agility values to determine turn order
+      const currentPlayerSpirit = playerSpirits[activePartySlot];
+      const playerAgility = currentPlayerSpirit ? calculateAllStats(currentPlayerSpirit.playerSpirit).agility : 0;
+      const enemyAgility = currentEnemy.agility;
+
+      if (enemyAgility < playerAgility) {
+        // Enemy is going second, apply 1-turn Strategic buff to updatedEnemies array
+        const strategicBuff: ActiveEffect = {
+          id: `strategic_${Date.now()}`,
+          effectType: "stat_buff",
+          turnsRemaining: 1,
+          stat: "attack",
+          statMultiplier: 1.3,
+        };
+        
+        updatedEnemies = updatedEnemies.map((e, i) => {
+          if (i !== activeEnemyIndex) return e;
+          return applyStatusEffect(e, strategicBuff) as Enemy;
+        });
+        
+        addLog(`${currentEnemy.name}'s Strategic passive activates! (+30% ATK this round)`);
+      }
+    }
 
     setBattleEnemies(updatedEnemies);
     setPlayerSpirits(updatedSpirits); // <-- Set spirits
