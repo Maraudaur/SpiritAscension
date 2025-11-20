@@ -1919,6 +1919,10 @@ export function useBattleLogic({
     );
     result.logMessages.forEach(addLog);
 
+    console.log(`[HANDLE ATTACK] ${activeBaseSpirit.name} used ${skill.name}`);
+    console.log(`[HANDLE ATTACK] effectsToApplyToCaster:`, result.effectsToApplyToCaster);
+    console.log(`[HANDLE ATTACK] Number of effects to apply: ${result.effectsToApplyToCaster.length}`);
+
     let damage = result.totalDamage;
     if (isEnemyBlocking) {
       damage = Math.floor(damage * 0.5);
@@ -1935,6 +1939,9 @@ export function useBattleLogic({
     setPlayerSpirits((prev) =>
       prev.map((s, i) => {
         if (i !== activePartySlot) return s;
+        
+        console.log(`[SET SPIRITS] Before applying effects, spirit has ${s.activeEffects.length} effects:`, s.activeEffects);
+        
         let newSpirit = { ...s };
         if (result.totalHealing > 0) {
           newSpirit.currentHealth = Math.min(
@@ -1946,9 +1953,13 @@ export function useBattleLogic({
           setTimeout(() => setPlayerHealthBarHeal(false), 600);
         }
         result.effectsToApplyToCaster.forEach((eff) => {
+          console.log(`[SET SPIRITS] Applying effect:`, eff);
           eff.targetIndex = activeEnemyIndex; // Set correct target
           newSpirit = applyStatusEffect(newSpirit, eff) as BattleSpirit;
         });
+        
+        console.log(`[SET SPIRITS] After applying effects, spirit has ${newSpirit.activeEffects.length} effects:`, newSpirit.activeEffects);
+        
         return newSpirit;
       }),
     );
