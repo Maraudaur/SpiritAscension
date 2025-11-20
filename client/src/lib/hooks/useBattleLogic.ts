@@ -444,37 +444,43 @@ export function useBattleLogic({
       targetName = (target as Enemy).name;
     }
     const newEffect = { ...effect, id: `${effect.effectType}_${Date.now()}` };
-    addLog(`${targetName} is afflicted with ${effect.effectType}!`);
 
-    // --- FIX: Use a safe, initialized array ---
     const currentEffects = target.activeEffects || [];
 
-    // Prevent charge/buff stacking
-    if (
-      newEffect.effectType === "charge" ||
-      newEffect.effectType === "stat_buff"
-    ) {
-      const otherEffects = currentEffects.filter(
-        (e) => e.effectType !== newEffect.effectType,
+    // Define which effect types CAN stack (always append, never replace)
+    // Currently only damage_over_time can stack (multiple DoT sources)
+    const stackableEffects: ActiveEffect["effectType"][] = [
+      "damage_over_time",
+    ];
+
+    let updatedEffects: ActiveEffect[];
+    let logMessage: string;
+
+    // Check if this is a stackable effect
+    if (stackableEffects.includes(newEffect.effectType)) {
+      // Stackable effects - always add as a new instance
+      updatedEffects = [...currentEffects, newEffect];
+      logMessage = `${targetName} is afflicted with ${effect.effectType}!`;
+    } else {
+      // Non-stackable effects - check if already present and replace
+      const existingEffectIndex = currentEffects.findIndex(
+        (e) => e.effectType === newEffect.effectType
       );
-      const updatedEffects = [...otherEffects, newEffect];
-      
-      // If target is a BattleSpirit, synchronize both activeEffects arrays
-      if ("playerSpirit" in target) {
-        return {
-          ...target,
-          activeEffects: updatedEffects,
-          playerSpirit: {
-            ...target.playerSpirit,
-            activeEffects: updatedEffects,
-          },
-        };
+
+      if (existingEffectIndex !== -1) {
+        // Effect already exists - reset its duration with the new effect data
+        updatedEffects = currentEffects.map((e, i) =>
+          i === existingEffectIndex ? newEffect : e
+        );
+        logMessage = `${targetName}'s ${effect.effectType} duration was reset!`;
+      } else {
+        // New effect - add it to the list
+        updatedEffects = [...currentEffects, newEffect];
+        logMessage = `${targetName} is afflicted with ${effect.effectType}!`;
       }
-      
-      return { ...target, activeEffects: updatedEffects };
     }
 
-    const updatedEffects = [...currentEffects, newEffect];
+    addLog(logMessage);
     
     // If target is a BattleSpirit, synchronize both activeEffects arrays
     if ("playerSpirit" in target) {
