@@ -53,10 +53,10 @@ export function QiHUD({ currentScreen, onNavigate }: QiHUDProps) {
       return;
     }
 
-    const result = spawnSpecificSpirit(selectedSpiritId);
+    const result = spawnSpecificSpirit(selectedSpiritId, debugSpiritLevel);
     if (result) {
       const spiritData = getAllSpirits().find((s) => s.id === selectedSpiritId);
-      setSpawnMessage(`✅ Spawned ${spiritData?.name}!`);
+      setSpawnMessage(`✅ Spawned ${spiritData?.name} Lv${debugSpiritLevel}!`);
       setTimeout(() => setSpawnMessage(""), 2000);
     } else {
       setSpawnMessage("❌ Failed to spawn spirit");

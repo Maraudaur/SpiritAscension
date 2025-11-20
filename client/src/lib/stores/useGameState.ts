@@ -113,7 +113,7 @@ export interface GameStateStore extends Omit<GameStateData, "activeParty"> {
   // Debug actions
   toggleFreeSummons: () => void;
   toggleFreeLevelUp: () => void;
-  spawnSpecificSpirit: (spiritId: string) => PlayerSpirit | null;
+  spawnSpecificSpirit: (spiritId: string, level?: number) => PlayerSpirit | null;
   setDebugEncounter: (encounter: Encounter | null) => void;
 }
 
@@ -218,7 +218,7 @@ function _createRandomSpirit(rarity: Rarity): PlayerSpirit {
   };
 }
 
-function _createSpecificSpirit(spiritId: string): PlayerSpirit | null {
+function _createSpecificSpirit(spiritId: string, level: number = 1): PlayerSpirit | null {
   // Find the base spirit by ID across all rarities
   let baseSpirit: BaseSpirit | undefined = undefined;
   for (const raritySpirits of Object.values(spiritsData)) {
@@ -240,7 +240,7 @@ function _createSpecificSpirit(spiritId: string): PlayerSpirit | null {
   return {
     instanceId: crypto.randomUUID(),
     spiritId: baseSpirit.id,
-    level: 1,
+    level: Math.max(1, Math.min(20, level)), // Clamp between 1-20
     experience: 0,
     isPrismatic: isPrismatic,
     potentialFactors: {
@@ -718,8 +718,8 @@ export const useGameState = create<GameStateStore>()(
         });
       },
 
-      spawnSpecificSpirit: (spiritId: string) => {
-        const newSpirit = _createSpecificSpirit(spiritId);
+      spawnSpecificSpirit: (spiritId: string, level: number = 1) => {
+        const newSpirit = _createSpecificSpirit(spiritId, level);
         if (newSpirit) {
           set((state) => {
             state.spirits.push(newSpirit);
