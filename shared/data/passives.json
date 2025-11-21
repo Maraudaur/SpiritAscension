@@ -2,7 +2,7 @@
   "attack_focus": {
     "id": "attack_focus",
     "name": "Attack Focus",
-    "description": "Increase Attack by 10%.",
+    "description": "Increase the user's Attack by 10%.",
     "effects": [
       {
         "type": "stat_boost",
@@ -14,7 +14,7 @@
   "defense_focus": {
     "id": "defense_focus",
     "name": "Defense Focus",
-    "description": "Increase Defense by 10%.",
+    "description": "Increase the user's Defense by 10%.",
     "effects": [
       {
         "type": "stat_boost",
@@ -26,7 +26,7 @@
   "health_focus": {
     "id": "health_focus",
     "name": "Health Focus",
-    "description": "Increase Health by 10%.",
+    "description": "Increase the user's Health by 10%.",
     "effects": [
       {
         "type": "stat_boost",
@@ -107,7 +107,7 @@
   "counter_strike": {
     "id": "counter_strike",
     "name": "Counter Strike",
-    "description": "50% chance to immediately counter-attack with a basic attack when hit.",
+    "description": "Chance to immediately counter-attack with a basic attack when hit.",
     "effects": [
       {
         "type": "counter_attack_chance",
@@ -156,7 +156,7 @@
   "fortitude": {
     "id": "fortitude",
     "name": "Fortitude",
-    "description": "Increases Attack while inflicted by a status effect.",
+    "description": "Increases the user's Attack while inflicted by a status effect.",
     "effects": [
       {
         "type": "conditional_stat_boost",

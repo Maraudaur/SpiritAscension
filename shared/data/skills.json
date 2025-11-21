@@ -89,7 +89,7 @@
   "atk_buff": {
     "id": "atk_buff",
     "name": "Empower",
-    "description": "Increase Attack for 3 turns.",
+    "description": "Increase the user's Attack for 3 turns.",
     "damage": 0,
     "healing": 0,
     "element": "none",
@@ -105,7 +105,7 @@
   "def_buff": {
     "id": "def_buff",
     "name": "Harden",
-    "description": "Increase Defense for 3 turns.",
+    "description": "Increase the user's Defense for 3 turns.",
     "damage": 0,
     "healing": 0,
     "element": "none",
@@ -122,7 +122,7 @@
   "def_buff": {
     "id": "def_debuff",
     "name": "Burn",
-    "description": "Weak Fire-type attack and decreases Defense for 3 turns.",
+    "description": "Weak Fire-type attack and decreases the foe's Defense for 3 turns.",
     "damage": 0.2,
     "healing": 0,
     "element": "fire",
@@ -138,7 +138,7 @@
   "agi_buff": {
     "id": "agi_buff",
     "name": "Speed",
-    "description": "Increase Agility for 3 turns.",
+    "description": "Increase the user's Agility for 3 turns.",
     "damage": 0,
     "healing": 0,
     "element": "none",
@@ -154,10 +154,10 @@
   "agi_debuff": {
     "id": "agi_debuff",
     "name": "Weights",
-    "description": "Decrease Agility for 3 turns.",
+    "description": "Decrease the foe's Agility for 3 turns.",
     "damage": 0,
     "healing": 0,
-    "element": "none",
+    "element": "metal",
     "effects": [
       {
         "type": "stat_debuff",
@@ -170,7 +170,7 @@
   "affinity_buff": {
     "id": "affinity_buff",
     "name": "Meditate",
-    "description": "Increase Affinity for 3 turns.",
+    "description": "Increase the user's Affinity for 3 turns.",
     "damage": 0,
     "healing": 0,
     "element": "none",
