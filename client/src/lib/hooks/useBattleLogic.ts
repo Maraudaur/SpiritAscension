@@ -437,12 +437,49 @@ export function useBattleLogic({
     effect: ActiveEffect,
   ): BattleSpirit | Enemy => {
     let targetName: string;
+    let targetBaseSpirit: BaseSpirit | undefined;
+    
     if ("playerSpirit" in target) {
-      const baseSpirit = getBaseSpirit(target.playerSpirit.spiritId);
-      targetName = baseSpirit?.name || "Player Spirit";
+      targetBaseSpirit = getBaseSpirit(target.playerSpirit.spiritId);
+      targetName = targetBaseSpirit?.name || "Player Spirit";
     } else {
+      targetBaseSpirit = getBaseSpirit((target as Enemy).spiritId);
       targetName = (target as Enemy).name;
     }
+    
+    // Check for effect immunity passive
+    if (targetBaseSpirit?.passiveAbilities) {
+      for (const passiveId of targetBaseSpirit.passiveAbilities) {
+        const passive = (passivesData as Record<string, PassiveAbility>)[passiveId];
+        if (!passive || !passive.effects) continue;
+        
+        for (const passiveEffect of passive.effects) {
+          if (passiveEffect.type === "effect_immunity") {
+            // Check if this immunity blocks the incoming effect
+            let isBlocked = false;
+            
+            if (passiveEffect.effectType === effect.effectType) {
+              // If it's a stat buff/debuff, check if the stat matches (or if no stat specified = blocks all)
+              if (effect.effectType === "stat_buff" || effect.effectType === "stat_debuff") {
+                if (!passiveEffect.stat || passiveEffect.stat === effect.stat) {
+                  isBlocked = true;
+                }
+              } else {
+                // For non-stat effects, just matching the effect type is enough
+                isBlocked = true;
+              }
+            }
+            
+            if (isBlocked) {
+              console.log(`🛡️ ${targetName}'s "${passive.name}" blocks ${effect.effectType}!`);
+              addLog(`${targetName}'s ${passive.name} blocks the effect!`);
+              return target; // Return unchanged
+            }
+          }
+        }
+      }
+    }
+    
     const newEffect = { ...effect, id: `${effect.effectType}_${Date.now()}` };
 
     const currentEffects = target.activeEffects || [];

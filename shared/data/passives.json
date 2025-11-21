@@ -165,5 +165,17 @@
         "value": 0.3
       }
     ]
+  },
+  "swift": {
+    "id": "swift",
+    "name": "Swift",
+    "description": "Immune to Agility debuffs.",
+    "effects": [
+      {
+        "type": "effect_immunity",
+        "effectType": "stat_debuff",
+        "stat": "agility"
+      }
+    ]
   }
 }

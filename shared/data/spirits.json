@@ -156,7 +156,7 @@
         "affinity": 100,
         "agility": 104
       },
-      "passiveAbilities": ["damage_reflect"],
+      "passiveAbilities": ["swift"],
       "skills": [
         {
           "skillId": "basic_attack",
