@@ -156,7 +156,7 @@
         "affinity": 100,
         "agility": 104
       },
-      "passiveAbilities": ["swift"],
+      "passiveAbilities": ["debuff_immunity_defense"],
       "skills": [
         {
           "skillId": "basic_attack",

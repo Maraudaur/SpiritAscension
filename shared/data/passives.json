@@ -166,15 +166,15 @@
       }
     ]
   },
-  "swift": {
-    "id": "swift",
-    "name": "Swift",
-    "description": "Immune to Agility debuffs.",
+  "debuff_immunity_defense": {
+    "id": "debuff_immunity_defense",
+    "name": "Fortified",
+    "description": "Protected against Defense debuffs.",
     "effects": [
       {
         "type": "effect_immunity",
         "effectType": "stat_debuff",
-        "stat": "agility"
+        "stat": "defense"
       }
     ]
   }
