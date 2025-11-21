@@ -163,8 +163,12 @@
           "unlockLevel": 1
         },
         {
-          "skillId": "thorns_buff",
+          "skillId": "basic_attack_metal",
           "unlockLevel": 3
+        },
+        {
+          "skillId": "agi_debuff",
+          "unlockLevel": 6
         }
       ],
       "spriteConfig": {

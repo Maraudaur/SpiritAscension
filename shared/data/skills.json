@@ -151,6 +151,22 @@
       }
     ]
   },
+  "agi_debuff": {
+    "id": "agi_debuff",
+    "name": "Weights",
+    "description": "Decrease Agility for 3 turns.",
+    "damage": 0,
+    "healing": 0,
+    "element": "none",
+    "effects": [
+      {
+        "type": "stat_debuff",
+        "stat": "agility",
+        "value": 0.5,
+        "duration": 3
+      }
+    ]
+  },
   "affinity_buff": {
     "id": "affinity_buff",
     "name": "Meditate",
