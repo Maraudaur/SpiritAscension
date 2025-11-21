@@ -2,7 +2,7 @@
   "basic_attack": {
     "id": "basic_attack",
     "name": "Swipe",
-    "description": "A Neutral-type attack",
+    "description": "A Neutral-type attack.",
     "damage": 1,
     "healing": 0,
     "element": "none",
@@ -11,7 +11,7 @@
   "heavy_hit": {
     "id": "heavy_hit",
     "name": "Heavy Hit",
-    "description": "A powerful strike dealing heavy damage",
+    "description": "A powerful strike dealing heavy damage.",
     "damage": 1.5,
     "healing": 0,
     "element": "none",
@@ -20,7 +20,7 @@
   "basic_attack_wood": {
     "id": "basic_attack_wood",
     "name": "Throw Bark",
-    "description": "A Wood-type attack",
+    "description": "A Wood-type attack.",
     "damage": 1,
     "healing": 0,
     "element": "wood",
@@ -29,7 +29,7 @@
   "basic_attack_fire": {
     "id": "basic_attack_fire",
     "name": "Ember",
-    "description": "A Fire-type attack",
+    "description": "A Fire-type attack.",
     "damage": 1,
     "healing": 0,
     "element": "fire",
@@ -38,7 +38,7 @@
   "basic_attack_fire": {
     "id": "basic_attack_earth",
     "name": "Rock Throw",
-    "description": "A Earth-type attack",
+    "description": "A Earth-type attack.",
     "damage": 1,
     "healing": 0,
     "element": "earth",
@@ -47,7 +47,7 @@
   "basic_attack_metal": {
     "id": "basic_attack_metal",
     "name": "Steel Ball",
-    "description": "A Metal-type attack",
+    "description": "A Metal-type attack.",
     "damage": 1,
     "healing": 0,
     "element": "metal",
@@ -56,7 +56,7 @@
   "basic_attack_water": {
     "id": "basic_attack_water",
     "name": "Water Gun",
-    "description": "A Water-type attack",
+    "description": "A Water-type attack.",
     "damage": 1,
     "healing": 0,
     "element": "water",
@@ -65,7 +65,7 @@
   "hit_and_heal": {
     "id": "hit_and_heal",
     "name": "Draining Strike",
-    "description": "Attack that heals the user for a portion of damage dealt",
+    "description": "Attack that heals the user for a portion of damage dealt.",
     "damage": 1,
     "healing": 0.3,
     "element": "none",
@@ -74,7 +74,7 @@
   "sand_toss": {
     "id": "sand_toss",
     "name": "Sand Toss",
-    "description": "Throws sand at the enemy and Blinds them",
+    "description": "Throws sand at the enemy and Blinds them.",
     "damage": 0,
     "healing": 0,
     "element": "earth",
@@ -89,7 +89,7 @@
   "atk_buff": {
     "id": "atk_buff",
     "name": "Empower",
-    "description": "Increase Attack for 3 turns",
+    "description": "Increase Attack for 3 turns.",
     "damage": 0,
     "healing": 0,
     "element": "none",
@@ -105,7 +105,7 @@
   "def_buff": {
     "id": "def_buff",
     "name": "Harden",
-    "description": "Increase Defense for 3 turns",
+    "description": "Increase Defense for 3 turns.",
     "damage": 0,
     "healing": 0,
     "element": "none",
@@ -122,7 +122,7 @@
   "def_buff": {
     "id": "def_debuff",
     "name": "Burn",
-    "description": "Weak Fire-type attack and decreases Defense for 3 turns",
+    "description": "Weak Fire-type attack and decreases Defense for 3 turns.",
     "damage": 0.2,
     "healing": 0,
     "element": "fire",
@@ -138,7 +138,7 @@
   "agi_buff": {
     "id": "agi_buff",
     "name": "Speed",
-    "description": "Increase Agility for 3 turns",
+    "description": "Increase Agility for 3 turns.",
     "damage": 0,
     "healing": 0,
     "element": "none",
@@ -154,7 +154,7 @@
   "affinity_buff": {
     "id": "affinity_buff",
     "name": "Meditate",
-    "description": "Increase Affinity for 3 turns",
+    "description": "Increase Affinity for 3 turns.",
     "damage": 0,
     "healing": 0,
     "element": "none",
@@ -170,7 +170,7 @@
   "charged_hit": {
     "id": "charged_hit",
     "name": "Charged Hit",
-    "description": "Charges for one turn, then unleashes a devastating strike with 2x damage",
+    "description": "Charges for one turn, then unleashes a devastating strike with 2x damage.",
     "damage": 0,
     "healing": 0,
     "element": "none",
@@ -186,7 +186,7 @@
   "metal_strike": {
     "id": "metal_strike",
     "name": "Metal Strike",
-    "description": "A powerful metal strike dealing heavy damage",
+    "description": "A powerful metal strike dealing heavy damage.",
     "damage": 1.5,
     "healing": 0,
     "element": "metal",
@@ -195,7 +195,7 @@
   "bubble_barrier": {
     "id": "bubble_barrier",
     "name": "Bubble Barrier",
-    "description": "Creates a protective shield that blocks the next attack completely",
+    "description": "Blocks the next attack this turn.",
     "damage": 0,
     "healing": 0,
     "element": "none",
@@ -224,7 +224,7 @@
   "water_charge": {
     "id": "water_charge",
     "name": "Water Charge",
-    "description": "Hits for moderate water damage, converts basic attacks to water, and increases attack by 20% for 3 turns",
+    "description": "Hits for moderate water damage, converts basic attacks to water, and increases attack by 20% for 3 turns.",
     "damage": 0.8,
     "healing": 0,
     "element": "water",

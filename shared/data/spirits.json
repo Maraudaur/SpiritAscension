@@ -120,7 +120,7 @@
         "affinity": 100,
         "agility": 128
       },
-      "passiveAbilities": ["health_focus"],
+      "passiveAbilities": ["regenerative"],
       "skills": [
         {
           "skillId": "basic_attack",
@@ -131,7 +131,7 @@
           "unlockLevel": 3
         },
         {
-          "skillId": "water_charge",
+          "skillId": "bubble_barrier",
           "unlockLevel": 6
         }
       ],
