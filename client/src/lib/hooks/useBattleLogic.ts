@@ -539,7 +539,8 @@ export function useBattleLogic({
         
         // Customize message for disable effect
         if (effect.effectType === "disable") {
-          logMessage = `${targetName}'s ${effect.disabledAction} action is disabled!`;
+          const duration = effect.turnsRemaining === -1 ? "permanently" : `for ${effect.turnsRemaining} turn(s)`;
+          logMessage = `${targetName}'s ${effect.disabledAction} action is disabled ${duration}!`;
         } else {
           logMessage = `${targetName} is afflicted with ${effect.effectType}!`;
         }
@@ -1417,6 +1418,22 @@ export function useBattleLogic({
           skillId = "basic_attack";
           addLog(`${activeEnemy.name} is overcome by rage and attacks wildly!`);
         }
+      }
+    }
+
+    // Check for disable effect - prevents specific actions
+    if (activeEnemy && activeEnemy.activeEffects) {
+      const disableEffect = activeEnemy.activeEffects.find(
+        (e) => 
+          e.effectType === "disable" &&
+          (e.turnsRemaining > 0 || e.turnsRemaining === -1)
+      );
+      
+      // If trying to use basic_attack and "fight" is disabled, skip the action
+      if (disableEffect && disableEffect.disabledAction === "fight" && skillId === "basic_attack") {
+        addLog(`${activeEnemy.name} tried to attack but couldn't! (Disabled)`);
+        setTurnPhase("enemy_end");
+        return;
       }
     }
 
