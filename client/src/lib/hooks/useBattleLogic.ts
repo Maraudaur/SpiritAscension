@@ -1451,10 +1451,16 @@ export function useBattleLogic({
       addLog(
         `Error: Enemy AI skill "${skillId}" not found. Defaulting to basic attack.`,
       );
-      handleEnemyAction(getSkill("basic_attack")!);
+      // Delay enemy action to match battle log message delay
+      setTimeout(() => {
+        handleEnemyAction(getSkill("basic_attack")!);
+      }, battleConfig.messageDisplayDelay);
       return;
     }
-    handleEnemyAction(skill);
+    // Delay enemy action to match battle log message delay
+    setTimeout(() => {
+      handleEnemyAction(skill);
+    }, battleConfig.messageDisplayDelay);
   };
 
   const runEnemyTurnEnd = () => {
@@ -2304,20 +2310,22 @@ export function useBattleLogic({
     );
     result.logMessages.forEach(addLog);
 
-    let damage = result.totalDamage;
-    if (isEnemyBlocking) {
-      damage = Math.floor(damage * 0.5);
-      addLog(`${activeEnemy.name} blocked! Damage reduced.`);
-    }
+    // Delay execution to match battle log message delay
+    setTimeout(() => {
+      let damage = result.totalDamage;
+      if (isEnemyBlocking) {
+        damage = Math.floor(damage * 0.5);
+        addLog(`${activeEnemy.name} blocked! Damage reduced.`);
+      }
 
-    if (result.totalDamage > 0) {
-      playDamage();
-      setEnemyHealthBarShake(true);
-      setTimeout(() => setEnemyHealthBarShake(false), 500);
-    }
+      if (result.totalDamage > 0) {
+        playDamage();
+        setEnemyHealthBarShake(true);
+        setTimeout(() => setEnemyHealthBarShake(false), 500);
+      }
 
-    // 3. Apply results using safe updaters
-    setPlayerSpirits((prev) =>
+      // 3. Apply results using safe updaters
+      setPlayerSpirits((prev) =>
       prev.map((s, i) => {
         if (i !== activePartySlot) return s;
         let newSpirit = { ...s };
@@ -2411,8 +2419,9 @@ export function useBattleLogic({
       );
     });
 
-    // 4. Move to next phase
-    setTurnPhase("player_execute");
+      // 4. Move to next phase
+      setTurnPhase("player_execute");
+    }, battleConfig.messageDisplayDelay);
   };
 
   /**
