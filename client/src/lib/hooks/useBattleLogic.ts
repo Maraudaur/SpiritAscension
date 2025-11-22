@@ -2189,7 +2189,7 @@ export function useBattleLogic({
    * (Step 4) Player's chosen attack.
    */
   const handleAttack = (skillId: string) => {
-    if (turnPhase !== "player_action") return;
+    if (turnPhase !== "player_action" || messageQueue.length > 0) return;
 
     let finalSkillId = skillId;
 
@@ -2600,7 +2600,7 @@ export function useBattleLogic({
   };
 
   const handleBlock = () => {
-    if (turnPhase !== "player_action") return;
+    if (turnPhase !== "player_action" || messageQueue.length > 0) return;
     setIsBlocking(true);
     setActionMenu("none");
     addLog(`${activeBaseSpirit?.name} takes a defensive stance!`);
@@ -2611,7 +2611,8 @@ export function useBattleLogic({
     const isForcedSwap = turnPhase === "player_forced_swap";
     
     // Allow swapping during normal player action or forced swap
-    if (turnPhase !== "player_action" && !isForcedSwap) return;
+    // But prevent swapping while messages are still being displayed
+    if ((turnPhase !== "player_action" && !isForcedSwap) || messageQueue.length > 0) return;
     if (index === activePartySlot) return;
     if (playerSpirits[index].currentHealth <= 0) {
       addLog("Cannot swap to a defeated spirit!");
