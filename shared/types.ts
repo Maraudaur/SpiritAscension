@@ -116,6 +116,12 @@ export interface BlindEffect {
   duration: number;
 }
 
+export interface DisableEffect {
+  type: "disable";
+  action: "fight" | "skill" | "spirit" | "escape"; // Which action to disable
+  duration: number; // -1 = permanent while spirit is active
+}
+
 export type CustomEffect =
   | StatBuffEffect
   | DOTEffect
@@ -130,7 +136,8 @@ export type CustomEffect =
   | DamageReflectBuffEffect
   | ApplyDotStackEffect
   | RageEffect
-  | BlindEffect;
+  | BlindEffect
+  | DisableEffect;
 
 export interface PassiveStatBoost {
   type: "stat_boost";
@@ -197,6 +204,11 @@ export interface PassiveEffectImmunity {
   stat?: StatType; // Optional - only for stat_buff/stat_debuff immunity
 }
 
+export interface PassiveDisable {
+  type: "disable";
+  action: "fight" | "skill" | "spirit" | "escape";
+}
+
 export interface SpiritSpriteConfig {
   textureUrl: string;
   frameWidth: number;
@@ -217,7 +229,8 @@ export type PassiveEffect =
   | PassiveSwapOutHeal
   | PassiveCritImmunity
   | PassiveConditionalStatBoost
-  | PassiveEffectImmunity;
+  | PassiveEffectImmunity
+  | PassiveDisable;
 
 export type CombatTrigger =
   | "on_hit"
@@ -264,6 +277,7 @@ export interface ActiveEffect {
   casterHasDotAmplification?: boolean; // Whether the caster has dot_amplification passive
   rageChance?: number; // For rage - chance to force basic_attack
   blindMissChance?: number; // For blind - chance to miss offensive attacks
+  disabledAction?: "fight" | "skill" | "spirit" | "escape"; // For disable effect
 }
 
 export interface ChargeEffect {

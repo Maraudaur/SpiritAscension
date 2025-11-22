@@ -536,7 +536,13 @@ export function useBattleLogic({
       } else {
         // New effect - add it to the list
         updatedEffects = [...currentEffects, newEffect];
-        logMessage = `${targetName} is afflicted with ${effect.effectType}!`;
+        
+        // Customize message for disable effect
+        if (effect.effectType === "disable") {
+          logMessage = `${targetName}'s ${effect.disabledAction} action is disabled!`;
+        } else {
+          logMessage = `${targetName} is afflicted with ${effect.effectType}!`;
+        }
         console.log(`   ✅ NEW EFFECT APPLIED`);
       }
     }
@@ -2191,6 +2197,23 @@ export function useBattleLogic({
   const handleAttack = (skillId: string) => {
     if (turnPhase !== "player_action" || messageQueue.length > 0) return;
 
+    // Check for disabled actions
+    const isActionDisabledCheck = (action: "fight" | "skill") => {
+      if (!activeSpirit?.activeEffects) return false;
+      return activeSpirit.activeEffects.some(
+        (effect) =>
+          effect.effectType === "disable" &&
+          effect.disabledAction === action &&
+          (effect.turnsRemaining > 0 || effect.turnsRemaining === -1)
+      );
+    };
+
+    const actionType = skillId === "basic_attack" ? "fight" : "skill";
+    if (isActionDisabledCheck(actionType)) {
+      addLog("Currently disabled!");
+      return;
+    }
+
     let finalSkillId = skillId;
 
     // Check for rage effect - may override skill selection
@@ -2613,6 +2636,20 @@ export function useBattleLogic({
     // Allow swapping during normal player action or forced swap
     // But prevent swapping while messages are still being displayed
     if ((turnPhase !== "player_action" && !isForcedSwap) || messageQueue.length > 0) return;
+
+    // Check for disabled spirit action (only during normal player action, not forced swap)
+    if (!isForcedSwap && activeSpirit?.activeEffects) {
+      const isDisabled = activeSpirit.activeEffects.some(
+        (effect) =>
+          effect.effectType === "disable" &&
+          effect.disabledAction === "spirit" &&
+          (effect.turnsRemaining > 0 || effect.turnsRemaining === -1)
+      );
+      if (isDisabled) {
+        addLog("Currently disabled!");
+        return;
+      }
+    }
     if (index === activePartySlot) return;
     if (playerSpirits[index].currentHealth <= 0) {
       addLog("Cannot swap to a defeated spirit!");
@@ -2738,6 +2775,20 @@ export function useBattleLogic({
   };
 
   const handleClose = () => {
+    // Check for disabled escape action
+    if (battleState === "fighting" && activeSpirit?.activeEffects) {
+      const isDisabled = activeSpirit.activeEffects.some(
+        (effect) =>
+          effect.effectType === "disable" &&
+          effect.disabledAction === "escape" &&
+          (effect.turnsRemaining > 0 || effect.turnsRemaining === -1)
+      );
+      if (isDisabled) {
+        addLog("Currently disabled!");
+        return;
+      }
+    }
+
     // Save final health state
     if (battleState !== "defeat") {
       playerSpirits.forEach((spirit) => {

@@ -34,6 +34,12 @@ import { motion, AnimatePresence } from "framer-motion";
 import type { BattleScreenProps } from "@/lib/battle-types";
 import { useBattleLogic } from "@/lib/hooks/useBattleLogic";
 import { SpiritSpriteAnimation } from "./SpiritSpriteAnimation";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 // --- NEW MODAL OVERLAY COMPONENT ---
 // This will wrap Setup, Victory, and Defeat screens
@@ -94,10 +100,22 @@ export function BattleScreen({
   const [isClient, setIsClient] = useState(false);
   const [inspectedSpiritIndex, setInspectedSpiritIndex] = useState<number | null>(null);
   const [showEnemyInfo, setShowEnemyInfo] = useState(false);
+  const [disabledActionTooltip, setDisabledActionTooltip] = useState<string | null>(null);
   
   useEffect(() => {
     setIsClient(true);
   }, []);
+
+  // Helper function to check if an action is disabled
+  const isActionDisabled = (action: "fight" | "skill" | "spirit" | "escape") => {
+    if (!activeSpirit?.activeEffects) return false;
+    return activeSpirit.activeEffects.some(
+      (effect) =>
+        effect.effectType === "disable" &&
+        effect.disabledAction === action &&
+        (effect.turnsRemaining > 0 || effect.turnsRemaining === -1)
+    );
+  };
 
   const {
     battleState,
@@ -426,65 +444,137 @@ export function BattleScreen({
       {battleState === "fighting" &&
         activeSpirit &&
         (activeSpirit.currentHealth > 0 || turnPhase === "player_forced_swap") && (
-          <div
-            className="absolute z-30 bottom-10"
-            style={{ left: "320px" }} // Positioned to the right of Player UI
-          >
-            <AnimatePresence mode="wait">
-              {actionMenu === "none" && (
-                <motion.div
-                  key="main-menu"
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: -20 }}
-                  className="flex flex-col items-start gap-1"
-                >
-                  <button
-                    onClick={() => {
-                      playButtonClick();
-                      handleSkillSelect("basic_attack");
-                    }}
-                    onMouseEnter={playButtonHover}
-                    className="text-white text-3xl font-bold [text-shadow:2px_2px_4px_#000] hover:text-yellow-300 transition-colors"
-                    disabled={isPaused}
+          <TooltipProvider>
+            <div
+              className="absolute z-30 bottom-10"
+              style={{ left: "320px" }} // Positioned to the right of Player UI
+            >
+              <AnimatePresence mode="wait">
+                {actionMenu === "none" && (
+                  <motion.div
+                    key="main-menu"
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: -20 }}
+                    className="flex flex-col items-start gap-1"
                   >
-                    FIGHT!
-                  </button>
-                  <button
-                    onClick={() => {
-                      playButtonClick();
-                      setActionMenu("skills");
-                    }}
-                    onMouseEnter={playButtonHover}
-                    className="text-white text-3xl font-bold [text-shadow:2px_2px_4px_#000] hover:text-yellow-300 transition-colors"
-                    disabled={isPaused}
-                  >
-                    SKILLS
-                  </button>
-                  <button
-                    onClick={() => {
-                      playButtonClick();
-                      setActionMenu("swap");
-                    }}
-                    onMouseEnter={playButtonHover}
-                    className="text-white text-3xl font-bold [text-shadow:2px_2px_4px_#000] hover:text-yellow-300 transition-colors"
-                    disabled={isPaused}
-                  >
-                    SPIRIT
-                  </button>
-                  <button
-                    onClick={() => {
-                      playButtonClick();
-                      handleClose();
-                    }}
-                    onMouseEnter={playButtonHover}
-                    className="text-white text-3xl font-bold [text-shadow:2px_2px_4px_#000] hover:text-yellow-300 transition-colors"
-                    disabled={isPaused}
-                  >
-                    ESCAPE
-                  </button>
-                </motion.div>
-              )}
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <button
+                          onClick={() => {
+                            if (isActionDisabled("fight")) {
+                              playButtonClick();
+                              setDisabledActionTooltip("fight");
+                              setTimeout(() => setDisabledActionTooltip(null), 2000);
+                              return;
+                            }
+                            playButtonClick();
+                            handleSkillSelect("basic_attack");
+                          }}
+                          onMouseEnter={playButtonHover}
+                          className={`text-3xl font-bold [text-shadow:2px_2px_4px_#000] transition-colors ${
+                            isActionDisabled("fight")
+                              ? "text-gray-500 cursor-not-allowed opacity-50"
+                              : "text-white hover:text-yellow-300"
+                          }`}
+                          disabled={isPaused || isActionDisabled("fight")}
+                        >
+                          FIGHT!
+                        </button>
+                      </TooltipTrigger>
+                      {isActionDisabled("fight") && (
+                        <TooltipContent>Currently disabled!</TooltipContent>
+                      )}
+                    </Tooltip>
+
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <button
+                          onClick={() => {
+                            if (isActionDisabled("skill")) {
+                              playButtonClick();
+                              setDisabledActionTooltip("skill");
+                              setTimeout(() => setDisabledActionTooltip(null), 2000);
+                              return;
+                            }
+                            playButtonClick();
+                            setActionMenu("skills");
+                          }}
+                          onMouseEnter={playButtonHover}
+                          className={`text-3xl font-bold [text-shadow:2px_2px_4px_#000] transition-colors ${
+                            isActionDisabled("skill")
+                              ? "text-gray-500 cursor-not-allowed opacity-50"
+                              : "text-white hover:text-yellow-300"
+                          }`}
+                          disabled={isPaused || isActionDisabled("skill")}
+                        >
+                          SKILLS
+                        </button>
+                      </TooltipTrigger>
+                      {isActionDisabled("skill") && (
+                        <TooltipContent>Currently disabled!</TooltipContent>
+                      )}
+                    </Tooltip>
+
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <button
+                          onClick={() => {
+                            if (isActionDisabled("spirit")) {
+                              playButtonClick();
+                              setDisabledActionTooltip("spirit");
+                              setTimeout(() => setDisabledActionTooltip(null), 2000);
+                              return;
+                            }
+                            playButtonClick();
+                            setActionMenu("swap");
+                          }}
+                          onMouseEnter={playButtonHover}
+                          className={`text-3xl font-bold [text-shadow:2px_2px_4px_#000] transition-colors ${
+                            isActionDisabled("spirit")
+                              ? "text-gray-500 cursor-not-allowed opacity-50"
+                              : "text-white hover:text-yellow-300"
+                          }`}
+                          disabled={isPaused || isActionDisabled("spirit")}
+                        >
+                          SPIRIT
+                        </button>
+                      </TooltipTrigger>
+                      {isActionDisabled("spirit") && (
+                        <TooltipContent>Currently disabled!</TooltipContent>
+                      )}
+                    </Tooltip>
+
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <button
+                          onClick={() => {
+                            if (isActionDisabled("escape")) {
+                              playButtonClick();
+                              setDisabledActionTooltip("escape");
+                              setTimeout(() => setDisabledActionTooltip(null), 2000);
+                              return;
+                            }
+                            playButtonClick();
+                            handleClose();
+                          }}
+                          onMouseEnter={playButtonHover}
+                          className={`text-3xl font-bold [text-shadow:2px_2px_4px_#000] transition-colors ${
+                            isActionDisabled("escape")
+                              ? "text-gray-500 cursor-not-allowed opacity-50"
+                              : "text-white hover:text-yellow-300"
+                          }`}
+                          disabled={isPaused || isActionDisabled("escape")}
+                        >
+                          ESCAPE
+                        </button>
+                      </TooltipTrigger>
+                      {isActionDisabled("escape") && (
+                        <TooltipContent>Currently disabled!</TooltipContent>
+                      )}
+                    </Tooltip>
+                  </motion.div>
+                )}
 
               {actionMenu === "skills" && (
                 <motion.div
@@ -630,7 +720,8 @@ export function BattleScreen({
                 </motion.div>
               )}
             </AnimatePresence>
-          </div>
+            </div>
+          </TooltipProvider>
         )}
 
       {/* SPIRIT INSPECTION OVERLAY */}
