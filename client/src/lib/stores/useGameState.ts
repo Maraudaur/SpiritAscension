@@ -10,6 +10,7 @@ import type {
   Encounter,
 } from "@shared/types";
 import spiritsDataJson from "@shared/data/spirits.json";
+import firstSummonPoolJson from "@shared/data/firstSummonPool.json";
 import { encrypt, decrypt } from "../encryption";
 
 // --- (FTUE, Spirit, AscensionBuffs types remain the same) ---
@@ -200,6 +201,52 @@ function _createRandomSpirit(rarity: Rarity): PlayerSpirit {
     return POTENTIAL_GRADES[ // <-- Now works
       Math.floor(Math.random() * POTENTIAL_GRADES.length)
     ];
+  };
+
+  return {
+    instanceId: crypto.randomUUID(),
+    spiritId: baseSpirit.id,
+    level: 1,
+    experience: 0,
+    isPrismatic: isPrismatic,
+    potentialFactors: {
+      attack: getRandomPotential(),
+      defense: getRandomPotential(),
+      health: getRandomPotential(),
+      affinity: getRandomPotential(),
+      agility: getRandomPotential(),
+    },
+  };
+}
+
+function _createFirstSummonSpirit(): PlayerSpirit {
+  // Pick a random spirit from the first summon pool
+  const poolData = firstSummonPoolJson as any;
+  const spiritIds = poolData.spiritIds || [];
+  
+  if (spiritIds.length === 0) {
+    // Fallback to common if pool is empty
+    return _createRandomSpirit("common");
+  }
+
+  const selectedSpiritId = spiritIds[Math.floor(Math.random() * spiritIds.length)];
+  
+  // Find the base spirit across all rarities
+  let baseSpirit: BaseSpirit | undefined = undefined;
+  for (const raritySpirits of Object.values(spiritsData)) {
+    baseSpirit = (raritySpirits as BaseSpirit[]).find((s) => s.id === selectedSpiritId);
+    if (baseSpirit) break;
+  }
+
+  if (!baseSpirit) {
+    console.warn(`First summon spirit "${selectedSpiritId}" not found, falling back to common`);
+    return _createRandomSpirit("common");
+  }
+
+  const isPrismatic = Math.random() < 0.001; // 0.1% chance
+
+  const getRandomPotential = (): PotentialGrade => {
+    return POTENTIAL_GRADES[Math.floor(Math.random() * POTENTIAL_GRADES.length)];
   };
 
   return {
@@ -538,9 +585,8 @@ export const useGameState = create<GameStateStore>()(
       summonSpirit: () => {
         // Uses helper functions from top level
         const currentSummonCount = get().summonCount ?? 0;
-        // First summon is always common
-        const rarity = currentSummonCount === 0 ? "common" : _selectRandomRarity();
-        const newSpirit = _createRandomSpirit(rarity);
+        // First summon comes from the first summon pool
+        const newSpirit = currentSummonCount === 0 ? _createFirstSummonSpirit() : _createRandomSpirit(_selectRandomRarity());
 
         set((state) => {
           state.spirits.push(newSpirit);
@@ -561,13 +607,17 @@ export const useGameState = create<GameStateStore>()(
 
         for (let i = 0; i < count; i++) {
           // Uses helper functions from top level
-          // First summon ever is always common
+          // First summon ever comes from the first summon pool
           const isFirstSummonEver = currentSummonCount === 0 && i === 0;
-          const rarity = isFirstSummonEver ? "common" : _selectRandomRarity();
-          if (["rare", "epic", "legendary"].includes(rarity)) {
-            hasRare = true;
+          if (isFirstSummonEver) {
+            newSpirits.push(_createFirstSummonSpirit());
+          } else {
+            const rarity = _selectRandomRarity();
+            if (["rare", "epic", "legendary"].includes(rarity)) {
+              hasRare = true;
+            }
+            newSpirits.push(_createRandomSpirit(rarity));
           }
-          newSpirits.push(_createRandomSpirit(rarity));
         }
 
         // Guaranteed rare still applies even on first batch (just not in first slot if it's the first summon ever)
