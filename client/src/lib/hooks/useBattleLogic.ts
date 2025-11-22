@@ -1017,21 +1017,28 @@ export function useBattleLogic({
       const updatedSpirits = spirits.map((spirit, spiritIndex) => {
         if (spiritIndex !== activePartySlot) return spirit;
         
+        const baseSpirit = getBaseSpirit(spirit.playerSpirit.spiritId);
+        const spiritName = baseSpirit?.name || "Player Spirit";
+        console.log(`⏱️ [TICK TURN END - PLAYER] ${spiritName} - Processing ${spirit.activeEffects.length} effects`);
+        
         const newActiveEffects: ActiveEffect[] = [];
         spirit.activeEffects.forEach((effect) => {
+          console.log(`  📊 ${effect.effectType}(${effect.turnsRemaining})${effect.disabledAction ? ` [${effect.disabledAction}]` : ''}`);
+          
           if (effect.turnsRemaining === -1) {
             // Permanent effect, keep it
+            console.log(`    ✅ PERMANENT - keeping`);
             newActiveEffects.push(effect);
           } else if (effect.turnsRemaining > 1) {
             // Decrement and keep
+            console.log(`    ⬇️  DECREMENTING from ${effect.turnsRemaining} to ${effect.turnsRemaining - 1}`);
             newActiveEffects.push({
               ...effect,
               turnsRemaining: effect.turnsRemaining - 1,
             });
           } else if (effect.turnsRemaining === 1) {
             // Effect expires at end of this turn - remove it
-            const baseSpirit = getBaseSpirit(spirit.playerSpirit.spiritId);
-            const spiritName = baseSpirit?.name || "Player Spirit";
+            console.log(`    ❌ EXPIRING (turnsRemaining = 1)`);
             if (effect.effectType !== "charge") {
               const effectName = effect.effectType === "disable" ? effect.disabledAction : effect.effectType;
               addLog(`${spiritName}'s ${effectName} effect has worn off.`);
@@ -1039,6 +1046,8 @@ export function useBattleLogic({
           }
           // else: turnsRemaining <= 0, don't push (already expired)
         });
+        
+        console.log(`  ✨ Updated from ${spirit.activeEffects.length} to ${newActiveEffects.length} effects`);
         
         return {
           ...spirit,
@@ -1055,19 +1064,26 @@ export function useBattleLogic({
       const updatedEnemies = enemies.map((enemy, enemyIndex) => {
         if (enemyIndex !== activeEnemyIndex) return enemy;
         
+        console.log(`⏱️ [TICK TURN END - ENEMY] ${enemy.name} - Processing ${enemy.activeEffects.length} effects`);
+        
         const newActiveEffects: ActiveEffect[] = [];
         enemy.activeEffects.forEach((effect) => {
+          console.log(`  📊 ${effect.effectType}(${effect.turnsRemaining})${effect.disabledAction ? ` [${effect.disabledAction}]` : ''}`);
+          
           if (effect.turnsRemaining === -1) {
             // Permanent effect, keep it
+            console.log(`    ✅ PERMANENT - keeping`);
             newActiveEffects.push(effect);
           } else if (effect.turnsRemaining > 1) {
             // Decrement and keep
+            console.log(`    ⬇️  DECREMENTING from ${effect.turnsRemaining} to ${effect.turnsRemaining - 1}`);
             newActiveEffects.push({
               ...effect,
               turnsRemaining: effect.turnsRemaining - 1,
             });
           } else if (effect.turnsRemaining === 1) {
             // Effect expires at end of this turn - remove it
+            console.log(`    ❌ EXPIRING (turnsRemaining = 1)`);
             if (effect.effectType !== "charge") {
               const effectName = effect.effectType === "disable" ? effect.disabledAction : effect.effectType;
               addLog(`${enemy.name}'s ${effectName} effect has worn off.`);
@@ -1075,6 +1091,8 @@ export function useBattleLogic({
           }
           // else: turnsRemaining <= 0, don't push (already expired)
         });
+        
+        console.log(`  ✨ Updated from ${enemy.activeEffects.length} to ${newActiveEffects.length} effects`);
         
         return { ...enemy, activeEffects: newActiveEffects };
       });
@@ -1511,9 +1529,15 @@ export function useBattleLogic({
           (e.turnsRemaining > 0 || e.turnsRemaining === -1)
       );
       
+      console.log(`🚫 [ENEMY ACTION CHECK] ${skillId} - Has disable effect: ${!!disableEffect}`);
+      if (disableEffect) {
+        console.log(`   Disabled action: ${disableEffect.disabledAction}, turnsRemaining: ${disableEffect.turnsRemaining}`);
+      }
+      
       // If trying to use basic_attack and "fight" is disabled, skip the action
       if (disableEffect && disableEffect.disabledAction === "fight" && skillId === "basic_attack") {
         addLog(`${activeEnemy.name} tried to attack but couldn't! (Disabled)`);
+        console.log(`   ❌ SKIPPING ACTION - fight is disabled`);
         setTurnPhase("enemy_end");
         return;
       }
@@ -2336,12 +2360,20 @@ export function useBattleLogic({
     // Check for disabled actions
     const isActionDisabledCheck = (action: "fight" | "skill") => {
       if (!activeSpirit?.activeEffects) return false;
-      return activeSpirit.activeEffects.some(
+      const disabled = activeSpirit.activeEffects.some(
         (effect) =>
           effect.effectType === "disable" &&
           effect.disabledAction === action &&
           (effect.turnsRemaining > 0 || effect.turnsRemaining === -1)
       );
+      console.log(`🚫 [ACTION CHECK] ${action} - Disabled: ${disabled}`);
+      if (disabled) {
+        const disableEffect = activeSpirit.activeEffects.find(
+          (e) => e.effectType === "disable" && e.disabledAction === action
+        );
+        console.log(`   Effect turnsRemaining: ${disableEffect?.turnsRemaining}`);
+      }
+      return disabled;
     };
 
     const actionType = skillId === "basic_attack" ? "fight" : "skill";
@@ -2778,13 +2810,17 @@ export function useBattleLogic({
 
     // Check for disabled spirit action (only during normal player action, not forced swap)
     if (!isForcedSwap && activeSpirit?.activeEffects) {
-      const isDisabled = activeSpirit.activeEffects.some(
+      const disableEffect = activeSpirit.activeEffects.find(
         (effect) =>
           effect.effectType === "disable" &&
           effect.disabledAction === "spirit" &&
           (effect.turnsRemaining > 0 || effect.turnsRemaining === -1)
       );
-      if (isDisabled) {
+      console.log(`🚫 [SPIRIT SWAP CHECK] Swapping to index ${index} - Disabled: ${!!disableEffect}`);
+      if (disableEffect) {
+        console.log(`   Effect turnsRemaining: ${disableEffect.turnsRemaining}`);
+      }
+      if (disableEffect) {
         addLog("Currently disabled!");
         return;
       }
@@ -2916,13 +2952,17 @@ export function useBattleLogic({
   const handleClose = () => {
     // Check for disabled escape action
     if (battleState === "fighting" && activeSpirit?.activeEffects) {
-      const isDisabled = activeSpirit.activeEffects.some(
+      const disableEffect = activeSpirit.activeEffects.find(
         (effect) =>
           effect.effectType === "disable" &&
           effect.disabledAction === "escape" &&
           (effect.turnsRemaining > 0 || effect.turnsRemaining === -1)
       );
-      if (isDisabled) {
+      console.log(`🚫 [ESCAPE CHECK] Escape disabled: ${!!disableEffect}`);
+      if (disableEffect) {
+        console.log(`   Effect turnsRemaining: ${disableEffect.turnsRemaining}`);
+      }
+      if (disableEffect) {
         addLog("Currently disabled!");
         return;
       }
