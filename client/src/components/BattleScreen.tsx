@@ -27,6 +27,8 @@ import {
   Shield,
   Loader2,
   ArrowUp,
+  Info,
+  X,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import type { BattleScreenProps } from "@/lib/battle-types";
@@ -91,6 +93,7 @@ export function BattleScreen({
 
   const [isClient, setIsClient] = useState(false);
   const [inspectedSpiritIndex, setInspectedSpiritIndex] = useState<number | null>(null);
+  const [showEnemyInfo, setShowEnemyInfo] = useState(false);
   
   useEffect(() => {
     setIsClient(true);
@@ -336,10 +339,19 @@ export function BattleScreen({
               exit={{ opacity: 0, x: -20 }}
               transition={{ duration: 0.2 }}
             >
-              <div className="flex justify-between items-baseline mb-1 text-right">
-                <span className="font-bold text-white text-2xl [text-shadow:0_2px_4px_rgba(0,0,0,0.7)]">
-                  {activeEnemy.name}
-                </span>
+              <div className="flex justify-between items-baseline mb-1 text-right gap-2">
+                <div className="flex items-center gap-2 flex-1 justify-end">
+                  <span className="font-bold text-white text-2xl [text-shadow:0_2px_4px_rgba(0,0,0,0.7)]">
+                    {activeEnemy.name}
+                  </span>
+                  <button
+                    onClick={() => setShowEnemyInfo(true)}
+                    className="p-1 rounded hover:bg-white/20 transition-colors"
+                    title="View enemy info"
+                  >
+                    <Info className="w-5 h-5 text-white" />
+                  </button>
+                </div>
                 <span className="text-lg text-white [text-shadow:0_2px_4px_rgba(0,0,0,0.7)]">
                   Lv. {activeEnemy.level}
                 </span>
@@ -1049,6 +1061,199 @@ export function BattleScreen({
               Choose Replacement Spirit
             </Button>
           </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* ENEMY INFO MODAL */}
+      <Dialog open={showEnemyInfo} onOpenChange={setShowEnemyInfo}>
+        <DialogContent className="max-w-4xl max-h-[85vh] parchment-bg" style={{ background: "#F5E6D3" }}>
+          {activeEnemy && (() => {
+            const baseSpirit = getBaseSpirit(activeEnemy.spiritId);
+            if (!baseSpirit) return null;
+
+            const lineage = getLineage(baseSpirit.lineage);
+            // Get all skills for this spirit and filter by enemy's current level
+            const availableSkillIds = baseSpirit.skills
+              .filter((bs) => bs.unlockLevel <= activeEnemy.level)
+              .map((bs) => bs.skillId);
+            
+            // Get the full skill objects from the available skill IDs
+            const allSkills = getSpiritAvailableSkills({ level: activeEnemy.level } as any);
+            const filteredSkills = allSkills.filter((skill) =>
+              availableSkillIds.includes(skill.id)
+            );
+
+            return (
+              <div className="flex flex-col gap-4" style={{ maxHeight: "80vh" }}>
+                {/* Close Button */}
+                <button
+                  onClick={() => setShowEnemyInfo(false)}
+                  className="absolute top-4 right-4 p-2 rounded-full hover:bg-gray-200 transition-colors"
+                  style={{ color: "#8B4513" }}
+                  aria-label="Close"
+                >
+                  <X className="w-6 h-6" />
+                </button>
+                
+                {/* Header with Spirit Name */}
+                <div className="pb-3 border-b-2" style={{ borderColor: "#8B4513" }}>
+                  <h3 className="text-2xl font-bold parchment-text mb-2">
+                    {baseSpirit.name}
+                  </h3>
+                  <div className="flex gap-2 flex-wrap items-center text-sm">
+                    <span
+                      className="text-xs font-bold px-2 py-1 rounded border-2"
+                      style={{
+                        background: getRarityColor(baseSpirit.rarity),
+                        color: "white",
+                        borderColor: "#8B4513",
+                      }}
+                    >
+                      {baseSpirit.rarity.charAt(0).toUpperCase() + baseSpirit.rarity.slice(1)}
+                    </span>
+                    <span className="text-xs parchment-text bg-white px-2 py-1 rounded border-2" style={{ borderColor: "#8B4513" }}>
+                      Level {activeEnemy.level}
+                    </span>
+                    {baseSpirit.elements.map((elemId) => {
+                      const elem = getElement(elemId);
+                      const isNeutral = elemId === "none";
+                      return (
+                        <span
+                          key={elemId}
+                          className="text-xs font-bold px-2 py-1 rounded"
+                          style={{
+                            backgroundColor: getElementColor(elemId),
+                            color: isNeutral ? "#000000" : "white",
+                          }}
+                        >
+                          {elem?.name}
+                        </span>
+                      );
+                    })}
+                    <span className="text-xs parchment-text font-semibold px-2 py-1 rounded bg-white border-2" style={{ borderColor: "#8B4513" }}>
+                      {lineage.name}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Three Column Layout */}
+                <div className="grid grid-cols-3 gap-4 flex-1 overflow-hidden">
+                  {/* LEFT COLUMN: Spirit Sprite */}
+                  <div className="flex flex-col items-center justify-center gap-4 py-2">
+                    <div className="flex items-center justify-center flex-1 min-h-0">
+                      <SpiritSpriteAnimation
+                        spiritId={baseSpirit.id}
+                        position="left"
+                        size={200}
+                        isTakingDamage={false}
+                        isDefeated={false}
+                      />
+                    </div>
+                  </div>
+
+                  {/* MIDDLE COLUMN: Combat Stats */}
+                  <div className="space-y-4 flex flex-col">
+                    <div className="p-3 rounded-lg border-2 flex-1" style={{ background: "#FFFFFF", borderColor: "#8B4513" }}>
+                      <h4 className="font-bold parchment-text text-sm mb-3">
+                        Combat Stats
+                      </h4>
+                      <div className="space-y-2 text-sm parchment-text">
+                        <div className="flex justify-between">
+                          <span>Attack:</span>
+                          <span className="font-semibold">{activeEnemy.attack}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span>Defense:</span>
+                          <span className="font-semibold">{activeEnemy.defense}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span>Health:</span>
+                          <span className="font-semibold">{activeEnemy.maxHealth}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span>Agility:</span>
+                          <span className="font-semibold">{activeEnemy.agility}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span>Affinity:</span>
+                          <span className="font-semibold">{activeEnemy.affinity}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* RIGHT COLUMN: Passive Abilities + Skills */}
+                  <div className="space-y-4 flex flex-col overflow-y-auto" style={{ maxHeight: "55vh" }}>
+                    <div className="p-3 rounded-lg border-2 flex-shrink-0" style={{ background: "#FFFFFF", borderColor: "#8B4513" }}>
+                      <h4 className="font-bold parchment-text text-sm mb-2">
+                        Passive Abilities
+                      </h4>
+                      <div className="text-sm parchment-text space-y-1">
+                        {baseSpirit.passiveAbilities &&
+                        baseSpirit.passiveAbilities.length > 0 ? (
+                          baseSpirit.passiveAbilities.map((passiveId) => {
+                            const passive = getPassiveAbility(passiveId);
+                            return (
+                              <div key={passiveId}>
+                                <p className="font-semibold">
+                                  {passive ? passive.name : "Unknown Passive"}
+                                </p>
+                                <p className="text-xs opacity-75">
+                                  {passive ? passive.description : ""}
+                                </p>
+                              </div>
+                            );
+                          })
+                        ) : (
+                          <p className="opacity-75">
+                            None
+                          </p>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="p-3 rounded-lg border-2 flex-shrink-0" style={{ background: "#FFFFFF", borderColor: "#8B4513" }}>
+                      <h4 className="font-bold parchment-text text-sm mb-2">
+                        Skills
+                      </h4>
+                      <div className="space-y-2">
+                        {filteredSkills.map((skill) => {
+                          const skillElement = getElement(skill.element);
+                          const isNeutral = skill.element === "none";
+                          return (
+                            <div
+                              key={skill.id}
+                              className="p-2 bg-amber-50 rounded border border-amber-300"
+                            >
+                              <div className="flex items-center justify-between gap-2 mb-1">
+                                <p className="font-semibold parchment-text text-xs">
+                                  {skill.name}
+                                </p>
+                                {skillElement && (
+                                  <span
+                                    className="text-xs font-bold px-2 py-0.5 rounded flex-shrink-0"
+                                    style={{
+                                      backgroundColor: getElementColor(skill.element),
+                                      color: isNeutral ? "#000000" : "white",
+                                    }}
+                                  >
+                                    {skillElement.name}
+                                  </span>
+                                )}
+                              </div>
+                              <p className="text-xs parchment-text opacity-75">
+                                {skill.description}
+                              </p>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            );
+          })()}
         </DialogContent>
       </Dialog>
     </div>
