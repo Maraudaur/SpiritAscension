@@ -2108,6 +2108,15 @@ export function useBattleLogic({
           };
           effectsToApplyToTarget.push(newActiveEffect);
           logMessages.push(`${target.name} is blinded!`);
+        } else if (skillEffect.type === "disable") {
+          const newActiveEffect: ActiveEffect = {
+            id: `disable_${Date.now()}`,
+            effectType: "disable",
+            turnsRemaining: skillEffect.duration,
+            disabledAction: skillEffect.action,
+          };
+          effectsToApplyToTarget.push(newActiveEffect);
+          logMessages.push(`${target.name}'s ${skillEffect.action} action is disabled!`);
         } else if (skillEffect.type === "apply_dot_stack") {
           // Check chance to apply (defaults to 100% if not specified)
           let applyChance = skillEffect.chance ?? 1.0;
