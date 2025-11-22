@@ -16,11 +16,11 @@
       "skills": [
         {
           "skillId": "basic_attack",
-          "unlockLevel": 1
+          "unlockLevel": 6
         },
         {
           "skillId": "basic_attack_wood",
-          "unlockLevel": 4
+          "unlockLevel": 6
         },
         {
           "skillId": "paralyze_strike",

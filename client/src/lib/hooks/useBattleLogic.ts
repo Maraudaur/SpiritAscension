@@ -2750,7 +2750,7 @@ export function useBattleLogic({
         setTimeout(() => setEnemyHealthBarShake(false), 500);
       }
 
-      const updatedSpirits = prevSpirits.map((sp, index) =>
+      let updatedSpirits = prevSpirits.map((sp, index) =>
         index === activePartySlot
           ? {
               ...sp,
@@ -2763,6 +2763,20 @@ export function useBattleLogic({
             }
           : sp,
       );
+
+      // ✨ CRITICAL FIX: Apply skill effects to target (disable, debuffs, etc.)
+      if (result.effectsToApplyToTarget.length > 0) {
+        console.log(`🎯 [APPLY TARGET EFFECTS] Applying ${result.effectsToApplyToTarget.length} effects to player spirit`);
+        updatedSpirits = updatedSpirits.map((sp, index) => {
+          if (index !== activePartySlot) return sp;
+          let newSpirit = { ...sp };
+          result.effectsToApplyToTarget.forEach((eff) => {
+            console.log(`  ➕ Applying ${eff.effectType}(${eff.turnsRemaining}) to ${getBaseSpirit(sp.playerSpirit.spiritId)?.name}`);
+            newSpirit = applyStatusEffect(newSpirit, eff) as BattleSpirit;
+          });
+          return newSpirit;
+        });
+      }
 
       // Check if active spirit died and force swap if needed
       if (newHealth <= 0) {
