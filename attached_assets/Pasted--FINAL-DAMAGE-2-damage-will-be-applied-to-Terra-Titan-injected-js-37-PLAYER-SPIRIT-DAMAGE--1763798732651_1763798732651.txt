@@ -1,0 +1,51 @@
+💥 [FINAL DAMAGE] 2 damage will be applied to Terra Titan
+injected.js:37 ❤️  [PLAYER SPIRIT DAMAGE]
+injected.js:37    Spirit: Terra Titan
+injected.js:37    Old Health: 39/39
+injected.js:37    Damage Applied: 2
+injected.js:37    New Health: 37/39
+injected.js:37 ✅ [FINAL STATE BEFORE RETURN]
+injected.js:37    Active Spirit: Terra Titan
+injected.js:37    Final Health: 37/39
+injected.js:37    Effects: 0
+injected.js:37 🔴 [setPlayerSpirits CALLED] Health about to be set to: 37
+injected.js:37 🔵 [PLAYER_START] Spirit health before turn start: 39 / 39
+injected.js:37 🔵 [PLAYER_START] Spirit health after runPlayerTurnStart: 39 / 39
+injected.js:37 🟡 [PLAYER_TURN_START] After tickPlayerEffects - Health: 39/39
+injected.js:37 🔊 playButtonHover called: Object
+injected.js:37 ✅ Hover sound played! Object
+injected.js:37 🔊 playButtonClick called: Object
+injected.js:37 🎮 [HANDLE ATTACK] skillId: basic_attack, activePartySlot: 0
+injected.js:37    currentSpirit exists: true
+injected.js:37    currentSpirit.health: 39/39
+injected.js:37    currentSpirit.activeEffects:  Array(0)
+injected.js:37 🚫 [ACTION CHECK] fight - Checking 0 effects
+injected.js:37    Result: Disabled = false
+injected.js:37 ✅ Click sound played! Object
+injected.js:37 📊 === STATUS EFFECTS (after PLAYER action) ===
+injected.js:37    Player (Terra Titan): Array(1)
+injected.js:37    Enemy (Bamboo Spirit): Array(1)
+injected.js:37 🟡 [PLAYER_TURN_END] After tickPlayerEffects - Health: 39/39
+injected.js:37 📊 === STATUS EFFECTS (after PLAYER action) ===
+injected.js:37    Player (Terra Titan): Array(1)
+injected.js:37    Enemy (Bamboo Spirit): Array(1)
+injected.js:37 🟡 [ENEMY_TURN_START] After tickEnemyEffects - Player Health: 39/39
+injected.js:37 🚫 [ENEMY ACTION CHECK] basic_attack - Has disable effect: false
+injected.js:37 📊 === STATUS EFFECTS (after ENEMY action) ===
+injected.js:37    Player (Terra Titan): Array(1)
+injected.js:37    Enemy (Bamboo Spirit): Array(1)
+injected.js:37 🟡 [ENEMY_TURN_END] After tickEnemyEffects - Player Health: 39/39
+injected.js:37 📊 === STATUS EFFECTS (after ENEMY action) ===
+injected.js:37    Player (Terra Titan): Array(1)
+injected.js:37    Enemy (Bamboo Spirit): Array(1)
+injected.js:37 🎯 [ENEMY ATTACK CALCULATED] totalDamage: 3
+injected.js:37 💥 [FINAL DAMAGE] 3 damage will be applied to Terra Titan
+injected.js:37 ❤️  [PLAYER SPIRIT DAMAGE]
+injected.js:37    Spirit: Terra Titan
+injected.js:37    Old Health: 39/39
+injected.js:37    Damage Applied: 3
+injected.js:37    New Health: 36/39
+injected.js:37 ✅ [FINAL STATE BEFORE RETURN]
+injected.js:37    Active Spirit: Terra Titan
+injected.js:37    Final Health: 36/39
+injected.js:37    Effects: 0

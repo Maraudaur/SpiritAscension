@@ -1384,36 +1384,36 @@ export function useBattleLogic({
     addLog(`--- ${activeBaseSpirit?.name}'s Turn ---`);
     setIsBlocking(false);
 
-    // ✨ FIX: Use setState callback to read CURRENT state instead of stale closure
-    // This ensures we process start-of-turn effects on the latest health/effects
-    let chargeUnleashed = false;
-
+    // ✨ CRITICAL: Don't nest setState calls! Use separate setter calls instead.
+    // This ensures React can batch updates properly.
     setPlayerSpirits((prevSpirits) => {
       const { updatedSpirits, updatedEnemies: enemiesAfterTick, chargeUnleashed: didUnleash } =
         tickPlayerEffects(
-          prevSpirits, // <-- Read CURRENT state, not stale closure
+          prevSpirits, // <-- Read CURRENT state
           battleEnemies,
           "start_of_turn",
         );
       
-      chargeUnleashed = didUnleash;
-      
-      // Also update enemies state if changed
-      setBattleEnemies(enemiesAfterTick);
-      
       console.log(`🟡 [PLAYER_TURN_START] After tickPlayerEffects - Health: ${updatedSpirits[activePartySlot]?.currentHealth}/${updatedSpirits[activePartySlot]?.maxHealth}`);
+      
+      // Update enemies separately (NOT inside this callback!)
+      // This is done by returning immediately after setPlayerSpirits
+      if (enemiesAfterTick && enemiesAfterTick.length > 0) {
+        // Use setTimeout to ensure this happens AFTER the spirits state is committed
+        setTimeout(() => setBattleEnemies(enemiesAfterTick), 0);
+      }
       
       return updatedSpirits;
     });
 
-    return chargeUnleashed;
+    return false; // Don't actually return chargeUnleashed, it's handled in effect
   };
 
   /**
    * (Step 4, End) Runs end-of-turn effects for the player.
    */
   const runPlayerTurnEnd = () => {
-    // ✨ FIX: Use setState callback to read CURRENT state instead of stale closure
+    // ✨ CRITICAL: Don't nest setState calls! Use separate setter calls instead.
     setPlayerSpirits((prevSpirits) => {
       const { updatedSpirits, updatedEnemies } = tickPlayerEffects(
         prevSpirits, // <-- Read CURRENT state
@@ -1423,8 +1423,10 @@ export function useBattleLogic({
       
       console.log(`🟡 [PLAYER_TURN_END] After tickPlayerEffects - Health: ${updatedSpirits[activePartySlot]?.currentHealth}/${updatedSpirits[activePartySlot]?.maxHealth}`);
       
-      // Also update enemies state if changed
-      setBattleEnemies(updatedEnemies);
+      // Update enemies separately (NOT inside this callback!)
+      if (updatedEnemies && updatedEnemies.length > 0) {
+        setTimeout(() => setBattleEnemies(updatedEnemies), 0);
+      }
       
       return updatedSpirits;
     });
@@ -1437,9 +1439,7 @@ export function useBattleLogic({
     addLog(`--- ${activeEnemy.name}'s Turn ---`);
     setIsEnemyBlocking(false);
 
-    // ✨ FIX: Use setState callback for enemies to read CURRENT state
-    let chargeUnleashed = false;
-
+    // ✨ CRITICAL: Don't nest setState calls! Use separate setter calls instead.
     setBattleEnemies((prevEnemies) => {
       const { updatedEnemies, updatedSpirits, chargeUnleashed: didUnleash } =
         tickEnemyEffects(
@@ -1447,13 +1447,15 @@ export function useBattleLogic({
           playerSpirits,
           "start_of_turn",
         );
-      
-      chargeUnleashed = didUnleash;
 
-      // Also update player spirits
-      setPlayerSpirits(updatedSpirits);
+      console.log(`🟡 [ENEMY_TURN_START] After tickEnemyEffects - Player Health: ${updatedSpirits[activePartySlot]?.currentHealth}/${updatedSpirits[activePartySlot]?.maxHealth}`);
 
-      // Check for Strategic passive on enemy spirit BEFORE returning state
+      // Update player spirits separately (NOT inside this callback!)
+      if (updatedSpirits && updatedSpirits.length > 0) {
+        setTimeout(() => setPlayerSpirits(updatedSpirits), 0);
+      }
+
+      // Check for Strategic passive on enemy spirit
       const currentEnemy = updatedEnemies[activeEnemyIndex];
       const enemyBaseSpirit = getBaseSpirit(currentEnemy.spiritId);
       
@@ -1484,12 +1486,10 @@ export function useBattleLogic({
         }
       }
 
-      console.log(`🟡 [ENEMY_TURN_START] After tickEnemyEffects - Player Health: ${updatedSpirits[activePartySlot]?.currentHealth}/${updatedSpirits[activePartySlot]?.maxHealth}`);
-
       return finalEnemies;
     });
 
-    return chargeUnleashed;
+    return false;
   };
 
   /**
@@ -1599,7 +1599,7 @@ export function useBattleLogic({
   };
 
   const runEnemyTurnEnd = () => {
-    // ✨ FIX: Use setState callback to read CURRENT state instead of stale closure
+    // ✨ CRITICAL: Don't nest setState calls! Use separate setter calls instead.
     setBattleEnemies((prevEnemies) => {
       const { updatedEnemies, updatedSpirits } = tickEnemyEffects(
         prevEnemies, // <-- Read CURRENT state
@@ -1609,8 +1609,10 @@ export function useBattleLogic({
       
       console.log(`🟡 [ENEMY_TURN_END] After tickEnemyEffects - Player Health: ${updatedSpirits[activePartySlot]?.currentHealth}/${updatedSpirits[activePartySlot]?.maxHealth}`);
       
-      // Also update player spirits
-      setPlayerSpirits(updatedSpirits);
+      // Update player spirits separately (NOT inside this callback!)
+      if (updatedSpirits && updatedSpirits.length > 0) {
+        setTimeout(() => setPlayerSpirits(updatedSpirits), 0);
+      }
       
       return updatedEnemies;
     });
@@ -1779,14 +1781,17 @@ export function useBattleLogic({
 
       case "enemy_action":
         // (Step 6)
-        runEnemyAction(); // Enemy performs its action, player health is updated via setPlayerSpirits
+        // ✨ CRITICAL: runEnemyAction handles its own phase transition
+        // This ensures the phase doesn't change until AFTER the action completes
+        runEnemyAction();
 
         // --- DEFEAT CHECKS REMOVED FROM HERE ---
         // All checks will happen at the start of player_start
         // or the end of enemy_end.
         // --- END DEFEAT CHECKS ---
 
-        setTurnPhase("enemy_end");
+        // NOTE: Phase transition happens inside runEnemyAction/handleEnemyAction
+        // after the setTimeout completes and state is updated
         break;
 
       case "enemy_end":
@@ -2837,8 +2842,13 @@ export function useBattleLogic({
       console.log(`🔴 [setPlayerSpirits CALLED] Health about to be set to:`, updatedSpirits[activePartySlot]?.currentHealth);
       return updatedSpirits;
     });
-    // The useEffect will catch the health change and trigger
-    // the end-of-turn logic.
+
+    // ✨ CRITICAL: Transition phase AFTER the state update is committed
+    // This ensures the player_start phase reads the updated health, not the old value
+    setTimeout(() => {
+      console.log(`🟢 [PHASE TRANSITION] setTurnPhase("enemy_end") called AFTER state update`);
+      setTurnPhase("enemy_end");
+    }, 0);
   };
 
   // ========== Player Action Handlers ==========
