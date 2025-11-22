@@ -2708,20 +2708,33 @@ export function useBattleLogic({
         damage,
       );
 
+      // ✨ CRITICAL: Build updatedSpirits BEFORE applying trigger effects
+      let updatedSpirits = prevSpirits.map((sp, index) =>
+        index === activePartySlot
+          ? {
+              ...sp,
+              currentHealth: newHealth,
+              activeEffects: hasShield
+                ? sp.activeEffects.filter(
+                    (e) => !(e.effectType === "one_time_shield"),
+                  )
+                : sp.activeEffects,
+            }
+          : sp,
+      );
+
+      // Apply trigger effects to the updatedSpirits (NOT a separate setState!)
       if (attackerEffects.length > 0) {
-        setPlayerSpirits(
-          (
-            prev, // <--- FIX: Changed to setPlayerSpirits
-          ) =>
-            prev.map((spirit, i) => {
-              if (i !== activePartySlot) return spirit; // <-- FIX: Use activePartySlot
-              let newSpirit = { ...spirit };
-              attackerEffects.forEach((eff) => {
-                newSpirit = applyStatusEffect(newSpirit, eff) as BattleSpirit; // <-- FIX: Use BattleSpirit
-              });
-              return newSpirit;
-            }),
-        );
+        console.log(`🔄 [APPLY TRIGGER EFFECTS] Applying ${attackerEffects.length} effects from trigger`);
+        updatedSpirits = updatedSpirits.map((spirit, i) => {
+          if (i !== activePartySlot) return spirit;
+          let newSpirit = { ...spirit };
+          attackerEffects.forEach((eff) => {
+            console.log(`  ➕ Trigger effect: ${eff.effectType}(${eff.turnsRemaining})`);
+            newSpirit = applyStatusEffect(newSpirit, eff) as BattleSpirit;
+          });
+          return newSpirit;
+        });
       }
 
       // Apply reflected damage to enemy
@@ -2760,20 +2773,6 @@ export function useBattleLogic({
         setEnemyHealthBarShake(true);
         setTimeout(() => setEnemyHealthBarShake(false), 500);
       }
-
-      let updatedSpirits = prevSpirits.map((sp, index) =>
-        index === activePartySlot
-          ? {
-              ...sp,
-              currentHealth: newHealth,
-              activeEffects: hasShield
-                ? sp.activeEffects.filter(
-                    (e) => !(e.effectType === "one_time_shield"),
-                  )
-                : sp.activeEffects,
-            }
-          : sp,
-      );
 
       // ✨ CRITICAL FIX: Apply skill effects to target (disable, debuffs, etc.)
       if (result.effectsToApplyToTarget.length > 0) {
