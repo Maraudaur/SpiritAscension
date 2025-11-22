@@ -2643,12 +2643,14 @@ export function useBattleLogic({
       activeEnemy.activeEffects || []
     );
     result.logMessages.forEach(addLog);
+    console.log(`🎯 [ENEMY ATTACK CALCULATED] totalDamage: ${result.totalDamage}`);
 
     // 3. Apply block/shield modifications
     let damage = result.totalDamage;
     if (isBlocking) {
       damage = Math.floor(damage * 0.5);
       addLog(`${activeBaseSpirit.name} blocked! Damage reduced.`);
+      console.log(`🛡️  [BLOCKING] Damage reduced from ${result.totalDamage} to ${damage}`);
     }
 
     const hasShield = activeSpirit.activeEffects.some(
@@ -2657,7 +2659,10 @@ export function useBattleLogic({
     if (hasShield) {
       damage = 0;
       addLog(`${activeBaseSpirit.name}'s Shield blocks the attack!`);
+      console.log(`⚔️  [SHIELD BLOCK] Damage negated (was ${result.totalDamage})`);
     }
+
+    console.log(`💥 [FINAL DAMAGE] ${damage} damage will be applied to ${activeBaseSpirit?.name}`);
 
     if (damage > 0) {
       playDamage();
@@ -2687,7 +2692,14 @@ export function useBattleLogic({
 
     setPlayerSpirits((prevSpirits) => {
       const targetSpirit = prevSpirits[activePartySlot];
+      const oldHealth = targetSpirit.currentHealth;
       const newHealth = Math.max(0, targetSpirit.currentHealth - damage);
+      
+      console.log(`❤️  [PLAYER SPIRIT DAMAGE]`);
+      console.log(`   Spirit: ${activeBaseSpirit?.name}`);
+      console.log(`   Old Health: ${oldHealth}/${targetSpirit.maxHealth}`);
+      console.log(`   Damage Applied: ${damage}`);
+      console.log(`   New Health: ${newHealth}/${targetSpirit.maxHealth}`);
 
       const { reflectedDamage, attackerEffects, counterAttackDamage } = executeTriggerEffects(
         "on_get_hit",
@@ -2792,6 +2804,13 @@ export function useBattleLogic({
           }, 500);
         }
       }
+
+      // Debug: Log final state before returning
+      const finalSpirit = updatedSpirits[activePartySlot];
+      console.log(`✅ [FINAL STATE BEFORE RETURN]`);
+      console.log(`   Active Spirit: ${getBaseSpirit(finalSpirit?.playerSpirit.spiritId)?.name}`);
+      console.log(`   Final Health: ${finalSpirit?.currentHealth}/${finalSpirit?.maxHealth}`);
+      console.log(`   Effects: ${finalSpirit?.activeEffects.length}`);
 
       return updatedSpirits;
     });
