@@ -20,6 +20,7 @@ import type {
   CombatTrigger,
 } from "@shared/types";
 import passivesData from "@shared/data/passives.json";
+import battleConfig from "@shared/data/battleConfig.json";
 import type { Encounter } from "@shared/types";
 import allEncounters from "@shared/data/encounters.json";
 import type {
@@ -110,6 +111,7 @@ export function useBattleLogic({
   const [battleState, setBattleState] = useState<BattleState>("setup");
   const [turnPhase, setTurnPhase] = useState<TurnPhase>("setup");
   const [battleLog, setBattleLog] = useState<string[]>([]);
+  const [messageQueue, setMessageQueue] = useState<string[]>([]); // Queue for delayed messages
   const [playerSpirits, setPlayerSpirits] = useState<BattleSpirit[]>([]);
   const [battleEnemies, setBattleEnemies] = useState<Enemy[]>([]);
   const [activePartySlot, setActivePartySlot] = useState(0);
@@ -156,8 +158,23 @@ export function useBattleLogic({
 
   // ========== Helper Functions ==========
   const addLog = (message: string) => {
-    setBattleLog((prev) => [...prev, message]);
+    // Add message to queue with delay
+    setMessageQueue((prev) => [...prev, message]);
   };
+
+  // Process queued messages with configured delay
+  useEffect(() => {
+    if (messageQueue.length === 0) return;
+
+    const messageDelay = battleConfig.messageDisplayDelay || 500;
+    const timeout = setTimeout(() => {
+      const nextMessage = messageQueue[0];
+      setBattleLog((prev) => [...prev, nextMessage]);
+      setMessageQueue((prev) => prev.slice(1));
+    }, messageDelay);
+
+    return () => clearTimeout(timeout);
+  }, [messageQueue]);
 
   const getPlayerAverageLevel = () => {
     if (activeParty.length === 0) return 1;
