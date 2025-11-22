@@ -1,0 +1,52 @@
+💥 [FINAL DAMAGE] 3 damage will be applied to Terra Titan
+injected.js:37 ❤️  [PLAYER SPIRIT DAMAGE]
+injected.js:37    Spirit: Terra Titan
+injected.js:37    Old Health: 39/39
+injected.js:37    Damage Applied: 3
+injected.js:37    New Health: 36/39
+injected.js:37 🎯 [APPLY TARGET EFFECTS] Applying 1 effects to player spirit
+injected.js:37   ➕ Applying disable(2) to Terra Titan
+injected.js:37 🔮 Applying disable to Terra Titan
+injected.js:37    Current effects (0): Array(0)
+injected.js:37    ✅ NEW EFFECT APPLIED
+injected.js:37    Updated effects (1): Array(1)
+injected.js:37 ✅ [FINAL STATE BEFORE RETURN]
+injected.js:37    Active Spirit: Terra Titan
+injected.js:37    Final Health: 36/39
+injected.js:37    Effects: 1
+injected.js:37 📊 === STATUS EFFECTS (after ENEMY action) ===
+injected.js:37    Player (Terra Titan): Array(1)
+injected.js:37    Enemy (Jade Sparrow): Array(1)
+injected.js:37 🔊 playButtonHover called: Object
+injected.js:37 ✅ Hover sound played! Object
+injected.js:37 🔊 playButtonClick called: Object
+injected.js:37 🎮 [HANDLE ATTACK] skillId: basic_attack, activePartySlot: 0
+injected.js:37    currentSpirit exists: true
+injected.js:37    currentSpirit.activeEffects:  Array(0)
+injected.js:37 🚫 [ACTION CHECK] fight - Checking 0 effects
+injected.js:37    Result: Disabled = false
+injected.js:37 ✅ Click sound played! Object
+injected.js:37 📊 === STATUS EFFECTS (after PLAYER action) ===
+injected.js:37    Player (Terra Titan): Array(1)
+injected.js:37    Enemy (Jade Sparrow): Array(1)
+injected.js:37 📊 === STATUS EFFECTS (after PLAYER action) ===
+injected.js:37    Player (Terra Titan): Array(1)
+injected.js:37    Enemy (Jade Sparrow): Array(1)
+injected.js:37 🚫 [ENEMY ACTION CHECK] basic_attack - Has disable effect: false
+injected.js:37 📊 === STATUS EFFECTS (after ENEMY action) ===
+injected.js:37    Player (Terra Titan): Array(1)
+injected.js:37    Enemy (Jade Sparrow): Array(1)
+injected.js:37 📊 === STATUS EFFECTS (after ENEMY action) ===
+injected.js:37    Player (Terra Titan): Array(1)
+injected.js:37    Enemy (Jade Sparrow): Array(1)
+injected.js:37 🎯 [ENEMY ATTACK CALCULATED] totalDamage: 4
+injected.js:37 💥 [FINAL DAMAGE] 4 damage will be applied to Terra Titan
+injected.js:37 ❤️  [PLAYER SPIRIT DAMAGE]
+injected.js:37    Spirit: Terra Titan
+injected.js:37    Old Health: 39/39
+injected.js:37    Damage Applied: 4
+injected.js:37    New Health: 35/39
+injected.js:37 ✅ [FINAL STATE BEFORE RETURN]
+injected.js:37    Active Spirit: Terra Titan
+injected.js:37    Final Health: 35/39
+injected.js:37    Effects: 0

@@ -1384,19 +1384,28 @@ export function useBattleLogic({
     addLog(`--- ${activeBaseSpirit?.name}'s Turn ---`);
     setIsBlocking(false);
 
-    // 1. Get the results from the tick function *first*
-    const { updatedSpirits, updatedEnemies, chargeUnleashed } =
-      tickPlayerEffects(
-        playerSpirits,
-        battleEnemies, // <-- Pass enemies
-        "start_of_turn",
-      );
+    // ✨ FIX: Use setState callback to read CURRENT state instead of stale closure
+    // This ensures we process start-of-turn effects on the latest health/effects
+    let chargeUnleashed = false;
 
-    // 2. Set the new state
-    setPlayerSpirits(updatedSpirits);
-    setBattleEnemies(updatedEnemies); // <-- Set enemies
+    setPlayerSpirits((prevSpirits) => {
+      const { updatedSpirits, updatedEnemies: enemiesAfterTick, chargeUnleashed: didUnleash } =
+        tickPlayerEffects(
+          prevSpirits, // <-- Read CURRENT state, not stale closure
+          battleEnemies,
+          "start_of_turn",
+        );
+      
+      chargeUnleashed = didUnleash;
+      
+      // Also update enemies state if changed
+      setBattleEnemies(enemiesAfterTick);
+      
+      console.log(`🟡 [PLAYER_TURN_START] After tickPlayerEffects - Health: ${updatedSpirits[activePartySlot]?.currentHealth}/${updatedSpirits[activePartySlot]?.maxHealth}`);
+      
+      return updatedSpirits;
+    });
 
-    // 3. Return the result
     return chargeUnleashed;
   };
 
@@ -1404,13 +1413,21 @@ export function useBattleLogic({
    * (Step 4, End) Runs end-of-turn effects for the player.
    */
   const runPlayerTurnEnd = () => {
-    const { updatedSpirits, updatedEnemies } = tickPlayerEffects(
-      playerSpirits,
-      battleEnemies, // <-- Pass enemies
-      "end_of_turn",
-    );
-    setPlayerSpirits(updatedSpirits);
-    setBattleEnemies(updatedEnemies); // <-- Set enemies
+    // ✨ FIX: Use setState callback to read CURRENT state instead of stale closure
+    setPlayerSpirits((prevSpirits) => {
+      const { updatedSpirits, updatedEnemies } = tickPlayerEffects(
+        prevSpirits, // <-- Read CURRENT state
+        battleEnemies,
+        "end_of_turn",
+      );
+      
+      console.log(`🟡 [PLAYER_TURN_END] After tickPlayerEffects - Health: ${updatedSpirits[activePartySlot]?.currentHealth}/${updatedSpirits[activePartySlot]?.maxHealth}`);
+      
+      // Also update enemies state if changed
+      setBattleEnemies(updatedEnemies);
+      
+      return updatedSpirits;
+    });
   };
 
   /**
@@ -1420,45 +1437,57 @@ export function useBattleLogic({
     addLog(`--- ${activeEnemy.name}'s Turn ---`);
     setIsEnemyBlocking(false);
 
-    let { updatedEnemies, updatedSpirits, chargeUnleashed } =
-      tickEnemyEffects(
-        battleEnemies,
-        playerSpirits, // <-- Pass spirits
-        "start_of_turn",
-      );
+    // ✨ FIX: Use setState callback for enemies to read CURRENT state
+    let chargeUnleashed = false;
 
-    // Check for Strategic passive on enemy spirit BEFORE setting state
-    // Grants +30% ATK for this round only when going second
-    const currentEnemy = updatedEnemies[activeEnemyIndex];
-    const enemyBaseSpirit = getBaseSpirit(currentEnemy.spiritId);
-    if (enemyBaseSpirit?.passiveAbilities?.includes("strategic")) {
-      // Get agility values to determine turn order
-      const currentPlayerSpirit = playerSpirits[activePartySlot];
-      const playerAgility = currentPlayerSpirit ? calculateAllStats(currentPlayerSpirit.playerSpirit, currentPlayerSpirit.activeEffects).agility : 0;
-      const enemyAgility = currentEnemy.agility;
+    setBattleEnemies((prevEnemies) => {
+      const { updatedEnemies, updatedSpirits, chargeUnleashed: didUnleash } =
+        tickEnemyEffects(
+          prevEnemies, // <-- Read CURRENT state
+          playerSpirits,
+          "start_of_turn",
+        );
+      
+      chargeUnleashed = didUnleash;
 
-      if (enemyAgility < playerAgility) {
-        // Enemy is going second, apply 1-turn Strategic buff to updatedEnemies array
-        const strategicBuff: ActiveEffect = {
-          id: `strategic_${Date.now()}`,
-          effectType: "stat_buff",
-          turnsRemaining: 1,
-          stat: "attack",
-          statMultiplier: 1.3,
-        };
-        
-        updatedEnemies = updatedEnemies.map((e, i) => {
-          if (i !== activeEnemyIndex) return e;
-          const buffedEnemy = applyStatusEffect(e, strategicBuff) as Enemy;
-          return buffedEnemy;
-        });
-        
-        addLog(`${currentEnemy.name}'s Strategic passive activates! (+30% ATK this round)`);
+      // Also update player spirits
+      setPlayerSpirits(updatedSpirits);
+
+      // Check for Strategic passive on enemy spirit BEFORE returning state
+      const currentEnemy = updatedEnemies[activeEnemyIndex];
+      const enemyBaseSpirit = getBaseSpirit(currentEnemy.spiritId);
+      
+      let finalEnemies = updatedEnemies;
+      if (enemyBaseSpirit?.passiveAbilities?.includes("strategic")) {
+        // Get agility values to determine turn order
+        const currentPlayerSpirit = playerSpirits[activePartySlot];
+        const playerAgility = currentPlayerSpirit ? calculateAllStats(currentPlayerSpirit.playerSpirit, currentPlayerSpirit.activeEffects).agility : 0;
+        const enemyAgility = currentEnemy.agility;
+
+        if (enemyAgility < playerAgility) {
+          // Enemy is going second, apply 1-turn Strategic buff
+          const strategicBuff: ActiveEffect = {
+            id: `strategic_${Date.now()}`,
+            effectType: "stat_buff",
+            turnsRemaining: 1,
+            stat: "attack",
+            statMultiplier: 1.3,
+          };
+          
+          finalEnemies = finalEnemies.map((e, i) => {
+            if (i !== activeEnemyIndex) return e;
+            const buffedEnemy = applyStatusEffect(e, strategicBuff) as Enemy;
+            return buffedEnemy;
+          });
+          
+          addLog(`${currentEnemy.name}'s Strategic passive activates! (+30% ATK this round)`);
+        }
       }
-    }
 
-    setBattleEnemies(updatedEnemies);
-    setPlayerSpirits(updatedSpirits); // <-- Set spirits
+      console.log(`🟡 [ENEMY_TURN_START] After tickEnemyEffects - Player Health: ${updatedSpirits[activePartySlot]?.currentHealth}/${updatedSpirits[activePartySlot]?.maxHealth}`);
+
+      return finalEnemies;
+    });
 
     return chargeUnleashed;
   };
@@ -1570,15 +1599,23 @@ export function useBattleLogic({
   };
 
   const runEnemyTurnEnd = () => {
-    const { updatedEnemies, updatedSpirits } = tickEnemyEffects(
-      battleEnemies,
-      playerSpirits, // <-- Pass spirits
-      "end_of_turn",
-    );
-    setBattleEnemies(updatedEnemies);
-    setPlayerSpirits(updatedSpirits); // <-- Set spirits
+    // ✨ FIX: Use setState callback to read CURRENT state instead of stale closure
+    setBattleEnemies((prevEnemies) => {
+      const { updatedEnemies, updatedSpirits } = tickEnemyEffects(
+        prevEnemies, // <-- Read CURRENT state
+        playerSpirits,
+        "end_of_turn",
+      );
+      
+      console.log(`🟡 [ENEMY_TURN_END] After tickEnemyEffects - Player Health: ${updatedSpirits[activePartySlot]?.currentHealth}/${updatedSpirits[activePartySlot]?.maxHealth}`);
+      
+      // Also update player spirits
+      setPlayerSpirits(updatedSpirits);
+      
+      return updatedEnemies;
+    });
 
-    // 3. Reset block
+    // Reset block
     setIsEnemyBlocking(false);
   };
 
@@ -1641,6 +1678,9 @@ export function useBattleLogic({
 
       case "player_start":
         // Check for game-ending defeat first.
+        const spiritBeforeTurnStart = playerSpirits[activePartySlot];
+        console.log(`🔵 [PLAYER_START] Spirit health before turn start:`, spiritBeforeTurnStart?.currentHealth, `/ ${spiritBeforeTurnStart?.maxHealth}`);
+        
         if (checkGameEndCondition()) {
           return;
         }
@@ -1648,6 +1688,8 @@ export function useBattleLogic({
 
         // (Step 3)
         const playerChargeUnleashed = runPlayerTurnStart();
+        const spiritAfterTurnStart = playerSpirits[activePartySlot];
+        console.log(`🔵 [PLAYER_START] Spirit health after runPlayerTurnStart:`, spiritAfterTurnStart?.currentHealth, `/ ${spiritAfterTurnStart?.maxHealth}`);
         if (playerChargeUnleashed) {
           addLog(`${activeBaseSpirit?.name}'s turn was used by the charge!`);
           setTurnPhase("player_end"); // Skip to end of turn
@@ -2344,6 +2386,7 @@ export function useBattleLogic({
     
     console.log(`🎮 [HANDLE ATTACK] skillId: ${skillId}, activePartySlot: ${activePartySlot}`);
     console.log(`   currentSpirit exists: ${!!currentSpirit}`);
+    console.log(`   currentSpirit.health: ${currentSpirit?.currentHealth}/${currentSpirit?.maxHealth}`);
     console.log(`   currentSpirit.activeEffects: `, currentSpirit?.activeEffects);
 
     // Check for disabled actions
@@ -2791,6 +2834,7 @@ export function useBattleLogic({
       console.log(`   Final Health: ${finalSpirit?.currentHealth}/${finalSpirit?.maxHealth}`);
       console.log(`   Effects: ${finalSpirit?.activeEffects.length}`);
 
+      console.log(`🔴 [setPlayerSpirits CALLED] Health about to be set to:`, updatedSpirits[activePartySlot]?.currentHealth);
       return updatedSpirits;
     });
     // The useEffect will catch the health change and trigger
