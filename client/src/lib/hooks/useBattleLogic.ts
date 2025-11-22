@@ -2459,100 +2459,80 @@ export function useBattleLogic({
         setTimeout(() => setEnemyHealthBarShake(false), 500);
       }
 
-      // 3. Apply results using safe updaters
-      setPlayerSpirits((prev) =>
-      prev.map((s, i) => {
-        if (i !== activePartySlot) return s;
-        let newSpirit = { ...s };
-        if (result.totalHealing > 0) {
-          newSpirit.currentHealth = Math.min(
-            newSpirit.maxHealth,
-            newSpirit.currentHealth + result.totalHealing,
-          );
-          playHeal();
-          setPlayerHealthBarHeal(true);
-          setTimeout(() => setPlayerHealthBarHeal(false), 600);
-        }
-        result.effectsToApplyToCaster.forEach((eff) => {
-          eff.targetIndex = activeEnemyIndex; // Set correct target
-          newSpirit = applyStatusEffect(newSpirit, eff) as BattleSpirit;
-        });
-        return newSpirit;
-      }),
-    );
-
-    setBattleEnemies((prevEnemies) => {
-      const targetEnemy = prevEnemies[activeEnemyIndex];
-      let newHealth = Math.max(0, targetEnemy.currentHealth - damage);
-
+      // 3. Apply results using SAFE SINGLE UPDATER (avoid nested setState)
+      // Calculate all player spirit changes first, then apply in one setState
       const { reflectedDamage, attackerEffects, counterAttackDamage } = executeTriggerEffects(
         "on_get_hit",
         activeSpirit, // Attacker
-        targetEnemy, // Target
+        activeEnemy, // Target (before damage applied)
         damage,
       );
 
-      // Apply effects to target (e.g., DoT stacks)
-      let updatedEnemy = {
-        ...prevEnemies[activeEnemyIndex],
-        currentHealth: newHealth,
-      };
-      result.effectsToApplyToTarget.forEach((eff) => {
-        updatedEnemy = applyStatusEffect(updatedEnemy, eff) as Enemy;
-      });
-
-      if (attackerEffects.length > 0) {
-        setPlayerSpirits((prev) =>
-          prev.map((spirit, i) => {
-            if (i !== activePartySlot) return spirit;
-            let newSpirit = { ...spirit };
-            // --- FIX: This loop now has the correct type for `eff` ---
+      setPlayerSpirits((prev) =>
+        prev.map((s, i) => {
+          if (i !== activePartySlot) return s;
+          let newSpirit = { ...s };
+          
+          // Apply healing from skill
+          if (result.totalHealing > 0) {
+            newSpirit.currentHealth = Math.min(
+              newSpirit.maxHealth,
+              newSpirit.currentHealth + result.totalHealing,
+            );
+            playHeal();
+            setPlayerHealthBarHeal(true);
+            setTimeout(() => setPlayerHealthBarHeal(false), 600);
+          }
+          
+          // Apply effects to caster (from skill)
+          result.effectsToApplyToCaster.forEach((eff) => {
+            eff.targetIndex = activeEnemyIndex;
+            newSpirit = applyStatusEffect(newSpirit, eff) as BattleSpirit;
+          });
+          
+          // Apply trigger effects to caster (e.g., from on_deal_damage triggers)
+          if (attackerEffects.length > 0) {
             attackerEffects.forEach((eff) => {
               newSpirit = applyStatusEffect(newSpirit, eff) as BattleSpirit;
             });
-            return newSpirit;
-          }),
-        );
-      }
-
-      // Apply reflected damage to player
-      if (reflectedDamage > 0) {
-        setPlayerSpirits((prev) =>
-          prev.map((spirit, i) => {
-            if (i !== activePartySlot) return spirit;
-            const newHealth = Math.max(
-              0,
-              spirit.currentHealth - reflectedDamage,
-            );
-            return { ...spirit, currentHealth: newHealth };
-          }),
-        );
-        addLog(
-          `${activeBaseSpirit.name} takes ${reflectedDamage} reflected damage!`,
-        );
-      }
-
-      // Apply counter attack damage to player
-      if (counterAttackDamage > 0) {
-        setPlayerSpirits((prev) =>
-          prev.map((spirit, i) => {
-            if (i !== activePartySlot) return spirit;
-            const newHealth = Math.max(
-              0,
-              spirit.currentHealth - counterAttackDamage,
-            );
-            return { ...spirit, currentHealth: newHealth };
-          }),
-        );
-        playDamage();
-        setPlayerHealthBarShake(true);
-        setTimeout(() => setPlayerHealthBarShake(false), 500);
-      }
-
-      return prevEnemies.map((en, index) =>
-        index === activeEnemyIndex ? updatedEnemy : en,
+          }
+          
+          // Apply reflected damage to player
+          if (reflectedDamage > 0) {
+            newSpirit.currentHealth = Math.max(0, newSpirit.currentHealth - reflectedDamage);
+            addLog(`${activeBaseSpirit?.name} takes ${reflectedDamage} reflected damage!`);
+          }
+          
+          // Apply counter attack damage to player
+          if (counterAttackDamage > 0) {
+            newSpirit.currentHealth = Math.max(0, newSpirit.currentHealth - counterAttackDamage);
+            playDamage();
+            setPlayerHealthBarShake(true);
+            setTimeout(() => setPlayerHealthBarShake(false), 500);
+          }
+          
+          return newSpirit;
+        }),
       );
-    });
+
+      // Now handle enemy updates separately
+      setBattleEnemies((prevEnemies) => {
+        const targetEnemy = prevEnemies[activeEnemyIndex];
+        let newHealth = Math.max(0, targetEnemy.currentHealth - damage);
+
+        // Apply effects to target (e.g., DoT stacks)
+        let updatedEnemy = {
+          ...prevEnemies[activeEnemyIndex],
+          currentHealth: newHealth,
+        };
+        result.effectsToApplyToTarget.forEach((eff) => {
+          updatedEnemy = applyStatusEffect(updatedEnemy, eff) as Enemy;
+        });
+
+        return prevEnemies.map((en, index) =>
+          index === activeEnemyIndex ? updatedEnemy : en,
+        );
+      });
 
       // 4. Move to next phase
       setTurnPhase("player_execute");

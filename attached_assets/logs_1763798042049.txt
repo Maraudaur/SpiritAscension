@@ -1,0 +1,99 @@
+✨ Initializing audio... (This should only run once)
+injected.js:37 👆 BUTTON HOVER detected!
+injected.js:37 🔊 playButtonHover called: Object
+injected.js:37 🖱️ BUTTON CLICKED!
+injected.js:37 🔊 playButtonClick called: Object
+injected.js:37 🎵 User interacted, attempting to play music.
+injected.js:37 🎵 Playing explore music
+injected.js:37 ✅ Hover sound played! Object
+injected.js:37 ✅ Click sound played! Object
+injected.js:37 👆 BUTTON HOVER detected!
+injected.js:37 🔊 playButtonHover called: Object
+injected.js:37 ✅ Hover sound played! Object
+injected.js:37 🖱️ BUTTON CLICKED!
+injected.js:37 🔊 playButtonClick called: Object
+injected.js:37 [Debug] Using debug encounter: debug_fight
+injected.js:37 ⚔️ Playing battle music
+injected.js:37 👆 BUTTON HOVER detected!
+injected.js:37 🔊 playButtonHover called: Object
+injected.js:37 ✅ Click sound played! Object
+injected.js:37 ✅ Hover sound played! Object
+injected.js:37 🔊 playButtonHover called: Object
+injected.js:37 ✅ Hover sound played! Object
+injected.js:37 🔊 playButtonClick called: Object
+injected.js:37 🎮 [HANDLE ATTACK] skillId: basic_attack, activePartySlot: 0
+injected.js:37    currentSpirit exists: true
+injected.js:37    currentSpirit.activeEffects:  Array(0)
+injected.js:37 🚫 [ACTION CHECK] fight - Checking 0 effects
+injected.js:37    Result: Disabled = false
+injected.js:37 ✅ Click sound played! Object
+injected.js:37 📊 === STATUS EFFECTS (after PLAYER action) ===
+injected.js:37    Player (Terra Titan): Array(1)
+injected.js:37    Enemy (Jade Sparrow): Array(1)
+injected.js:37 📊 === STATUS EFFECTS (after PLAYER action) ===
+injected.js:37    Player (Terra Titan): Array(1)
+injected.js:37    Enemy (Jade Sparrow): Array(1)
+injected.js:37 🚫 [ENEMY ACTION CHECK] paralyze_strike - Has disable effect: false
+injected.js:37 📊 === STATUS EFFECTS (after ENEMY action) ===
+injected.js:37    Player (Terra Titan): Array(1)
+injected.js:37    Enemy (Jade Sparrow): Array(1)
+injected.js:37 📊 === STATUS EFFECTS (after ENEMY action) ===
+injected.js:37    Player (Terra Titan): Array(1)
+injected.js:37    Enemy (Jade Sparrow): Array(1)
+injected.js:37 🎯 [ENEMY ATTACK CALCULATED] totalDamage: 3
+injected.js:37 💥 [FINAL DAMAGE] 3 damage will be applied to Terra Titan
+injected.js:37 ❤️  [PLAYER SPIRIT DAMAGE]
+injected.js:37    Spirit: Terra Titan
+injected.js:37    Old Health: 39/39
+injected.js:37    Damage Applied: 3
+injected.js:37    New Health: 36/39
+injected.js:37 🎯 [APPLY TARGET EFFECTS] Applying 1 effects to player spirit
+injected.js:37   ➕ Applying disable(2) to Terra Titan
+injected.js:37 🔮 Applying disable to Terra Titan
+injected.js:37    Current effects (0): Array(0)
+injected.js:37    ✅ NEW EFFECT APPLIED
+injected.js:37    Updated effects (1): Array(1)0: "disable(2)"length: 1[[Prototype]]: Array(0)
+injected.js:37 ✅ [FINAL STATE BEFORE RETURN]
+injected.js:37    Active Spirit: Terra Titan
+injected.js:37    Final Health: 36/39
+injected.js:37    Effects: 1
+injected.js:37 📊 === STATUS EFFECTS (after ENEMY action) ===
+injected.js:37    Player (Terra Titan): Array(1)
+injected.js:37    Enemy (Jade Sparrow): Array(1)
+a0df91602a414c03.js:2 Viewport failed to stabilize
+(anonymous) @ a0df91602a414c03.js:2Understand this warning
+injected.js:37 🔊 playButtonHover called: Object
+injected.js:37 ✅ Hover sound played! Object
+injected.js:37 🔊 playButtonHover called: Object
+injected.js:37 ✅ Hover sound played! Object
+injected.js:37 🔊 playButtonClick called: Object
+injected.js:37 🎮 [HANDLE ATTACK] skillId: basic_attack, activePartySlot: 0
+injected.js:37    currentSpirit exists: true
+injected.js:37    currentSpirit.activeEffects:  Array(0)
+injected.js:37 🚫 [ACTION CHECK] fight - Checking 0 effects
+injected.js:37    Result: Disabled = false
+injected.js:37 ✅ Click sound played! Object
+injected.js:37 📊 === STATUS EFFECTS (after PLAYER action) ===
+injected.js:37    Player (Terra Titan): Array(1)
+injected.js:37    Enemy (Jade Sparrow): Array(1)
+injected.js:37 📊 === STATUS EFFECTS (after PLAYER action) ===
+injected.js:37    Player (Terra Titan): Array(1)
+injected.js:37    Enemy (Jade Sparrow): Array(1)
+injected.js:37 🚫 [ENEMY ACTION CHECK] paralyze_strike - Has disable effect: false
+injected.js:37 📊 === STATUS EFFECTS (after ENEMY action) ===
+injected.js:37    Player (Terra Titan): Array(1)
+injected.js:37    Enemy (Jade Sparrow): Array(1)
+injected.js:37 📊 === STATUS EFFECTS (after ENEMY action) ===
+injected.js:37    Player (Terra Titan): Array(1)0: "No effects"length: 1[[Prototype]]: Array(0)at: ƒ at()concat: ƒ concat()constructor: ƒ Array()copyWithin: ƒ copyWithin()entries: ƒ entries()every: ƒ every()fill: ƒ fill()filter: ƒ filter()find: ƒ find()findIndex: ƒ findIndex()findLast: ƒ findLast()findLastIndex: ƒ findLastIndex()flat: ƒ flat()flatMap: ƒ flatMap()forEach: ƒ forEach()includes: ƒ includes()indexOf: ƒ indexOf()join: ƒ join()keys: ƒ keys()lastIndexOf: ƒ lastIndexOf()length: 0map: ƒ map()pop: ƒ pop()push: ƒ push()reduce: ƒ reduce()reduceRight: ƒ reduceRight()reverse: ƒ reverse()shift: ƒ shift()slice: ƒ slice()some: ƒ some()sort: ƒ sort()splice: ƒ splice()toLocaleString: ƒ toLocaleString()toReversed: ƒ toReversed()toSorted: ƒ toSorted()toSpliced: ƒ toSpliced()toString: ƒ toString()unshift: ƒ unshift()values: ƒ values()with: ƒ with()Symbol(Symbol.iterator): ƒ values()Symbol(Symbol.unscopables): {at: true, copyWithin: true, entries: true, fill: true, find: true, …}[[Prototype]]: Object
+injected.js:37    Enemy (Jade Sparrow): Array(1)0: "No effects"length: 1[[Prototype]]: Array(0)
+injected.js:37 🎯 [ENEMY ATTACK CALCULATED] totalDamage: 3
+injected.js:37 💥 [FINAL DAMAGE] 3 damage will be applied to Terra Titan
+injected.js:37 ❤️  [PLAYER SPIRIT DAMAGE]
+injected.js:37    Spirit: Terra Titan
+injected.js:37    Old Health: 39/39
+injected.js:37    Damage Applied: 3
+injected.js:37    New Health: 36/39
+injected.js:37 🎯 [APPLY TARGET EFFECTS] Applying 1 effects to player spirit
+injected.js:37   ➕ Applying disable(2) to Terra Titan
+injected.js:37 🔮 Applying disable to Terra Titan
+injected.js:37    Current effects (0): Array(0)
