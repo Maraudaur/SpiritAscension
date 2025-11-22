@@ -368,5 +368,20 @@
         "duration": 3
       }
     ]
+  },
+  "paralyze_strike": {
+    "id": "paralyze_strike",
+    "name": "Paralyze Strike",
+    "description": "A Metal-type attack that disables the enemy's attack for 2 turns.",
+    "damage": 0.8,
+    "healing": 0,
+    "element": "metal",
+    "effects": [
+      {
+        "type": "disable",
+        "action": "fight",
+        "duration": 2
+      }
+    ]
   }
 }

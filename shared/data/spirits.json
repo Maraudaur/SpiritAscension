@@ -23,6 +23,10 @@
           "unlockLevel": 3
         },
         {
+          "skillId": "paralyze_strike",
+          "unlockLevel": 4
+        },
+        {
           "skillId": "def_shred_dot",
           "unlockLevel": 6
         }
