@@ -1001,6 +1001,88 @@ export function useBattleLogic({
   };
 
   /**
+   * Ticks down effect durations for the active spirit at the end of their turn.
+   * This ensures "2 turn" effects last for exactly 2 of that spirit's turns.
+   */
+  const tickTurnEndEffects = (
+    spirits: BattleSpirit[],
+    enemies: Enemy[],
+    isPlayerTurn: boolean,
+  ): {
+    updatedSpirits: BattleSpirit[];
+    updatedEnemies: Enemy[];
+  } => {
+    if (isPlayerTurn) {
+      // Decrement effects for the ACTIVE PLAYER SPIRIT
+      const updatedSpirits = spirits.map((spirit, spiritIndex) => {
+        if (spiritIndex !== activePartySlot) return spirit;
+        
+        const newActiveEffects: ActiveEffect[] = [];
+        spirit.activeEffects.forEach((effect) => {
+          if (effect.turnsRemaining === -1) {
+            // Permanent effect, keep it
+            newActiveEffects.push(effect);
+          } else if (effect.turnsRemaining > 1) {
+            // Decrement and keep
+            newActiveEffects.push({
+              ...effect,
+              turnsRemaining: effect.turnsRemaining - 1,
+            });
+          } else if (effect.turnsRemaining === 1) {
+            // Effect expires at end of this turn - remove it
+            const baseSpirit = getBaseSpirit(spirit.playerSpirit.spiritId);
+            const spiritName = baseSpirit?.name || "Player Spirit";
+            if (effect.effectType !== "charge") {
+              const effectName = effect.effectType === "disable" ? effect.disabledAction : effect.effectType;
+              addLog(`${spiritName}'s ${effectName} effect has worn off.`);
+            }
+          }
+          // else: turnsRemaining <= 0, don't push (already expired)
+        });
+        
+        return {
+          ...spirit,
+          activeEffects: newActiveEffects,
+          playerSpirit: {
+            ...spirit.playerSpirit,
+            activeEffects: newActiveEffects,
+          },
+        };
+      });
+      return { updatedSpirits, updatedEnemies: enemies };
+    } else {
+      // Decrement effects for the ACTIVE ENEMY
+      const updatedEnemies = enemies.map((enemy, enemyIndex) => {
+        if (enemyIndex !== activeEnemyIndex) return enemy;
+        
+        const newActiveEffects: ActiveEffect[] = [];
+        enemy.activeEffects.forEach((effect) => {
+          if (effect.turnsRemaining === -1) {
+            // Permanent effect, keep it
+            newActiveEffects.push(effect);
+          } else if (effect.turnsRemaining > 1) {
+            // Decrement and keep
+            newActiveEffects.push({
+              ...effect,
+              turnsRemaining: effect.turnsRemaining - 1,
+            });
+          } else if (effect.turnsRemaining === 1) {
+            // Effect expires at end of this turn - remove it
+            if (effect.effectType !== "charge") {
+              const effectName = effect.effectType === "disable" ? effect.disabledAction : effect.effectType;
+              addLog(`${enemy.name}'s ${effectName} effect has worn off.`);
+            }
+          }
+          // else: turnsRemaining <= 0, don't push (already expired)
+        });
+        
+        return { ...enemy, activeEffects: newActiveEffects };
+      });
+      return { updatedSpirits: spirits, updatedEnemies };
+    }
+  };
+
+  /**
    * Ticks down effect durations at the end of each complete round.
    * This is called after both player and enemy have acted.
    */
@@ -1567,6 +1649,17 @@ export function useBattleLogic({
         // (Step 4, End)
         runPlayerTurnEnd(); // Tick DOTs/effects
 
+        // Decrement effect durations for the player's turn
+        (() => {
+          const { updatedSpirits, updatedEnemies } = tickTurnEndEffects(
+            playerSpirits,
+            battleEnemies,
+            true
+          );
+          setPlayerSpirits(updatedSpirits);
+          setBattleEnemies(updatedEnemies);
+        })();
+
         // --- DEFEAT CHECK (for poison, etc.) ---
         // Check if poison/etc defeated the active spirit
         if (checkGameEndCondition()) {
@@ -1642,6 +1735,17 @@ export function useBattleLogic({
       case "enemy_end":
         // (Step 7)
         runEnemyTurnEnd(); // Tick DOTs/effects
+
+        // Decrement effect durations for the enemy's turn
+        (() => {
+          const { updatedSpirits, updatedEnemies } = tickTurnEndEffects(
+            playerSpirits,
+            battleEnemies,
+            false
+          );
+          setPlayerSpirits(updatedSpirits);
+          setBattleEnemies(updatedEnemies);
+        })();
 
         // --- DEFEAT CHECK (for poison, etc.) ---
         // Check if poison/etc defeated the active enemy
