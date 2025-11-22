@@ -1672,17 +1672,8 @@ export function useBattleLogic({
       case "player_end":
         // (Step 4, End)
         runPlayerTurnEnd(); // Tick DOTs/effects
-
-        // Decrement effect durations for the player's turn
-        (() => {
-          const { updatedSpirits, updatedEnemies } = tickTurnEndEffects(
-            playerSpirits,
-            battleEnemies,
-            true
-          );
-          setPlayerSpirits(updatedSpirits);
-          setBattleEnemies(updatedEnemies);
-        })();
+        // NOTE: Effect durations are decremented at round end (tickRoundEndEffects), not turn end
+        // This ensures "2 turn" effects last for exactly 2 full rounds
 
         // --- DEFEAT CHECK (for poison, etc.) ---
         // Check if poison/etc defeated the active spirit
@@ -1759,17 +1750,8 @@ export function useBattleLogic({
       case "enemy_end":
         // (Step 7)
         runEnemyTurnEnd(); // Tick DOTs/effects
-
-        // Decrement effect durations for the enemy's turn
-        (() => {
-          const { updatedSpirits, updatedEnemies } = tickTurnEndEffects(
-            playerSpirits,
-            battleEnemies,
-            false
-          );
-          setPlayerSpirits(updatedSpirits);
-          setBattleEnemies(updatedEnemies);
-        })();
+        // NOTE: Effect durations are decremented at round end (tickRoundEndEffects), not turn end
+        // This ensures "2 turn" effects last for exactly 2 full rounds
 
         // --- DEFEAT CHECK (for poison, etc.) ---
         // Check if poison/etc defeated the active enemy
@@ -2357,18 +2339,34 @@ export function useBattleLogic({
   const handleAttack = (skillId: string) => {
     if (turnPhase !== "player_action" || messageQueue.length > 0) return;
 
+    // Get the CURRENT spirit from state (not a closure reference)
+    const currentSpirit = playerSpirits[activePartySlot];
+    
+    console.log(`🎮 [HANDLE ATTACK] skillId: ${skillId}, activePartySlot: ${activePartySlot}`);
+    console.log(`   currentSpirit exists: ${!!currentSpirit}`);
+    console.log(`   currentSpirit.activeEffects: `, currentSpirit?.activeEffects);
+
     // Check for disabled actions
     const isActionDisabledCheck = (action: "fight" | "skill") => {
-      if (!activeSpirit?.activeEffects) return false;
-      const disabled = activeSpirit.activeEffects.some(
+      if (!currentSpirit?.activeEffects) {
+        console.log(`🚫 [ACTION CHECK] ${action} - No activeEffects found`);
+        return false;
+      }
+      
+      console.log(`🚫 [ACTION CHECK] ${action} - Checking ${currentSpirit.activeEffects.length} effects`);
+      currentSpirit.activeEffects.forEach((e, idx) => {
+        console.log(`   [${idx}] ${e.effectType}(${e.turnsRemaining})${e.disabledAction ? ` action:${e.disabledAction}` : ''}`);
+      });
+      
+      const disabled = currentSpirit.activeEffects.some(
         (effect) =>
           effect.effectType === "disable" &&
           effect.disabledAction === action &&
           (effect.turnsRemaining > 0 || effect.turnsRemaining === -1)
       );
-      console.log(`🚫 [ACTION CHECK] ${action} - Disabled: ${disabled}`);
+      console.log(`   Result: Disabled = ${disabled}`);
       if (disabled) {
-        const disableEffect = activeSpirit.activeEffects.find(
+        const disableEffect = currentSpirit.activeEffects.find(
           (e) => e.effectType === "disable" && e.disabledAction === action
         );
         console.log(`   Effect turnsRemaining: ${disableEffect?.turnsRemaining}`);
@@ -2379,6 +2377,7 @@ export function useBattleLogic({
     const actionType = skillId === "basic_attack" ? "fight" : "skill";
     if (isActionDisabledCheck(actionType)) {
       addLog("Currently disabled!");
+      console.log(`❌ ACTION BLOCKED - player cannot use ${actionType}`);
       return;
     }
 
