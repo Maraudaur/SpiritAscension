@@ -47,6 +47,7 @@ export function SummonScreen({ onNavigate }: SummonScreenProps) {
     getMultiSummonCost,
     summonMultipleSpirits,
     freeSummons,
+    summonCount,
   } = useGameState();
   
   const [summonedSpirit, setSummonedSpirit] = useState<PlayerSpirit | null>(
@@ -589,10 +590,13 @@ export function SummonScreen({ onNavigate }: SummonScreenProps) {
                   <div className="grid grid-cols-3 gap-4 mt-6">
                     <Button
                       onClick={handleContinue}
+                      disabled={summonCount === 1}
                       className="w-full p-4 text-lg font-bold"
                       style={{
-                        background: "var(--vermillion)",
+                        background: summonCount === 1 ? "#999" : "var(--vermillion)",
                         color: "var(--parchment)",
+                        opacity: summonCount === 1 ? 0.5 : 1,
+                        cursor: summonCount === 1 ? "not-allowed" : "pointer",
                       }}
                     >
                       {summonQueue.length > 0 &&
@@ -612,10 +616,13 @@ export function SummonScreen({ onNavigate }: SummonScreenProps) {
                     </Button>
                     <Button
                       onClick={() => onNavigate("cultivation")}
+                      disabled={summonCount === 1}
                       className="w-full p-4 text-lg font-bold"
                       style={{
-                        background: "var(--azure)",
+                        background: summonCount === 1 ? "#999" : "var(--azure)",
                         color: "var(--parchment)",
+                        opacity: summonCount === 1 ? 0.5 : 1,
+                        cursor: summonCount === 1 ? "not-allowed" : "pointer",
                       }}
                     >
                       Return to Cultivation
