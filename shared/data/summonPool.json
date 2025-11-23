@@ -1,6 +1,6 @@
 {
   "pools": {
-    "balanced_starter": {
+    "starter": {
       "id": "starter",
       "name": "Starter",
       "description": "A well-rounded team of starter spirits",

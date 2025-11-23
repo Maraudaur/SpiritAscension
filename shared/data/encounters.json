@@ -13,8 +13,7 @@
     "rewards": {
       "qi": 300,
       "essences": {
-        "spirit_c01": 3,
-        "spirit_c02": 3
+        "spirit_c05": 3
       }
     },
     "penalties": {
