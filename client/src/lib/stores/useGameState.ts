@@ -57,6 +57,7 @@ export interface GameStateStore extends Omit<GameStateData, "activeParty"> {
   completedStoryNodes: number[];
   currentEncounterId: string | null;
   storyBattleCheckpoint: StoryBattleCheckpoint | null;
+  selectedFirstSummonPoolId: string | null;
 
   // Debug State
   freeSummons: boolean;
@@ -97,6 +98,7 @@ export interface GameStateStore extends Omit<GameStateData, "activeParty"> {
   addEssence: (spiritId: string, amount: number) => void;
   summonSpirit: () => PlayerSpirit;
   summonMultipleSpirits: (count: number) => PlayerSpirit[];
+  setSelectedFirstSummonPoolId: (poolId: string | null) => void;
 
   // SpiritManager Actions
   addToParty: (instanceId: string) => void;
@@ -219,10 +221,22 @@ function _createRandomSpirit(rarity: Rarity): PlayerSpirit {
   };
 }
 
-function _createFirstSummonSpirit(): PlayerSpirit {
+function _createFirstSummonSpirit(poolId?: string | null): PlayerSpirit {
   // Pick a random spirit from the first summon pool
   const poolData = firstSummonPoolJson as any;
-  const spiritIds = poolData.spiritIds || [];
+  const pools = poolData.pools || {};
+  const defaultPoolId = poolData.defaultPoolId || "balanced_starter";
+  
+  // Use provided poolId, or fall back to default
+  const selectedPoolId = poolId || defaultPoolId;
+  const selectedPool = pools[selectedPoolId];
+  
+  if (!selectedPool) {
+    console.warn(`First summon pool "${selectedPoolId}" not found, falling back to default`);
+    return _createFirstSummonSpirit(defaultPoolId);
+  }
+  
+  const spiritIds = selectedPool.spiritIds || [];
   
   if (spiritIds.length === 0) {
     // Fallback to common if pool is empty
@@ -315,6 +329,7 @@ export const useGameState = create<GameStateStore>()(
       completedStoryNodes: [],
       currentEncounterId: null,
       storyBattleCheckpoint: null,
+      selectedFirstSummonPoolId: null,
       freeSummons: false,
       freeLevelUp: false,
       debugEncounter: null,
@@ -400,6 +415,9 @@ export const useGameState = create<GameStateStore>()(
       setStoryBattleCheckpoint: (checkpoint: StoryBattleCheckpoint | null) => {
         set({ storyBattleCheckpoint: checkpoint });
       },
+      setSelectedFirstSummonPoolId: (poolId: string | null) => {
+        set({ selectedFirstSummonPoolId: poolId });
+      },
       resolveStoryBattle: (outcome: "victory" | "defeat") => {
         set((state) => {
           if (outcome === "victory") {
@@ -437,6 +455,7 @@ export const useGameState = create<GameStateStore>()(
             completedStoryNodes: [],
             currentEncounterId: null,
             storyBattleCheckpoint: null,
+            selectedFirstSummonPoolId: null,
             debugEncounter: null,
           });
         });
@@ -585,8 +604,9 @@ export const useGameState = create<GameStateStore>()(
       summonSpirit: () => {
         // Uses helper functions from top level
         const currentSummonCount = get().summonCount ?? 0;
+        const poolId = get().selectedFirstSummonPoolId;
         // First summon comes from the first summon pool
-        const newSpirit = currentSummonCount === 0 ? _createFirstSummonSpirit() : _createRandomSpirit(_selectRandomRarity());
+        const newSpirit = currentSummonCount === 0 ? _createFirstSummonSpirit(poolId) : _createRandomSpirit(_selectRandomRarity());
 
         set((state) => {
           state.spirits.push(newSpirit);
@@ -604,13 +624,14 @@ export const useGameState = create<GameStateStore>()(
         const newSpirits: PlayerSpirit[] = [];
         let hasRare = false;
         const currentSummonCount = get().summonCount ?? 0;
+        const poolId = get().selectedFirstSummonPoolId;
 
         for (let i = 0; i < count; i++) {
           // Uses helper functions from top level
           // First summon ever comes from the first summon pool
           const isFirstSummonEver = currentSummonCount === 0 && i === 0;
           if (isFirstSummonEver) {
-            newSpirits.push(_createFirstSummonSpirit());
+            newSpirits.push(_createFirstSummonSpirit(poolId));
           } else {
             const rarity = _selectRandomRarity();
             if (["rare", "epic", "legendary"].includes(rarity)) {

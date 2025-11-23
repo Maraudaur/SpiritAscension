@@ -1,18 +1,13 @@
 [
   {
     "id": "e001",
-    "name": "JadeStone",
+    "name": "BasicCombat",
     "averageLevel": 1,
     "enemies": [
       {
-        "spiritId": "spirit_c10",
+        "spiritId": "spirit_c04",
         "level": 1,
-        "ai": ["crit_setup", "basic_attack"]
-      },
-      {
-        "spiritId": "spirit_c02",
-        "level": 1,
-        "ai": ["r000"]
+        "ai": ["basic_attack"]
       }
     ],
     "rewards": {
@@ -28,23 +23,13 @@
   },
   {
     "id": "e002",
-    "name": "Ember Foxes",
+    "name": "Elements",
     "averageLevel": 2,
     "enemies": [
       {
         "spiritId": "spirit_c03",
-        "level": 1,
-        "ai": ["r000"]
-      },
-      {
-        "spiritId": "spirit_c03",
-        "level": 1,
-        "ai": ["r000"]
-      },
-      {
-        "spiritId": "spirit_c03",
         "level": 2,
-        "ai": ["r000"]
+        "ai": ["basic_attack"]
       }
     ],
     "rewards": {
@@ -59,16 +44,11 @@
   },
   {
     "id": "e003",
-    "name": "Mountain Duo",
+    "name": "HighDefense",
     "averageLevel": 3,
     "enemies": [
       {
-        "spiritId": "spirit_c07",
-        "level": 3,
-        "ai": ["basic_attack"]
-      },
-      {
-        "spiritId": "spirit_c06",
+        "spiritId": "spirit_c02",
         "level": 3,
         "ai": ["basic_attack"]
       }
@@ -86,18 +66,13 @@
   },
   {
     "id": "e004",
-    "name": "Poison Wall",
+    "name": "ReallyStrong",
     "averageLevel": 2,
     "enemies": [
       {
         "spiritId": "spirit_c05",
         "level": 2,
-        "ai": ["ancestral_healing", "basic_attack"]
-      },
-      {
-        "spiritId": "spirit_c05",
-        "level": 2,
-        "ai": ["ancestral_healing", "basic_attack"]
+        "ai": ["basic_attack"]
       }
     ],
     "rewards": {
