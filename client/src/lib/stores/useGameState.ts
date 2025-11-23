@@ -232,8 +232,9 @@ function _createFirstSummonSpirit(poolId?: string | null): PlayerSpirit {
   const selectedPool = pools[selectedPoolId];
   
   if (!selectedPool) {
-    console.warn(`First summon pool "${selectedPoolId}" not found, falling back to default`);
-    return _createFirstSummonSpirit(defaultPoolId);
+    console.warn(`First summon pool "${selectedPoolId}" not found, falling back to general summoning pool with rarity-based chances`);
+    const rarity = _selectRandomRarity();
+    return _createRandomSpirit(rarity);
   }
   
   const spiritIds = selectedPool.spiritIds || [];

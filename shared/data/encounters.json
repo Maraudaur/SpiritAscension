@@ -24,12 +24,12 @@
   {
     "id": "e002",
     "name": "Elements",
-    "averageLevel": 2,
+    "averageLevel": 6,
     "enemies": [
       {
         "spiritId": "spirit_c03",
-        "level": 2,
-        "ai": ["basic_attack"]
+        "level": 6,
+        "ai": ["r000"]
       }
     ],
     "rewards": {
