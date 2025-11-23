@@ -10,7 +10,7 @@ import type {
   Encounter,
 } from "@shared/types";
 import spiritsDataJson from "@shared/data/spirits.json";
-import firstSummonPoolJson from "@shared/data/firstSummonPool.json";
+import summonPoolJson from "@shared/data/summonPool.json";
 import { encrypt, decrypt } from "../encryption";
 
 // --- (FTUE, Spirit, AscensionBuffs types remain the same) ---
@@ -223,7 +223,7 @@ function _createRandomSpirit(rarity: Rarity): PlayerSpirit {
 
 function _createFirstSummonSpirit(poolId?: string | null): PlayerSpirit {
   // Pick a random spirit from the first summon pool
-  const poolData = firstSummonPoolJson as any;
+  const poolData = summonPoolJson as any;
   const pools = poolData.pools || {};
   const defaultPoolId = poolData.defaultPoolId || "balanced_starter";
   

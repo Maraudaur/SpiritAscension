@@ -1,0 +1,35 @@
+{
+  "pools": {
+    "balanced_starter": {
+      "id": "balanced_starter",
+      "name": "Balanced Starter",
+      "description": "A well-rounded team of starter spirits",
+      "spiritIds": ["spirit_c01", "spirit_c02", "spirit_c03", "spirit_c04", "spirit_c05", "spirit_c06"]
+    },
+    "earth_focused": {
+      "id": "earth_focused",
+      "name": "Earth Focused",
+      "description": "Strong earth element starters",
+      "spiritIds": ["spirit_c02", "spirit_c05", "spirit_c06"]
+    },
+    "fire_focused": {
+      "id": "fire_focused",
+      "name": "Fire Focused",
+      "description": "Strong fire element starters",
+      "spiritIds": ["spirit_c03", "spirit_c04"]
+    },
+    "water_focused": {
+      "id": "water_focused",
+      "name": "Water Focused",
+      "description": "Strong water element starters",
+      "spiritIds": ["spirit_c02", "spirit_c04"]
+    },
+    "wood_focused": {
+      "id": "wood_focused",
+      "name": "Wood Focused",
+      "description": "Strong wood element starters",
+      "spiritIds": ["spirit_c01", "spirit_c05", "spirit_c06"]
+    }
+  },
+  "defaultPoolId": "balanced_starter"
+}
