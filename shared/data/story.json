@@ -39,25 +39,75 @@
   },
   {
     "id": 1,
-    "title": "First Steps",
-    "description": "Learn the basics of Qi cultivation",
-    "summary": "You train your first spirit and learn combat basics. A corrupted level 10 spirit blocks the path to a nearby town - you must prepare and defeat it.",
+    "title": "The Elements",
+    "description": "Learn about elemental relationships.",
+    "summary": "Each element has another element that it's stronger or weaker to.",
     "characters": [{ "id": "Droplet", "position": "right" }],
     "dialogues": [
       {
         "speakerId": "Droplet",
         "expression": "happy",
-        "text": "How was your first fight? lets level up our spirit. Go to the spirit tab, click your spirit and level up! You can get more spirit essense later by summoning more spirits and harmonizing them."
-      },
+        "text": "Wood -> Fire -> Earth -> Metal -> Water -> Wood"
+      }
+    ],
+    "encounterId": "e002"
+  },
+  {
+    "id": 2,
+    "title": "Buffs and Debuffs",
+    "description": "Learn the basics of buffs and debuffs.",
+    "summary": "Buffs and debuffs can help turn the tide of battle.",
+    "characters": [{ "id": "Droplet", "position": "right" }],
+    "dialogues": [
       {
         "speakerId": "Droplet",
         "expression": "happy",
-        "text": "The more battles you do the more Qi and Qi generation you will get! make sure to keep upgrading that Qi generation rate! Head on to the battle tab to start training"
-      },
+        "text": "Buffs and debuffs can make your spirit stronger or the enemy spirit weaker."
+      }
+    ],
+    "encounterId": "e003"
+  },
+  {
+    "id": 3,
+    "title": "Status Effects",
+    "description": "Learn the basics of status effects.",
+    "summary": "Status effects are powerful lingering effects.",
+    "characters": [{ "id": "Droplet", "position": "right" }],
+    "dialogues": [
+      {
+        "speakerId": "Droplet",
+        "expression": "happy",
+        "text": "Status effects can do a lot of things and help turn the tide of battle to your favour."
+      }
+    ],
+    "encounterId": "e004"
+  },
+  {
+    "id": 4,
+    "title": "Dual Elements",
+    "description": "Learn about dual elements.",
+    "summary": "Some spirits are of two elements.",
+    "characters": [{ "id": "Droplet", "position": "right" }],
+    "dialogues": [
       {
         "speakerId": "Droplet",
         "expression": "angry",
-        "text": "There's a small town up ahead, but there seems to be a corrupted spirit blocking the path. It's level 10 so get your spirits prepared and take it on!"
+        "text": "Some spirits have dual elements. This means they can be strong and weak against two types of elements instead of just one."
+      }
+    ],
+    "encounterId": "e005"
+  },
+  {
+    "id": 5,
+    "title": "The Boss",
+    "description": "Learn the basics of Qi cultivation.",
+    "summary": "You train your first spirit and learn combat basics. A corrupted spirit blocks the path to a nearby town - you must prepare and defeat it.",
+    "characters": [{ "id": "Droplet", "position": "right" }],
+    "dialogues": [
+      {
+        "speakerId": "Droplet",
+        "expression": "angry",
+        "text": "There's a small town up ahead, but there seems to be a corrupted spirit blocking the path. It's very strong so get your spirits prepared and take it on!"
       }
     ],
     "encounterId": "e_boss_01"

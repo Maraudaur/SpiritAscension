@@ -43,12 +43,33 @@
   },
   {
     "id": "e003",
+    "name": "ReallyStrong",
+    "averageLevel": 6,
+    "enemies": [
+      {
+        "spiritId": "spirit_c05",
+        "level": 6,
+        "ai": ["basic_attack"]
+      }
+    ],
+    "rewards": {
+      "qi": 800,
+      "essences": {
+        "spirit_c05": 6
+      }
+    },
+    "penalties": {
+      "qiLoss": 500
+    }
+  },
+  {
+    "id": "e004",
     "name": "HighDefense",
-    "averageLevel": 3,
+    "averageLevel": 9,
     "enemies": [
       {
         "spiritId": "spirit_c02",
-        "level": 3,
+        "level": 9,
         "ai": ["basic_attack"]
       }
     ],
@@ -64,20 +85,21 @@
     }
   },
   {
-    "id": "e004",
-    "name": "ReallyStrong",
-    "averageLevel": 2,
+    "id": "e005",
+    "name": "DualElements",
+    "averageLevel": 13,
     "enemies": [
       {
-        "spiritId": "spirit_c05",
-        "level": 2,
+        "spiritId": "spirit_c02",
+        "level": 13,
         "ai": ["basic_attack"]
       }
     ],
     "rewards": {
       "qi": 800,
       "essences": {
-        "spirit_c05": 6
+        "spirit_c07": 3,
+        "spirit_c06": 3
       }
     },
     "penalties": {
@@ -87,11 +109,11 @@
   {
     "id": "e_boss_01",
     "name": "Heavenly Warlord",
-    "averageLevel": 10,
+    "averageLevel": 20,
     "enemies": [
       {
         "spiritId": "boss_01",
-        "level": 10,
+        "level": 20,
         "ai": ["taunt", "def_buff", "charged_hit"]
       }
     ],

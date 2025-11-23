@@ -99,7 +99,7 @@
           "unlockLevel": 3
         },
         {
-          "skillId": "def_debuff",
+          "skillId": "def_buff",
           "unlockLevel": 6
         }
       ],
