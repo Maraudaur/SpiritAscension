@@ -280,6 +280,53 @@ function _createFirstSummonSpirit(poolId?: string | null): PlayerSpirit {
   };
 }
 
+function _createGuaranteedNewCommonSpirit(ownedSpirits: PlayerSpirit[]): PlayerSpirit {
+  // Get all common spirits
+  const commonSpirits = spiritsData["common"] || [];
+  
+  // Get IDs of common spirits the player already owns
+  const ownedCommonIds = new Set(
+    ownedSpirits
+      .filter(ps => {
+        const baseSpirit = commonSpirits.find(s => s.id === ps.spiritId);
+        return baseSpirit !== undefined;
+      })
+      .map(ps => ps.spiritId)
+  );
+  
+  // Find unowned common spirits
+  const unownedCommons = commonSpirits.filter(s => !ownedCommonIds.has(s.id));
+  
+  // If player has all commons, fall back to normal summoning
+  if (unownedCommons.length === 0) {
+    console.log("Player has all common spirits, falling back to rarity-based summoning");
+    return _createRandomSpirit(_selectRandomRarity());
+  }
+  
+  // Pick a random unowned common spirit
+  const selectedSpirit = unownedCommons[Math.floor(Math.random() * unownedCommons.length)];
+  const isPrismatic = Math.random() < 0.001; // 0.1% chance
+  
+  const getRandomPotential = (): PotentialGrade => {
+    return POTENTIAL_GRADES[Math.floor(Math.random() * POTENTIAL_GRADES.length)];
+  };
+  
+  return {
+    instanceId: crypto.randomUUID(),
+    spiritId: selectedSpirit.id,
+    level: 1,
+    experience: 0,
+    isPrismatic: isPrismatic,
+    potentialFactors: {
+      attack: getRandomPotential(),
+      defense: getRandomPotential(),
+      health: getRandomPotential(),
+      affinity: getRandomPotential(),
+      agility: getRandomPotential(),
+    },
+  };
+}
+
 function _createSpecificSpirit(spiritId: string, level: number = 1): PlayerSpirit | null {
   // Find the base spirit by ID across all rarities
   let baseSpirit: BaseSpirit | undefined = undefined;
@@ -606,8 +653,19 @@ export const useGameState = create<GameStateStore>()(
         // Uses helper functions from top level
         const currentSummonCount = get().summonCount ?? 0;
         const poolId = get().selectedFirstSummonPoolId;
+        const currentSpirits = get().spirits;
+        
         // First summon comes from the first summon pool
-        const newSpirit = currentSummonCount === 0 ? _createFirstSummonSpirit(poolId) : _createRandomSpirit(_selectRandomRarity());
+        let newSpirit: PlayerSpirit;
+        if (currentSummonCount === 0) {
+          newSpirit = _createFirstSummonSpirit(poolId);
+        } else if (currentSummonCount >= 1 && currentSummonCount <= 4) {
+          // Summons 2-5: guarantee a new common spirit
+          newSpirit = _createGuaranteedNewCommonSpirit(currentSpirits);
+        } else {
+          // After 5 summons, use normal rarity-based summoning
+          newSpirit = _createRandomSpirit(_selectRandomRarity());
+        }
 
         set((state) => {
           state.spirits.push(newSpirit);
@@ -626,14 +684,23 @@ export const useGameState = create<GameStateStore>()(
         let hasRare = false;
         const currentSummonCount = get().summonCount ?? 0;
         const poolId = get().selectedFirstSummonPoolId;
+        let currentSpirits = get().spirits;
 
         for (let i = 0; i < count; i++) {
           // Uses helper functions from top level
-          // First summon ever comes from the first summon pool
+          const summonIndex = currentSummonCount + i;
           const isFirstSummonEver = currentSummonCount === 0 && i === 0;
+          
           if (isFirstSummonEver) {
             newSpirits.push(_createFirstSummonSpirit(poolId));
+          } else if (summonIndex >= 1 && summonIndex <= 4) {
+            // Summons 2-5: guarantee a new common spirit
+            const newCommon = _createGuaranteedNewCommonSpirit(currentSpirits);
+            newSpirits.push(newCommon);
+            // Add to tracking so multi-summon doesn't duplicate spirits
+            currentSpirits = [...currentSpirits, newCommon];
           } else {
+            // After 5 summons, use normal rarity-based summoning
             const rarity = _selectRandomRarity();
             if (["rare", "epic", "legendary"].includes(rarity)) {
               hasRare = true;
@@ -643,9 +710,14 @@ export const useGameState = create<GameStateStore>()(
         }
 
         // Guaranteed rare still applies even on first batch (just not in first slot if it's the first summon ever)
-        if (!hasRare) {
-          // If this is the very first summon batch, put the rare in the last slot (not first)
-          newSpirits[count - 1] = _createRandomSpirit("rare");
+        if (!hasRare && currentSummonCount + count > 5) {
+          // If this batch includes summons after #5, put a guaranteed rare in the appropriate spot
+          for (let i = 0; i < newSpirits.length; i++) {
+            if (currentSummonCount + i > 5) {
+              newSpirits[i] = _createRandomSpirit("rare");
+              break;
+            }
+          }
         }
 
         set((state) => {

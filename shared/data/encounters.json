@@ -23,11 +23,11 @@
   {
     "id": "e002",
     "name": "Elements",
-    "averageLevel": 6,
+    "averageLevel": 4,
     "enemies": [
       {
         "spiritId": "spirit_c03",
-        "level": 6,
+        "level": 4,
         "ai": ["r000"]
       }
     ],
