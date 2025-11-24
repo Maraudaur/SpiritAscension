@@ -183,6 +183,42 @@
         "animationSpeed": 0.1
       },
       "elements": ["metal"]
+    },
+    {
+      "id": "spirit_c06",
+      "name": "Void Phantom",
+      "rarity": "common",
+      "lineage": "horse",
+      "baseStats": {
+        "attack": 180,
+        "defense": 110,
+        "health": 130,
+        "affinity": 80,
+        "agility": 135
+      },
+      "passiveAbilities": ["attack_focus"],
+      "skills": [
+        {
+          "skillId": "basic_attack",
+          "unlockLevel": 1
+        },
+        {
+          "skillId": "heavy_hit",
+          "unlockLevel": 3
+        },
+        {
+          "skillId": "crit_setup",
+          "unlockLevel": 6
+        }
+      ],
+      "spriteConfig": {
+        "textureUrl": "/sprites/cinderpaw_idle.png",
+        "frameWidth": 128,
+        "frameHeight": 128,
+        "totalFrames": 8,
+        "animationSpeed": 0.1
+      },
+      "elements": ["neutral"]
     }
   ],
   "uncommon": [

@@ -5,6 +5,12 @@
       "name": "Starter",
       "description": "A well-rounded team of starter spirits",
       "spiritIds": ["spirit_c05"]
+    },
+    "common": {
+      "id": "common",
+      "name": "Common",
+      "description": "Common spirits for summoning",
+      "spiritIds": ["spirit_c01", "spirit_c02", "spirit_c03", "spirit_c04", "spirit_c05", "spirit_c06"]
     }
   },
   "defaultPoolId": "starter"
