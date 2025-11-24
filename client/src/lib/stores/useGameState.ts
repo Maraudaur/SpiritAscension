@@ -20,6 +20,7 @@ export type FtueStep =
   | "highlightSummon"
   | "highlightSummonButton"
   | "highlightSpirits"
+  | "highlightSpiritsForNode1"
   | "highlightFirstSpirit"
   | "highlightLevelUpButton"
   | "highlightBattle"

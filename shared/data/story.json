@@ -40,8 +40,8 @@
   {
     "id": 1,
     "title": "Getting Stronger",
-    "description": "Learn about stregnthening your spirits.",
-    "summary": "Leveling up your spirits makes them stronger.",
+    "description": "Learn about becoming stronger.",
+    "summary": "Leveling up your mind and spirits to become stronger.",
     "characters": [{ "id": "Droplet", "position": "right" }],
     "dialogues": [
       {
@@ -49,8 +49,7 @@
         "expression": "happy",
         "text": "Remember to level up your spirits to make them stronger. If you are low on QI, remember to cultivate to increase your income."
       }
-    ],
-    "encounterId": "e002"
+    ]
   },
   {
     "id": 2,

@@ -29,6 +29,9 @@ export function Sidebar({ currentScreen, onNavigate }: SidebarProps) {
     if (screen === "spirits" && ftueStep === "highlightSpirits") {
       setFtueStep("highlightFirstSpirit");
     }
+    if (screen === "spirits" && ftueStep === "highlightSpiritsForNode1") {
+      setFtueStep("highlightFirstSpirit");
+    }
     if (screen === "battle" && ftueStep === "highlightBattle") {
       // Don't clear yet - will clear after winning battle
       // Keep highlightBattle active so player knows this is FTUE
@@ -107,6 +110,9 @@ export function Sidebar({ currentScreen, onNavigate }: SidebarProps) {
             ftueClass = "animate-pulse-bright";
           }
           if (item.id === "spirits" && ftueStep === "highlightSpirits") {
+            ftueClass = "animate-pulse-bright";
+          }
+          if (item.id === "spirits" && ftueStep === "highlightSpiritsForNode1") {
             ftueClass = "animate-pulse-bright";
           }
           if (item.id === "battle" && ftueStep === "highlightBattle") {
