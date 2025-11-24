@@ -100,6 +100,7 @@ export function StoryScreen({ onClose, onNavigate }: StoryScreenProps) {
     setFtueStep,
     ftueStep,
     setStoryBattleCheckpoint,
+    healAllSpirits,
   } = useGameState();
 
   const storyNodes = storyData as StoryNode[];
@@ -162,6 +163,8 @@ export function StoryScreen({ onClose, onNavigate }: StoryScreenProps) {
 
     // If node is incomplete AND has an encounter, trigger the battle
     if (isNodeIncomplete && currentNode.encounterId) {
+      // Heal all spirits when starting a story battle
+      healAllSpirits();
       // Set checkpoint for story battle retry flow
       setStoryBattleCheckpoint({
         nodeId: currentStoryNodeId,

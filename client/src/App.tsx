@@ -17,7 +17,7 @@ function App() {
   const [battleSource, setBattleSource] = useState<"story" | "sidebar" | "debug">(
     "sidebar",
   );
-  const { updateQi } = useGameState();
+  const { updateQi, healAllSpirits } = useGameState();
 
   // Get all functions from the store
   const {
@@ -125,6 +125,7 @@ function App() {
         onNavigate={(screen) => {
           if (screen === "battle") {
             setBattleSource("sidebar");
+            healAllSpirits();
           }
           setCurrentScreen(screen);
         }}

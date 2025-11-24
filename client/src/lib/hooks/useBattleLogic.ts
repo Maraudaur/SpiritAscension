@@ -3046,9 +3046,7 @@ export function useBattleLogic({
       }
     }
 
-    // When exiting the battle screen, heal all spirits for next battle session
-    // This applies whether the player won or lost
-    healAllSpirits();
+    // Note: Don't heal here - healing happens when starting a new battle from Story/Battle screens
     
     // Resolve story battle checkpoint if this was a story battle
     if (returnTo === "story") {
