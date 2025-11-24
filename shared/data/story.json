@@ -45,6 +45,7 @@
     "characters": [{ "id": "Droplet", "position": "right" }],
     "dialogues": [
       {
+
         "speakerId": "Droplet",
         "expression": "happy",
         "text": "Remember to level up your spirits to make them stronger. If you are low on QI, remember to cultivate to increase your income."
