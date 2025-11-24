@@ -3046,15 +3046,9 @@ export function useBattleLogic({
       }
     }
 
-    // Save final health state
-    if (battleState !== "defeat") {
-      playerSpirits.forEach((spirit) => {
-        updateSpiritHealth(
-          spirit.playerSpirit.instanceId,
-          spirit.currentHealth,
-        );
-      });
-    }
+    // When exiting the battle screen, heal all spirits for next battle session
+    // This applies whether the player won or lost
+    healAllSpirits();
     
     // Resolve story battle checkpoint if this was a story battle
     if (returnTo === "story") {
@@ -3088,16 +3082,8 @@ export function useBattleLogic({
       setBattleRewards({ qi: rewards.qi, qiGeneration: 0.1 }); // Placeholder
     }
 
-    // Restore player health after victory
-    setPlayerSpirits((prev) =>
-      prev.map((spirit) => ({
-        ...spirit,
-        currentHealth: spirit.maxHealth,
-      })),
-    );
-    
-    // Clear all effects from game state so next battle starts fresh
-    healAllSpirits();
+    // Note: Don't restore health here - it persists during continuous battles
+    // Health will be reset when the player exits the battle screen
   };
 
   return {
