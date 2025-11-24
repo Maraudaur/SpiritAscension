@@ -115,12 +115,24 @@ export function StoryScreen({ onClose, onNavigate }: StoryScreenProps) {
       setFtueStep("highlightSummon");
     } else if (currentStoryNodeId === 1 && currentStoryDialogueIndex === 0) {
       // Story node 1 requires both multiplier upgrade AND spirit leveling
-      // Show both highlights together
-      setFtueStep("highlightMultiplier");
+      // Only start the tutorial if requirements aren't met yet
+      const hasLevel2Spirit = spirits.some((spirit) => spirit.level >= 2);
+      const hasUpgradedMultiplier = qiUpgrades.multiplierLevel >= 2;
+      
+      // Only trigger FTUE if at least one requirement is missing
+      if (!hasLevel2Spirit || !hasUpgradedMultiplier) {
+        // If both are missing, start with Cultivation (multiplier first)
+        // If only spirit leveling is missing, jump to Spirit Manager
+        if (!hasUpgradedMultiplier) {
+          setFtueStep("highlightCultivation");
+        } else if (!hasLevel2Spirit) {
+          setFtueStep("highlightSpiritsForNode1");
+        }
+      }
     } else if (currentStoryNodeId === 1 && currentStoryDialogueIndex === 1) {
       setFtueStep("highlightBattle");
     }
-  }, [currentStoryNodeId, currentStoryDialogueIndex, setFtueStep]);
+  }, [currentStoryNodeId, currentStoryDialogueIndex, setFtueStep, spirits, qiUpgrades.multiplierLevel]);
 
   const handleNodeClick = (nodeId: number) => {
     // --- FIX: Update global state ---

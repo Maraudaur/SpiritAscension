@@ -95,13 +95,12 @@ export function SpiritManager({ onClose }: SpiritManagerProps = {}) {
     };
   }, [audioElement]);
   
-  // FTUE: Auto-select first spirit when highlightFirstSpirit is active
+  // FTUE: When a spirit is selected during highlightFirstSpirit, advance to level up button
   useEffect(() => {
-    if (ftueStep === "highlightFirstSpirit" && spirits.length > 0 && !selectedSpirit) {
-      setSelectedSpirit(spirits[0]);
+    if (ftueStep === "highlightFirstSpirit" && selectedSpirit) {
       setFtueStep("highlightLevelUpButton");
     }
-  }, [ftueStep, spirits, selectedSpirit, setFtueStep]);
+  }, [ftueStep, selectedSpirit, setFtueStep]);
   
   // Apply filters and sorting
   const filteredAndSortedSpirits = useMemo(() => {
@@ -246,8 +245,9 @@ export function SpiritManager({ onClose }: SpiritManagerProps = {}) {
             const lineage =
               spirit && baseSpirit ? getLineage(baseSpirit.lineage) : null;
 
-            // Highlight first spirit in party during FTUE
-            const shouldHighlight = ftueStep === "highlightFirstSpirit" && index === 0 && spirit;
+            // Highlight first occupied spirit slot during FTUE
+            const firstOccupiedIndex = activeParty.findIndex(slot => slot !== null);
+            const shouldHighlight = ftueStep === "highlightFirstSpirit" && index === firstOccupiedIndex && spirit;
             
             return (
               <div

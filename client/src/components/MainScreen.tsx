@@ -63,12 +63,20 @@ export function MainScreen({ onNavigate }: MainScreenProps) {
 
   const ftueStep = useGameState((s) => s.ftueStep);
   const setFtueStep = useGameState((s) => s.setFtueStep);
+  const spirits = useGameState((s) => s.spirits);
   
   const handleMultiplierUpgrade = () => {
     upgradeQiMultiplier();
     // After upgrading multiplier during story node 1, guide player to level up spirits
+    // Only if they still need to level up a spirit
     if (ftueStep === "highlightMultiplier") {
-      setFtueStep("highlightSpiritsForNode1");
+      const hasLevel2Spirit = spirits.some((spirit) => spirit.level >= 2);
+      if (!hasLevel2Spirit) {
+        setFtueStep("highlightSpiritsForNode1");
+      } else {
+        // Both requirements met, clear FTUE
+        setFtueStep(null);
+      }
     }
   };
   const [displayQi, setDisplayQi] = useState(qi);

@@ -21,7 +21,14 @@ export function Sidebar({ currentScreen, onNavigate }: SidebarProps) {
 
     // 2. Check and advance FTUE step
     if (screen === "cultivation" && ftueStep === "highlightCultivation") {
-      setFtueStep("highlightUpgradeBase");
+      // For story node 0, advance to base upgrade
+      // For story node 1, advance to multiplier upgrade
+      const currentNodeId = useGameState.getState().currentStoryNodeId;
+      if (currentNodeId === 1) {
+        setFtueStep("highlightMultiplier");
+      } else {
+        setFtueStep("highlightUpgradeBase");
+      }
     }
     if (screen === "summon" && ftueStep === "highlightSummon") {
       setFtueStep("highlightSummonButton");
