@@ -115,18 +115,18 @@ export function StoryScreen({ onClose, onNavigate }: StoryScreenProps) {
     } else if (currentStoryNodeId === 0 && currentStoryDialogueIndex === 3) {
       setFtueStep("highlightSummon");
     } else if (currentStoryNodeId === 1 && currentStoryDialogueIndex === 0) {
-      // Story node 1 requires both multiplier upgrade AND spirit leveling
+      // Story node 1 requires both multiplier upgrade AND spirit leveling to level 3
       // Only start the tutorial if requirements aren't met yet
-      const hasLevel2Spirit = spirits.some((spirit) => spirit.level >= 2);
+      const hasLevel3Spirit = spirits.some((spirit) => spirit.level >= 3);
       const hasUpgradedMultiplier = qiUpgrades.multiplierLevel >= 2;
       
       // Only trigger FTUE if at least one requirement is missing
-      if (!hasLevel2Spirit || !hasUpgradedMultiplier) {
+      if (!hasLevel3Spirit || !hasUpgradedMultiplier) {
         // If both are missing, start with Cultivation (multiplier first)
         // If only spirit leveling is missing, jump to Spirit Manager
         if (!hasUpgradedMultiplier) {
           setFtueStep("highlightCultivation");
-        } else if (!hasLevel2Spirit) {
+        } else if (!hasLevel3Spirit) {
           setFtueStep("highlightSpiritsForNode1");
         }
       }
@@ -209,7 +209,7 @@ export function StoryScreen({ onClose, onNavigate }: StoryScreenProps) {
 
     // --- FTUE GATING LOGIC ---
     const hasNoSpiritsInParty = activeParty.every((slot) => slot === null);
-    const hasLevel2Spirit = spirits.some((spirit) => spirit.level >= 2);
+    const hasLevel3Spirit = spirits.some((spirit) => spirit.level >= 3);
     const hasWonBattle = battlesWon >= 1;
     const hasUpgradedMultiplier = qiUpgrades.multiplierLevel >= 2;
 
@@ -222,7 +222,7 @@ export function StoryScreen({ onClose, onNavigate }: StoryScreenProps) {
         hasNoSpiritsInParty) ||
       (currentStoryNodeId === 1 &&
         currentStoryDialogueIndex === 0 &&
-        (!hasLevel2Spirit || !hasUpgradedMultiplier)) ||
+        (!hasLevel3Spirit || !hasUpgradedMultiplier)) ||
       (currentStoryNodeId === 1 &&
         currentStoryDialogueIndex === 1 &&
         !hasWonBattle);
