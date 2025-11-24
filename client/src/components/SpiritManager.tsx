@@ -183,6 +183,11 @@ export function SpiritManager({ onClose }: SpiritManagerProps = {}) {
     audio.volume = 0.6;
     audio.play();
     setAudioElement(audio);
+    
+    // Clear FTUE step after leveling up during story node 1 flow
+    if (ftueStep === "highlightLevelUpButton") {
+      setFtueStep(null);
+    }
   };
 
   const closeLevelUpAnimation = () => {
@@ -241,6 +246,9 @@ export function SpiritManager({ onClose }: SpiritManagerProps = {}) {
             const lineage =
               spirit && baseSpirit ? getLineage(baseSpirit.lineage) : null;
 
+            // Highlight first spirit in party during FTUE
+            const shouldHighlight = ftueStep === "highlightFirstSpirit" && index === 0 && spirit;
+            
             return (
               <div
                 key={index}
@@ -249,7 +257,7 @@ export function SpiritManager({ onClose }: SpiritManagerProps = {}) {
                   spirit
                     ? "bg-white shadow-md cursor-pointer hover:shadow-lg transition-shadow"
                     : "border-dashed border-gray-400 bg-gray-100"
-                } min-h-[140px] flex flex-col justify-between`}
+                } ${shouldHighlight ? "animate-pulse-bright" : ""} min-h-[140px] flex flex-col justify-between`}
                 style={{ borderColor: spirit ? "#8B4513" : undefined }}
               >
                 {spirit && baseSpirit && lineage ? (

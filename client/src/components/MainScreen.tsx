@@ -62,6 +62,15 @@ export function MainScreen({ onNavigate }: MainScreenProps) {
   } = useGameState();
 
   const ftueStep = useGameState((s) => s.ftueStep);
+  const setFtueStep = useGameState((s) => s.setFtueStep);
+  
+  const handleMultiplierUpgrade = () => {
+    upgradeQiMultiplier();
+    // After upgrading multiplier during story node 1, guide player to level up spirits
+    if (ftueStep === "highlightMultiplier") {
+      setFtueStep("highlightSpiritsForNode1");
+    }
+  };
   const [displayQi, setDisplayQi] = useState(qi);
 
   const [ascendConfirmStep, setAscendConfirmStep] = useState(0);
@@ -296,7 +305,7 @@ export function MainScreen({ onNavigate }: MainScreenProps) {
               <Tooltip>
                 <TooltipTrigger asChild>
                   <Button
-                    onClick={upgradeQiMultiplier}
+                    onClick={handleMultiplierUpgrade}
                     disabled={!canUpgradeMultiplier}
                     className={`w-full mt-4 transition-all hover:-translate-y-0.5 hover:shadow-lg disabled:hover:translate-y-0 disabled:hover:shadow-none ${
                       ftueStep === "highlightMultiplier"
