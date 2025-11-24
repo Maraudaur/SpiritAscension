@@ -129,8 +129,6 @@ export function StoryScreen({ onClose, onNavigate }: StoryScreenProps) {
           setFtueStep("highlightSpiritsForNode1");
         }
       }
-    } else if (currentStoryNodeId === 1 && currentStoryDialogueIndex === 1) {
-      setFtueStep("highlightBattle");
     }
   }, [currentStoryNodeId, currentStoryDialogueIndex, setFtueStep, spirits, qiUpgrades.multiplierLevel]);
 
