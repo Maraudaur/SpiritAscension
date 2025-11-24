@@ -17,7 +17,7 @@
       }
     },
     "penalties": {
-      "qiLoss": 100
+      "qiLoss": 5
     }
   },
   {
@@ -38,18 +38,18 @@
       }
     },
     "penalties": {
-      "qiLoss": 400
+      "qiLoss": 10
     }
   },
   {
     "id": "e003",
-    "name": "ReallyStrong",
+    "name": "Buffs&Debuffs",
     "averageLevel": 6,
     "enemies": [
       {
-        "spiritId": "spirit_c05",
+        "spiritId": "spirit_c06",
         "level": 6,
-        "ai": ["basic_attack"]
+        "ai": ["r000"]
       }
     ],
     "rewards": {
@@ -59,12 +59,12 @@
       }
     },
     "penalties": {
-      "qiLoss": 500
+      "qiLoss": 15
     }
   },
   {
     "id": "e004",
-    "name": "HighDefense",
+    "name": "StatusEffects",
     "averageLevel": 9,
     "enemies": [
       {
@@ -81,7 +81,7 @@
       }
     },
     "penalties": {
-      "qiLoss": 500
+      "qiLoss": 20
     }
   },
   {
@@ -103,7 +103,7 @@
       }
     },
     "penalties": {
-      "qiLoss": 500
+      "qiLoss": 25
     }
   },
   {
@@ -121,7 +121,7 @@
       "qi": 100
     },
     "penalties": {
-      "qiLoss": 1000
+      "qiLoss": 50
     }
   }
 ]

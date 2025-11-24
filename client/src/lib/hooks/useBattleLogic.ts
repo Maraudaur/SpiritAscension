@@ -3095,10 +3095,9 @@ export function useBattleLogic({
         currentHealth: spirit.maxHealth,
       })),
     );
-    playerSpirits.forEach((spirit) => {
-      const stats = calculateAllStats(spirit.playerSpirit, spirit.activeEffects);
-      updateSpiritHealth(spirit.playerSpirit.instanceId, stats.health);
-    });
+    
+    // Clear all effects from game state so next battle starts fresh
+    healAllSpirits();
   };
 
   return {
