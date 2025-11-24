@@ -39,7 +39,22 @@
   },
   {
     "id": 1,
-    "title": "The Elements",
+    "title": "Getting Stronger",
+    "description": "Learn about stregnthening your spirits.",
+    "summary": "Leveling up your spirits makes them stronger.",
+    "characters": [{ "id": "Droplet", "position": "right" }],
+    "dialogues": [
+      {
+        "speakerId": "Droplet",
+        "expression": "happy",
+        "text": "Remember to level up your spirits to make them stronger. If you are low on QI, remember to cultivate to increase your income."
+      }
+    ],
+    "encounterId": "e002"
+  },
+  {
+    "id": 2,
+    "title": "Elements",
     "description": "Learn about elemental relationships.",
     "summary": "Each element has another element that it's stronger or weaker to.",
     "characters": [{ "id": "Droplet", "position": "right" }],
@@ -47,13 +62,13 @@
       {
         "speakerId": "Droplet",
         "expression": "happy",
-        "text": "Wood -> Fire -> Earth -> Metal -> Water -> Wood"
+        "text": "Wood -> Earth -> Water -> Fire -> Metal -> Wood"
       }
     ],
     "encounterId": "e002"
   },
   {
-    "id": 2,
+    "id": 3,
     "title": "Buffs and Debuffs",
     "description": "Learn the basics of buffs and debuffs.",
     "summary": "Buffs and debuffs can help turn the tide of battle.",
@@ -68,7 +83,7 @@
     "encounterId": "e003"
   },
   {
-    "id": 3,
+    "id": 4,
     "title": "Status Effects",
     "description": "Learn the basics of status effects.",
     "summary": "Status effects are powerful lingering effects.",
@@ -83,7 +98,7 @@
     "encounterId": "e004"
   },
   {
-    "id": 4,
+    "id": 5,
     "title": "Dual Elements",
     "description": "Learn about dual elements.",
     "summary": "Some spirits are of two elements.",
@@ -98,7 +113,7 @@
     "encounterId": "e005"
   },
   {
-    "id": 5,
+    "id": 6,
     "title": "The Boss",
     "description": "Learn the basics of Qi cultivation.",
     "summary": "You train your first spirit and learn combat basics. A corrupted spirit blocks the path to a nearby town - you must prepare and defeat it.",

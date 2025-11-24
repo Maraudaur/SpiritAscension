@@ -95,6 +95,7 @@ export function StoryScreen({ onClose, onNavigate }: StoryScreenProps) {
     activeParty,
     spirits,
     battlesWon,
+    qiUpgrades,
     setStoryPosition, // <-- The action to update global state
     setFtueStep,
     ftueStep,
@@ -195,6 +196,7 @@ export function StoryScreen({ onClose, onNavigate }: StoryScreenProps) {
     const hasNoSpiritsInParty = activeParty.every((slot) => slot === null);
     const hasLevel2Spirit = spirits.some((spirit) => spirit.level >= 2);
     const hasWonBattle = battlesWon >= 1;
+    const hasUpgradedMultiplier = qiUpgrades.multiplierLevel >= 2;
 
     const isGated =
       (currentStoryNodeId === 0 &&
@@ -205,7 +207,7 @@ export function StoryScreen({ onClose, onNavigate }: StoryScreenProps) {
         hasNoSpiritsInParty) ||
       (currentStoryNodeId === 1 &&
         currentStoryDialogueIndex === 0 &&
-        !hasLevel2Spirit) ||
+        (!hasLevel2Spirit || !hasUpgradedMultiplier)) ||
       (currentStoryNodeId === 1 &&
         currentStoryDialogueIndex === 1 &&
         !hasWonBattle);
