@@ -3082,8 +3082,11 @@ export function useBattleLogic({
       setBattleRewards({ qi: rewards.qi, qiGeneration: 0.1 }); // Placeholder
     }
 
-    // Note: Don't restore health here - it persists during continuous battles
-    // Health will be reset when the player exits the battle screen
+    // Save current health to game state for Continue Battling
+    // This allows health to persist between continuous battles
+    playerSpirits.forEach((spirit) => {
+      updateSpiritHealth(spirit.playerSpirit.instanceId, spirit.currentHealth);
+    });
   };
 
   return {
