@@ -64,6 +64,8 @@ export function SpiritManager({ onClose }: SpiritManagerProps = {}) {
     ftueStep,
     setFtueStep,
     freeLevelUp,
+    hasAddedToPartyAfterFirstSummon,
+    summonCount,
   } = useGameState();
   const [selectedSpirit, setSelectedSpirit] = useState<PlayerSpirit | null>(
     null,
@@ -477,7 +479,11 @@ export function SpiritManager({ onClose }: SpiritManagerProps = {}) {
                           e.stopPropagation();
                           handleAddToParty(spirit.instanceId);
                         }}
-                        className="w-full p-1.5 bg-green-600 text-white rounded text-xs font-semibold hover:bg-green-700 flex items-center justify-center gap-1"
+                        className={`w-full p-1.5 bg-green-600 text-white rounded text-xs font-semibold hover:bg-green-700 flex items-center justify-center gap-1 ${
+                          summonCount === 1 && !hasAddedToPartyAfterFirstSummon
+                            ? "animate-pulse-bright"
+                            : ""
+                        }`}
                       >
                         <Plus className="w-3 h-3" />
                         Add to Party

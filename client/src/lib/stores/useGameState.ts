@@ -48,6 +48,7 @@ export interface GameStateStore extends Omit<GameStateData, "activeParty"> {
   currentStoryDialogueIndex: number;
   ftueStep: FtueStep;
   hasUpgradedBase: boolean;
+  hasAddedToPartyAfterFirstSummon: boolean;
 
   // Overrides
   activeParty: (string | null)[];
@@ -374,6 +375,7 @@ export const useGameState = create<GameStateStore>()(
       currentStoryDialogueIndex: 0,
       ftueStep: null,
       hasUpgradedBase: false,
+      hasAddedToPartyAfterFirstSummon: false,
       completedStoryNodes: [],
       currentEncounterId: null,
       storyBattleCheckpoint: null,
@@ -500,6 +502,7 @@ export const useGameState = create<GameStateStore>()(
             currentStoryDialogueIndex: 0,
             ftueStep: null,
             hasUpgradedBase: false,
+            hasAddedToPartyAfterFirstSummon: false,
             completedStoryNodes: [],
             currentEncounterId: null,
             storyBattleCheckpoint: null,
@@ -736,6 +739,10 @@ export const useGameState = create<GameStateStore>()(
           if (emptySlotIndex !== -1) {
             // Add the spirit to that slot
             state.activeParty[emptySlotIndex] = instanceId;
+            // Mark that user has added to party after first summon
+            if (!state.hasAddedToPartyAfterFirstSummon) {
+              state.hasAddedToPartyAfterFirstSummon = true;
+            }
           }
         });
       },
