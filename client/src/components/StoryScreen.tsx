@@ -161,7 +161,7 @@ export function StoryScreen({ onClose, onNavigate }: StoryScreenProps) {
     const isNodeIncomplete = !isStoryNodeCompleted(currentStoryNodeId);
 
     // If node is incomplete AND has an encounter, trigger the battle
-    if (isNodeIncomplete && currentNode.encounterId !== null) {
+    if (isNodeIncomplete && currentNode.encounterId) {
       // Set checkpoint for story battle retry flow
       setStoryBattleCheckpoint({
         nodeId: currentStoryNodeId,
@@ -394,7 +394,7 @@ export function StoryScreen({ onClose, onNavigate }: StoryScreenProps) {
                       }}
                     >
                       {isLastDialogue ? ( // This logic is now consistent
-                        currentNode.encounterId !== null ? (
+                        currentNode.encounterId ? (
                           <>
                             Begin Trial <ArrowRight className="w-4 h-4" />
                           </>
