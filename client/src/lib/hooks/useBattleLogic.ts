@@ -2551,12 +2551,9 @@ export function useBattleLogic({
             addLog(`${activeBaseSpirit?.name} takes ${reflectedDamage} reflected damage!`);
           }
           
-          // Apply counter attack damage to player
+          // Apply counter attack damage to player (damage is immediate, VFX is delayed)
           if (counterAttackDamage > 0) {
             newSpirit.currentHealth = Math.max(0, newSpirit.currentHealth - counterAttackDamage);
-            playDamage();
-            setPlayerHealthBarShake(true);
-            setTimeout(() => setPlayerHealthBarShake(false), 250);
           }
           
           return newSpirit;
@@ -2581,6 +2578,16 @@ export function useBattleLogic({
           index === activeEnemyIndex ? updatedEnemy : en,
         );
       });
+
+      // Delayed VFX for counter attack (damage already applied above)
+      if (counterAttackDamage > 0) {
+        setTimeout(() => {
+          addLog(`⚔️ COUNTER! ${activeEnemy.name} strikes back!`);
+          playDamage();
+          setPlayerHealthBarShake(true);
+          setTimeout(() => setPlayerHealthBarShake(false), 250);
+        }, 300);
+      }
 
       // 4. Move to next phase
       setTurnPhase("player_execute");
@@ -2785,8 +2792,9 @@ export function useBattleLogic({
         setTimeout(() => setEnemyHealthBarShake(false), 250);
       }
 
-      // Apply counter attack damage to enemy
+      // Apply counter attack damage to enemy (damage is immediate, VFX is delayed)
       if (counterAttackDamage > 0) {
+        updatedSpirits = updatedSpirits; // Keep same (counter damage applied to enemy)
         setBattleEnemies((prev) =>
           prev.map((enemy, i) => {
             if (i !== activeEnemyIndex) return enemy;
@@ -2797,9 +2805,14 @@ export function useBattleLogic({
             return { ...enemy, currentHealth: newHealth };
           }),
         );
-        playDamage();
-        setEnemyHealthBarShake(true);
-        setTimeout(() => setEnemyHealthBarShake(false), 250);
+        
+        // Delayed VFX only
+        setTimeout(() => {
+          addLog(`⚔️ COUNTER! ${activeBaseSpirit?.name} strikes back!`);
+          playDamage();
+          setEnemyHealthBarShake(true);
+          setTimeout(() => setEnemyHealthBarShake(false), 250);
+        }, 300);
       }
 
       // ✨ CRITICAL FIX: Apply skill effects to target (disable, debuffs, etc.)

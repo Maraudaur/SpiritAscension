@@ -216,7 +216,10 @@ export function SpiritSpriteAnimation({
 
       return () => {
         timeouts.forEach(clearTimeout);
-        // If effect is cancelled, make sure to reset state
+        // If effect is cancelled, make sure to reset state AND tint
+        if (spriteRef.current) {
+          spriteRef.current.tint = 0xffffff; // Reset tint to prevent stuck red
+        }
         setIsAnimatingHit(false);
       };
     }

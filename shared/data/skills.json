@@ -35,7 +35,7 @@
     "element": "fire",
     "effects": []
   },
-  "basic_attack_fire": {
+  "basic_attack_earth": {
     "id": "basic_attack_earth",
     "name": "Rock Throw",
     "description": "A Earth-type attack.",
