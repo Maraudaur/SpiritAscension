@@ -105,7 +105,7 @@ export function useBattleLogic({
     playExploreMusic,
   } = useAudio();
 
-  const TURN_TRANSITION_DELAY = 1000;
+  const TURN_TRANSITION_DELAY = 500;
 
   // ========== Battle State ==========
   const [battleState, setBattleState] = useState<BattleState>("setup");
@@ -166,7 +166,7 @@ export function useBattleLogic({
   useEffect(() => {
     if (messageQueue.length === 0) return;
 
-    const messageDelay = battleConfig.messageDisplayDelay || 500;
+    const messageDelay = battleConfig.messageDisplayDelay || 250;
     const timeout = setTimeout(() => {
       const nextMessage = messageQueue[0];
       setBattleLog((prev) => [...prev, nextMessage]);
@@ -621,7 +621,7 @@ export function useBattleLogic({
             );
             playHeal();
             setPlayerHealthBarHeal(true);
-            setTimeout(() => setPlayerHealthBarHeal(false), 600);
+            setTimeout(() => setPlayerHealthBarHeal(false), 300);
           }
         }
 
@@ -728,7 +728,7 @@ export function useBattleLogic({
             addLog(`${spiritName} heals for ${totalHeal} HP!`);
             playHeal();
             setPlayerHealthBarHeal(true);
-            setTimeout(() => setPlayerHealthBarHeal(false), 600);
+            setTimeout(() => setPlayerHealthBarHeal(false), 300);
           }
 
           // --- BEGIN NEW CHARGE DAMAGE LOGIC ---
@@ -799,7 +799,7 @@ export function useBattleLogic({
                 if (damage > 0) {
                   playDamage();
                   setEnemyHealthBarShake(true);
-                  setTimeout(() => setEnemyHealthBarShake(false), 500);
+                  setTimeout(() => setEnemyHealthBarShake(false), 250);
                 }
 
                 // 4. Apply damage to the target enemy
@@ -973,7 +973,7 @@ export function useBattleLogic({
                 if (damage > 0) {
                   playDamage();
                   setPlayerHealthBarShake(true);
-                  setTimeout(() => setPlayerHealthBarShake(false), 500);
+                  setTimeout(() => setPlayerHealthBarShake(false), 250);
                 }
 
                 // 4. Apply damage to the target spirit
@@ -2504,7 +2504,7 @@ export function useBattleLogic({
       if (result.totalDamage > 0) {
         playDamage();
         setEnemyHealthBarShake(true);
-        setTimeout(() => setEnemyHealthBarShake(false), 500);
+        setTimeout(() => setEnemyHealthBarShake(false), 250);
       }
 
       // 3. Apply results using SAFE SINGLE UPDATER (avoid nested setState)
@@ -2529,7 +2529,7 @@ export function useBattleLogic({
             );
             playHeal();
             setPlayerHealthBarHeal(true);
-            setTimeout(() => setPlayerHealthBarHeal(false), 600);
+            setTimeout(() => setPlayerHealthBarHeal(false), 300);
           }
           
           // Apply effects to caster (from skill)
@@ -2556,7 +2556,7 @@ export function useBattleLogic({
             newSpirit.currentHealth = Math.max(0, newSpirit.currentHealth - counterAttackDamage);
             playDamage();
             setPlayerHealthBarShake(true);
-            setTimeout(() => setPlayerHealthBarShake(false), 500);
+            setTimeout(() => setPlayerHealthBarShake(false), 250);
           }
           
           return newSpirit;
@@ -2695,7 +2695,7 @@ export function useBattleLogic({
     if (damage > 0) {
       playDamage();
       setPlayerHealthBarShake(true);
-      setTimeout(() => setPlayerHealthBarShake(false), 500);
+      setTimeout(() => setPlayerHealthBarShake(false), 250);
     }
 
     // 4. Apply results using safe updaters
@@ -2782,7 +2782,7 @@ export function useBattleLogic({
         );
         playDamage();
         setEnemyHealthBarShake(true);
-        setTimeout(() => setEnemyHealthBarShake(false), 500);
+        setTimeout(() => setEnemyHealthBarShake(false), 250);
       }
 
       // Apply counter attack damage to enemy
@@ -2799,7 +2799,7 @@ export function useBattleLogic({
         );
         playDamage();
         setEnemyHealthBarShake(true);
-        setTimeout(() => setEnemyHealthBarShake(false), 500);
+        setTimeout(() => setEnemyHealthBarShake(false), 250);
       }
 
       // ✨ CRITICAL FIX: Apply skill effects to target (disable, debuffs, etc.)

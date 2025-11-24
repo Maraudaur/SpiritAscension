@@ -184,7 +184,7 @@ export function BattleScreen({
     if (newHealth < prevPlayerHealth.current) {
       setTimeout(() => {
         setPlayerLagHealth(newHealth);
-      }, 500);
+      }, 250);
     } else {
       setPlayerLagHealth(newHealth);
     }
@@ -196,7 +196,7 @@ export function BattleScreen({
     if (newHealth < prevEnemyHealth.current) {
       setTimeout(() => {
         setEnemyLagHealth(newHealth);
-      }, 500);
+      }, 250);
     } else {
       setEnemyLagHealth(newHealth);
     }
