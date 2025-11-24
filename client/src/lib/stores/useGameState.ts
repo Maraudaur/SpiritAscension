@@ -667,8 +667,12 @@ export const useGameState = create<GameStateStore>()(
         let newSpirit: PlayerSpirit;
         if (currentSummonCount === 0) {
           newSpirit = _createFirstSummonSpirit(poolId);
-        } else if (currentSummonCount >= 1 && currentSummonCount <= 4) {
-          // Summons 2-5: guarantee a new common spirit
+        } else if (currentSummonCount === 1) {
+          // Second summon: guarantee spirit_c04 (water common)
+          const guaranteedSpirit = _createSpecificSpirit("spirit_c04", 1);
+          newSpirit = guaranteedSpirit || _createRandomSpirit("common");
+        } else if (currentSummonCount >= 2 && currentSummonCount <= 4) {
+          // Summons 3-5: guarantee a new common spirit
           newSpirit = _createGuaranteedNewCommonSpirit(currentSpirits);
         } else {
           // After 5 summons, use normal rarity-based summoning
@@ -698,11 +702,19 @@ export const useGameState = create<GameStateStore>()(
           // Uses helper functions from top level
           const summonIndex = currentSummonCount + i;
           const isFirstSummonEver = currentSummonCount === 0 && i === 0;
+          const isSecondSummon = summonIndex === 1;
           
           if (isFirstSummonEver) {
             newSpirits.push(_createFirstSummonSpirit(poolId));
-          } else if (summonIndex >= 1 && summonIndex <= 4) {
-            // Summons 2-5: guarantee a new common spirit
+          } else if (isSecondSummon) {
+            // Second summon: guarantee spirit_c04 (water common)
+            const guaranteedSpirit = _createSpecificSpirit("spirit_c04", 1);
+            const spiritToAdd = guaranteedSpirit || _createRandomSpirit("common");
+            newSpirits.push(spiritToAdd);
+            // Add to tracking so multi-summon doesn't duplicate this spirit
+            currentSpirits = [...currentSpirits, spiritToAdd];
+          } else if (summonIndex >= 2 && summonIndex <= 4) {
+            // Summons 3-5: guarantee a new common spirit
             const newCommon = _createGuaranteedNewCommonSpirit(currentSpirits);
             newSpirits.push(newCommon);
             // Add to tracking so multi-summon doesn't duplicate spirits
