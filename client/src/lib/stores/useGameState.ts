@@ -23,6 +23,7 @@ export type FtueStep =
   | "highlightFirstSpirit"
   | "highlightLevelUpButton"
   | "highlightBattle"
+  | "highlightMultiplier"
   | null;
 
 export type Spirit = BaseSpirit & {
@@ -571,6 +572,9 @@ export const useGameState = create<GameStateStore>()(
             state.qi -= cost;
             state.qiUpgrades.multiplier += 0.1;
             state.qiUpgrades.multiplierLevel += 1;
+            if (state.ftueStep === "highlightMultiplier") {
+              state.ftueStep = null;
+            }
           });
         }
       },

@@ -11,7 +11,7 @@
       }
     ],
     "rewards": {
-      "qi": 300,
+      "qi": 10,
       "essences": {
         "spirit_c05": 3
       }
@@ -32,7 +32,7 @@
       }
     ],
     "rewards": {
-      "qi": 500,
+      "qi": 20,
       "essences": {
         "spirit_c03": 9
       }
@@ -53,7 +53,7 @@
       }
     ],
     "rewards": {
-      "qi": 800,
+      "qi": 30,
       "essences": {
         "spirit_c05": 6
       }
@@ -74,7 +74,7 @@
       }
     ],
     "rewards": {
-      "qi": 800,
+      "qi": 40,
       "essences": {
         "spirit_c07": 3,
         "spirit_c06": 3
@@ -96,7 +96,7 @@
       }
     ],
     "rewards": {
-      "qi": 800,
+      "qi": 50,
       "essences": {
         "spirit_c07": 3,
         "spirit_c06": 3
@@ -118,7 +118,7 @@
       }
     ],
     "rewards": {
-      "qi": 10000
+      "qi": 100
     },
     "penalties": {
       "qiLoss": 1000

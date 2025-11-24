@@ -114,7 +114,7 @@ export function StoryScreen({ onClose, onNavigate }: StoryScreenProps) {
     } else if (currentStoryNodeId === 0 && currentStoryDialogueIndex === 3) {
       setFtueStep("highlightSummon");
     } else if (currentStoryNodeId === 1 && currentStoryDialogueIndex === 0) {
-      setFtueStep("highlightSpirits");
+      setFtueStep("highlightMultiplier");
     } else if (currentStoryNodeId === 1 && currentStoryDialogueIndex === 1) {
       setFtueStep("highlightBattle");
     }

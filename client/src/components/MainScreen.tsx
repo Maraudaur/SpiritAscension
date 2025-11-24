@@ -298,7 +298,11 @@ export function MainScreen({ onNavigate }: MainScreenProps) {
                   <Button
                     onClick={upgradeQiMultiplier}
                     disabled={!canUpgradeMultiplier}
-                    className="w-full mt-4 transition-all hover:-translate-y-0.5 hover:shadow-lg disabled:hover:translate-y-0 disabled:hover:shadow-none"
+                    className={`w-full mt-4 transition-all hover:-translate-y-0.5 hover:shadow-lg disabled:hover:translate-y-0 disabled:hover:shadow-none ${
+                      ftueStep === "highlightMultiplier"
+                        ? "animate-pulse-bright"
+                        : ""
+                    }`}
                     style={{
                       background: canUpgradeMultiplier
                         ? "var(--vermillion)"

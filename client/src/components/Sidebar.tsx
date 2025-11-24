@@ -112,6 +112,9 @@ export function Sidebar({ currentScreen, onNavigate }: SidebarProps) {
           if (item.id === "battle" && ftueStep === "highlightBattle") {
             ftueClass = "animate-pulse-bright";
           }
+          if (item.id === "cultivation" && ftueStep === "highlightMultiplier") {
+            ftueClass = "animate-pulse-bright";
+          }
 
           return (
             <button
