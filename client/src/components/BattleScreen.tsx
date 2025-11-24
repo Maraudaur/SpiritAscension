@@ -11,6 +11,7 @@ import {
   getAvailableSkills as getSpiritAvailableSkills,
   getPassiveAbility,
 } from "@/lib/spiritUtils";
+import { useGameState } from "@/lib/stores/useGameState";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -93,6 +94,7 @@ export function BattleScreen({
   returnTo = "cultivation",
   autoStart = false,
 }: BattleScreenProps) {
+  const { battlesWon } = useGameState();
   const logic = useBattleLogic({ onClose, isBossBattle: false, returnTo });
   const logContainerRef = useRef<HTMLDivElement>(null);
   const hasStartedBattle = useRef(false);
@@ -1034,10 +1036,13 @@ export function BattleScreen({
               <div className="grid grid-cols-2 gap-3">
                 <Button
                   onClick={startBattle}
+                  disabled={battlesWon === 1}
                   className="w-full font-bold"
                   style={{
-                    background: "var(--vermillion)",
+                    background: battlesWon === 1 ? "#999" : "var(--vermillion)",
                     color: "var(--parchment)",
+                    opacity: battlesWon === 1 ? 0.5 : 1,
+                    cursor: battlesWon === 1 ? "not-allowed" : "pointer",
                   }}
                 >
                   Continue Battling
