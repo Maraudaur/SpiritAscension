@@ -2146,6 +2146,30 @@ export function useBattleLogic({
         elementalMessage = " It was resisted...";
     }
 
+    // --- 4.5. Apply Element Boost Passive (increases damage for matching element skills)
+    if (skillElement !== "none" && baseSpirit.passiveAbilities && skill.damage > 0) {
+      for (const passiveId of baseSpirit.passiveAbilities) {
+        const passive = (passivesData as Record<string, PassiveAbility>)[
+          passiveId
+        ];
+        if (!passive || !passive.effects) continue;
+        for (const effect of passive.effects) {
+          if (
+            effect.type === "element_boost" &&
+            (effect as any).element === skillElement &&
+            (effect as any).boost
+          ) {
+            const boostAmount = Math.floor(
+              totalDamage * (effect as any).boost
+            );
+            totalDamage += boostAmount;
+            elementalMessage += ` ${passive.name} boost applied!`;
+            break;
+          }
+        }
+      }
+    }
+
     // --- 5. Apply Critical Hit (check for crit immunity)
     let targetHasCritImmunity = false;
     const targetBaseSpirit = getBaseSpirit(target.spiritId);

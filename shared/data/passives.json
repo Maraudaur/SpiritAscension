@@ -177,5 +177,17 @@
         "stat": "defense"
       }
     ]
+  },
+  "fire_boost": {
+    "id": "fire_boost",
+    "name": "Fire Boost",
+    "description": "Increases all Fire-element skill damage by 30%.",
+    "effects": [
+      {
+        "type": "element_boost",
+        "element": "fire",
+        "boost": 0.3
+      }
+    ]
   }
 }

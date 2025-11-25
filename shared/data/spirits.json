@@ -270,7 +270,7 @@
         "affinity": 70,
         "agility": 121
       },
-      "passiveAbilities": ["defense_focus"],
+      "passiveAbilities": ["fire_boost"],
       "skills": [
         {
           "skillId": "basic_attack",
