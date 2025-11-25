@@ -281,7 +281,7 @@
           "unlockLevel": 3
         },
         {
-          "skillId": "def_buff",
+          "skillId": "def_debuff_fire",
           "unlockLevel": 6
         }
       ],

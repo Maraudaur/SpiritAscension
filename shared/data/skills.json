@@ -102,9 +102,9 @@
       }
     ]
   },
-  "atk_buff": {
+  "atk_debuff": {
     "id": "atk_debuff",
-    "name": "Weaken",
+    "name": "Enfeeble",
     "description": "Decrease the foe's Attack for 3 turns.",
     "damage": 0,
     "healing": 0,
@@ -134,9 +134,24 @@
       }
     ]
   },
-
-  "def_buff": {
+  "def_debuff": {
     "id": "def_debuff",
+    "name": "Weaken",
+    "description": "Decrease the foe's Defense for 3 turns.",
+    "damage": 0,
+    "healing": 0,
+    "element": "fire",
+    "effects": [
+      {
+        "type": "stat_debuff",
+        "stat": "defense",
+        "value": 0.5,
+        "duration": 3
+      }
+    ]
+  },
+  "def_debuff_fire": {
+    "id": "def_debuff_fire",
     "name": "Burn",
     "description": "Weak Fire-type attack and decreases the foe's Defense for 3 turns.",
     "damage": 0.2,
