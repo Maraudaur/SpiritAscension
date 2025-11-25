@@ -61,7 +61,7 @@
       {
         "speakerId": "Droplet",
         "expression": "happy",
-        "text": "Wood -> Earth -> Water -> Fire -> Metal -> Wood"
+        "text": "Some elements are stronger than others, dealing additional damage. When facing a difficult spirit, look at their element and try to summon one of a stronger element. Wood -> Earth -> Water -> Fire -> Metal -> Wood"
       }
     ],
     "encounterId": "e002"
