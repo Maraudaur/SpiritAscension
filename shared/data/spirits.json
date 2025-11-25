@@ -48,7 +48,7 @@
         "affinity": 60,
         "agility": 110
       },
-      "passiveAbilities": ["strategic"],
+      "passiveAbilities": ["bulky"],
       "skills": [
         {
           "skillId": "basic_attack",

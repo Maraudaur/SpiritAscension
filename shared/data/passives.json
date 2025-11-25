@@ -223,5 +223,22 @@
         "healRatio": 0.3
       }
     ]
+  },
+  "bulky": {
+    "id": "bulky",
+    "name": "Bulky",
+    "description": "Increase the user's Defense at the cost of their Attack.",
+    "effects": [
+      {
+        "type": "stat_boost",
+        "stat": "attack",
+        "value": -0.5
+      },
+      {
+        "type": "stat_boost",
+        "stat": "defense",
+        "value": 0.5
+      }
+    ]
   }
 }
