@@ -138,14 +138,16 @@ const BATTLE_REWARD_COST_BASE = 100;
 const BASE_SUMMON_COST = 50; // <-- Now accessible
 
 export const POTENTIAL_BONUSES: { [key in PotentialGrade]: number } = {
-  SS: 1.25,
-  S: 1.2,
-  A: 1.1,
-  B: 1.05,
-  C: 1,
+  SS: 0.25,
+  S: 0.2,
+  A: 0.1,
+  B: 0.05,
+  C: 0,
+  D: -0.05,
 };
 
-const POTENTIAL_GRADES: PotentialGrade[] = ["C", "B", "A", "S", "SS"];
+const POTENTIAL_GRADES: PotentialGrade[] = ["D", "C", "B", "A", "S", "SS"];
+const EARLY_SUMMON_GRADES: PotentialGrade[] = ["D", "C", "B"];
 
 const SUMMON_RATES: { rarity: Rarity; weight: number }[] = [
   { rarity: "common", weight: 600 },
@@ -264,7 +266,7 @@ function _createFirstSummonSpirit(poolId?: string | null): PlayerSpirit {
   const isPrismatic = Math.random() < 0.001; // 0.1% chance
 
   const getRandomPotential = (): PotentialGrade => {
-    return POTENTIAL_GRADES[Math.floor(Math.random() * POTENTIAL_GRADES.length)];
+    return EARLY_SUMMON_GRADES[Math.floor(Math.random() * EARLY_SUMMON_GRADES.length)];
   };
 
   return {
@@ -311,7 +313,7 @@ function _createGuaranteedNewCommonSpirit(ownedSpirits: PlayerSpirit[]): PlayerS
   const isPrismatic = Math.random() < 0.001; // 0.1% chance
   
   const getRandomPotential = (): PotentialGrade => {
-    return POTENTIAL_GRADES[Math.floor(Math.random() * POTENTIAL_GRADES.length)];
+    return EARLY_SUMMON_GRADES[Math.floor(Math.random() * EARLY_SUMMON_GRADES.length)];
   };
   
   return {
@@ -330,7 +332,7 @@ function _createGuaranteedNewCommonSpirit(ownedSpirits: PlayerSpirit[]): PlayerS
   };
 }
 
-function _createSpecificSpirit(spiritId: string, level: number = 1): PlayerSpirit | null {
+function _createSpecificSpirit(spiritId: string, level: number = 1, useEarlyGrades: boolean = false): PlayerSpirit | null {
   // Find the base spirit by ID across all rarities
   let baseSpirit: BaseSpirit | undefined = undefined;
   for (const raritySpirits of Object.values(spiritsData)) {
@@ -345,8 +347,9 @@ function _createSpecificSpirit(spiritId: string, level: number = 1): PlayerSpiri
 
   const isPrismatic = Math.random() < 0.001; // 0.1% chance
 
+  const gradePool = useEarlyGrades ? EARLY_SUMMON_GRADES : POTENTIAL_GRADES;
   const getRandomPotential = (): PotentialGrade => {
-    return POTENTIAL_GRADES[Math.floor(Math.random() * POTENTIAL_GRADES.length)];
+    return gradePool[Math.floor(Math.random() * gradePool.length)];
   };
 
   return {
@@ -668,9 +671,9 @@ export const useGameState = create<GameStateStore>()(
         if (currentSummonCount === 0) {
           newSpirit = _createFirstSummonSpirit(poolId);
         } else if (currentSummonCount === 1) {
-          // Second summon: guarantee spirit_c04 (water common)
-          const guaranteedSpirit = _createSpecificSpirit("spirit_c04", 1);
-          newSpirit = guaranteedSpirit || _createRandomSpirit("common");
+          // Second summon: guarantee spirit_c04 (water common) with early grades
+          const guaranteedSpirit = _createSpecificSpirit("spirit_c04", 1, true);
+          newSpirit = guaranteedSpirit || _createGuaranteedNewCommonSpirit(currentSpirits);
         } else if (currentSummonCount >= 2 && currentSummonCount <= 4) {
           // Summons 3-5: guarantee a new common spirit
           newSpirit = _createGuaranteedNewCommonSpirit(currentSpirits);
@@ -707,9 +710,9 @@ export const useGameState = create<GameStateStore>()(
           if (isFirstSummonEver) {
             newSpirits.push(_createFirstSummonSpirit(poolId));
           } else if (isSecondSummon) {
-            // Second summon: guarantee spirit_c04 (water common)
-            const guaranteedSpirit = _createSpecificSpirit("spirit_c04", 1);
-            const spiritToAdd = guaranteedSpirit || _createRandomSpirit("common");
+            // Second summon: guarantee spirit_c04 (water common) with early grades
+            const guaranteedSpirit = _createSpecificSpirit("spirit_c04", 1, true);
+            const spiritToAdd = guaranteedSpirit || _createGuaranteedNewCommonSpirit(currentSpirits);
             newSpirits.push(spiritToAdd);
             // Add to tracking so multi-summon doesn't duplicate this spirit
             currentSpirits = [...currentSpirits, spiritToAdd];

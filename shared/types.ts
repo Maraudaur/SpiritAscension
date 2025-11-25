@@ -23,7 +23,7 @@ export interface PassiveAbility {
   effects: PassiveEffect[];
 }
 
-export type PotentialGrade = "C" | "B" | "A" | "S" | "SS";
+export type PotentialGrade = "D" | "C" | "B" | "A" | "S" | "SS";
 
 export type SkillElementId = ElementId | "none";
 

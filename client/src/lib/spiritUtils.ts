@@ -315,6 +315,7 @@ export function getRarityColor(rarity: string): string {
 
 export function getPotentialColor(grade: PotentialGrade): string {
   const colors: Record<PotentialGrade, string> = {
+    D: "#6b7280",
     C: "#9ca3af",
     B: "#22c55e",
     A: "#3b82f6",
