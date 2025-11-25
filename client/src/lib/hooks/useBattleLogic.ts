@@ -2292,6 +2292,18 @@ export function useBattleLogic({
               );
             }
           }
+          // Vampiric passive - heals on ANY damage dealt
+          if (effect.type === "vampiric") {
+            const vampiricHealing = Math.floor(
+              totalDamage * (effect as { type: "vampiric"; healRatio: number }).healRatio,
+            );
+            if (vampiricHealing > 0) {
+              totalHealing += vampiricHealing;
+              logMessages.push(
+                `${attacker.name}'s "${passive.name}" passive healed ${vampiricHealing} HP!`,
+              );
+            }
+          }
         }
       }
     }
