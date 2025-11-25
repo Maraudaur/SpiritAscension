@@ -49,7 +49,7 @@
       {
         "spiritId": "spirit_c06",
         "level": 6,
-        "ai": ["r000"]
+        "ai": ["hit_and_heal", "basic_attack", "hit_and_heal", "heavy_hit"]
       }
     ],
     "rewards": {

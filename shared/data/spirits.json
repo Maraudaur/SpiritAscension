@@ -203,11 +203,11 @@
           "unlockLevel": 1
         },
         {
-          "skillId": "heavy_hit",
+          "skillId": "hit_and_heal",
           "unlockLevel": 3
         },
         {
-          "skillId": "hit_and_heal",
+          "skillId": "heavy_hit",
           "unlockLevel": 6
         }
       ],
