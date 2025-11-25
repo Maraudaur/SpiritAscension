@@ -21,7 +21,7 @@
     "id": "basic_attack_wood",
     "name": "Throw Bark",
     "description": "A Wood-type attack.",
-    "damage": 1,
+    "damage": 1.1,
     "healing": 0,
     "element": "wood",
     "effects": []
@@ -30,7 +30,7 @@
     "id": "basic_attack_fire",
     "name": "Ember",
     "description": "A Fire-type attack.",
-    "damage": 1,
+    "damage": 1.1,
     "healing": 0,
     "element": "fire",
     "effects": []
@@ -39,7 +39,7 @@
     "id": "basic_attack_earth",
     "name": "Rock Throw",
     "description": "A Earth-type attack.",
-    "damage": 1,
+    "damage": 1.1,
     "healing": 0,
     "element": "earth",
     "effects": []
@@ -48,7 +48,7 @@
     "id": "basic_attack_metal",
     "name": "Steel Ball",
     "description": "A Metal-type attack.",
-    "damage": 1,
+    "damage": 1.1,
     "healing": 0,
     "element": "metal",
     "effects": []
@@ -57,7 +57,7 @@
     "id": "basic_attack_water",
     "name": "Water Gun",
     "description": "A Water-type attack.",
-    "damage": 1,
+    "damage": 1.1,
     "healing": 0,
     "element": "water",
     "effects": []

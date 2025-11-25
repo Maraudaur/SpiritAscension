@@ -28,7 +28,7 @@
       {
         "spiritId": "spirit_c03",
         "level": 5,
-        "ai": ["r000"]
+        "ai": ["basic_attack_fire", "basic_attack"]
       }
     ],
     "rewards": {

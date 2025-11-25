@@ -12,7 +12,7 @@
         "affinity": 60,
         "agility": 119
       },
-      "passiveAbilities": ["stalwart"],
+      "passiveAbilities": ["fortitude"],
       "skills": [
         {
           "skillId": "basic_attack",
@@ -85,10 +85,10 @@
         "attack": 160,
         "defense": 100,
         "health": 140,
-        "affinity": 100,
-        "agility": 140
+        "affinity": 110,
+        "agility": 130
       },
-      "passiveAbilities": ["fortitude"],
+      "passiveAbilities": ["stalwart"],
       "skills": [
         {
           "skillId": "basic_attack",
