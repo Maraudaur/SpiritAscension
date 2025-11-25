@@ -158,6 +158,20 @@ const SUMMON_RATES: { rarity: Rarity; weight: number }[] = [
   { rarity: "legendary", weight: 10 },
 ];
 const TOTAL_WEIGHT = SUMMON_RATES.reduce((sum, rate) => sum + rate.weight, 0);
+
+// Story node ID that unlocks multi-element spirit summoning
+const MULTI_ELEMENT_UNLOCK_STORY_ID = 5;
+
+// Helper to check if multi-element summoning is unlocked
+function _isMultiElementUnlocked(completedStoryNodes: number[]): boolean {
+  return completedStoryNodes.includes(MULTI_ELEMENT_UNLOCK_STORY_ID);
+}
+
+// Helper to filter spirits to single-element only
+function _filterSingleElementSpirits(spirits: BaseSpirit[], allowMultiElement: boolean): BaseSpirit[] {
+  if (allowMultiElement) return spirits;
+  return spirits.filter(s => s.elements.length <= 1);
+}
 // --- END OF CONSTANTS ---
 
 // --- Initial State ---
