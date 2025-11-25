@@ -3097,6 +3097,12 @@ export function useBattleLogic({
           for (const effect of passive.effects) {
             if (effect.type === "swap_out_heal") {
               const outgoingSpirit = playerSpirits[activePartySlot];
+              
+              // Skip healing if spirit is knocked out (health = 0)
+              if (outgoingSpirit.currentHealth <= 0) {
+                continue;
+              }
+              
               const spiritStats = calculateAllStats(outgoingSpirit.playerSpirit, outgoingSpirit.activeEffects);
               const maxHealth = spiritStats.health;
               const healAmount = Math.floor(maxHealth * effect.healPercentage);
