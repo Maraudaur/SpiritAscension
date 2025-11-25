@@ -674,8 +674,12 @@ export const useGameState = create<GameStateStore>()(
           // Second summon: guarantee spirit_c04 (water common) with early grades
           const guaranteedSpirit = _createSpecificSpirit("spirit_c04", 1, true);
           newSpirit = guaranteedSpirit || _createGuaranteedNewCommonSpirit(currentSpirits);
-        } else if (currentSummonCount >= 2 && currentSummonCount <= 4) {
-          // Summons 3-5: guarantee a new common spirit
+        } else if (currentSummonCount === 2) {
+          // Third summon: guarantee spirit_c03 (fire common) with early grades
+          const guaranteedSpirit = _createSpecificSpirit("spirit_c03", 1, true);
+          newSpirit = guaranteedSpirit || _createGuaranteedNewCommonSpirit(currentSpirits);
+        } else if (currentSummonCount >= 3 && currentSummonCount <= 4) {
+          // Summons 4-5: guarantee a new common spirit
           newSpirit = _createGuaranteedNewCommonSpirit(currentSpirits);
         } else {
           // After 5 summons, use normal rarity-based summoning
