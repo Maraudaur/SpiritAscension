@@ -245,7 +245,7 @@
           "unlockLevel": 3
         },
         {
-          "skillId": "lifesteal_buff",
+          "skillId": "counter_stance",
           "unlockLevel": 6
         }
       ],
@@ -260,9 +260,9 @@
     },
     {
       "id": "spirit_u02",
-      "name": "Mountain Bear",
+      "name": "Inferno Wolf",
       "rarity": "uncommon",
-      "lineage": "ox",
+      "lineage": "tiger",
       "baseStats": {
         "attack": 140,
         "defense": 200,
@@ -277,12 +277,12 @@
           "unlockLevel": 1
         },
         {
-          "skillId": "heavy_hit",
+          "skillId": "basic_attack_fire",
           "unlockLevel": 3
         },
         {
-          "skillId": "hit_and_heal",
-          "unlockLevel": 3
+          "skillId": "def_buff",
+          "unlockLevel": 6
         }
       ],
       "spriteConfig": {
@@ -292,13 +292,13 @@
         "totalFrames": 8,
         "animationSpeed": 0.1
       },
-      "elements": ["earth"]
+      "elements": ["fire", "earth"]
     },
     {
       "id": "spirit_u03",
-      "name": "Inferno Wolf",
+      "name": "Mountain Bear",
       "rarity": "uncommon",
-      "lineage": "tiger",
+      "lineage": "ox",
       "baseStats": {
         "attack": 200,
         "defense": 120,
@@ -309,7 +309,7 @@
       "passiveAbilities": ["attack_focus"],
       "skills": [
         {
-          "skillId": "basic_attack",
+          "skillId": "basic_attack_earth",
           "unlockLevel": 1
         },
         {
@@ -317,8 +317,8 @@
           "unlockLevel": 3
         },
         {
-          "skillId": "crit_setup",
-          "unlockLevel": 3
+          "skillId": "affinity_buff",
+          "unlockLevel": 6
         }
       ],
       "spriteConfig": {
@@ -328,7 +328,7 @@
         "totalFrames": 8,
         "animationSpeed": 0.1
       },
-      "elements": ["fire"]
+      "elements": ["earth", "metal"]
     },
     {
       "id": "spirit_u04",
@@ -342,19 +342,19 @@
         "affinity": 110,
         "agility": 136
       },
-      "passiveAbilities": ["health_focus"],
+      "passiveAbilities": ["lucky"],
       "skills": [
         {
           "skillId": "basic_attack",
           "unlockLevel": 1
         },
         {
-          "skillId": "heavy_hit",
+          "skillId": "basic_attack_metal",
           "unlockLevel": 3
         },
         {
           "skillId": "hit_and_heal",
-          "unlockLevel": 3
+          "unlockLevel": 6
         }
       ],
       "spriteConfig": {
@@ -364,11 +364,11 @@
         "totalFrames": 8,
         "animationSpeed": 0.1
       },
-      "elements": ["water"]
+      "elements": ["metal", "water"]
     },
     {
       "id": "spirit_u05",
-      "name": "Platinum Eagle",
+      "name": "Swift Eagle",
       "rarity": "uncommon",
       "lineage": "horse",
       "baseStats": {
@@ -385,12 +385,12 @@
           "unlockLevel": 1
         },
         {
-          "skillId": "heavy_hit",
+          "skillId": "basic_attack_water",
           "unlockLevel": 3
         },
         {
           "skillId": "hit_and_heal",
-          "unlockLevel": 3
+          "unlockLevel": 6
         }
       ],
       "spriteConfig": {
@@ -400,7 +400,7 @@
         "totalFrames": 8,
         "animationSpeed": 0.1
       },
-      "elements": ["metal"]
+      "elements": ["water", "wood"]
     },
     {
       "id": "spirit_u06",

@@ -399,5 +399,19 @@
         "duration": 2
       }
     ]
+  },
+  "counter_stance": {
+    "id": "counter_stance",
+    "name": "Counter Stance",
+    "description": "Takes a defensive stance. The next attack received this turn triggers a guaranteed counter-attack.",
+    "damage": 0,
+    "healing": 0,
+    "element": "none",
+    "effects": [
+      {
+        "type": "counter_stance",
+        "duration": 1
+      }
+    ]
   }
 }
