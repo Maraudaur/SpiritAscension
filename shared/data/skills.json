@@ -438,5 +438,20 @@
     "element": "metal",
     "damageStat": "defense",
     "effects": []
+  },
+  "forget_strike": {
+    "id": "forget_strike",
+    "name": "Forget Strike",
+    "description": "A Water-type attack that disables the enemy's Skill action for 2 turns.",
+    "damage": 0.8,
+    "healing": 0,
+    "element": "water",
+    "effects": [
+      {
+        "type": "disable",
+        "action": "skill",
+        "duration": 2
+      }
+    ]
   }
 }
