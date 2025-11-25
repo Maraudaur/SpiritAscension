@@ -385,6 +385,7 @@ export interface EncounterEnemy {
   spiritId: string; // ID from spirits.json
   level: number;
   ai: EnemyAI;
+  statModifier?: number; // Optional modifier applied to all stats (e.g., -0.30 for 30% weaker)
 }
 
 export interface EncounterReward {

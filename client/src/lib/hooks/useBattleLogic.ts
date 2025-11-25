@@ -1241,31 +1241,38 @@ export function useBattleLogic({
         // e001 is the tutorial battle - no bonus to make it easier
         const enemyPotentialBonus = encounter.id === "e001" ? 0 : 0.05;
         const levelMultiplier = enemyData.level * 0.02;
+        // Apply per-enemy stat modifier if present (e.g., -0.30 for weaker enemies)
+        const statModifier = enemyData.statModifier ?? 0;
         const enemyAttack = Math.floor(
           baseSpirit.baseStats.attack *
             (1 + enemyPotentialBonus) *
-            levelMultiplier,
+            levelMultiplier *
+            (1 + statModifier),
         );
         const enemyDefense = Math.floor(
           baseSpirit.baseStats.defense *
             (1 + enemyPotentialBonus) *
-            levelMultiplier,
+            levelMultiplier *
+            (1 + statModifier),
         );
         const enemyHealth =
           Math.floor(
             baseSpirit.baseStats.health *
               (1 + enemyPotentialBonus) *
-              levelMultiplier,
+              levelMultiplier *
+              (1 + statModifier),
           ) + 10;
         const enemyElementalAffinity = Math.floor(
           baseSpirit.baseStats.affinity *
             (1 + enemyPotentialBonus) *
-            levelMultiplier,
+            levelMultiplier *
+            (1 + statModifier),
         );
         const enemyAgility = Math.floor(
           baseSpirit.baseStats.agility *
             (1 + enemyPotentialBonus) *
-            levelMultiplier,
+            levelMultiplier *
+            (1 + statModifier),
         );
 
         return {
