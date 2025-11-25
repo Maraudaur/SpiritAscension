@@ -1238,7 +1238,7 @@ export function useBattleLogic({
         if (!baseSpirit || !baseSpirit.baseStats) return null;
 
         // Simplified enemy stat calculation (from old file)
-        const enemyPotentialBonus = 0.10;
+        const enemyPotentialBonus = 0.05;
         const levelMultiplier = enemyData.level * 0.02;
         const enemyAttack = Math.floor(
           baseSpirit.baseStats.attack *
