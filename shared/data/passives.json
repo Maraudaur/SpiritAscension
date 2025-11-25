@@ -216,7 +216,7 @@
   "vampiric": {
     "id": "vampiric",
     "name": "Vampiric",
-    "description": "Recovers 30% of all damage dealt as health.",
+    "description": "Recovers health from all damage dealt.",
     "effects": [
       {
         "type": "vampiric",

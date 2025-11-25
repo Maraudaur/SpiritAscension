@@ -218,7 +218,7 @@
         "totalFrames": 8,
         "animationSpeed": 0.1
       },
-      "elements": ["neutral"]
+      "elements": ["none"]
     }
   ],
   "uncommon": [
