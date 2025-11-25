@@ -84,9 +84,9 @@
       "baseStats": {
         "attack": 160,
         "defense": 100,
-        "health": 140,
+        "health": 130,
         "affinity": 110,
-        "agility": 130
+        "agility": 140
       },
       "passiveAbilities": ["stalwart"],
       "skills": [
@@ -190,10 +190,10 @@
       "rarity": "common",
       "lineage": "horse",
       "baseStats": {
-        "attack": 220,
+        "attack": 240,
         "defense": 110,
-        "health": 130,
-        "affinity": 40,
+        "health": 150,
+        "affinity": 0,
         "agility": 135
       },
       "passiveAbilities": ["attack_focus"],
