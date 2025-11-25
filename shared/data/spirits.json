@@ -313,11 +313,11 @@
           "unlockLevel": 1
         },
         {
-          "skillId": "heavy_hit",
+          "skillId": "body_slam",
           "unlockLevel": 3
         },
         {
-          "skillId": "affinity_buff",
+          "skillId": "def_buff",
           "unlockLevel": 6
         }
       ],

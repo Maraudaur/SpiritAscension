@@ -35,6 +35,18 @@
       }
     ]
   },
+  "affinity_focus": {
+    "id": "affinity_focus",
+    "name": "Affinity Focus",
+    "description": "Increase the user's Affinity by 10%.",
+    "effects": [
+      {
+        "type": "stat_boost",
+        "stat": "affinity",
+        "value": 0.1
+      }
+    ]
+  },
   "healing_waters": {
     "id": "healing_waters",
     "name": "Healing Waters",

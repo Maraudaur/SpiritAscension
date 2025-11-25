@@ -2010,10 +2010,19 @@ export function useBattleLogic({
 
     // --- 2. Calculate Base Damage
     const level = attacker.level;
-    let attack = attacker.attack;
+    
+    // --- 2.1. Determine which stat to use for damage (Attack or custom damageStat)
+    let damageStat = attacker.attack;
+    const skillWithDamageStat = skill as any;
+    if (skillWithDamageStat.damageStat) {
+      const statName = skillWithDamageStat.damageStat as keyof typeof attacker;
+      damageStat = attacker[statName] || attacker.attack;
+    }
+    
     const defense = Math.max(1, target.defense);
     
     // --- 2.5. Apply Fortitude Passive (conditional attack boost when afflicted)
+    let modifiedDamageStat = damageStat;
     if (baseSpirit.passiveAbilities && attackerActiveEffects.length > 0) {
       for (const passiveId of baseSpirit.passiveAbilities) {
         const passive = (passivesData as Record<string, PassiveAbility>)[
@@ -2024,7 +2033,7 @@ export function useBattleLogic({
           if (effect.type === "conditional_stat_boost" && 
               effect.condition === "has_status_effect" && 
               effect.stat === "attack") {
-            attack = Math.floor(attack * (1 + effect.value));
+            modifiedDamageStat = Math.floor(modifiedDamageStat * (1 + effect.value));
             break;
           }
         }
@@ -2034,7 +2043,7 @@ export function useBattleLogic({
     const STATIC_BASE_POWER = 60;
     const GAME_SCALING_FACTOR = 50;
     const levelComponent = Math.floor((2 * level) / 5) + 2;
-    const attackDefenseRatio = attack / defense;
+    const attackDefenseRatio = modifiedDamageStat / defense;
     const baseCalculation =
       Math.floor(
         (levelComponent * STATIC_BASE_POWER * attackDefenseRatio) /

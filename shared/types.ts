@@ -315,6 +315,7 @@ export interface Skill {
   damage: number;
   healing: number;
   element: SkillElementId;
+  damageStat?: StatType;
   effects?: CustomEffect[];
 }
 
