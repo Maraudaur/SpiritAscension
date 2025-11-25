@@ -196,7 +196,7 @@
         "affinity": 0,
         "agility": 135
       },
-      "passiveAbilities": ["attack_focus"],
+      "passiveAbilities": ["vampiric"],
       "skills": [
         {
           "skillId": "basic_attack",

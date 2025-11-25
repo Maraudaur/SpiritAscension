@@ -212,5 +212,16 @@
         "maxDuration": 2
       }
     ]
+  },
+  "vampiric": {
+    "id": "vampiric",
+    "name": "Vampiric",
+    "description": "Recovers 30% of all damage dealt as health.",
+    "effects": [
+      {
+        "type": "vampiric",
+        "healRatio": 0.3
+      }
+    ]
   }
 }
