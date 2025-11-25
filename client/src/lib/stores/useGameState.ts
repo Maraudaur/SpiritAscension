@@ -285,6 +285,9 @@ function _createFirstSummonSpirit(poolId?: string | null): PlayerSpirit {
   };
 }
 
+// The first 5 common spirits that players are guaranteed to get
+const STARTER_COMMON_IDS = ["spirit_c01", "spirit_c02", "spirit_c03", "spirit_c04", "spirit_c05"];
+
 function _createGuaranteedNewCommonSpirit(ownedSpirits: PlayerSpirit[]): PlayerSpirit {
   // Get all common spirits
   const commonSpirits = spiritsData["common"] || [];
@@ -310,6 +313,54 @@ function _createGuaranteedNewCommonSpirit(ownedSpirits: PlayerSpirit[]): PlayerS
   
   // Pick a random unowned common spirit
   const selectedSpirit = unownedCommons[Math.floor(Math.random() * unownedCommons.length)];
+  const isPrismatic = Math.random() < 0.001; // 0.1% chance
+  
+  const getRandomPotential = (): PotentialGrade => {
+    return EARLY_SUMMON_GRADES[Math.floor(Math.random() * EARLY_SUMMON_GRADES.length)];
+  };
+  
+  return {
+    instanceId: crypto.randomUUID(),
+    spiritId: selectedSpirit.id,
+    level: 1,
+    experience: 0,
+    isPrismatic: isPrismatic,
+    potentialFactors: {
+      attack: getRandomPotential(),
+      defense: getRandomPotential(),
+      health: getRandomPotential(),
+      affinity: getRandomPotential(),
+      agility: getRandomPotential(),
+    },
+  };
+}
+
+// Restricted version that only picks from the first 5 common spirits (c01-c05)
+function _createGuaranteedStarterCommonSpirit(ownedSpirits: PlayerSpirit[]): PlayerSpirit {
+  // Get all common spirits
+  const commonSpirits = spiritsData["common"] || [];
+  
+  // Filter to only the starter commons
+  const starterCommons = commonSpirits.filter(s => STARTER_COMMON_IDS.includes(s.id));
+  
+  // Get IDs of starter commons the player already owns
+  const ownedStarterIds = new Set(
+    ownedSpirits
+      .filter(ps => STARTER_COMMON_IDS.includes(ps.spiritId))
+      .map(ps => ps.spiritId)
+  );
+  
+  // Find unowned starter commons
+  const unownedStarterCommons = starterCommons.filter(s => !ownedStarterIds.has(s.id));
+  
+  // If player has all starter commons, fall back to regular guaranteed common
+  if (unownedStarterCommons.length === 0) {
+    console.log("Player has all starter commons, falling back to any common");
+    return _createGuaranteedNewCommonSpirit(ownedSpirits);
+  }
+  
+  // Pick a random unowned starter common spirit
+  const selectedSpirit = unownedStarterCommons[Math.floor(Math.random() * unownedStarterCommons.length)];
   const isPrismatic = Math.random() < 0.001; // 0.1% chance
   
   const getRandomPotential = (): PotentialGrade => {
@@ -679,8 +730,8 @@ export const useGameState = create<GameStateStore>()(
           const guaranteedSpirit = _createSpecificSpirit("spirit_c03", 1, true);
           newSpirit = guaranteedSpirit || _createGuaranteedNewCommonSpirit(currentSpirits);
         } else if (currentSummonCount >= 3 && currentSummonCount <= 4) {
-          // Summons 4-5: guarantee a new common spirit
-          newSpirit = _createGuaranteedNewCommonSpirit(currentSpirits);
+          // Summons 4-5: guarantee a new starter common spirit (c01-c05 only)
+          newSpirit = _createGuaranteedStarterCommonSpirit(currentSpirits);
         } else {
           // After 5 summons, use normal rarity-based summoning
           newSpirit = _createRandomSpirit(_selectRandomRarity());
@@ -720,9 +771,16 @@ export const useGameState = create<GameStateStore>()(
             newSpirits.push(spiritToAdd);
             // Add to tracking so multi-summon doesn't duplicate this spirit
             currentSpirits = [...currentSpirits, spiritToAdd];
-          } else if (summonIndex >= 2 && summonIndex <= 4) {
-            // Summons 3-5: guarantee a new common spirit
-            const newCommon = _createGuaranteedNewCommonSpirit(currentSpirits);
+          } else if (summonIndex === 2) {
+            // Third summon: guarantee spirit_c03 (fire common) with early grades
+            const guaranteedSpirit = _createSpecificSpirit("spirit_c03", 1, true);
+            const spiritToAdd = guaranteedSpirit || _createGuaranteedNewCommonSpirit(currentSpirits);
+            newSpirits.push(spiritToAdd);
+            // Add to tracking so multi-summon doesn't duplicate this spirit
+            currentSpirits = [...currentSpirits, spiritToAdd];
+          } else if (summonIndex >= 3 && summonIndex <= 4) {
+            // Summons 4-5: guarantee a new starter common spirit (c01-c05 only)
+            const newCommon = _createGuaranteedStarterCommonSpirit(currentSpirits);
             newSpirits.push(newCommon);
             // Add to tracking so multi-summon doesn't duplicate spirits
             currentSpirits = [...currentSpirits, newCommon];
