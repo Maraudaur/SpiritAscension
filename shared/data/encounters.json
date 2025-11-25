@@ -23,7 +23,7 @@
   {
     "id": "e002",
     "name": "Elements",
-    "averageLevel": 5Actually,
+    "averageLevel": 5,
     "enemies": [
       {
         "spiritId": "spirit_c03",
