@@ -429,10 +429,10 @@
       }
     ]
   },
-  "body_slam": {
-    "id": "body_slam",
+  "stat_based_attack_defense": {
+    "id": "stat_based_attack_defense",
     "name": "Body Slam",
-    "description": "A powerful Metal attack that uses the spirit's Defense as its power source.",
+    "description": "A Metal-type attack based on the spirit's Defense.",
     "damage": 0.8,
     "healing": 0,
     "element": "metal",
