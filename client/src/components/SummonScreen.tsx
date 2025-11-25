@@ -61,6 +61,8 @@ export function SummonScreen({ onNavigate }: SummonScreenProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [showSummonRates, setShowSummonRates] = useState(false);
   const [essenceSkippedForCurrent, setEssenceSkippedForCurrent] = useState(false);
+  const [currentEssenceReward, setCurrentEssenceReward] = useState(0);
+  const [queueEssenceRewards, setQueueEssenceRewards] = useState<number[]>([]);
 
   const spiritCost = getSpiritCost();
   const multiSummonCost = getMultiSummonCost(10);
@@ -92,16 +94,24 @@ export function SummonScreen({ onNavigate }: SummonScreenProps) {
     const cost = getSpiritCost();
     const canProceed = freeSummons || spendQi(cost);
     if (canProceed) {
-      const isFirstSummon = summonCount === 0;
+      const currentSummonIndex = summonCount ?? 0;
       const spirit = summonSpirit();
 
       const baseSpirit = getBaseSpirit(spirit.spiritId);
-      const skipEssence = isFirstSummon && spirit.spiritId === "spirit_c01";
+      const skipEssence = currentSummonIndex === 0 && spirit.spiritId === "spirit_c01";
       setEssenceSkippedForCurrent(skipEssence);
       
       if (baseSpirit && !skipEssence) {
-        const reward = 5 + spirit.level * 2;
+        let reward = 5 + spirit.level * 2;
+        
+        if (currentSummonIndex === 1 && spirit.spiritId === "spirit_c04") {
+          reward = 4;
+        }
+        
+        setCurrentEssenceReward(reward);
         addEssence(baseSpirit.id, reward);
+      } else {
+        setCurrentEssenceReward(0);
       }
 
       startReveal(spirit);
@@ -112,22 +122,33 @@ export function SummonScreen({ onNavigate }: SummonScreenProps) {
     const cost = getMultiSummonCost(count);
     const canProceed = freeSummons || spendQi(cost);
     if (canProceed) {
-      const isFirstSummonBatch = summonCount === 0;
+      const startingSummonIndex = summonCount ?? 0;
       const newSpirits = summonMultipleSpirits(count);
+      const essenceRewards: number[] = [];
 
       newSpirits.forEach((spirit, index) => {
         const baseSpirit = getBaseSpirit(spirit.spiritId);
-        const isFirstSummon = isFirstSummonBatch && index === 0;
-        const skipEssence = isFirstSummon && spirit.spiritId === "spirit_c01";
+        const summonIndex = startingSummonIndex + index;
+        const skipEssence = summonIndex === 0 && spirit.spiritId === "spirit_c01";
         
         if (baseSpirit && !skipEssence) {
-          const reward = 5 + spirit.level * 2;
+          let reward = 5 + spirit.level * 2;
+          
+          if (summonIndex === 1 && spirit.spiritId === "spirit_c04") {
+            reward = 4;
+          }
+          
+          essenceRewards.push(reward);
           addEssence(baseSpirit.id, reward);
+        } else {
+          essenceRewards.push(0);
         }
       });
 
-      const firstSpiritSkipsEssence = isFirstSummonBatch && newSpirits[0]?.spiritId === "spirit_c01";
+      const firstSpiritSkipsEssence = startingSummonIndex === 0 && newSpirits[0]?.spiritId === "spirit_c01";
       setEssenceSkippedForCurrent(firstSpiritSkipsEssence);
+      setCurrentEssenceReward(essenceRewards[0] || 0);
+      setQueueEssenceRewards(essenceRewards);
       
       setSummonQueue(newSpirits);
       setCurrentIndex(0);
@@ -154,10 +175,12 @@ export function SummonScreen({ onNavigate }: SummonScreenProps) {
       const nextIndex = currentIndex + 1;
       if (nextIndex < summonQueue.length) {
         setCurrentIndex(nextIndex);
-        setEssenceSkippedForCurrent(false);
+        setEssenceSkippedForCurrent(queueEssenceRewards[nextIndex] === 0);
+        setCurrentEssenceReward(queueEssenceRewards[nextIndex] || 0);
         startReveal(summonQueue[nextIndex]);
       } else {
         setSummonQueue([]);
+        setQueueEssenceRewards([]);
         setStage("idle");
       }
     } else {
@@ -592,11 +615,11 @@ export function SummonScreen({ onNavigate }: SummonScreenProps) {
                     </div>
                   </div>
 
-                  {!essenceSkippedForCurrent && (
+                  {!essenceSkippedForCurrent && currentEssenceReward > 0 && (
                     <div className="mt-4 pt-4 border-t-2 border-amber-700/50 text-center parchment-text text-sm italic">
                       You received{" "}
                       <span className="font-bold">
-                        {5 + summonedSpirit.level * 2} {baseSpirit.name} Essence
+                        {currentEssenceReward} {baseSpirit.name} Essence
                       </span>{" "}
                       for this summon.
                     </div>
