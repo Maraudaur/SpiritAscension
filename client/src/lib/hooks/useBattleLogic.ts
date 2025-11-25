@@ -1238,7 +1238,8 @@ export function useBattleLogic({
         if (!baseSpirit || !baseSpirit.baseStats) return null;
 
         // Simplified enemy stat calculation (from old file)
-        const enemyPotentialBonus = 0.05;
+        // e001 is the tutorial battle - no bonus to make it easier
+        const enemyPotentialBonus = encounter.id === "e001" ? 0 : 0.05;
         const levelMultiplier = enemyData.level * 0.02;
         const enemyAttack = Math.floor(
           baseSpirit.baseStats.attack *
