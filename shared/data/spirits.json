@@ -378,7 +378,7 @@
         "affinity": 110,
         "agility": 139
       },
-      "passiveAbilities": ["attack_focus"],
+      "passiveAbilities": ["detox"],
       "skills": [
         {
           "skillId": "basic_attack",

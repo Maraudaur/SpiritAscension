@@ -201,5 +201,16 @@
         "boost": 0.3
       }
     ]
+  },
+  "detox": {
+    "id": "detox",
+    "name": "Detox",
+    "description": "Status effects only last until the end of the next round.",
+    "effects": [
+      {
+        "type": "effect_duration_cap",
+        "maxDuration": 2
+      }
+    ]
   }
 }

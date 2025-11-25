@@ -554,6 +554,25 @@ export function useBattleLogic({
 
     const currentEffects = target.activeEffects || [];
 
+    // Check for effect_duration_cap passive (Detox)
+    let cappedEffect = { ...newEffect };
+    if (targetBaseSpirit?.passiveAbilities) {
+      for (const passiveId of targetBaseSpirit.passiveAbilities) {
+        const passive = (passivesData as Record<string, PassiveAbility>)[passiveId];
+        if (!passive || !passive.effects) continue;
+        
+        for (const passiveEffect of passive.effects) {
+          if (passiveEffect.type === "effect_duration_cap") {
+            if (cappedEffect.turnsRemaining !== -1 && cappedEffect.turnsRemaining > passiveEffect.maxDuration) {
+              cappedEffect.turnsRemaining = passiveEffect.maxDuration;
+              console.log(`✨ ${targetName}'s Detox caps effect duration to ${passiveEffect.maxDuration} turn(s)`);
+              addLog(`${targetName}'s Detox reduces the effect duration!`);
+            }
+          }
+        }
+      }
+    }
+
     // Define which effect types CAN stack (allow multiple instances)
     // Only stat_buff and stat_debuff can stack
     const stackableEffects: ActiveEffect["effectType"][] = [
@@ -564,23 +583,23 @@ export function useBattleLogic({
     let updatedEffects: ActiveEffect[];
     let logMessage: string;
 
-    console.log(`🔮 Applying ${newEffect.effectType} to ${targetName}`);
+    console.log(`🔮 Applying ${cappedEffect.effectType} to ${targetName}`);
     console.log(`   Current effects (${currentEffects.length}):`, currentEffects.map(e => e.effectType));
 
     // Check if this is a stackable effect
-    if (stackableEffects.includes(newEffect.effectType)) {
+    if (stackableEffects.includes(cappedEffect.effectType)) {
       // Stackable effects - always add as a new instance
-      updatedEffects = [...currentEffects, newEffect];
+      updatedEffects = [...currentEffects, cappedEffect];
       logMessage = `${targetName} is afflicted with ${effect.effectType}!`;
       console.log(`   ✅ STACKED (stackable effect type)`);
     } else {
       // Non-stackable effects - check if already present and replace
       // For disable effects, also check if the disabledAction matches
       const existingEffectIndex = currentEffects.findIndex((e) => {
-        if (e.effectType !== newEffect.effectType) return false;
+        if (e.effectType !== cappedEffect.effectType) return false;
         // For disable effects, different actions can coexist independently
-        if (e.effectType === "disable" && newEffect.effectType === "disable") {
-          return e.disabledAction === newEffect.disabledAction;
+        if (e.effectType === "disable" && cappedEffect.effectType === "disable") {
+          return e.disabledAction === cappedEffect.disabledAction;
         }
         return true;
       });
@@ -588,7 +607,7 @@ export function useBattleLogic({
       if (existingEffectIndex !== -1) {
         // Effect already exists - reset its duration with the new effect data
         updatedEffects = currentEffects.map((e, i) =>
-          i === existingEffectIndex ? newEffect : e
+          i === existingEffectIndex ? cappedEffect : e
         );
         // Customize reset message for disable effect
         if (effect.effectType === "disable") {
@@ -599,7 +618,7 @@ export function useBattleLogic({
         console.log(`   🔄 DURATION RESET (effect already exists)`);
       } else {
         // New effect - add it to the list
-        updatedEffects = [...currentEffects, newEffect];
+        updatedEffects = [...currentEffects, cappedEffect];
         
         // Customize message for disable effect
         if (effect.effectType === "disable") {

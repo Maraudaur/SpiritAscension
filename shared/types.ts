@@ -209,6 +209,11 @@ export interface PassiveDisable {
   action: "fight" | "skill" | "spirit" | "escape";
 }
 
+export interface PassiveEffectDurationCap {
+  type: "effect_duration_cap";
+  maxDuration: number; // Maximum turns an effect can last
+}
+
 export interface SpiritSpriteConfig {
   textureUrl: string;
   frameWidth: number;
@@ -230,7 +235,8 @@ export type PassiveEffect =
   | PassiveCritImmunity
   | PassiveConditionalStatBoost
   | PassiveEffectImmunity
-  | PassiveDisable;
+  | PassiveDisable
+  | PassiveEffectDurationCap;
 
 export type CombatTrigger =
   | "on_hit"
