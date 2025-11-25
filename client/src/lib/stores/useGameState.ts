@@ -902,7 +902,11 @@ export const useGameState = create<GameStateStore>()(
       resetPartyOrder: () => {
         set((state) => {
           // Reset activeParty to match the original party order
-          state.activeParty = [...state.originalPartyOrder];
+          // Filter out any stale IDs that no longer exist in spirits
+          const validSpiritIds = new Set(state.spirits.map(s => s.instanceId));
+          state.activeParty = state.originalPartyOrder.map(id => 
+            id && validSpiritIds.has(id) ? id : null
+          );
         });
       },
 
@@ -965,6 +969,12 @@ export const useGameState = create<GameStateStore>()(
           if (state.activeParty.includes(instanceId)) {
             const index = state.activeParty.indexOf(instanceId);
             state.activeParty[index] = null;
+          }
+
+          // Also remove from original party order
+          if (state.originalPartyOrder.includes(instanceId)) {
+            const index = state.originalPartyOrder.indexOf(instanceId);
+            state.originalPartyOrder[index] = null;
           }
 
           // Remove from spirit list
@@ -1037,6 +1047,7 @@ export const useGameState = create<GameStateStore>()(
         set((state) => {
           state.spirits = [];
           state.activeParty = [null, null, null, null];
+          state.originalPartyOrder = [null, null, null, null];
           state.summonCount = 0;
         });
       },

@@ -101,6 +101,7 @@ export function StoryScreen({ onClose, onNavigate }: StoryScreenProps) {
     ftueStep,
     setStoryBattleCheckpoint,
     healAllSpirits,
+    resetPartyOrder,
   } = useGameState();
 
   const storyNodes = storyData as StoryNode[];
@@ -165,6 +166,8 @@ export function StoryScreen({ onClose, onNavigate }: StoryScreenProps) {
     if (isNodeIncomplete && currentNode.encounterId) {
       // Heal all spirits when starting a story battle
       healAllSpirits();
+      // Reset party order to original configuration for new encounter
+      resetPartyOrder();
       // Set checkpoint for story battle retry flow
       setStoryBattleCheckpoint({
         nodeId: currentStoryNodeId,
