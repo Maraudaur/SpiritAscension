@@ -147,7 +147,6 @@ export const POTENTIAL_BONUSES: { [key in PotentialGrade]: number } = {
 };
 
 const POTENTIAL_GRADES: PotentialGrade[] = ["D", "C", "B", "A", "S", "SS"];
-const EARLY_SUMMON_GRADES: PotentialGrade[] = ["D", "C", "B"];
 
 const SUMMON_RATES: { rarity: Rarity; weight: number }[] = [
   { rarity: "common", weight: 600 },
@@ -266,7 +265,7 @@ function _createFirstSummonSpirit(poolId?: string | null): PlayerSpirit {
   const isPrismatic = Math.random() < 0.001; // 0.1% chance
 
   const getRandomPotential = (): PotentialGrade => {
-    return EARLY_SUMMON_GRADES[Math.floor(Math.random() * EARLY_SUMMON_GRADES.length)];
+    return POTENTIAL_GRADES[Math.floor(Math.random() * POTENTIAL_GRADES.length)];
   };
 
   return {
@@ -313,7 +312,7 @@ function _createGuaranteedNewCommonSpirit(ownedSpirits: PlayerSpirit[]): PlayerS
   const isPrismatic = Math.random() < 0.001; // 0.1% chance
   
   const getRandomPotential = (): PotentialGrade => {
-    return EARLY_SUMMON_GRADES[Math.floor(Math.random() * EARLY_SUMMON_GRADES.length)];
+    return POTENTIAL_GRADES[Math.floor(Math.random() * POTENTIAL_GRADES.length)];
   };
   
   return {
@@ -332,7 +331,7 @@ function _createGuaranteedNewCommonSpirit(ownedSpirits: PlayerSpirit[]): PlayerS
   };
 }
 
-function _createSpecificSpirit(spiritId: string, level: number = 1, useEarlyGrades: boolean = false): PlayerSpirit | null {
+function _createSpecificSpirit(spiritId: string, level: number = 1): PlayerSpirit | null {
   // Find the base spirit by ID across all rarities
   let baseSpirit: BaseSpirit | undefined = undefined;
   for (const raritySpirits of Object.values(spiritsData)) {
@@ -347,9 +346,8 @@ function _createSpecificSpirit(spiritId: string, level: number = 1, useEarlyGrad
 
   const isPrismatic = Math.random() < 0.001; // 0.1% chance
 
-  const gradePool = useEarlyGrades ? EARLY_SUMMON_GRADES : POTENTIAL_GRADES;
   const getRandomPotential = (): PotentialGrade => {
-    return gradePool[Math.floor(Math.random() * gradePool.length)];
+    return POTENTIAL_GRADES[Math.floor(Math.random() * POTENTIAL_GRADES.length)];
   };
 
   return {
@@ -671,9 +669,9 @@ export const useGameState = create<GameStateStore>()(
         if (currentSummonCount === 0) {
           newSpirit = _createFirstSummonSpirit(poolId);
         } else if (currentSummonCount === 1) {
-          // Second summon: guarantee spirit_c04 (water common) with early grades
-          const guaranteedSpirit = _createSpecificSpirit("spirit_c04", 1, true);
-          newSpirit = guaranteedSpirit || _createGuaranteedNewCommonSpirit(currentSpirits);
+          // Second summon: guarantee spirit_c04 (water common)
+          const guaranteedSpirit = _createSpecificSpirit("spirit_c04", 1);
+          newSpirit = guaranteedSpirit || _createRandomSpirit("common");
         } else if (currentSummonCount >= 2 && currentSummonCount <= 4) {
           // Summons 3-5: guarantee a new common spirit
           newSpirit = _createGuaranteedNewCommonSpirit(currentSpirits);
@@ -710,9 +708,9 @@ export const useGameState = create<GameStateStore>()(
           if (isFirstSummonEver) {
             newSpirits.push(_createFirstSummonSpirit(poolId));
           } else if (isSecondSummon) {
-            // Second summon: guarantee spirit_c04 (water common) with early grades
-            const guaranteedSpirit = _createSpecificSpirit("spirit_c04", 1, true);
-            const spiritToAdd = guaranteedSpirit || _createGuaranteedNewCommonSpirit(currentSpirits);
+            // Second summon: guarantee spirit_c04 (water common)
+            const guaranteedSpirit = _createSpecificSpirit("spirit_c04", 1);
+            const spiritToAdd = guaranteedSpirit || _createRandomSpirit("common");
             newSpirits.push(spiritToAdd);
             // Add to tracking so multi-summon doesn't duplicate this spirit
             currentSpirits = [...currentSpirits, spiritToAdd];
