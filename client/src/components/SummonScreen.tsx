@@ -98,7 +98,7 @@ export function SummonScreen({ onNavigate }: SummonScreenProps) {
       const spirit = summonSpirit();
 
       const baseSpirit = getBaseSpirit(spirit.spiritId);
-      const skipEssence = currentSummonIndex === 0 && spirit.spiritId === "spirit_c01";
+      const skipEssence = currentSummonIndex === 0 && spirit.spiritId === "spirit_c05";
       setEssenceSkippedForCurrent(skipEssence);
       
       if (baseSpirit && !skipEssence) {
@@ -131,7 +131,7 @@ export function SummonScreen({ onNavigate }: SummonScreenProps) {
       newSpirits.forEach((spirit, index) => {
         const baseSpirit = getBaseSpirit(spirit.spiritId);
         const summonIndex = startingSummonIndex + index;
-        const skipEssence = summonIndex === 0 && spirit.spiritId === "spirit_c01";
+        const skipEssence = summonIndex === 0 && spirit.spiritId === "spirit_c05";
         
         if (baseSpirit && !skipEssence) {
           let reward = 5 + spirit.level * 2;
@@ -149,7 +149,7 @@ export function SummonScreen({ onNavigate }: SummonScreenProps) {
         }
       });
 
-      const firstSpiritSkipsEssence = startingSummonIndex === 0 && newSpirits[0]?.spiritId === "spirit_c01";
+      const firstSpiritSkipsEssence = startingSummonIndex === 0 && newSpirits[0]?.spiritId === "spirit_c05";
       setEssenceSkippedForCurrent(firstSpiritSkipsEssence);
       setCurrentEssenceReward(essenceRewards[0] || 0);
       setQueueEssenceRewards(essenceRewards);
