@@ -212,6 +212,7 @@ function App() {
                   }}
                   returnTo="cultivation"
                   autoStart={false}
+                  battleSource="sidebar"
                 />
               </div>
             )}
@@ -233,6 +234,7 @@ function App() {
                     }}
                     returnTo="story"
                     autoStart={true}
+                    battleSource="story"
                   />
                 </div>
               </div>
@@ -251,6 +253,7 @@ function App() {
                   }}
                   returnTo="cultivation"
                   autoStart={true}
+                  battleSource="debug"
                 />
               </div>
             )}

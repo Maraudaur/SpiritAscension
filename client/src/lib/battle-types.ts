@@ -16,6 +16,7 @@ export interface BattleScreenProps {
   returnTo?: "cultivation" | "story";
   autoStart?: boolean;
   onDefeatAnimationComplete?: () => void;
+  battleSource?: "story" | "sidebar" | "debug";
 }
 
 export interface BattleSpirit {

@@ -93,6 +93,7 @@ export function BattleScreen({
   onNavigate,
   returnTo = "cultivation",
   autoStart = false,
+  battleSource = "sidebar",
 }: BattleScreenProps) {
   const { battlesWon } = useGameState();
   const logic = useBattleLogic({ onClose, isBossBattle: false, returnTo });
@@ -1016,7 +1017,9 @@ export function BattleScreen({
                 🎉 Victory! 🎉
               </h3>
               <p className="text-md text-green-800 mb-3 text-center font-semibold">
-                You defeated the enemy! A new challenger approaches...
+                {battleSource === "story"
+                  ? "You have conquered this trial!"
+                  : "You defeated the enemy! A new challenger approaches..."}
               </p>
               <div className="mb-4 space-y-2 p-3 bg-white rounded border border-green-400">
                 <p className="text-lg font-bold text-green-800">
@@ -1033,20 +1036,7 @@ export function BattleScreen({
                   All spirits have been fully healed!
                 </p>
               </div>
-              <div className="grid grid-cols-2 gap-3">
-                <Button
-                  onClick={startBattle}
-                  disabled={battlesWon === 1}
-                  className="w-full font-bold"
-                  style={{
-                    background: battlesWon === 1 ? "#999" : "var(--vermillion)",
-                    color: "var(--parchment)",
-                    opacity: battlesWon === 1 ? 0.5 : 1,
-                    cursor: battlesWon === 1 ? "not-allowed" : "pointer",
-                  }}
-                >
-                  Continue Battling
-                </Button>
+              {battleSource === "story" ? (
                 <Button
                   onClick={handleClose}
                   className="w-full font-bold"
@@ -1055,9 +1045,35 @@ export function BattleScreen({
                     color: "var(--parchment)",
                   }}
                 >
-                  Return to {returnTo === "story" ? "Story" : "Cultivation"}
+                  Return to Story
                 </Button>
-              </div>
+              ) : (
+                <div className="grid grid-cols-2 gap-3">
+                  <Button
+                    onClick={startBattle}
+                    disabled={battlesWon === 1}
+                    className="w-full font-bold"
+                    style={{
+                      background: battlesWon === 1 ? "#999" : "var(--vermillion)",
+                      color: "var(--parchment)",
+                      opacity: battlesWon === 1 ? 0.5 : 1,
+                      cursor: battlesWon === 1 ? "not-allowed" : "pointer",
+                    }}
+                  >
+                    Continue Battling
+                  </Button>
+                  <Button
+                    onClick={handleClose}
+                    className="w-full font-bold"
+                    style={{
+                      background: "var(--jade-green)",
+                      color: "var(--parchment)",
+                    }}
+                  >
+                    Return to {returnTo === "story" ? "Story" : "Cultivation"}
+                  </Button>
+                </div>
+              )}
             </div>
           </ModalOverlay>
         )}
