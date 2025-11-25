@@ -26,7 +26,7 @@ interface QiHUDProps {
 }
 
 export function QiHUD({ currentScreen, onNavigate }: QiHUDProps) {
-  const { qi, qiPerSecond, resetGame, freeSummons, toggleFreeSummons, freeLevelUp, toggleFreeLevelUp, spawnSpecificSpirit, setCurrentEncounterId, setDebugEncounter } = useGameState();
+  const { qi, qiPerSecond, resetGame, freeSummons, toggleFreeSummons, freeLevelUp, toggleFreeLevelUp, spawnSpecificSpirit, setCurrentEncounterId, setDebugEncounter, clearAllSpirits } = useGameState();
   const { isMuted, toggleMute, volume, setVolume } = useAudio();
   const [showVolumeSlider, setShowVolumeSlider] = useState(false);
   const [showDebugMenu, setShowDebugMenu] = useState(false);
@@ -382,6 +382,19 @@ export function QiHUD({ currentScreen, onNavigate }: QiHUDProps) {
                       onCheckedChange={toggleFreeLevelUp}
                     />
                   </div>
+
+                  <Button
+                    variant="destructive"
+                    size="sm"
+                    onClick={() => {
+                      if (confirm("Clear all spirits? This will remove all your summoned spirits so you can re-summon them with updated data.")) {
+                        clearAllSpirits();
+                      }
+                    }}
+                    className="w-full text-xs mt-2"
+                  >
+                    Clear All Spirits
+                  </Button>
 
                   <div className="pt-2 border-t border-orange-300 mt-2 space-y-2">
                     <div className="text-xs font-medium text-orange-700 mb-1">

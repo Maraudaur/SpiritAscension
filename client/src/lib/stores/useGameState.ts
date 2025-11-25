@@ -121,6 +121,7 @@ export interface GameStateStore extends Omit<GameStateData, "activeParty"> {
   toggleFreeLevelUp: () => void;
   spawnSpecificSpirit: (spiritId: string, level?: number) => PlayerSpirit | null;
   setDebugEncounter: (encounter: Encounter | null) => void;
+  clearAllSpirits: () => void;
 }
 
 // --- FIX: ALL CONSTANTS MOVED TO TOP-LEVEL SCOPE ---
@@ -965,6 +966,13 @@ export const useGameState = create<GameStateStore>()(
       setDebugEncounter: (encounter: Encounter | null) => {
         set((state) => {
           state.debugEncounter = encounter;
+        });
+      },
+      clearAllSpirits: () => {
+        set((state) => {
+          state.spirits = [];
+          state.activeParty = [null, null, null, null];
+          state.summonCount = 0;
         });
       },
     })),
