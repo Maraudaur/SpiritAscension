@@ -353,7 +353,7 @@
           "unlockLevel": 3
         },
         {
-          "skillId": "forget_strike",
+          "skillId": "action_disabler_skill",
           "unlockLevel": 6
         }
       ],

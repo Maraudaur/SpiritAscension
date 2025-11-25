@@ -575,16 +575,27 @@ export function useBattleLogic({
       console.log(`   ✅ STACKED (stackable effect type)`);
     } else {
       // Non-stackable effects - check if already present and replace
-      const existingEffectIndex = currentEffects.findIndex(
-        (e) => e.effectType === newEffect.effectType
-      );
+      // For disable effects, also check if the disabledAction matches
+      const existingEffectIndex = currentEffects.findIndex((e) => {
+        if (e.effectType !== newEffect.effectType) return false;
+        // For disable effects, different actions can coexist independently
+        if (e.effectType === "disable" && newEffect.effectType === "disable") {
+          return e.disabledAction === newEffect.disabledAction;
+        }
+        return true;
+      });
 
       if (existingEffectIndex !== -1) {
         // Effect already exists - reset its duration with the new effect data
         updatedEffects = currentEffects.map((e, i) =>
           i === existingEffectIndex ? newEffect : e
         );
-        logMessage = `${targetName}'s ${effect.effectType} duration was reset!`;
+        // Customize reset message for disable effect
+        if (effect.effectType === "disable") {
+          logMessage = `${targetName}'s ${effect.disabledAction} disable duration was reset!`;
+        } else {
+          logMessage = `${targetName}'s ${effect.effectType} duration was reset!`;
+        }
         console.log(`   🔄 DURATION RESET (effect already exists)`);
       } else {
         // New effect - add it to the list

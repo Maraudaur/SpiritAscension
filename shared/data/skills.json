@@ -439,18 +439,18 @@
     "damageStat": "defense",
     "effects": []
   },
-  "forget_strike": {
-    "id": "forget_strike",
-    "name": "Forget Strike",
-    "description": "A Water-type attack that disables the enemy's Skill action for 2 turns.",
-    "damage": 0.8,
+  "action_disabler_skill": {
+    "id": "action_disabler_skill",
+    "name": "Bonk",
+    "description": "A weak attack that temporarily disables the foe's Skill action.",
+    "damage": 0.5,
     "healing": 0,
-    "element": "water",
+    "element": "none",
     "effects": [
       {
         "type": "disable",
         "action": "skill",
-        "duration": 2
+        "duration": 3
       }
     ]
   }
