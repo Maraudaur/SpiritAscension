@@ -444,6 +444,59 @@ export function useBattleLogic({
           }
         }
       }
+
+      // 4. Check for Counter Stance effect on target
+      if ("activeEffects" in target) {
+        const battleTarget = target as BattleSpirit;
+        const counterStanceEffect = battleTarget.activeEffects.find(
+          (effect) => effect.effectType === "counter_stance"
+        );
+
+        if (counterStanceEffect) {
+          // Calculate counter attack damage using the same formula as passive counter attacks
+          let targetAttack = 0;
+          let targetLevel = 1;
+          let attackerDefense = 1;
+
+          const targetStats = calculateAllStats(
+            battleTarget.playerSpirit,
+            battleTarget.activeEffects
+          );
+          targetAttack = targetStats.attack;
+          targetLevel = battleTarget.playerSpirit.level;
+
+          if ("playerSpirit" in attacker) {
+            const battleAttacker = attacker as BattleSpirit;
+            const attackerStats = calculateAllStats(
+              battleAttacker.playerSpirit,
+              battleAttacker.activeEffects
+            );
+            attackerDefense = Math.max(1, attackerStats.defense);
+          } else {
+            const enemyStats = applyEnemyActiveEffects(attacker as Enemy);
+            attackerDefense = Math.max(1, enemyStats.defense);
+          }
+
+          const levelComponent = Math.floor((2 * targetLevel) / 5) + 2;
+          const attackDefenseRatio = targetAttack / attackerDefense;
+          const baseDamage = Math.floor(
+            (levelComponent * 60 * attackDefenseRatio) / 50
+          ) + 2;
+          counterAttackDamage = Math.max(1, Math.floor(baseDamage));
+
+          const targetDisplayName =
+            getBaseSpirit(battleTarget.playerSpirit.spiritId)?.name ||
+            "Unknown";
+          addLog(
+            `${targetDisplayName}'s Counter Stance triggers a guaranteed counter-attack dealing ${counterAttackDamage} damage!`
+          );
+
+          // Remove the counter_stance effect so it only triggers once
+          battleTarget.activeEffects = battleTarget.activeEffects.filter(
+            (effect) => effect.id !== counterStanceEffect.id
+          );
+        }
+      }
     }
     return { reflectedDamage, attackerEffects, counterAttackDamage };
   };

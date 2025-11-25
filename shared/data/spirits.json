@@ -218,7 +218,7 @@
         "totalFrames": 8,
         "animationSpeed": 0.1
       },
-      "elements": ["none"]
+      "elements": ["neutral"]
     }
   ],
   "uncommon": [
@@ -241,12 +241,12 @@
           "unlockLevel": 1
         },
         {
-          "skillId": "heavy_hit",
+          "skillId": "basic_attack_wood",
           "unlockLevel": 3
         },
         {
           "skillId": "lifesteal_buff",
-          "unlockLevel": 3
+          "unlockLevel": 6
         }
       ],
       "spriteConfig": {
@@ -256,7 +256,7 @@
         "totalFrames": 8,
         "animationSpeed": 0.1
       },
-      "elements": ["wood"]
+      "elements": ["wood", "fire"]
     },
     {
       "id": "spirit_u02",
