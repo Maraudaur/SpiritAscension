@@ -205,7 +205,7 @@
   "detox": {
     "id": "detox",
     "name": "Detox",
-    "description": "Status effects only last until the end of the next round.",
+    "description": "Recovers from status effects faster.",
     "effects": [
       {
         "type": "effect_duration_cap",
