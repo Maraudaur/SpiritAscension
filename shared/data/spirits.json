@@ -16,19 +16,15 @@
       "skills": [
         {
           "skillId": "basic_attack",
-          "unlockLevel": 6
-        },
-        {
-          "skillId": "basic_attack_wood",
-          "unlockLevel": 6
-        },
-        {
-          "skillId": "paralyze_strike",
           "unlockLevel": 1
         },
         {
+          "skillId": "basic_attack_wood",
+          "unlockLevel": 3
+        },
+        {
           "skillId": "def_shred_dot",
-          "unlockLevel": 4
+          "unlockLevel": 6
         }
       ],
       "spriteConfig": {
