@@ -106,6 +106,8 @@ export function SummonScreen({ onNavigate }: SummonScreenProps) {
         
         if (currentSummonIndex === 1 && spirit.spiritId === "spirit_c04") {
           reward = 4;
+        } else if (currentSummonIndex === 2 && spirit.spiritId === "spirit_c03") {
+          reward = 5;
         }
         
         setCurrentEssenceReward(reward);
@@ -136,6 +138,8 @@ export function SummonScreen({ onNavigate }: SummonScreenProps) {
           
           if (summonIndex === 1 && spirit.spiritId === "spirit_c04") {
             reward = 4;
+          } else if (summonIndex === 2 && spirit.spiritId === "spirit_c03") {
+            reward = 5;
           }
           
           essenceRewards.push(reward);
