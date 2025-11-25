@@ -10,6 +10,7 @@ import {
   calculateAllStats,
   getAvailableSkills as getSpiritAvailableSkills,
   getPassiveAbility,
+  getSkill,
 } from "@/lib/spiritUtils";
 import { useGameState } from "@/lib/stores/useGameState";
 import { Button } from "@/components/ui/button";
@@ -1185,15 +1186,10 @@ export function BattleScreen({
 
             const lineage = getLineage(baseSpirit.lineage);
             // Get all skills for this spirit and filter by enemy's current level
-            const availableSkillIds = baseSpirit.skills
+            const filteredSkills = baseSpirit.skills
               .filter((bs) => bs.unlockLevel <= activeEnemy.level)
-              .map((bs) => bs.skillId);
-            
-            // Get the full skill objects from the available skill IDs
-            const allSkills = getSpiritAvailableSkills({ level: activeEnemy.level } as any);
-            const filteredSkills = allSkills.filter((skill) =>
-              availableSkillIds.includes(skill.id)
-            );
+              .map((bs) => getSkill(bs.skillId))
+              .filter((skill): skill is NonNullable<typeof skill> => skill !== undefined);
 
             return (
               <div className="flex flex-col gap-4" style={{ maxHeight: "80vh" }}>
