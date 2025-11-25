@@ -199,11 +199,11 @@
           "unlockLevel": 1
         },
         {
-          "skillId": "hit_and_heal",
+          "skillId": "heavy_hit",
           "unlockLevel": 3
         },
         {
-          "skillId": "heavy_hit",
+          "skillId": "charged_hit",
           "unlockLevel": 6
         }
       ],
