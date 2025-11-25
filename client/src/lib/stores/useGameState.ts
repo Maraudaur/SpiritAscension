@@ -147,6 +147,7 @@ export const POTENTIAL_BONUSES: { [key in PotentialGrade]: number } = {
 };
 
 const POTENTIAL_GRADES: PotentialGrade[] = ["D", "C", "B", "A", "S", "SS"];
+const EARLY_SUMMON_GRADES: PotentialGrade[] = ["C", "B", "A"]; // First 5 summons use this (no D/S/SS)
 
 const SUMMON_RATES: { rarity: Rarity; weight: number }[] = [
   { rarity: "common", weight: 600 },
