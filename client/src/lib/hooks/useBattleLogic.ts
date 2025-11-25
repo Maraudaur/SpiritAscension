@@ -2069,7 +2069,7 @@ export function useBattleLogic({
         }
       }
     }
-    
+
     const STATIC_BASE_POWER = 60;
     const GAME_SCALING_FACTOR = 50;
     const levelComponent = Math.floor((2 * level) / 5) + 2;
@@ -2502,6 +2502,26 @@ export function useBattleLogic({
           };
           effectsToApplyToCaster.push(newActiveEffect);
           logMessages.push(`${attacker.name} creates a protective shield!`);
+        } else if (skillEffect.type === "stat_debuff") {
+          const newActiveEffect: ActiveEffect = {
+            id: `${skillEffect.stat}_debuff_${Date.now()}`,
+            effectType: "stat_debuff",
+            turnsRemaining: skillEffect.duration,
+            stat: skillEffect.stat,
+            statMultiplier: 1 - skillEffect.value,
+          };
+          effectsToApplyToTarget.push(newActiveEffect);
+          logMessages.push(`${target.name}'s ${skillEffect.stat} was reduced!`);
+        } else if (skillEffect.type === "stat_buff") {
+          const newActiveEffect: ActiveEffect = {
+            id: `${skillEffect.stat}_buff_${Date.now()}`,
+            effectType: "stat_buff",
+            turnsRemaining: skillEffect.duration,
+            stat: skillEffect.stat,
+            statMultiplier: 1 + skillEffect.value,
+          };
+          effectsToApplyToCaster.push(newActiveEffect);
+          logMessages.push(`${attacker.name}'s ${skillEffect.stat} was increased!`);
         }
       }
     }
