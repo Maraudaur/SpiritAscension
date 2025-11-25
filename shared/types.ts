@@ -214,6 +214,11 @@ export interface PassiveEffectDurationCap {
   maxDuration: number; // Maximum turns an effect can last
 }
 
+export interface PassiveVampiric {
+  type: "vampiric";
+  healRatio: number; // 0.3 for 30% of damage dealt heals the attacker
+}
+
 export interface SpiritSpriteConfig {
   textureUrl: string;
   frameWidth: number;
@@ -236,7 +241,8 @@ export type PassiveEffect =
   | PassiveConditionalStatBoost
   | PassiveEffectImmunity
   | PassiveDisable
-  | PassiveEffectDurationCap;
+  | PassiveEffectDurationCap
+  | PassiveVampiric;
 
 export type CombatTrigger =
   | "on_hit"

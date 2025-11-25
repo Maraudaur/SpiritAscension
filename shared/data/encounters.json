@@ -8,7 +8,7 @@
         "spiritId": "spirit_c04",
         "level": 1,
         "ai": ["basic_attack"],
-        "statModifier": -0.30
+        "statModifier": -0.3
       }
     ],
     "rewards": {
@@ -71,7 +71,7 @@
       {
         "spiritId": "spirit_c02",
         "level": 9,
-        "ai": ["basic_attack"]
+        "ai": ["r000"]
       }
     ],
     "rewards": {
@@ -91,9 +91,9 @@
     "averageLevel": 13,
     "enemies": [
       {
-        "spiritId": "spirit_c02",
+        "spiritId": "spirit_u03",
         "level": 13,
-        "ai": ["basic_attack"]
+        "ai": ["r000"]
       }
     ],
     "rewards": {
