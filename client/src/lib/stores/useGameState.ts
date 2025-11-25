@@ -54,6 +54,7 @@ export interface GameStateStore extends Omit<GameStateData, "activeParty"> {
 
   // Overrides
   activeParty: (string | null)[];
+  originalPartyOrder: (string | null)[];
 
   // Other State
   ascensionTier: number;
@@ -106,6 +107,7 @@ export interface GameStateStore extends Omit<GameStateData, "activeParty"> {
   // SpiritManager Actions
   addToParty: (instanceId: string) => void;
   removeFromParty: (instanceId: string) => void;
+  resetPartyOrder: () => void;
   getEssenceCount: (spiritId: string) => number;
   getLevelUpCost: (level: number) => { qi: number; essence: number };
   levelUpSpirit: (instanceId: string) => void;
@@ -475,6 +477,7 @@ export const useGameState = create<GameStateStore>()(
       // --- (Initial State and FTUE State) ---
       ...initialState,
       activeParty: [null, null, null, null],
+      originalPartyOrder: [null, null, null, null],
       ascensionTier: 0,
       currentStoryNodeId: null,
       currentStoryDialogueIndex: 0,
@@ -540,7 +543,7 @@ export const useGameState = create<GameStateStore>()(
         }
       },
       setParty: (party: (string | null)[]) => {
-        set({ activeParty: party });
+        set({ activeParty: party, originalPartyOrder: [...party] });
       },
       isStoryNodeCompleted: (id: number) => {
         return get().completedStoryNodes.includes(id);
@@ -602,6 +605,7 @@ export const useGameState = create<GameStateStore>()(
           Object.assign(state, {
             ...initialState,
             activeParty: [null, null, null, null],
+            originalPartyOrder: [null, null, null, null],
             ascensionTier: 0,
             currentStoryNodeId: null,
             currentStoryDialogueIndex: 0,
@@ -872,6 +876,8 @@ export const useGameState = create<GameStateStore>()(
           if (emptySlotIndex !== -1) {
             // Add the spirit to that slot
             state.activeParty[emptySlotIndex] = instanceId;
+            // Also update original party order
+            state.originalPartyOrder[emptySlotIndex] = instanceId;
             // Mark that user has added to party after first summon
             if (!state.hasAddedToPartyAfterFirstSummon) {
               state.hasAddedToPartyAfterFirstSummon = true;
@@ -887,7 +893,16 @@ export const useGameState = create<GameStateStore>()(
           if (spiritIndex !== -1) {
             // Set that slot back to null
             state.activeParty[spiritIndex] = null;
+            // Also update original party order
+            state.originalPartyOrder[spiritIndex] = null;
           }
+        });
+      },
+
+      resetPartyOrder: () => {
+        set((state) => {
+          // Reset activeParty to match the original party order
+          state.activeParty = [...state.originalPartyOrder];
         });
       },
 
