@@ -57,6 +57,7 @@
     "rewards": {
       "qi": 30,
       "essences": {
+        "spirit_c01": 1,
         "spirit_c03": 3,
         "spirit_c04": 3,
         "spirit_c05": 3
