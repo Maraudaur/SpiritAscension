@@ -175,6 +175,16 @@ export function calculateStat(
   return Math.floor(baseWithPotential * (level * 0.02));
 }
 
+export function calculateHealthStat(
+  baseStat: number,
+  level: number,
+  potential: PotentialGrade,
+): number {
+  const potentialBonus = POTENTIAL_BONUSES[potential];
+  const baseWithPotential = baseStat * (1 + potentialBonus);
+  return Math.floor(baseWithPotential * (level * 0.025));
+}
+
 export function calculateAllStats(
   playerSpirit: PlayerSpirit,
   battleActiveEffects?: ActiveEffect[]
@@ -197,7 +207,7 @@ export function calculateAllStats(
   );
 
   let health =
-    calculateStat(
+    calculateHealthStat(
       baseSpirit.baseStats.health,
       playerSpirit.level,
       playerSpirit.potentialFactors.health,
