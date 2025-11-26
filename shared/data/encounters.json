@@ -70,11 +70,13 @@
     "id": "e004",
     "name": "StatusEffects",
     "averageLevel": 9,
+    "_originalEnemy": "spirit_c02",
+    "_revertNote": "To revert: change spiritId back to spirit_c02 and ai to [r000]",
     "enemies": [
       {
-        "spiritId": "spirit_c02",
+        "spiritId": "enemy_e01",
         "level": 9,
-        "ai": ["r000"]
+        "ai": ["def_buff", "basic_attack_earth", "basic_attack", "basic_attack_earth"]
       }
     ],
     "rewards": {

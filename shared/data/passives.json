@@ -240,5 +240,16 @@
         "value": 0.5
       }
     ]
+  },
+  "stone_armor": {
+    "id": "stone_armor",
+    "name": "Stone Armor",
+    "description": "Reduces all incoming damage by 30%.",
+    "effects": [
+      {
+        "type": "damage_reduction",
+        "value": 0.3
+      }
+    ]
   }
 }

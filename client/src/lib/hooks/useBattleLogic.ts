@@ -2241,6 +2241,24 @@ export function useBattleLogic({
       }
     }
 
+    // --- 5.5. Apply Damage Reduction Passive (reduces incoming damage)
+    if (targetBaseSpirit?.passiveAbilities && totalDamage > 0) {
+      for (const passiveId of targetBaseSpirit.passiveAbilities) {
+        const passive = (passivesData as Record<string, PassiveAbility>)[passiveId];
+        if (passive?.effects) {
+          for (const effect of passive.effects) {
+            if (effect.type === "damage_reduction" && (effect as any).value) {
+              const reductionRatio = (effect as any).value;
+              const reducedAmount = Math.floor(totalDamage * reductionRatio);
+              totalDamage = Math.max(1, totalDamage - reducedAmount);
+              elementalMessage += ` ${passive.name} reduced damage!`;
+              break;
+            }
+          }
+        }
+      }
+    }
+
     // --- 6. Log attack message
     if (skillElement === "none") {
       const finalElementalDamage = Math.floor(

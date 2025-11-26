@@ -1342,5 +1342,43 @@
       },
       "elements": ["fire", "metal"]
     }
+  ],
+  "enemy": [
+    {
+      "id": "enemy_e01",
+      "name": "Terracotta Guardian",
+      "rarity": "enemy",
+      "lineage": "ox",
+      "baseStats": {
+        "attack": 80,
+        "defense": 200,
+        "health": 400,
+        "affinity": 40,
+        "agility": 90
+      },
+      "passiveAbilities": ["stone_armor"],
+      "skills": [
+        {
+          "skillId": "basic_attack",
+          "unlockLevel": 1
+        },
+        {
+          "skillId": "basic_attack_earth",
+          "unlockLevel": 1
+        },
+        {
+          "skillId": "def_buff",
+          "unlockLevel": 1
+        }
+      ],
+      "spriteConfig": {
+        "textureUrl": "/sprites/cinderpaw_idle.png",
+        "frameWidth": 128,
+        "frameHeight": 128,
+        "totalFrames": 8,
+        "animationSpeed": 0.1
+      },
+      "elements": ["earth"]
+    }
   ]
 }
