@@ -1364,11 +1364,11 @@
         },
         {
           "skillId": "basic_attack_earth",
-          "unlockLevel": 1
+          "unlockLevel": 3
         },
         {
           "skillId": "def_buff",
-          "unlockLevel": 1
+          "unlockLevel": 6
         }
       ],
       "spriteConfig": {
