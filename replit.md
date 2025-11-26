@@ -31,3 +31,16 @@ Drizzle ORM is configured for PostgreSQL (Neon serverless) with a schema defined
 -   **Validation**: Zod for schema validation.
 -   **Asset Handling**: Vite for 3D models and audio files.
 -   **Session Management**: `connect-pg-simple` (prepared for use).
+
+# Game Design Notes
+
+## Spirit Categories
+- **Player Spirits**: Stored in common/uncommon/rare/epic/legendary categories in spirits.json - these can appear in summon pools
+- **Boss Spirits**: Stored in boss category - used for special boss encounters
+- **Enemy-Only Spirits**: Stored in enemy category - these never appear in summon pools and are for encounter design only (e.g., Terracotta Guardian enemy_e01)
+
+## Passive Abilities
+- **Damage Reduction (stone_armor)**: Reduces all incoming damage by 30%, applied after critical hit calculations in useBattleLogic.ts. Minimum damage is clamped to 1.
+
+## Encounter Reversion Notes
+- **e004**: Originally used spirit_c02 with ai: ["r000"]. Now uses enemy_e01 (Terracotta Guardian). Revert info stored in _originalEnemy and _revertNote fields.
