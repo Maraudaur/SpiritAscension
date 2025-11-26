@@ -76,7 +76,7 @@
       {
         "spiritId": "enemy_e01",
         "level": 9,
-        "ai": ["def_buff", "basic_attack_earth", "basic_attack", "basic_attack_earth"]
+        "ai": ["r000"]
       }
     ],
     "rewards": {

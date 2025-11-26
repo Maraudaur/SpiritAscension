@@ -1821,12 +1821,16 @@ export function useBattleLogic({
           // If this was the end of a complete round (enemy went first), 
           // tick down effect durations before returning
           if (!playerWentFirst) {
-            const { updatedSpirits, updatedEnemies } = tickRoundEndEffects(
-              playerSpirits,
-              battleEnemies
-            );
-            setPlayerSpirits(updatedSpirits);
-            setBattleEnemies(updatedEnemies);
+            // Use functional state update to read CURRENT state (after checkAndHandleSpiritDefeat updates)
+            setPlayerSpirits((currentSpirits) => {
+              const { updatedSpirits, updatedEnemies } = tickRoundEndEffects(
+                currentSpirits,
+                battleEnemies
+              );
+              // Update enemies separately after spirits are updated
+              setTimeout(() => setBattleEnemies(updatedEnemies), 0);
+              return updatedSpirits;
+            });
           }
           return;
         }
@@ -1839,13 +1843,21 @@ export function useBattleLogic({
             setTurnPhase("enemy_start");
           } else {
             // Round is over - tick down effect durations before starting new round
-            const { updatedSpirits, updatedEnemies } = tickRoundEndEffects(
-              playerSpirits,
-              battleEnemies
-            );
-            setPlayerSpirits(updatedSpirits);
-            setBattleEnemies(updatedEnemies);
-            setTurnPhase("round_start");
+            // Use functional state update to read CURRENT state (after DOT damage applied by runPlayerTurnEnd)
+            setPlayerSpirits((currentSpirits) => {
+              const { updatedSpirits, updatedEnemies } = tickRoundEndEffects(
+                currentSpirits,
+                battleEnemies
+              );
+              // Update enemies separately after spirits are updated
+              setTimeout(() => setBattleEnemies(updatedEnemies), 0);
+              return updatedSpirits;
+            });
+            
+            // Delay phase transition to ensure state updates are committed
+            setTimeout(() => {
+              setTurnPhase("round_start");
+            }, 16);
           }
           setIsPaused(false);
         }, TURN_TRANSITION_DELAY);
