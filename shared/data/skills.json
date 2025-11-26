@@ -347,7 +347,7 @@
     "effects": [
       {
         "type": "apply_dot_stack",
-        "damageRatio": 0.05,
+        "damageRatio": 0.125,
         "duration": 5,
         "stacks": 1,
         "maxStacks": 1,
